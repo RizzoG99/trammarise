@@ -1,0 +1,82 @@
+.audio-state {
+  width: 100%;
+  max-width: 800px;
+  animation: fadeIn var(--transition-base);
+}
+
+.audio-info {
+  text-align: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.audio-title {
+  font-size: var(--font-size-2xl);
+  font-weight: 600;
+  margin-bottom: var(--spacing-xs);
+}
+
+.audio-subtitle {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+}
+
+.trim-controls {
+  padding: var(--spacing-md);
+  background: var(--color-bg-glass);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-md);
+  text-align: center;
+}
+
+.trim-instruction {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-md);
+}
+
+.trim-buttons {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.trim-buttons .btn {
+  flex: 1;
+}
+
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-lg);
+}
+
+.action-buttons .btn {
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .action-buttons {
+    flex-direction: row;
+  }
+
+  .action-buttons .btn {
+    flex: 1;
+  }
+
+  .action-buttons .btn-large {
+    flex: 2;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
