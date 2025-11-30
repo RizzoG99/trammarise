@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import WaveSurfer from 'wavesurfer.js';
+import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions.esm.js';
 import type { WaveSurferConfig } from '../types/audio';
 
 interface UseWaveSurferReturn {
   wavesurfer: WaveSurfer | null;
+  regions: RegionsPlugin | null;
   isReady: boolean;
   isPlaying: boolean;
   currentTime: number;
@@ -12,6 +14,7 @@ interface UseWaveSurferReturn {
   play: () => void;
   pause: () => void;
   playPause: () => void;
+  enableRegions: (enable: boolean) => void;
   destroy: () => void;
 }
 
@@ -20,6 +23,7 @@ export const useWaveSurfer = (
   config?: WaveSurferConfig
 ): UseWaveSurferReturn => {
   const wavesurferRef = useRef<WaveSurfer | null>(null);
+  const regionsRef = useRef<RegionsPlugin | null>(null);
   const [isReady, setIsReady] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -43,8 +47,17 @@ export const useWaveSurfer = (
       ...config,
     };
 
+    // Initialize Regions Plugin
+    const regions = RegionsPlugin.create();
+    regionsRef.current = regions;
+
+    // Create audio context for Safari compatibility
+    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+
     const ws = WaveSurfer.create({
       container: containerRef.current,
+      plugins: [regions],
+      audioContext,
       ...defaultConfig,
     });
 
@@ -66,11 +79,23 @@ export const useWaveSurfer = (
       setCurrentTime(ws.getCurrentTime());
     });
 
+    // Resume audio context for Safari (required after user interaction)
+    if (audioContext.state === 'suspended') {
+      const resumeAudio = () => {
+        audioContext.resume().catch(() => {
+          // Silent catch - audio context may already be resumed
+        });
+        document.removeEventListener('click', resumeAudio);
+      };
+      document.addEventListener('click', resumeAudio);
+    }
+
     wavesurferRef.current = ws;
 
     return () => {
       ws.destroy();
       wavesurferRef.current = null;
+      regionsRef.current = null;
     };
   }, [containerRef, config]);
 
@@ -79,7 +104,15 @@ export const useWaveSurfer = (
     if (!wavesurferRef.current) return;
 
     setIsReady(false);
-    wavesurferRef.current.loadBlob(file);
+
+    // Add error handler for debugging
+    wavesurferRef.current.on('error', (error) => {
+      console.error('WaveSurfer error:', error);
+    });
+
+    wavesurferRef.current.loadBlob(file).catch((error) => {
+      console.error('Failed to load audio blob:', error, 'File type:', file.type);
+    });
   }, []);
 
   // Playback controls
@@ -95,9 +128,28 @@ export const useWaveSurfer = (
     wavesurferRef.current?.playPause();
   }, []);
 
+  const enableRegions = useCallback((enable: boolean) => {
+    if (!regionsRef.current || !wavesurferRef.current) return;
+    
+    regionsRef.current.clearRegions();
+    
+    if (enable) {
+      const duration = wavesurferRef.current.getDuration();
+      // Add a default region covering 80% of the track
+      regionsRef.current.addRegion({
+        start: duration * 0.1,
+        end: duration * 0.9,
+        color: 'rgba(139, 92, 246, 0.3)',
+        drag: true,
+        resize: true,
+      });
+    }
+  }, []);
+
   const destroy = useCallback(() => {
     wavesurferRef.current?.destroy();
     wavesurferRef.current = null;
+    regionsRef.current = null;
     setIsReady(false);
     setIsPlaying(false);
     setCurrentTime(0);
@@ -106,6 +158,7 @@ export const useWaveSurfer = (
 
   return {
     wavesurfer: wavesurferRef.current,
+    regions: regionsRef.current,
     isReady,
     isPlaying,
     currentTime,
@@ -114,6 +167,7 @@ export const useWaveSurfer = (
     play,
     pause,
     playPause,
+    enableRegions,
     destroy,
   };
 };

@@ -37,7 +37,22 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
       setError(null);
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
-      const mediaRecorder = new MediaRecorder(stream);
+      // Determine the best audio format based on browser support
+      let mimeType = 'audio/webm';
+      const options = { mimeType };
+
+      // Check for Safari and use appropriate format
+      if (!MediaRecorder.isTypeSupported(mimeType)) {
+        // Fallback to audio/mp4 for Safari
+        if (MediaRecorder.isTypeSupported('audio/mp4')) {
+          mimeType = 'audio/mp4';
+        } else {
+          // Final fallback without specifying mime type (browser default)
+          delete (options as Partial<MediaRecorderOptions>).mimeType;
+        }
+      }
+
+      const mediaRecorder = new MediaRecorder(stream, options);
       chunksRef.current = [];
 
       mediaRecorder.ondataavailable = (e) => {
@@ -47,7 +62,7 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
       };
 
       mediaRecorder.onstop = () => {
-        const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
+        const blob = new Blob(chunksRef.current, { type: mimeType });
         setAudioBlob(blob);
         setIsRecording(false);
 
@@ -71,6 +86,10 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
       timerRef.current = window.setInterval(() => {
         const elapsed = Math.floor((Date.now() - startTimeRef.current) / 1000);
         setDuration(elapsed);
+        // Request data periodically for better Safari support
+        if (mediaRecorder.state === 'recording') {
+          mediaRecorder.requestData();
+        }
       }, 100);
     } catch (err) {
       console.error('Error accessing microphone:', err);

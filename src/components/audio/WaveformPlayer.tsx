@@ -1,10 +1,18 @@
 import React, { useRef, useEffect } from 'react';
 import { useWaveSurfer } from '../../hooks/useWaveSurfer';
+import WaveSurfer from 'wavesurfer.js';
+import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions.esm.js';
 import './WaveformPlayer.css';
+
+export interface WaveformPlayerRef {
+  wavesurfer: WaveSurfer;
+  regions: RegionsPlugin | null;
+  enableRegions: (enable: boolean) => void;
+}
 
 interface WaveformPlayerProps {
   audioFile: File | Blob | null;
-  onWaveSurferReady?: (ws: any) => void;
+  onWaveSurferReady?: (player: WaveformPlayerRef) => void;
   onPlaybackChange?: (isPlaying: boolean) => void;
   onTimeUpdate?: (currentTime: number, duration: number) => void;
 }
@@ -16,7 +24,7 @@ export const WaveformPlayer: React.FC<WaveformPlayerProps> = ({
   onTimeUpdate,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const { wavesurfer, isPlaying, currentTime, duration, loadAudio } =
+  const { wavesurfer, regions, enableRegions, isPlaying, currentTime, duration, loadAudio } =
     useWaveSurfer(containerRef);
 
   // Load audio when file changes
@@ -26,12 +34,16 @@ export const WaveformPlayer: React.FC<WaveformPlayerProps> = ({
     }
   }, [audioFile, loadAudio]);
 
-  // Notify parent of wavesurfer instance
+  // Notify parent of wavesurfer instance and controls
   useEffect(() => {
     if (wavesurfer && onWaveSurferReady) {
-      onWaveSurferReady(wavesurfer);
+      onWaveSurferReady({ 
+        wavesurfer, 
+        regions,
+        enableRegions 
+      });
     }
-  }, [wavesurfer, onWaveSurferReady]);
+  }, [wavesurfer, regions, enableRegions, onWaveSurferReady]);
 
   // Notify parent of playback changes
   useEffect(() => {

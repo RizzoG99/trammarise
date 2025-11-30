@@ -7,8 +7,11 @@ interface PlaybackControlsProps {
   isPlaying: boolean;
   currentTime: number;
   duration: number;
+  isTrimming: boolean;
   onPlayPause: () => void;
   onTrimClick: () => void;
+  onApplyTrim: () => void;
+  onCancelTrim: () => void;
 }
 
 const PlayIcon = () => (
@@ -29,12 +32,27 @@ const TrimIcon = () => (
   </svg>
 );
 
+const CheckIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M20 6L9 17l-5-5" />
+  </svg>
+);
+
+const XIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M18 6L6 18M6 6l12 12" />
+  </svg>
+);
+
 export const PlaybackControls: React.FC<PlaybackControlsProps> = ({
   isPlaying,
   currentTime,
   duration,
+  isTrimming,
   onPlayPause,
   onTrimClick,
+  onApplyTrim,
+  onCancelTrim,
 }) => {
   return (
     <div className="playback-controls">
@@ -48,9 +66,22 @@ export const PlaybackControls: React.FC<PlaybackControlsProps> = ({
         <span>{formatTime(duration)}</span>
       </div>
 
-      <Button variant="small" icon={<TrimIcon />} onClick={onTrimClick}>
-        Trim Audio
-      </Button>
+      <div className={`trim-button-container ${isTrimming ? 'trimming' : ''}`}>
+        {isTrimming ? (
+          <div className="trim-actions">
+            <Button variant="circle-thick" onClick={onApplyTrim} title="Apply Trim">
+              <CheckIcon />
+            </Button>
+            <Button variant="small" onClick={onCancelTrim} title="Cancel Trim">
+              <XIcon />
+            </Button>
+          </div>
+        ) : (
+          <Button variant="small" icon={<TrimIcon />} onClick={onTrimClick}>
+            Trim Audio
+          </Button>
+        )}
+      </div>
     </div>
   );
 };
