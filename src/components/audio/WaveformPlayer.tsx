@@ -8,6 +8,10 @@ export interface WaveformPlayerRef {
   wavesurfer: WaveSurfer;
   regions: RegionsPlugin | null;
   enableRegions: (enable: boolean) => void;
+  enableRegionSelection: () => void;
+  disableRegionSelection: () => void;
+  getActiveRegion: () => any;
+  clearRegions: () => void;
 }
 
 interface WaveformPlayerProps {
@@ -47,15 +51,18 @@ export const WaveformPlayer: React.FC<WaveformPlayerProps> = ({
   // Notify parent of wavesurfer instance with region methods
   useEffect(() => {
     if (wavesurfer && onWaveSurferReady) {
-      onWaveSurferReady({
-        ...wavesurfer,
+      const playerRef: WaveformPlayerRef = {
+        wavesurfer,
+        regions: waveSurferInstance.regions,
+        enableRegions: waveSurferInstance.enableRegions,
         enableRegionSelection,
         disableRegionSelection,
         getActiveRegion,
         clearRegions,
-      });
+      };
+      onWaveSurferReady(playerRef);
     }
-  }, [wavesurfer, onWaveSurferReady, enableRegionSelection, disableRegionSelection, getActiveRegion, clearRegions]);
+  }, [wavesurfer, waveSurferInstance.regions, waveSurferInstance.enableRegions, onWaveSurferReady, enableRegionSelection, disableRegionSelection, getActiveRegion, clearRegions]);
 
   // Notify parent of playback changes
   useEffect(() => {

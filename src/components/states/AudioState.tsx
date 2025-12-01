@@ -53,31 +53,18 @@ export const AudioState: React.FC<AudioStateProps> = ({
 
     if (newShowTrim) {
       // Enable region selection when entering trim mode
-      wavesurferRef.current?.enableRegionSelection?.();
+      playerRef.current?.enableRegions(true);
     } else {
       // Disable and clear regions when exiting trim mode
-      wavesurferRef.current?.disableRegionSelection?.();
-      wavesurferRef.current?.clearRegions?.();
+      playerRef.current?.enableRegions(false);
+      playerRef.current?.clearRegions();
     }
   };
 
-  const handleApplyTrim = () => {
-    const region = wavesurferRef.current?.getActiveRegion?.();
-
-    if (!region) {
-      alert('Please select a region on the waveform by clicking and dragging.');
-      return;
-    }
-
-    alert(
-      `Trim applied!\n\nSelected region: ${region.start.toFixed(2)}s to ${region.end.toFixed(2)}s\n\nThis will be implemented to actually trim the audio in the next phase.`
-    );
-
-    // Clear region and exit trim mode
-    wavesurferRef.current?.clearRegions?.();
-    wavesurferRef.current?.disableRegionSelection?.();
-    setShowTrim(false);
+  const handleCancelTrim = () => {
+    playerRef.current?.clearRegions();
     playerRef.current?.enableRegions(false);
+    setShowTrim(false);
   };
 
   const handleApplyTrim = async () => {
