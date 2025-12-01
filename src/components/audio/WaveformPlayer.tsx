@@ -1,10 +1,18 @@
 import React, { useRef, useEffect } from 'react';
 import { useWaveSurfer } from '../../hooks/useWaveSurfer';
+import WaveSurfer from 'wavesurfer.js';
+import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions.esm.js';
 import './WaveformPlayer.css';
+
+export interface WaveformPlayerRef {
+  wavesurfer: WaveSurfer;
+  regions: RegionsPlugin | null;
+  enableRegions: (enable: boolean) => void;
+}
 
 interface WaveformPlayerProps {
   audioFile: File | Blob | null;
-  onWaveSurferReady?: (ws: any) => void;
+  onWaveSurferReady?: (player: WaveformPlayerRef) => void;
   onPlaybackChange?: (isPlaying: boolean) => void;
   onTimeUpdate?: (currentTime: number, duration: number) => void;
 }

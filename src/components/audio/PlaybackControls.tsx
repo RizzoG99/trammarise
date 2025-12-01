@@ -7,16 +7,22 @@ interface PlaybackControlsProps {
   isPlaying: boolean;
   currentTime: number;
   duration: number;
+  isTrimming: boolean;
   onPlayPause: () => void;
   onTrimClick: () => void;
+  onApplyTrim: () => void;
+  onCancelTrim: () => void;
 }
 
 export const PlaybackControls: React.FC<PlaybackControlsProps> = ({
   isPlaying,
   currentTime,
   duration,
+  isTrimming,
   onPlayPause,
   onTrimClick,
+  onApplyTrim,
+  onCancelTrim,
 }) => {
   return (
     <div className="playback-controls">
@@ -30,9 +36,22 @@ export const PlaybackControls: React.FC<PlaybackControlsProps> = ({
         <span>{formatTime(duration)}</span>
       </div>
 
-      <button className="control-btn trim-btn" onClick={onTrimClick} aria-label="Trim Audio">
-        <TrimIcon />
-      </button>
+      <div className={`trim-button-container ${isTrimming ? 'trimming' : ''}`}>
+        {isTrimming ? (
+          <div className="trim-actions">
+            <Button variant="circle-thick" onClick={onApplyTrim} title="Apply Trim">
+              <CheckIcon />
+            </Button>
+            <Button variant="small" onClick={onCancelTrim} title="Cancel Trim">
+              <XIcon />
+            </Button>
+          </div>
+        ) : (
+          <Button variant="small" icon={<TrimIcon />} onClick={onTrimClick}>
+            Trim Audio
+          </Button>
+        )}
+      </div>
     </div>
   );
 };

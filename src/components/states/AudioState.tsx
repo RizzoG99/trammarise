@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { WaveformPlayer } from '../audio/WaveformPlayer';
+import type { WaveformPlayerRef } from '../audio/WaveformPlayer';
 import { PlaybackControls } from '../audio/PlaybackControls';
 import { Button } from '../ui/Button';
 import './AudioState.css';
@@ -17,6 +18,13 @@ const ProcessIcon = () => (
   </svg>
 );
 
+type MessageType = 'success' | 'error' | 'info';
+
+interface Message {
+  text: string;
+  type: MessageType;
+}
+
 export const AudioState: React.FC<AudioStateProps> = ({
   audioFile,
   audioName,
@@ -27,10 +35,16 @@ export const AudioState: React.FC<AudioStateProps> = ({
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [showTrim, setShowTrim] = useState(false);
-  const wavesurferRef = useRef<any>(null);
+  const [message, setMessage] = useState<Message | null>(null);
+  const playerRef = useRef<WaveformPlayerRef | null>(null);
+
+  const showMessage = (text: string, type: MessageType) => {
+    setMessage({ text, type });
+    setTimeout(() => setMessage(null), 4000);
+  };
 
   const handlePlayPause = () => {
-    wavesurferRef.current?.playPause();
+    playerRef.current?.wavesurfer?.playPause();
   };
 
   const handleTrimClick = () => {
@@ -63,6 +77,41 @@ export const AudioState: React.FC<AudioStateProps> = ({
     wavesurferRef.current?.clearRegions?.();
     wavesurferRef.current?.disableRegionSelection?.();
     setShowTrim(false);
+    playerRef.current?.enableRegions(false);
+  };
+
+  const handleApplyTrim = async () => {
+    const regions = playerRef.current?.regions?.getRegions();
+    
+    if (regions && regions.length > 0) {
+      const region = regions[0];
+      const start = region.start;
+      const end = region.end;
+      
+      try {
+        const wavesurfer = playerRef.current?.wavesurfer;
+        if (!wavesurfer) return;
+
+        const audioBuffer = wavesurfer.getDecodedData();
+        
+        if (audioBuffer) {
+          // Import the trim utility dynamically
+          const { trimAudioBuffer, audioBufferToWav } = await import('../../utils/audio');
+          const trimmedBuffer = await trimAudioBuffer(audioBuffer, start, end);
+          const blob = audioBufferToWav(trimmedBuffer);
+          
+          await wavesurfer.loadBlob(blob);
+          handleCancelTrim();
+
+          showMessage('Audio trimmed successfully!', 'success');
+        }
+      } catch (error) {
+        console.error('Error trimming audio:', error);
+        showMessage('Failed to trim audio. Please try again.', 'error');
+      }
+    } else {
+      showMessage('Please select a region to trim', 'info');
+    }
   };
 
   const handleProcess = () => {
@@ -77,9 +126,15 @@ export const AudioState: React.FC<AudioStateProps> = ({
         <p className="audio-subtitle">Visualize and trim your audio below</p>
       </div>
 
+      {message && (
+        <div className={`message message-${message.type}`}>
+          {message.text}
+        </div>
+      )}
+
       <WaveformPlayer
         audioFile={audioFile}
-        onWaveSurferReady={(ws) => (wavesurferRef.current = ws)}
+        onWaveSurferReady={(player) => (playerRef.current = player)}
         onPlaybackChange={setIsPlaying}
         onTimeUpdate={(time, dur) => {
           setCurrentTime(time);
@@ -91,8 +146,11 @@ export const AudioState: React.FC<AudioStateProps> = ({
         isPlaying={isPlaying}
         currentTime={currentTime}
         duration={duration}
+        isTrimming={showTrim}
         onPlayPause={handlePlayPause}
         onTrimClick={handleTrimClick}
+        onApplyTrim={handleApplyTrim}
+        onCancelTrim={handleCancelTrim}
       />
 
       {showTrim && (

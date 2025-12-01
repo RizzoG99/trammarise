@@ -19,6 +19,7 @@ function App() {
   });
   const [result, setResult] = useState<ProcessingResult | null>(null);
   const [aiConfiguration, setAiConfiguration] = useState<AIConfiguration | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const { isRecording, duration, audioBlob, startRecording, stopRecording, error } =
     useAudioRecorder();
@@ -34,10 +35,11 @@ function App() {
     }
   }, [audioBlob, isRecording]);
 
-  // Show error alerts
+  // Show error messages
   useEffect(() => {
     if (error) {
-      alert(error);
+      setErrorMessage(error);
+      setTimeout(() => setErrorMessage(null), 4000);
     }
   }, [error]);
 
@@ -48,6 +50,8 @@ function App() {
     });
     setAppState('audio');
   };
+
+
 
   const handleStartRecording = async () => {
     await startRecording();
@@ -111,6 +115,12 @@ function App() {
   return (
     <div className="container">
       <main className="main-content">
+        {errorMessage && (
+          <div className="error-message">
+            {errorMessage}
+          </div>
+        )}
+
         {appState === 'initial' && (
           <InitialState
             onFileUpload={handleFileUpload}
