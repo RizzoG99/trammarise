@@ -35,6 +35,10 @@
   height: 24px;
 }
 
+.trim-btn {
+  background: var(--color-accent-success);
+}
+
 .time-display {
   display: flex;
   align-items: center;
