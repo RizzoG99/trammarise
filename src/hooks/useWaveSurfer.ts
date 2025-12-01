@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import WaveSurfer from 'wavesurfer.js';
+import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions';
 import type { WaveSurferConfig } from '../types/audio';
 
 interface UseWaveSurferReturn {
@@ -13,6 +14,10 @@ interface UseWaveSurferReturn {
   pause: () => void;
   playPause: () => void;
   destroy: () => void;
+  enableRegionSelection: () => void;
+  disableRegionSelection: () => void;
+  getActiveRegion: () => { start: number; end: number } | null;
+  clearRegions: () => void;
 }
 
 export const useWaveSurfer = (
@@ -20,6 +25,7 @@ export const useWaveSurfer = (
   config?: WaveSurferConfig
 ): UseWaveSurferReturn => {
   const wavesurferRef = useRef<WaveSurfer | null>(null);
+  const regionsPluginRef = useRef<RegionsPlugin | null>(null);
   const [isReady, setIsReady] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -48,6 +54,10 @@ export const useWaveSurfer = (
       ...defaultConfig,
     });
 
+    // Initialize regions plugin
+    const regions = ws.registerPlugin(RegionsPlugin.create());
+    regionsPluginRef.current = regions;
+
     // Event listeners
     ws.on('ready', () => {
       setIsReady(true);
@@ -71,6 +81,7 @@ export const useWaveSurfer = (
     return () => {
       ws.destroy();
       wavesurferRef.current = null;
+      regionsPluginRef.current = null;
     };
   }, [containerRef, config]);
 
@@ -104,6 +115,62 @@ export const useWaveSurfer = (
     setDuration(0);
   }, []);
 
+  // Region selection controls
+  const enableRegionSelection = useCallback(() => {
+    if (!regionsPluginRef.current) return;
+
+    // Clear any existing regions first
+    regionsPluginRef.current.clearRegions();
+
+    // Enable drag selection on the waveform
+    regionsPluginRef.current.enableDragSelection({
+      color: 'rgba(139, 92, 246, 0.3)',
+    });
+
+    // Listen for region-created event to ensure only one region exists
+    regionsPluginRef.current.on('region-created', () => {
+      const regions = regionsPluginRef.current?.getRegions() || [];
+      // If more than one region exists, keep only the most recent one
+      if (regions.length > 1) {
+        // Remove all but the last region
+        for (let i = 0; i < regions.length - 1; i++) {
+          regions[i].remove();
+        }
+      }
+    });
+  }, []);
+
+  const disableRegionSelection = useCallback(() => {
+    if (!regionsPluginRef.current) return;
+
+    // Disable drag selection
+    regionsPluginRef.current.enableDragSelection({
+      color: 'rgba(139, 92, 246, 0.3)',
+    });
+    // Note: WaveSurfer doesn't have a direct disable method,
+    // so we clear regions instead when exiting trim mode
+  }, []);
+
+  const getActiveRegion = useCallback(() => {
+    if (!regionsPluginRef.current) return null;
+
+    const regions = regionsPluginRef.current.getRegions();
+    if (regions.length === 0) return null;
+
+    // Get the first/most recent region
+    const region = regions[0];
+    return {
+      start: region.start,
+      end: region.end,
+    };
+  }, []);
+
+  const clearRegions = useCallback(() => {
+    if (!regionsPluginRef.current) return;
+
+    regionsPluginRef.current.clearRegions();
+  }, []);
+
   return {
     wavesurfer: wavesurferRef.current,
     isReady,
@@ -115,5 +182,9 @@ export const useWaveSurfer = (
     pause,
     playPause,
     destroy,
+    enableRegionSelection,
+    disableRegionSelection,
+    getActiveRegion,
+    clearRegions,
   };
 };

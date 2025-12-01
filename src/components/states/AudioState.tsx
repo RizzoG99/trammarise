@@ -8,6 +8,7 @@ interface AudioStateProps {
   audioFile: File | Blob;
   audioName: string;
   onReset: () => void;
+  onProcessingStart: () => void;
 }
 
 const ProcessIcon = () => (
@@ -20,6 +21,7 @@ export const AudioState: React.FC<AudioStateProps> = ({
   audioFile,
   audioName,
   onReset,
+  onProcessingStart,
 }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -32,18 +34,40 @@ export const AudioState: React.FC<AudioStateProps> = ({
   };
 
   const handleTrimClick = () => {
-    setShowTrim(!showTrim);
+    const newShowTrim = !showTrim;
+    setShowTrim(newShowTrim);
+
+    if (newShowTrim) {
+      // Enable region selection when entering trim mode
+      wavesurferRef.current?.enableRegionSelection?.();
+    } else {
+      // Disable and clear regions when exiting trim mode
+      wavesurferRef.current?.disableRegionSelection?.();
+      wavesurferRef.current?.clearRegions?.();
+    }
   };
 
   const handleApplyTrim = () => {
-    // Simplified trim - just trim to 50%
-    const duration = wavesurferRef.current?.getDuration() || 0;
-    alert(`Trim would keep first 50% of audio (0 to ${(duration * 0.5).toFixed(1)}s)`);
+    const region = wavesurferRef.current?.getActiveRegion?.();
+
+    if (!region) {
+      alert('Please select a region on the waveform by clicking and dragging.');
+      return;
+    }
+
+    alert(
+      `Trim applied!\n\nSelected region: ${region.start.toFixed(2)}s to ${region.end.toFixed(2)}s\n\nThis will be implemented to actually trim the audio in the next phase.`
+    );
+
+    // Clear region and exit trim mode
+    wavesurferRef.current?.clearRegions?.();
+    wavesurferRef.current?.disableRegionSelection?.();
     setShowTrim(false);
   };
 
   const handleProcess = () => {
-    alert('Audio processing will be implemented in the next phase.\\n\\nThis will transcribe and summarize the audio.');
+    // Trigger configuration state
+    onProcessingStart();
   };
 
   return (
@@ -74,13 +98,13 @@ export const AudioState: React.FC<AudioStateProps> = ({
       {showTrim && (
         <div className="trim-controls">
           <p className="trim-instruction">
-            Audio duration: {duration.toFixed(1)}s. Trim keeps first 50% by default.
+            Click and drag on the waveform to select the portion of audio you want to keep.
           </p>
           <div className="trim-buttons">
             <Button variant="success" onClick={handleApplyTrim}>
               Apply Trim
             </Button>
-            <Button variant="outline" onClick={() => setShowTrim(false)}>
+            <Button variant="outline" onClick={handleTrimClick}>
               Cancel
             </Button>
           </div>

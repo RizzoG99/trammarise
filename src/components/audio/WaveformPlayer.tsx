@@ -16,8 +16,18 @@ export const WaveformPlayer: React.FC<WaveformPlayerProps> = ({
   onTimeUpdate,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const { wavesurfer, isPlaying, currentTime, duration, loadAudio } =
-    useWaveSurfer(containerRef);
+  const waveSurferInstance = useWaveSurfer(containerRef);
+  const {
+    wavesurfer,
+    isPlaying,
+    currentTime,
+    duration,
+    loadAudio,
+    enableRegionSelection,
+    disableRegionSelection,
+    getActiveRegion,
+    clearRegions,
+  } = waveSurferInstance;
 
   // Load audio when file changes
   useEffect(() => {
@@ -26,12 +36,18 @@ export const WaveformPlayer: React.FC<WaveformPlayerProps> = ({
     }
   }, [audioFile, loadAudio]);
 
-  // Notify parent of wavesurfer instance
+  // Notify parent of wavesurfer instance with region methods
   useEffect(() => {
     if (wavesurfer && onWaveSurferReady) {
-      onWaveSurferReady(wavesurfer);
+      onWaveSurferReady({
+        ...wavesurfer,
+        enableRegionSelection,
+        disableRegionSelection,
+        getActiveRegion,
+        clearRegions,
+      });
     }
-  }, [wavesurfer, onWaveSurferReady]);
+  }, [wavesurfer, onWaveSurferReady, enableRegionSelection, disableRegionSelection, getActiveRegion, clearRegions]);
 
   // Notify parent of playback changes
   useEffect(() => {
