@@ -43,12 +43,41 @@ function App() {
     }
   }, [error]);
 
-  const handleFileUpload = (file: File) => {
-    setAudioFile({
-      name: file.name,
-      blob: file,
-    });
-    setAppState('audio');
+  const handleFileUpload = async (file: File, shouldCompress: boolean) => {
+    if (shouldCompress) {
+      // Show processing state during compression
+      setAppState('processing');
+      setProcessingData({ step: 'compressing', progress: 0 });
+
+      try {
+        const { compressAudioFile } = await import('./utils/audioCompression');
+
+        const compressedBlob = await compressAudioFile(file, (progress) => {
+          setProcessingData({ step: 'compressing', progress });
+        });
+
+        setAudioFile({
+          name: file.name,
+          blob: compressedBlob,
+        });
+        setAppState('audio');
+      } catch (error: any) {
+        console.error('Compression error:', error);
+        setErrorMessage('Failed to compress audio. Loading original file...');
+        // Fallback to original file
+        setAudioFile({
+          name: file.name,
+          blob: file,
+        });
+        setAppState('audio');
+      }
+    } else {
+      setAudioFile({
+        name: file.name,
+        blob: file,
+      });
+      setAppState('audio');
+    }
   };
 
 

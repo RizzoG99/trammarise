@@ -51,6 +51,9 @@ export const useWaveSurfer = (
       ...config,
     };
 
+    // Create audio context for Safari compatibility
+    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+
     const ws = WaveSurfer.create({
       container: containerRef.current,
       ...defaultConfig,

@@ -10,7 +10,7 @@ export class OpenAIProvider implements AIProvider {
     const systemPrompt = this.buildSummarizePrompt(contentType);
 
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4',
+      model: 'gpt-5',
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: `Please summarize this transcript:\n\n${transcript}` }

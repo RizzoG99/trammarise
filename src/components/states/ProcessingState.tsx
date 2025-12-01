@@ -12,6 +12,8 @@ export const ProcessingState: React.FC<ProcessingStateProps> = ({ processingData
 
   const getMessage = () => {
     switch (step) {
+      case 'compressing':
+        return 'Optimizing audio for processing...';
       case 'transcribing':
         return 'Transcribing audio with Whisper...';
       case 'configuring':
@@ -27,6 +29,8 @@ export const ProcessingState: React.FC<ProcessingStateProps> = ({ processingData
 
   const getStepNumber = () => {
     switch (step) {
+      case 'compressing':
+        return 'Optimizing';
       case 'transcribing':
         return '1/2';
       case 'configuring':

@@ -1,9 +1,12 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { Button } from '../ui/Button';
+import { FileSizeWarningModal } from '../ui/FileSizeWarningModal';
+import { getFileSizeStatus } from '../../utils/fileSize';
+import type { FileSizeStatus } from '../../utils/fileSize';
 import './InitialState.css';
 
 interface InitialStateProps {
-  onFileUpload: (file: File) => void;
+  onFileUpload: (file: File, shouldCompress: boolean) => void;
   onStartRecording: () => void;
 }
 
@@ -31,14 +34,37 @@ export const InitialState: React.FC<InitialStateProps> = ({
   onStartRecording,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [isDragging, setIsDragging] = React.useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [showWarningModal, setShowWarningModal] = useState(false);
+  const [currentFile, setCurrentFile] = useState<File | null>(null);
+  const [fileSizeStatus, setFileSizeStatus] = useState<FileSizeStatus | null>(null);
+
+  const handleFileValidation = (file: File) => {
+    if (!file.type.startsWith('audio/')) {
+      alert('Please select a valid audio file');
+      return;
+    }
+
+    const status = getFileSizeStatus(file.size);
+    setFileSizeStatus(status);
+    setCurrentFile(file);
+
+    if (status.isTooLarge) {
+      // File is too large, must compress
+      setShowWarningModal(true);
+    } else if (status.needsWarning) {
+      // File is large, show warning with option to compress or proceed
+      setShowWarningModal(true);
+    } else {
+      // File size is acceptable, proceed directly
+      onFileUpload(file, false);
+    }
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file && file.type.startsWith('audio/')) {
-      onFileUpload(file);
-    } else if (file) {
-      alert('Please select a valid audio file');
+    if (file) {
+      handleFileValidation(file);
     }
   };
 
@@ -60,49 +86,81 @@ export const InitialState: React.FC<InitialStateProps> = ({
     setIsDragging(false);
 
     const file = e.dataTransfer.files[0];
-    if (file && file.type.startsWith('audio/')) {
-      onFileUpload(file);
-    } else if (file) {
-      alert('Please select a valid audio file');
+    if (file) {
+      handleFileValidation(file);
     }
   };
 
+  const handleProceedWithoutCompression = () => {
+    if (currentFile) {
+      onFileUpload(currentFile, false);
+      setShowWarningModal(false);
+      setCurrentFile(null);
+    }
+  };
+
+  const handleCompressAndProceed = () => {
+    if (currentFile) {
+      onFileUpload(currentFile, true);
+      setShowWarningModal(false);
+      setCurrentFile(null);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setShowWarningModal(false);
+    setCurrentFile(null);
+    setFileSizeStatus(null);
+  };
+
   return (
-    <div className="initial-state">
-      <div className="welcome-text">
-        <h1 className="title">Transform Your Audio</h1>
-        <p className="subtitle">
-          Upload an audio file or start recording to transcribe and summarize
-        </p>
+    <>
+      <div className="initial-state">
+        <div className="welcome-text">
+          <h1 className="title">Transform Your Audio</h1>
+          <p className="subtitle">
+            Upload an audio file or start recording to transcribe and summarize
+          </p>
+        </div>
+
+        <div className="action-buttons">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="audio/*"
+            onChange={handleFileChange}
+            style={{ display: 'none' }}
+          />
+
+          <Button variant="primary" icon={<UploadIcon />} onClick={handleUploadClick}>
+            Upload Audio
+          </Button>
+
+          <Button variant="secondary" icon={<RecordIcon />} onClick={onStartRecording}>
+            Start Recording
+          </Button>
+        </div>
+
+        <div
+          className={`drop-zone ${isDragging ? 'drag-over' : ''}`}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+        >
+          <DropIcon />
+          <p>or drag and drop audio file here</p>
+        </div>
       </div>
 
-      <div className="action-buttons">
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="audio/*"
-          onChange={handleFileChange}
-          style={{ display: 'none' }}
+      {fileSizeStatus && (
+        <FileSizeWarningModal
+          isOpen={showWarningModal}
+          onClose={handleCloseModal}
+          fileSizeStatus={fileSizeStatus}
+          onProceed={handleProceedWithoutCompression}
+          onCompress={handleCompressAndProceed}
         />
-
-        <Button variant="primary" icon={<UploadIcon />} onClick={handleUploadClick}>
-          Upload Audio
-        </Button>
-
-        <Button variant="secondary" icon={<RecordIcon />} onClick={onStartRecording}>
-          Start Recording
-        </Button>
-      </div>
-
-      <div
-        className={`drop-zone ${isDragging ? 'drag-over' : ''}`}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
-      >
-        <DropIcon />
-        <p>or drag and drop audio file here</p>
-      </div>
-    </div>
+      )}
+    </>
   );
 };
