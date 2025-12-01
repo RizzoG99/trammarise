@@ -1,6 +1,10 @@
-export * from './PlayIcon';
-export * from './PauseIcon';
-export * from './TrimIcon';
-export * from './CheckIcon';
-export * from './XIcon';
+// Export Lucide React icons with the same names as before
+// This maintains backward compatibility with existing imports
+export { 
+  Play as PlayIcon,
+  Pause as PauseIcon,
+  Scissors as TrimIcon,
+  Check as CheckIcon,
+  X as XIcon,
+} from 'lucide-react';
 // Add others as we create them
