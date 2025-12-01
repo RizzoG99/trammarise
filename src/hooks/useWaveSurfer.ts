@@ -51,17 +51,8 @@ export const useWaveSurfer = (
       ...config,
     };
 
-    // Initialize Regions Plugin
-    const regions = RegionsPlugin.create();
-    regionsRef.current = regions;
-
-    // Create audio context for Safari compatibility
-    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-
     const ws = WaveSurfer.create({
       container: containerRef.current,
-      plugins: [regions],
-      audioContext,
       ...defaultConfig,
     });
 
@@ -86,17 +77,6 @@ export const useWaveSurfer = (
     ws.on('seeking', () => {
       setCurrentTime(ws.getCurrentTime());
     });
-
-    // Resume audio context for Safari (required after user interaction)
-    if (audioContext.state === 'suspended') {
-      const resumeAudio = () => {
-        audioContext.resume().catch(() => {
-          // Silent catch - audio context may already be resumed
-        });
-        document.removeEventListener('click', resumeAudio);
-      };
-      document.addEventListener('click', resumeAudio);
-    }
 
     wavesurferRef.current = ws;
 
@@ -137,14 +117,14 @@ export const useWaveSurfer = (
   }, []);
 
   const enableRegions = useCallback((enable: boolean) => {
-    if (!regionsRef.current || !wavesurferRef.current) return;
-    
-    regionsRef.current.clearRegions();
-    
+    if (!regionsPluginRef.current || !wavesurferRef.current) return;
+
+    regionsPluginRef.current.clearRegions();
+
     if (enable) {
       const duration = wavesurferRef.current.getDuration();
       // Add a default region covering 80% of the track
-      regionsRef.current.addRegion({
+      regionsPluginRef.current.addRegion({
         start: duration * 0.1,
         end: duration * 0.9,
         color: 'rgba(139, 92, 246, 0.3)',
@@ -157,7 +137,7 @@ export const useWaveSurfer = (
   const destroy = useCallback(() => {
     wavesurferRef.current?.destroy();
     wavesurferRef.current = null;
-    regionsRef.current = null;
+    regionsPluginRef.current = null;
     setIsReady(false);
     setIsPlaying(false);
     setCurrentTime(0);
@@ -222,7 +202,7 @@ export const useWaveSurfer = (
 
   return {
     wavesurfer: wavesurferRef.current,
-    regions: regionsRef.current,
+    regions: regionsPluginRef.current,
     isReady,
     isPlaying,
     currentTime,
