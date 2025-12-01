@@ -62,15 +62,17 @@
 
 .trim-button-container {
   animation: fadeInOut var(--transition-base) ease-in-out;
+  flex: 1;
 }
 
 .trim-button-container.trimming {
   animation: fadeInOut var(--transition-base) ease-in-out;
+  flex: 1;
 }
 
 .trim-actions {
   display: flex;
-  align-items: center;
+  justify-content: center;
   gap: var(--spacing-md);
   animation: slideInRight var(--transition-base) ease-in-out;
 }

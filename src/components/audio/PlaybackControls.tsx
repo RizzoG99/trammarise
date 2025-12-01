@@ -27,24 +27,28 @@ export const PlaybackControls: React.FC<PlaybackControlsProps> = ({
 }) => {
   return (
     <div className="playback-controls">
-      <button className="control-btn" onClick={onPlayPause} aria-label="Play/Pause">
-        {isPlaying ? <PauseIcon /> : <PlayIcon />}
-      </button>
+      {!isTrimming && (
+        <>
+          <button className="control-btn" onClick={onPlayPause} aria-label="Play/Pause">
+            {isPlaying ? <PauseIcon /> : <PlayIcon />}
+          </button>
 
-      <div className="time-display">
-        <span>{formatTime(currentTime)}</span>
-        <span className="time-separator">/</span>
-        <span>{formatTime(duration)}</span>
-      </div>
+          <div className="time-display">
+            <span>{formatTime(currentTime)}</span>
+            <span className="time-separator">/</span>
+            <span>{formatTime(duration)}</span>
+          </div>
+        </>
+      )}
 
       <div className={`trim-button-container ${isTrimming ? 'trimming' : ''}`}>
         {isTrimming ? (
           <div className="trim-actions">
-            <Button variant="circle-thick" onClick={onApplyTrim} title="Apply Trim">
-              <CheckIcon />
+            <Button variant="success" icon={<CheckIcon />} onClick={onApplyTrim} title="Save trimmed audio">
+              Save
             </Button>
-            <Button variant="small" onClick={onCancelTrim} title="Cancel Trim">
-              <XIcon />
+            <Button variant="danger" icon={<XIcon />} onClick={onCancelTrim} title="Cancel and discard trim">
+              Cancel
             </Button>
           </div>
         ) : (

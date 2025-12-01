@@ -140,22 +140,6 @@ export const AudioState: React.FC<AudioStateProps> = ({
         onCancelTrim={handleCancelTrim}
       />
 
-      {showTrim && (
-        <div className="trim-controls">
-          <p className="trim-instruction">
-            Click and drag on the waveform to select the portion of audio you want to keep.
-          </p>
-          <div className="trim-buttons">
-            <Button variant="success" onClick={handleApplyTrim}>
-              Apply Trim
-            </Button>
-            <Button variant="outline" onClick={handleTrimClick}>
-              Cancel
-            </Button>
-          </div>
-        </div>
-      )}
-
       <div className="action-buttons">
         <Button variant="large" icon={<ProcessIcon />} onClick={handleProcess}>
           Process Audio

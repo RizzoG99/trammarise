@@ -8,6 +8,8 @@ import './InitialState.css';
 interface InitialStateProps {
   onFileUpload: (file: File, shouldCompress: boolean) => void;
   onStartRecording: () => void;
+  hasMicrophoneAccess: boolean | null;
+  onRecordingAttempt: () => void;
 }
 
 const UploadIcon = () => (
@@ -32,6 +34,8 @@ const DropIcon = () => (
 export const InitialState: React.FC<InitialStateProps> = ({
   onFileUpload,
   onStartRecording,
+  hasMicrophoneAccess,
+  onRecordingAttempt,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -113,6 +117,14 @@ export const InitialState: React.FC<InitialStateProps> = ({
     setFileSizeStatus(null);
   };
 
+  const handleRecordClick = () => {
+    if (hasMicrophoneAccess === false) {
+      onRecordingAttempt();
+    } else {
+      onStartRecording();
+    }
+  };
+
   return (
     <>
       <div className="initial-state">
@@ -136,7 +148,12 @@ export const InitialState: React.FC<InitialStateProps> = ({
             Upload Audio
           </Button>
 
-          <Button variant="secondary" icon={<RecordIcon />} onClick={onStartRecording}>
+          <Button 
+            variant="secondary" 
+            icon={<RecordIcon />} 
+            onClick={handleRecordClick}
+            disabled={hasMicrophoneAccess === false}
+          >
             Start Recording
           </Button>
         </div>

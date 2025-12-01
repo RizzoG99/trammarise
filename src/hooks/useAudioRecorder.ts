@@ -4,9 +4,11 @@ interface UseAudioRecorderReturn {
   isRecording: boolean;
   duration: number;
   audioBlob: Blob | null;
-  startRecording: () => Promise<void>;
+  startRecording: () => Promise<boolean>;
   stopRecording: () => void;
   error: string | null;
+  hasMicrophoneAccess: boolean | null;
+  checkMicrophonePermission: () => Promise<void>;
 }
 
 export const useAudioRecorder = (): UseAudioRecorderReturn => {
@@ -14,6 +16,7 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
   const [duration, setDuration] = useState(0);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [hasMicrophoneAccess, setHasMicrophoneAccess] = useState<boolean | null>(null);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
@@ -32,9 +35,26 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
     };
   }, []);
 
-  const startRecording = useCallback(async () => {
+  const checkMicrophonePermission = useCallback(async () => {
+    try {
+      const permissionStatus = await navigator.permissions.query({ name: 'microphone' as PermissionName });
+      // Only set to false if explicitly denied, not if it's "prompt"
+      setHasMicrophoneAccess(permissionStatus.state === 'denied' ? false : null);
+      
+      // Listen for permission changes
+      permissionStatus.onchange = () => {
+        setHasMicrophoneAccess(permissionStatus.state === 'denied' ? false : null);
+      };
+    } catch (err) {
+      // Fallback: if Permissions API is unavailable, assume permission needs to be requested
+      setHasMicrophoneAccess(null);
+    }
+  }, []);
+
+  const startRecording = useCallback(async (): Promise<boolean> => {
     try {
       setError(null);
+
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
       // Determine the best audio format based on browser support
@@ -91,9 +111,14 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
           mediaRecorder.requestData();
         }
       }, 100);
+      
+      return true; // Success
     } catch (err) {
       console.error('Error accessing microphone:', err);
-      setError('Unable to access microphone. Please grant permission and try again.');
+      // Update permission state if access was denied
+      setHasMicrophoneAccess(false);
+      setError('Microphone access denied. Please grant permission in your browser settings.');
+      return false; // Failure
     }
   }, []);
 
@@ -110,5 +135,7 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
     startRecording,
     stopRecording,
     error,
+    hasMicrophoneAccess,
+    checkMicrophonePermission,
   };
 };

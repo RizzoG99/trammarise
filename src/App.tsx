@@ -5,6 +5,7 @@ import { AudioState } from './components/states/AudioState';
 import { ConfigurationState } from './components/states/ConfigurationState';
 import { ProcessingState } from './components/states/ProcessingState';
 import { ResultsState } from './components/states/ResultsState';
+import { Snackbar } from './components/ui/Snackbar';
 import { useAudioRecorder } from './hooks/useAudioRecorder';
 import { transcribeAudio, summarizeTranscript } from './utils/api';
 import type { AppState, AudioFile, ProcessingResult, ProcessingStateData, AIConfiguration } from './types/audio';
@@ -20,9 +21,15 @@ function App() {
   const [result, setResult] = useState<ProcessingResult | null>(null);
   const [aiConfiguration, setAiConfiguration] = useState<AIConfiguration | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [snackbarMessage, setSnackbarMessage] = useState<string | null>(null);
 
-  const { isRecording, duration, audioBlob, startRecording, stopRecording, error } =
+  const { isRecording, duration, audioBlob, startRecording, stopRecording, error, hasMicrophoneAccess, checkMicrophonePermission } =
     useAudioRecorder();
+
+  // Check microphone permission on mount
+  useEffect(() => {
+    checkMicrophonePermission();
+  }, [checkMicrophonePermission]);
 
   // Handle recording completion
   useEffect(() => {
@@ -83,8 +90,17 @@ function App() {
 
 
   const handleStartRecording = async () => {
-    await startRecording();
-    setAppState('recording');
+    const success = await startRecording();
+    // Only navigate to recording state if recording actually started successfully
+    if (success) {
+      setAppState('recording');
+    }
+  };
+
+  const handleRecordingAttempt = () => {
+    if (hasMicrophoneAccess === false) {
+      setSnackbarMessage('Microphone access denied. Please grant permission in your browser settings.');
+    }
   };
 
   const handleReset = () => {
@@ -154,6 +170,8 @@ function App() {
           <InitialState
             onFileUpload={handleFileUpload}
             onStartRecording={handleStartRecording}
+            hasMicrophoneAccess={hasMicrophoneAccess}
+            onRecordingAttempt={handleRecordingAttempt}
           />
         )}
 
@@ -191,6 +209,13 @@ function App() {
           />
         )}
       </main>
+
+      <Snackbar
+        message={snackbarMessage || ''}
+        variant="error"
+        isOpen={!!snackbarMessage}
+        onClose={() => setSnackbarMessage(null)}
+      />
 
       <footer className="footer">
         <p>Trammarise &copy; 2025 - Audio Transcription & Summarization</p>
