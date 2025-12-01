@@ -4,6 +4,9 @@ import { Button } from '../ui/Button';
 import { validateApiKey } from '../../utils/api';
 import { getApiConfig, saveApiConfig } from '../../utils/session-storage';
 import type { AIProvider, AIConfiguration } from '../../types/audio';
+import { Input } from '../ui/Input';
+import { SelectCard } from '../ui/SelectCard';
+import { RadioCard } from '../ui/RadioCard';
 import './ConfigurationForm.css';
 
 interface ConfigurationFormProps {
@@ -131,29 +134,27 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ onSubmit, 
         </label>
         <div className="content-type-grid">
           {CONTENT_TYPES.map((type) => (
-            <button
+            <SelectCard
               key={type.value}
-              type="button"
-              className={`content-type-button ${contentType === type.value ? 'selected' : ''}`}
+              value={type.value}
+              label={type.label}
+              icon={type.icon}
+              selected={contentType === type.value}
               onClick={() => setContentType(type.value)}
-            >
-              <span className="content-type-icon">{type.icon}</span>
-              <span className="content-type-label">{type.label}</span>
-            </button>
+            />
           ))}
         </div>
         {errors.contentType && <span className="error-message">{errors.contentType}</span>}
 
         {contentType === 'other' && (
           <div className="custom-content-type">
-            <input
-              type="text"
-              className="form-input"
+            <Input
               placeholder="e.g., Data Science Lesson"
               value={customContentType}
               onChange={(e) => setCustomContentType(e.target.value)}
+              error={errors.customContentType}
+              fullWidth
             />
-            {errors.customContentType && <span className="error-message">{errors.customContentType}</span>}
           </div>
         )}
       </div>
@@ -164,86 +165,65 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ onSubmit, 
           <span className="required">*</span>
         </label>
         <div className="provider-options">
-          <label className="provider-option">
-            <input
-              type="radio"
-              name="provider"
-              value="openai"
-              checked={provider === 'openai'}
-              onChange={(e) => setProvider(e.target.value as AIProvider)}
-            />
-            <span className="provider-label">
-              <strong>ChatGPT</strong> (OpenAI)
-              <span className="provider-note">All-in-one: transcription + summarization</span>
-            </span>
-          </label>
+          <RadioCard
+            name="provider"
+            value="openai"
+            checked={provider === 'openai'}
+            onChange={(val) => setProvider(val as AIProvider)}
+            title="ChatGPT (OpenAI)"
+            description="All-in-one: transcription + summarization"
+          />
 
-          <label className="provider-option">
-            <input
-              type="radio"
-              name="provider"
-              value="claude"
-              checked={provider === 'claude'}
-              onChange={(e) => setProvider(e.target.value as AIProvider)}
-            />
-            <span className="provider-label">
-              <strong>Claude</strong> (Anthropic)
-              <span className="provider-note">Requires OpenAI key for transcription</span>
-            </span>
-          </label>
+          <RadioCard
+            name="provider"
+            value="claude"
+            checked={provider === 'claude'}
+            onChange={(val) => setProvider(val as AIProvider)}
+            title="Claude (Anthropic)"
+            description="Requires OpenAI key for transcription"
+          />
 
-          <label className="provider-option">
-            <input
-              type="radio"
-              name="provider"
-              value="deepseek"
-              checked={provider === 'deepseek'}
-              onChange={(e) => setProvider(e.target.value as AIProvider)}
-            />
-            <span className="provider-label">
-              <strong>Deepseek</strong>
-              <span className="provider-note">Lower cost - Requires OpenAI key for transcription</span>
-            </span>
-          </label>
+          <RadioCard
+            name="provider"
+            value="deepseek"
+            checked={provider === 'deepseek'}
+            onChange={(val) => setProvider(val as AIProvider)}
+            title="Deepseek"
+            description="Lower cost - Requires OpenAI key for transcription"
+          />
         </div>
         {errors.provider && <span className="error-message">{errors.provider}</span>}
       </div>
 
       {provider !== 'openai' && (
         <div className="form-section">
-          <label className="form-label" htmlFor="openai-key">
-            OpenAI API Key (for transcription)
-            <span className="required">*</span>
-          </label>
-          <input
+          <Input
             id="openai-key"
             type="password"
-            className={`form-input ${errors.openaiKey ? 'error' : ''}`}
+            label="OpenAI API Key (for transcription)"
             placeholder="sk-..."
             value={openaiKey}
             onChange={(e) => setOpenaiKey(e.target.value)}
+            error={errors.openaiKey}
+            required
+            fullWidth
           />
-          {errors.openaiKey && <span className="error-message">{errors.openaiKey}</span>}
         </div>
       )}
 
       <div className="form-section">
-        <label className="form-label" htmlFor="api-key">
-          {provider === 'openai' ? 'OpenAI' : provider === 'claude' ? 'Claude' : 'Deepseek'} API Key
-          <span className="required">*</span>
-        </label>
-        <input
+        <Input
           id="api-key"
           type="password"
-          className={`form-input ${errors.apiKey ? 'error' : ''}`}
+          label={`${provider === 'openai' ? 'OpenAI' : provider === 'claude' ? 'Claude' : 'Deepseek'} API Key`}
           placeholder={provider === 'openai' ? 'sk-...' : provider === 'claude' ? 'sk-ant-...' : 'sk-...'}
           value={apiKey}
           onChange={(e) => setApiKey(e.target.value)}
+          error={errors.apiKey}
+          hint="Your API key is only stored in your browser session and cleared when you close the tab."
+          required
+          fullWidth
         />
-        {errors.apiKey && <span className="error-message">{errors.apiKey}</span>}
-        <p className="field-hint">
-          Your API key is only stored in your browser session and cleared when you close the tab.
-        </p>
       </div>
 
       <ApiKeyInfo provider={provider} />
