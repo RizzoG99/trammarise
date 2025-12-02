@@ -17,11 +17,26 @@ export const ApiKeyInfo: React.FC<ApiKeyInfoProps> = ({ provider }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const providerInfo = {
+    openrouter: {
+      name: 'OpenRouter',
+      url: 'https://openrouter.ai/keys',
+      models: 'Access to 100+ models (GPT-4, Claude, Gemini, Llama, etc.)',
+      pricing: 'Varies by model - often cheaper than direct API access',
+      note: 'Single API key for multiple AI providers',
+      steps: [
+        'Go to OpenRouter',
+        'Sign in with Google or GitHub',
+        'Navigate to "Keys" section',
+        'Click "Create Key"',
+        'Copy your API key (starts with sk-or-...)',
+        'Add credits to your account if needed'
+      ]
+    },
     openai: {
-      name: 'OpenAI (ChatGPT)',
+      name: 'OpenAI (for Whisper transcription)',
       url: 'https://platform.openai.com/api-keys',
-      models: 'Whisper (transcription), GPT-4 (summarization/chat)',
-      pricing: '~$0.006/min transcription, ~$0.01-0.03 per summary',
+      models: 'Whisper (audio transcription)',
+      pricing: '~$0.006/min transcription',
       steps: [
         'Go to OpenAI Platform',
         'Sign in or create an account',
@@ -30,34 +45,6 @@ export const ApiKeyInfo: React.FC<ApiKeyInfoProps> = ({ provider }) => {
         'Add billing information if needed'
       ]
     },
-    claude: {
-      name: 'Claude (Anthropic)',
-      url: 'https://console.anthropic.com/',
-      models: 'Claude 3.5 Sonnet (summarization/chat)',
-      pricing: '~$3/$15 per million input/output tokens',
-      note: 'Cannot transcribe audio - you\'ll also need an OpenAI key for transcription',
-      steps: [
-        'Go to Anthropic Console',
-        'Sign in or create an account',
-        'Navigate to "API Keys" section',
-        'Click "Create Key"',
-        'Copy your API key'
-      ]
-    },
-    deepseek: {
-      name: 'Deepseek',
-      url: 'https://platform.deepseek.com/',
-      models: 'Deepseek-chat (summarization/chat)',
-      pricing: 'Lower cost alternative (check platform for current rates)',
-      note: 'Cannot transcribe audio - you\'ll also need an OpenAI key for transcription',
-      steps: [
-        'Go to Deepseek Platform',
-        'Sign in or create an account',
-        'Navigate to API keys section',
-        'Generate new API key',
-        'Copy and save securely'
-      ]
-    }
   };
 
   const info = providerInfo[provider];

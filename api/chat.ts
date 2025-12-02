@@ -10,7 +10,7 @@ export default async function handler(
   }
 
   try {
-    const { transcript, summary, message, history, provider, apiKey } = req.body;
+    const { transcript, summary, message, history, provider, apiKey, model } = req.body;
 
     if (!transcript || !summary || !message) {
       return res.status(400).json({ error: 'Missing required fields' });
@@ -18,6 +18,10 @@ export default async function handler(
 
     if (!provider || !apiKey) {
       return res.status(400).json({ error: 'Provider and API key are required' });
+    }
+
+    if (provider === 'openrouter' && !model) {
+      return res.status(400).json({ error: 'Model is required for OpenRouter' });
     }
 
     const aiProvider = ProviderFactory.getProvider(provider as ProviderType);
@@ -28,7 +32,8 @@ export default async function handler(
       message,
       history: Array.isArray(history) ? history : [],
       apiKey,
-    });
+      model, // Pass model for OpenRouter
+    } as any); // Type assertion needed due to optional model param
 
     return res.status(200).json({ response });
   } catch (error: any) {

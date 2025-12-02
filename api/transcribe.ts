@@ -37,6 +37,7 @@ export default async function handler(
     const parts = buffer.toString('binary').split(`--${boundary}`);
     let audioData: Buffer | null = null;
     let apiKey: string | null = null;
+    let language: string | undefined = undefined;
 
     for (const part of parts) {
       if (part.includes('Content-Disposition')) {
@@ -59,6 +60,14 @@ export default async function handler(
             const endMarker = content.indexOf('\r\n');
             apiKey = endMarker !== -1 ? content.substring(0, endMarker) : content.trim();
           }
+        } else if (part.includes('name="language"')) {
+          // Extract language
+          const headerEnd = part.indexOf('\r\n\r\n');
+          if (headerEnd !== -1) {
+            const content = part.substring(headerEnd + 4);
+            const endMarker = content.indexOf('\r\n');
+            language = endMarker !== -1 ? content.substring(0, endMarker) : content.trim();
+          }
         }
       }
     }
@@ -73,13 +82,17 @@ export default async function handler(
 
     const openai = new OpenAI({ apiKey });
 
-    // Create a File-like object for OpenAI
-    const audioFile = new File([audioData], 'audio.webm', { type: 'audio/webm' });
+    // Create a File-like object for OpenAI using the SDK's helper if available, or just pass the buffer with name
+    // The OpenAI SDK accepts a File object (from web API) or a ReadStream (from fs).
+    // Since we have a buffer, we can use the 'openai/uploads' helper or construct a File if available.
+    // However, to be safe in Node environment:
+    const file = await OpenAI.toFile(audioData, 'audio.webm');
 
     // Call Whisper API
     const transcription = await openai.audio.transcriptions.create({
-      file: audioFile,
+      file,
       model: 'whisper-1',
+      language,
     });
 
     return res.status(200).json({

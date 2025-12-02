@@ -8,13 +8,13 @@ import type {
 /**
  * Transcribe audio using OpenAI Whisper API
  */
-export async function transcribeAudio(
-  audioBlob: Blob,
-  apiKey: string
-): Promise<TranscriptionResponse> {
+export async function transcribeAudio(audioBlob: Blob, apiKey: string, language?: string): Promise<{ transcript: string }> {
   const formData = new FormData();
   formData.append('file', audioBlob, 'audio.webm');
   formData.append('apiKey', apiKey);
+  if (language) {
+    formData.append('language', language);
+  }
 
   const response = await fetch('/api/transcribe', {
     method: 'POST',
@@ -36,12 +36,13 @@ export async function summarizeTranscript(
   transcript: string,
   contentType: string,
   provider: string,
-  apiKey: string
+  apiKey: string,
+  model?: string
 ): Promise<SummarizationResponse> {
   const response = await fetch('/api/summarize', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ transcript, contentType, provider, apiKey }),
+    body: JSON.stringify({ transcript, contentType, provider, apiKey, model }),
   });
 
   if (!response.ok) {
@@ -61,12 +62,13 @@ export async function chatWithAI(
   message: string,
   history: ChatMessage[],
   provider: string,
-  apiKey: string
+  apiKey: string,
+  model?: string
 ): Promise<ChatResponse> {
   const response = await fetch('/api/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ transcript, summary, message, history, provider, apiKey }),
+    body: JSON.stringify({ transcript, summary, message, history, provider, apiKey, model }),
   });
 
   if (!response.ok) {

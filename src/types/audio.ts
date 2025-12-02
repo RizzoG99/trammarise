@@ -2,6 +2,7 @@
 export interface AudioFile {
   name: string;
   blob: Blob;
+  file: File;
   url?: string;
 }
 
@@ -9,13 +10,17 @@ export interface AudioFile {
 export type AppState = 'initial' | 'recording' | 'audio' | 'configuration' | 'processing' | 'results';
 
 // AI Provider types
-export type AIProvider = 'openai' | 'claude' | 'deepseek';
+export type AIProvider = 'openai' | 'openrouter';
+export type ConfigMode = 'simple' | 'advanced';
 
 export interface AIConfiguration {
+  mode: ConfigMode;
   provider: AIProvider;
-  apiKey: string;
-  openaiKey: string; // For transcription (Whisper)
+  model: string; // For simple: 'gpt-4o' or 'o3-mini', for advanced: OpenRouter model ID
+  openaiKey: string; // Always required for Whisper transcription
+  openrouterKey?: string; // Only for advanced mode
   contentType: string;
+  language: string;
 }
 
 // Recording state

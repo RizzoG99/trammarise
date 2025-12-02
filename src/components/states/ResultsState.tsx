@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { ActionButtons } from '../results/ActionButtons';
 import { ChatInterface } from '../results/ChatInterface';
+import { Button } from '../ui/Button';
 import { chatWithAI } from '../../utils/api';
 import type { ProcessingResult, ChatMessage } from '../../types/audio';
 import './ResultsState.css';
@@ -35,15 +36,19 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
 
     try {
       // Call chat API with configuration
+      const apiKey = result.configuration.mode === 'simple' 
+        ? result.configuration.openaiKey 
+        : result.configuration.openrouterKey!;
+      
       const { response } = await chatWithAI(
         result.transcript,
         result.summary,
         message,
         result.chatHistory,
         result.configuration.provider,
-        result.configuration.apiKey
+        apiKey,
+        result.configuration.model
       );
-
       // Add assistant response to chat history
       const assistantMessage: ChatMessage = { role: 'assistant', content: response };
       onUpdateResult({
@@ -66,9 +71,28 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
     }
   };
 
+  const handleDownloadPDF = async () => {
+    const { generatePDF } = await import('../../utils/pdf-generator');
+    generatePDF(result.summary, result.transcript, result.configuration);
+  };
+
   return (
     <div className="results-state">
-      <header className="results-header">
+      <div className="results-header">
+        <div className="header-title-group">
+          <Button variant="outline" onClick={onBack} className="back-button-small">
+            ← Back
+          </Button>
+          <h2>Summary & Chat</h2>
+        </div>
+        <div className="header-actions">
+          <Button variant="outline" onClick={handleDownloadPDF}>
+            📄 Download PDF
+          </Button>
+        </div>
+      </div>
+      {/* The original back button and title are replaced by the new header structure */}
+      {/* <header className="results-header">
         <button className="back-button" onClick={onBack} aria-label="Back to audio">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M19 12H5M12 19l-7-7 7-7" />
@@ -76,7 +100,7 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
           Back
         </button>
         <h1 className="results-title">{audioName}</h1>
-      </header>
+      </header> */}
 
       <div className="results-container">
         <div className="results-content">

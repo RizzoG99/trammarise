@@ -14,7 +14,13 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.0",
+    "@ffmpeg/ffmpeg": "^0.12.15",
+    "@ffmpeg/util": "^0.12.2",
+    "@openrouter/ai-sdk-provider": "^1.3.0",
+    "@openrouter/sdk": "^0.2.6",
     "@vercel/node": "^5.5.13",
+    "ai": "^5.0.106",
+    "jspdf": "^3.0.4",
     "lucide-react": "^0.555.0",
     "openai": "^6.9.1",
     "react": "^19.2.0",

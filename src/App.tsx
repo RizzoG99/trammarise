@@ -31,14 +31,20 @@ function App() {
     checkMicrophonePermission();
   }, [checkMicrophonePermission]);
 
+  const handleStopRecording = (blob: Blob) => {
+    const file = new File([blob], 'recording.wav', { type: 'audio/wav' });
+    setAudioFile({
+      name: `Recording ${new Date().toLocaleTimeString()}`,
+      blob,
+      file,
+    });
+    setAppState('audio');
+  };
+
   // Handle recording completion
   useEffect(() => {
     if (audioBlob && !isRecording) {
-      setAudioFile({
-        name: 'Recorded Audio',
-        blob: audioBlob,
-      });
-      setAppState('audio');
+      handleStopRecording(audioBlob);
     }
   }, [audioBlob, isRecording]);
 
@@ -63,9 +69,13 @@ function App() {
           setProcessingData({ step: 'compressing', progress });
         });
 
+        // Create a File object from the compressed Blob
+        const compressedFile = new File([compressedBlob], file.name, { type: compressedBlob.type || file.type });
+
         setAudioFile({
           name: file.name,
           blob: compressedBlob,
+          file: compressedFile,
         });
         setAppState('audio');
       } catch (error: any) {
@@ -75,6 +85,7 @@ function App() {
         setAudioFile({
           name: file.name,
           blob: file,
+          file: file,
         });
         setAppState('audio');
       }
@@ -82,6 +93,7 @@ function App() {
       setAudioFile({
         name: file.name,
         blob: file,
+        file: file,
       });
       setAppState('audio');
     }
@@ -125,26 +137,50 @@ function App() {
     setProcessingData({ step: 'transcribing', progress: 0 });
 
     try {
-      // Step 1: Transcribe audio with OpenAI Whisper
-      const { transcript } = await transcribeAudio(audioFile.blob, config.openaiKey);
+      // Step 0: Process large audio (Compress & Chunk)
+      // Dynamic import to avoid loading ffmpeg unless needed
+      const { processLargeAudio } = await import('./utils/audio-processor');
+      
+      const chunks = await processLargeAudio(audioFile.file, (step, progress) => {
+        if (step === 'compressing') {
+          setProcessingData({ step: 'transcribing', progress: Math.round(progress * 0.2) }); // 0-20%
+        } else if (step === 'chunking') {
+          setProcessingData({ step: 'transcribing', progress: 20 + Math.round(progress * 0.1) }); // 20-30%
+        }
+      });
 
-      setProcessingData({ step: 'transcribing', progress: 50 });
+      // Step 1: Transcribe chunks sequentially
+      let fullTranscript = '';
+      
+      for (let i = 0; i < chunks.length; i++) {
+        const chunk = chunks[i];
+        const progressBase = 30 + Math.round((i / chunks.length) * 40); // 30-70%
+        setProcessingData({ step: 'transcribing', progress: progressBase });
 
-      // Step 2: Generate summary with selected AI provider
-      setProcessingData({ step: 'summarizing', progress: 50 });
+        const { transcript } = await transcribeAudio(chunk, config.openaiKey, config.language);
+        fullTranscript += (fullTranscript ? '\n\n' : '') + transcript;
+      }
 
+      setProcessingData({ step: 'transcribing', progress: 70 });
+
+      // Step 2: Generate summary with selected provider
+      setProcessingData({ step: 'summarizing', progress: 70 });
+
+      const apiKey = config.mode === 'simple' ? config.openaiKey : config.openrouterKey!;
+      
       const { summary } = await summarizeTranscript(
-        transcript,
+        fullTranscript,
         config.contentType,
         config.provider,
-        config.apiKey
+        apiKey,
+        config.model
       );
 
       setProcessingData({ step: 'summarizing', progress: 100 });
 
       // Complete processing
       setResult({
-        transcript,
+        transcript: fullTranscript,
         summary,
         chatHistory: [],
         configuration: config,
