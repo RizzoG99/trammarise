@@ -1,8 +1,21 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { ProviderFactory, type ProviderType } from './providers/factory';
 import { API_VALIDATION, CONTENT_TYPES } from '../src/utils/constants';
+import busboy from 'busboy';
+import { extractPdfText } from './utils/pdf-extractor';
+
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
 
 const { MAX_TRANSCRIPT_LENGTH, MIN_TRANSCRIPT_LENGTH, MIN_API_KEY_LENGTH, MAX_API_KEY_LENGTH } = API_VALIDATION;
+
+interface ContextImage {
+  type: string;
+  data: string; // base64
+}
 
 export default async function handler(
   req: VercelRequest,
@@ -13,11 +26,57 @@ export default async function handler(
   }
 
   try {
-    const { transcript, contentType, provider, apiKey, model } = req.body;
+    console.log('Summarize API called');
+    const bb = busboy({ headers: req.headers });
+    
+    const fields: Record<string, string> = {};
+    const contextImages: ContextImage[] = [];
+    let contextText = '';
+
+    const parsePromise = new Promise<void>((resolve, reject) => {
+      bb.on('field', (name, val) => {
+        fields[name] = val;
+      });
+
+      bb.on('file', (name, file, info) => {
+        const { mimeType } = info;
+        const chunks: Buffer[] = [];
+
+        file.on('data', (chunk) => chunks.push(chunk));
+        
+        file.on('end', async () => {
+          const buffer = Buffer.concat(chunks);
+
+          if (mimeType === 'application/pdf') {
+            try {
+              const pdfText = await extractPdfText(buffer);
+              contextText += `\n\n[Document Context: ${info.filename}]\n${pdfText}\n`;
+            } catch (e) {
+              console.error('Error parsing PDF:', e);
+            }
+          } else if (mimeType === 'text/plain') {
+            contextText += `\n\n[Document Context: ${info.filename}]\n${buffer.toString('utf-8')}\n`;
+          } else if (mimeType.startsWith('image/')) {
+            contextImages.push({
+              type: mimeType,
+              data: buffer.toString('base64')
+            });
+          }
+        });
+      });
+
+      bb.on('finish', resolve);
+      bb.on('error', reject);
+    });
+
+    req.pipe(bb);
+    await parsePromise;
+
+    const { transcript, contentType, provider, apiKey, model } = fields;
 
     // Validate transcript
-    if (!transcript || typeof transcript !== 'string') {
-      return res.status(400).json({ error: 'Transcript is required and must be a string' });
+    if (!transcript) {
+      return res.status(400).json({ error: 'Transcript is required' });
     }
 
     if (transcript.length < MIN_TRANSCRIPT_LENGTH) {
@@ -29,19 +88,19 @@ export default async function handler(
     }
 
     // Validate contentType
-    if (contentType && !CONTENT_TYPES.includes(contentType)) {
+    if (contentType && !CONTENT_TYPES.includes(contentType as any)) {
       return res.status(400).json({
         error: `Invalid content type. Must be one of: ${CONTENT_TYPES.join(', ')}`
       });
     }
 
     // Validate provider and API key
-    if (!provider || typeof provider !== 'string') {
-      return res.status(400).json({ error: 'Provider is required and must be a string' });
+    if (!provider) {
+      return res.status(400).json({ error: 'Provider is required' });
     }
 
-    if (!apiKey || typeof apiKey !== 'string') {
-      return res.status(400).json({ error: 'API key is required and must be a string' });
+    if (!apiKey) {
+      return res.status(400).json({ error: 'API key is required' });
     }
 
     if (apiKey.length < MIN_API_KEY_LENGTH || apiKey.length > MAX_API_KEY_LENGTH) {
@@ -49,17 +108,21 @@ export default async function handler(
     }
 
     // Validate OpenRouter-specific requirements
-    if (provider === 'openrouter' && (!model || typeof model !== 'string')) {
-      return res.status(400).json({ error: 'Model is required for OpenRouter and must be a string' });
+    if (provider === 'openrouter' && !model) {
+      return res.status(400).json({ error: 'Model is required for OpenRouter' });
     }
 
     const aiProvider = ProviderFactory.getProvider(provider as ProviderType);
 
     const summary = await aiProvider.summarize({
       transcript,
-      contentType,
+      contentType: contentType as any,
       apiKey,
-      model, // Optional: only required for OpenRouter
+      model,
+      context: {
+        text: contextText,
+        images: contextImages
+      }
     });
 
     return res.status(200).json({ summary });

@@ -200,19 +200,16 @@ function App() {
       // Check if aborted after transcription
       if (abortController.signal.aborted) throw new Error('Processing cancelled');
 
-      // Step 2: Generate summary with selected provider
-      setProcessingData({ step: 'summarizing', progress: 70 });
-
-      const apiKey = config.mode === 'simple' ? config.openaiKey : config.openrouterKey!;
-
+      // 2. Summarize with context files
+      setProcessingData({ step: 'summarizing', progress: 50 });
       const { summary } = await summarizeTranscript(
         fullTranscript,
         config.contentType,
         config.provider,
-        apiKey,
-        config.model
+        config.provider === 'openai' ? config.openaiKey : config.openrouterKey!,
+        config.model,
+        config.contextFiles
       );
-
       setProcessingData({ step: 'summarizing', progress: 100 });
 
       // Complete processing

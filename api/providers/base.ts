@@ -7,9 +7,13 @@ export interface ChatMessage {
 
 export interface SummarizeParams {
   transcript: string;
-  contentType?: string;
+  contentType: string;
   apiKey: string;
   model?: string; // Optional model parameter for providers that support it
+  context?: {
+    text: string;
+    images: { type: string; data: string }[];
+  };
 }
 
 export interface ChatParams {

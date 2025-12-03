@@ -21,6 +21,7 @@ export interface AIConfiguration {
   openrouterKey?: string; // Only for advanced mode
   contentType: string;
   language: string;
+  contextFiles?: File[];
 }
 
 // Recording state

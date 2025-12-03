@@ -79,12 +79,28 @@ export async function summarizeTranscript(
   contentType: string,
   provider: string,
   apiKey: string,
-  model?: string
+  model?: string,
+  contextFiles?: File[]
 ): Promise<SummarizationResponse> {
+  const formData = new FormData();
+  formData.append('transcript', transcript);
+  formData.append('contentType', contentType);
+  formData.append('provider', provider);
+  formData.append('apiKey', apiKey);
+  
+  if (model) {
+    formData.append('model', model);
+  }
+
+  if (contextFiles && contextFiles.length > 0) {
+    contextFiles.forEach((file) => {
+      formData.append('contextFiles', file);
+    });
+  }
+
   const response = await fetchWithTimeout('/api/summarize', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ transcript, contentType, provider, apiKey, model }),
+    body: formData,
   }, API_DEFAULT_TIMEOUT);
 
   if (!response.ok) {

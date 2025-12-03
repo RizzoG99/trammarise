@@ -4,17 +4,44 @@ import type { AIProvider, SummarizeParams, ChatParams } from './base';
 export class OpenAIProvider implements AIProvider {
   name = 'OpenAI';
 
-  async summarize({ transcript, contentType, apiKey, model }: SummarizeParams & { model?: string }): Promise<string> {
+  async summarize({ transcript, contentType, apiKey, model, context }: SummarizeParams & { model?: string }): Promise<string> {
     const openai = new OpenAI({ baseURL: 'https://api.openai.com/v1',  apiKey });
 
     const systemPrompt = this.buildSummarizePrompt(contentType || 'general');
 
+    const messages: any[] = [
+      { role: 'system', content: systemPrompt }
+    ];
+
+    const userContent: any[] = [
+      { type: 'text', text: `Please summarize this transcript:\n\n${transcript}` }
+    ];
+
+    if (context) {
+      if (context.text) {
+        userContent.push({ 
+          type: 'text', 
+          text: `\n\nAdditional Context from Documents:\n${context.text}` 
+        });
+      }
+
+      if (context.images && context.images.length > 0) {
+        context.images.forEach(img => {
+          userContent.push({
+            type: 'image_url',
+            image_url: {
+              url: `data:${img.type};base64,${img.data}`
+            }
+          });
+        });
+      }
+    }
+
+    messages.push({ role: 'user', content: userContent });
+
     const completion = await openai.chat.completions.create({
       model: model || 'gpt-4o', // Default to gpt-4o if not specified
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: `Please summarize this transcript:\n\n${transcript}` }
-      ],
+      messages: messages as any,
       temperature: 0.7,
     });
 
