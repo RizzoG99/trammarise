@@ -58,9 +58,9 @@ export const ApiKeyInfo: React.FC<ApiKeyInfoProps> = ({ provider }) => {
   const info = providerInfo[provider];
 
   return (
-    <div className="mt-4 border border-border-glass rounded-lg overflow-hidden">
+    <div className="mt-4 border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden">
       <button
-        className="w-full flex items-center gap-3 p-4 bg-bg-surface-hover border-none cursor-pointer text-sm font-medium text-text-primary transition-colors hover:bg-white/15"
+        className="w-full flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-800/50 border-none cursor-pointer text-sm font-medium text-slate-900 dark:text-white transition-colors hover:bg-slate-100 dark:hover:bg-slate-700"
         onClick={() => setIsExpanded(!isExpanded)}
         aria-expanded={isExpanded}
       >
@@ -70,10 +70,10 @@ export const ApiKeyInfo: React.FC<ApiKeyInfoProps> = ({ provider }) => {
       </button>
 
       {isExpanded && (
-        <div className="p-6 bg-bg-surface border-t border-border-glass animate-[slideDown_0.2s_ease-out]">
+        <div className="p-6 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 animate-[slideDown_0.2s_ease-out]">
           <div className="mb-6 last:mb-0">
-            <h4 className="mb-3 text-base font-semibold text-text-primary">Getting Started</h4>
-            <ol className="m-0 pl-6 text-text-secondary leading-relaxed">
+            <h4 className="mb-3 text-base font-semibold text-slate-900 dark:text-white">Getting Started</h4>
+            <ol className="m-0 pl-6 text-slate-600 dark:text-slate-300 leading-relaxed">
               {info.steps.map((step, index) => (
                 <li key={index} className="mb-2">{step}</li>
               ))}
@@ -82,31 +82,31 @@ export const ApiKeyInfo: React.FC<ApiKeyInfoProps> = ({ provider }) => {
               href={info.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block mt-3 text-primary no-underline font-medium transition-colors hover:text-primary-hover hover:underline"
+              className="inline-block mt-3 text-indigo-600 dark:text-indigo-400 no-underline font-medium transition-colors hover:text-indigo-700 dark:hover:text-indigo-300 hover:underline"
             >
               Visit {info.name} Platform →
             </a>
           </div>
 
           <div className="mb-6 last:mb-0">
-            <h4 className="mb-3 text-base font-semibold text-text-primary">Models Used</h4>
-            <p className="m-0 text-text-secondary leading-relaxed">{info.models}</p>
+            <h4 className="mb-3 text-base font-semibold text-slate-900 dark:text-white">Models Used</h4>
+            <p className="m-0 text-slate-600 dark:text-slate-300 leading-relaxed">{info.models}</p>
           </div>
 
           {info.note && (
-            <div className="mb-6 last:mb-0 p-4 bg-yellow-500/10 border-l-4 border-yellow-500 rounded text-text-secondary">
-              <strong className="text-yellow-500">Note:</strong> {info.note}
+            <div className="mb-6 last:mb-0 p-4 bg-amber-50 dark:bg-amber-900/20 border-l-4 border-amber-500 rounded text-slate-700 dark:text-slate-200">
+              <strong className="text-amber-600 dark:text-amber-400">Note:</strong> {info.note}
             </div>
           )}
 
           <div className="mb-6 last:mb-0">
-            <h4 className="mb-3 text-base font-semibold text-text-primary">Pricing</h4>
-            <p className="m-0 text-text-secondary leading-relaxed">{info.pricing}</p>
+            <h4 className="mb-3 text-base font-semibold text-slate-900 dark:text-white">Pricing</h4>
+            <p className="m-0 text-slate-600 dark:text-slate-300 leading-relaxed">{info.pricing}</p>
           </div>
 
-          <div className="mb-6 last:mb-0 p-4 bg-blue-500/10 border-l-4 border-blue-500 rounded">
-            <h4 className="mb-3 text-base font-semibold text-text-primary">Security Notes</h4>
-            <ul className="m-0 pl-5 text-text-secondary leading-relaxed">
+          <div className="mb-6 last:mb-0 p-4 bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 rounded">
+            <h4 className="mb-3 text-base font-semibold text-slate-900 dark:text-white">Security Notes</h4>
+            <ul className="m-0 pl-5 text-slate-600 dark:text-slate-300 leading-relaxed">
               <li className="mb-1 text-sm">Keys are stored only in your browser session</li>
               <li className="mb-1 text-sm">Never saved to disk or cloud</li>
               <li className="mb-1 text-sm">Cleared when you close the tab</li>

@@ -155,21 +155,21 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ onSubmit, 
   };
 
   return (
-    <form className="w-full max-w-[600px] mx-auto" onSubmit={handleSubmit}>
+    <form className="w-full max-w-[600px] mx-auto" onSubmit={handleSubmit} noValidate>
 
       {/* Language Selection */}
       <div className="mb-8">
-        <label className="block mb-3 font-semibold text-text-primary text-base">
+        <label className="block mb-3 font-semibold text-slate-900 dark:text-white text-base">
           Audio Language
-          <span className="text-accent-error ml-1">*</span>
+          <span className="text-red-500 ml-1">*</span>
         </label>
         <select
-          className="w-full p-3 text-base border border-border-glass rounded-lg bg-bg-surface text-text-primary cursor-pointer transition-all hover:bg-bg-surface-hover hover:border-primary-light/30 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+          className="w-full p-3 text-base border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white cursor-pointer transition-all hover:border-indigo-400 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600/20"
           value={language}
           onChange={(e) => setLanguage(e.target.value)}
         >
           {LANGUAGES.map((lang) => (
-            <option key={lang.value} value={lang.value} className="bg-[#1a1a1a] text-white p-2">
+            <option key={lang.value} value={lang.value} className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white p-2">
               {lang.label}
             </option>
           ))}
@@ -178,9 +178,9 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ onSubmit, 
 
       {/* Content Type */}
       <div className="mb-8">
-        <label className="block mb-3 font-semibold text-text-primary text-base">
+        <label className="block mb-3 font-semibold text-slate-900 dark:text-white text-base">
           Content Type
-          <span className="text-accent-error ml-1">*</span>
+          <span className="text-red-500 ml-1">*</span>
         </label>
         <div className="grid grid-cols-[repeat(auto-fit,minmax(140px,1fr))] gap-3">
           {CONTENT_TYPES.map((type) => (
@@ -194,7 +194,7 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ onSubmit, 
             />
           ))}
         </div>
-        {errors.contentType && <span className="block mt-2 text-accent-error text-sm">{errors.contentType}</span>}
+        {errors.contentType && <span className="block mt-2 text-red-500 text-sm">{errors.contentType}</span>}
 
         {contentType === 'other' && (
           <div className="mt-3 animate-[slideDown_0.2s_ease-out]">
@@ -222,24 +222,24 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ onSubmit, 
       {mode === 'simple' && (
         <>
           <div className="mb-8">
-            <label className="block mb-3 font-semibold text-text-primary text-base">
+            <label className="block mb-3 font-semibold text-slate-900 dark:text-white text-base">
               Performance Level
-              <span className="text-accent-error ml-1">*</span>
+              <span className="text-red-500 ml-1">*</span>
             </label>
             <div className="flex flex-col gap-3">
               {SIMPLE_MODELS.map((model) => (
-                <label key={model.value} className="flex items-start gap-3 p-4 bg-bg-surface border-2 border-border-glass rounded-lg cursor-pointer transition-all hover:bg-white/10 hover:border-primary-light/30 has-[:checked]:border-primary has-[:checked]:bg-primary/10 has-[:checked]:shadow-[0_0_0_2px_rgba(139,92,246,0.2)]">
+                <label key={model.value} className="flex items-start gap-3 p-4 bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 rounded-lg cursor-pointer transition-all hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-indigo-300 has-[:checked]:border-indigo-600 has-[:checked]:bg-indigo-50 dark:has-[:checked]:bg-indigo-900/20 has-[:checked]:shadow-sm">
                   <input
                     type="radio"
                     name="simpleModel"
                     value={model.value}
                     checked={simpleModel === model.value}
                     onChange={(e) => setSimpleModel(e.target.value)}
-                    className="mt-1 cursor-pointer w-[18px] h-[18px] flex-shrink-0 accent-primary"
+                    className="mt-1 cursor-pointer w-[18px] h-[18px] flex-shrink-0 accent-indigo-600"
                   />
                   <div className="flex flex-col gap-1 flex-1">
-                    <strong className="text-base text-text-primary">{model.label}</strong>
-                    <span className="text-sm text-text-secondary">{model.description}</span>
+                    <strong className="text-base text-slate-900 dark:text-white">{model.label}</strong>
+                    <span className="text-sm text-slate-600 dark:text-slate-400">{model.description}</span>
                   </div>
                 </label>
               ))}
@@ -261,9 +261,9 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ onSubmit, 
             />
           </div>
 
-          <div className="p-4 bg-primary/10 border border-primary/30 rounded-lg mt-4">
-            <strong className="block mb-2 text-text-primary">ℹ️ What's included:</strong>
-            <ul className="m-0 pl-6 text-text-secondary">
+          <div className="p-4 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg mt-4">
+            <strong className="block mb-2 text-indigo-900 dark:text-indigo-100">ℹ️ What's included:</strong>
+            <ul className="m-0 pl-6 text-indigo-800 dark:text-indigo-200">
               <li className="my-1 text-sm">Whisper transcription (industry-leading accuracy)</li>
               <li className="my-1 text-sm">{simpleModel === 'gpt-4o' ? 'GPT-4o' : 'GPT-o3 Mini'} summarization</li>
               <li className="my-1 text-sm">Single API key for simplicity</li>
@@ -278,22 +278,22 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ onSubmit, 
       {mode === 'advanced' && (
         <>
           <div className="mb-8">
-            <label className="block mb-3 font-semibold text-text-primary text-base">
+            <label className="block mb-3 font-semibold text-slate-900 dark:text-white text-base">
               AI Model
-              <span className="text-accent-error ml-1">*</span>
+              <span className="text-red-500 ml-1">*</span>
             </label>
             <select
-              className="w-full p-3 text-base border border-border-glass rounded-lg bg-bg-surface text-text-primary cursor-pointer transition-all hover:bg-bg-surface-hover hover:border-primary-light/30 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+              className="w-full p-3 text-base border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white cursor-pointer transition-all hover:border-indigo-400 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600/20"
               value={advancedModel}
               onChange={(e) => setAdvancedModel(e.target.value)}
             >
               {CURATED_MODELS.map((m) => (
-                <option key={m.id} value={m.id} className="bg-[#1a1a1a] text-white p-2">
+                <option key={m.id} value={m.id} className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white p-2">
                   {m.name} - {m.provider} ({m.description})
                 </option>
               ))}
             </select>
-            {errors.advancedModel && <span className="block mt-2 text-accent-error text-sm">{errors.advancedModel}</span>}
+            {errors.advancedModel && <span className="block mt-2 text-red-500 text-sm">{errors.advancedModel}</span>}
           </div>
 
           <div className="mb-8">
@@ -330,7 +330,7 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ onSubmit, 
         </>
       )}
 
-      <div className="flex gap-4 mt-8 pt-8 border-t border-border-glass flex-col-reverse sm:flex-row">
+      <div className="flex gap-4 mt-8 pt-8 border-t border-slate-200 dark:border-slate-700 flex-col-reverse sm:flex-row">
         <Button type="button" variant="outline" onClick={onCancel} disabled={isValidating} className="w-full sm:w-auto flex-1">
           Back
         </Button>

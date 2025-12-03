@@ -5,7 +5,7 @@ export type ButtonVariant = 'primary' | 'secondary' | 'success' | 'danger' | 'ou
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
   icon?: React.ReactNode;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 export const Button: React.FC<ButtonProps> = ({
@@ -26,7 +26,7 @@ export const Button: React.FC<ButtonProps> = ({
     small: "px-3 py-1 text-sm",
     large: "px-8 py-4 text-lg",
     circle: "w-12 h-12 rounded-full p-0",
-    'circle-thick': "w-16 h-16 rounded-full p-0 bg-green-600 text-text-primary hover:bg-green-700 hover:scale-110 hover:shadow-lg flex-shrink-0",
+    'circle-thick': "w-16 h-16 rounded-full p-0 bg-emerald-600 text-white hover:bg-emerald-700 hover:scale-110 hover:shadow-lg flex-shrink-0 border-2 border-emerald-700",
   };
 
   // Helper to combine classes based on variant
@@ -41,7 +41,7 @@ export const Button: React.FC<ButtonProps> = ({
   return (
     <button className={classes} {...props}>
       {icon && <span className="flex items-center justify-center w-5 h-5">{icon}</span>}
-      <span>{children}</span>
+      {children && <span>{children}</span>}
     </button>
   );
 };

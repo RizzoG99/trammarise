@@ -25,37 +25,37 @@ export const PlaybackControls: React.FC<PlaybackControlsProps> = ({
   onCancelTrim,
 }) => {
   return (
-    <div className="flex items-center justify-between gap-4 p-4 bg-bg-glass backdrop-blur-md rounded-lg mb-4">
-      {!isTrimming && (
-        <>
-          <button 
-            className="w-12 h-12 border-none rounded-full bg-gradient-to-r from-primary to-primary-light text-text-primary cursor-pointer flex items-center justify-center transition-all shrink-0 hover:scale-110 hover:shadow-lg touch:w-14 touch:h-14" 
-            onClick={onPlayPause} 
-            aria-label="Play/Pause"
-          >
-            {isPlaying ? <PauseIcon /> : <PlayIcon />}
-          </button>
+    <div className="flex items-center justify-between gap-6 p-5 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm mt-4">
+      {/* Left: Play button + Duration */}
+      <div className="flex items-center gap-4">
+        <button
+          onClick={onPlayPause}
+          className="w-14 h-14 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center transition-all hover:scale-105 shadow-md hover:shadow-lg flex-shrink-0"
+          aria-label="Play/Pause"
+        >
+          {isPlaying ? <PauseIcon /> : <PlayIcon />}
+        </button>
 
-          <div className="flex items-center gap-1 tabular-nums text-sm text-text-secondary flex-1">
-            <span>{formatTime(currentTime)}</span>
-            <span className="text-text-tertiary">/</span>
-            <span>{formatTime(duration)}</span>
-          </div>
-        </>
-      )}
+        <div className="flex items-center gap-2 tabular-nums text-base text-slate-700 dark:text-slate-300 font-medium">
+          <span>{formatTime(currentTime)}</span>
+          <span className="text-slate-400 dark:text-slate-500">·</span>
+          <span>{formatTime(duration)}</span>
+        </div>
+      </div>
 
-      <div className={`flex-1 animate-[fadeInOut_0.3s_ease-in-out] ${isTrimming ? 'animate-[fadeInOut_0.3s_ease-in-out]' : ''}`}>
+      {/* Right: Trim button OR Save/Cancel buttons */}
+      <div className="flex items-center gap-3">
         {isTrimming ? (
-          <div className="flex justify-center gap-4 animate-[slideInRight_0.3s_ease-in-out]">
-            <Button variant="success" icon={<CheckIcon />} onClick={onApplyTrim} title="Save trimmed audio">
-              Save
+          <>
+            <Button variant="success" icon={<CheckIcon />} onClick={onApplyTrim}>
+              Save Trim
             </Button>
-            <Button variant="danger" icon={<XIcon />} onClick={onCancelTrim} title="Cancel and discard trim">
+            <Button variant="outline" icon={<XIcon />} onClick={onCancelTrim}>
               Cancel
             </Button>
-          </div>
+          </>
         ) : (
-          <Button variant="small" icon={<TrimIcon />} onClick={onTrimClick}>
+          <Button variant="secondary" icon={<TrimIcon />} onClick={onTrimClick}>
             Trim Audio
           </Button>
         )}

@@ -186,7 +186,7 @@ export const AudioState: React.FC<AudioStateProps> = ({
       />
 
       <div className="flex flex-col gap-4 mt-8 sm:flex-row">
-        <Button variant="large" icon={<ProcessIcon />} onClick={handleProcess} className="w-full sm:flex-[2]">
+        <Button variant="primary" icon={<ProcessIcon />} onClick={handleProcess} className="w-full sm:flex-[2]">
           Process Audio
         </Button>
         <Button variant="outline" onClick={onReset} className="w-full sm:flex-1">

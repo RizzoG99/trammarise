@@ -21,26 +21,26 @@ export const Input: React.FC<InputProps> = ({
   return (
     <div className={`flex flex-col gap-2 mb-4 ${fullWidth ? 'w-full' : ''} ${className}`}>
       {label && (
-        <label htmlFor={inputId} className="text-sm font-medium text-text-primary flex items-center gap-1">
+        <label htmlFor={inputId} className="text-sm font-medium text-slate-900 dark:text-white flex items-center gap-1">
           {label}
-          {props.required && <span className="text-accent-error">*</span>}
+          {props.required && <span className="text-red-500">*</span>}
         </label>
       )}
       <input
         id={inputId}
         className={`
-          px-4 py-3 rounded-lg border bg-bg-surface text-text-primary text-base transition-all
-          focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 focus:bg-bg-surface-hover
-          placeholder:text-text-secondary/50
+          px-4 py-3 rounded-lg border bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-base transition-all
+          focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600/20 focus:bg-white dark:focus:bg-slate-800
+          placeholder:text-slate-400 dark:placeholder:text-slate-500
           ${error 
-            ? 'border-accent-error focus:ring-accent-error/20' 
-            : 'border-border-glass'
+            ? 'border-red-500 focus:ring-red-500/20' 
+            : 'border-slate-300 dark:border-slate-600'
           }
         `}
         {...props}
       />
-      {error && <span className="text-xs text-accent-error animate-[slideDown_0.2s_ease-out]">{error}</span>}
-      {hint && !error && <span className="text-xs text-text-secondary/60">{hint}</span>}
+      {error && <span className="text-xs text-red-500 animate-[slideDown_0.2s_ease-out]">{error}</span>}
+      {hint && !error && <span className="text-xs text-slate-500 dark:text-slate-400">{hint}</span>}
     </div>
   );
 };

@@ -18,13 +18,13 @@ export const RecordingState: React.FC<RecordingStateProps> = ({
   onStopRecording,
 }) => {
   return (
-    <div className="w-full max-w-[600px] text-center animate-[fadeIn_0.3s_ease-out]">
-      <div className="flex items-center justify-center gap-2 mb-8">
-        <div className="w-3 h-3 rounded-full bg-accent-error animate-[pulse_1.5s_ease-in-out_infinite]" />
-        <span className="text-lg font-medium text-accent-error">Recording...</span>
+    <div className="w-full max-w-[600px] flex flex-col items-center animate-[fadeIn_0.3s_ease-out]">
+      <div className="flex items-center justify-center gap-3 mb-8">
+        <div className="w-3 h-3 rounded-full bg-red-500 animate-[pulse_1.5s_ease-in-out_infinite]" />
+        <span className="text-lg font-medium text-red-500">Recording...</span>
       </div>
 
-      <div className="text-4xl font-light mb-12 tabular-nums">{formatTime(duration)}</div>
+      <div className="text-5xl font-light mb-12 tabular-nums text-white dark:text-slate-900">{formatTime(duration)}</div>
 
       <Button variant="danger" icon={<StopIcon />} onClick={onStopRecording}>
         Stop Recording
