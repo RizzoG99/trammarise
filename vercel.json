@@ -16,6 +16,9 @@
     }
   ],
   "functions": {
+    "api/transcribe.ts": {
+      "maxDuration": 300
+    },
     "api/**/*.ts": {
       "maxDuration": 60
     }

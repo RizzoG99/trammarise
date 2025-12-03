@@ -9,7 +9,8 @@ export const config = {
   },
 };
 
-const { MAX_FILE_SIZE, REQUEST_TIMEOUT, MAX_FILES, MAX_FIELDS } = API_VALIDATION;
+const { MAX_FILE_SIZE, MAX_FILES, MAX_FIELDS } = API_VALIDATION;
+const TRANSCRIBE_TIMEOUT = 300000; // 5 minutes - matches frontend timeout
 
 export default async function handler(
   req: VercelRequest,
@@ -19,12 +20,12 @@ export default async function handler(
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // Set request timeout
+  // Set request timeout to 5 minutes for large audio files
   const timeoutId = setTimeout(() => {
     if (!res.headersSent) {
-      res.status(408).json({ error: 'Request timeout' });
+      res.status(408).json({ error: 'Request timeout - audio file took too long to transcribe' });
     }
-  }, REQUEST_TIMEOUT);
+  }, TRANSCRIBE_TIMEOUT);
 
   try {
     // Parse multipart form data with busboy
