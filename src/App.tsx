@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { InitialState } from './components/states/InitialState';
 import { RecordingState } from './components/states/RecordingState';
 import { AudioState } from './components/states/AudioState';
@@ -22,9 +22,13 @@ function App() {
   const [aiConfiguration, setAiConfiguration] = useState<AIConfiguration | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [snackbarMessage, setSnackbarMessage] = useState<string | null>(null);
+  const [processingAbortController, setProcessingAbortController] = useState<AbortController | null>(null);
 
   const { isRecording, duration, audioBlob, startRecording, stopRecording, error, hasMicrophoneAccess, checkMicrophonePermission } =
     useAudioRecorder();
+
+  // Track the last processed audioBlob to prevent race conditions
+  const lastProcessedBlobRef = useRef<Blob | null>(null);
 
   // Check microphone permission on mount
   useEffect(() => {
@@ -41,9 +45,10 @@ function App() {
     setAppState('audio');
   };
 
-  // Handle recording completion
+  // Handle recording completion - fixed race condition
   useEffect(() => {
-    if (audioBlob && !isRecording) {
+    if (audioBlob && !isRecording && audioBlob !== lastProcessedBlobRef.current) {
+      lastProcessedBlobRef.current = audioBlob;
       handleStopRecording(audioBlob);
     }
   }, [audioBlob, isRecording]);
@@ -119,6 +124,7 @@ function App() {
     setAudioFile(null);
     setResult(null);
     setAiConfiguration(null);
+    lastProcessedBlobRef.current = null; // Clear tracked blob to allow new recordings
     setAppState('initial');
   };
 
@@ -126,22 +132,44 @@ function App() {
     setAppState('audio');
   };
 
+  const handleCancelProcessing = () => {
+    if (processingAbortController) {
+      processingAbortController.abort();
+      setSnackbarMessage('Processing cancelled');
+      setAppState('configuration');
+    }
+  };
+
   const handleConfigure = async (config: AIConfiguration) => {
     if (!audioFile) {
-      alert('Audio file not found. Please try again.');
+      setSnackbarMessage('Audio file not found. Please try again.');
+      setAppState('audio');
       return;
     }
 
+    // Create abort controller for cancellable operations
+    const abortController = new AbortController();
+    setProcessingAbortController(abortController);
+
     setAiConfiguration(config);
     setAppState('processing');
-    setProcessingData({ step: 'transcribing', progress: 0 });
+    setProcessingData({ step: 'loading', progress: 0 });
 
     try {
+      // Check if aborted before starting
+      if (abortController.signal.aborted) throw new Error('Processing cancelled');
+
       // Step 0: Process large audio (Compress & Chunk)
       // Dynamic import to avoid loading ffmpeg unless needed
       const { processLargeAudio } = await import('./utils/audio-processor');
-      
+
+      // Show loading state - FFmpeg will load here if needed
+      setProcessingData({ step: 'transcribing', progress: 0 });
+
       const chunks = await processLargeAudio(audioFile.file, (step, progress) => {
+        // Check if aborted during processing
+        if (abortController.signal.aborted) throw new Error('Processing cancelled');
+
         if (step === 'compressing') {
           setProcessingData({ step: 'transcribing', progress: Math.round(progress * 0.2) }); // 0-20%
         } else if (step === 'chunking') {
@@ -149,25 +177,37 @@ function App() {
         }
       });
 
+      // Check if aborted after chunking
+      if (abortController.signal.aborted) throw new Error('Processing cancelled');
+
       // Step 1: Transcribe chunks sequentially
       let fullTranscript = '';
-      
+
       for (let i = 0; i < chunks.length; i++) {
+        // Check if aborted before each chunk
+        if (abortController.signal.aborted) throw new Error('Processing cancelled');
+
         const chunk = chunks[i];
         const progressBase = 30 + Math.round((i / chunks.length) * 40); // 30-70%
         setProcessingData({ step: 'transcribing', progress: progressBase });
 
-        const { transcript } = await transcribeAudio(chunk, config.openaiKey, config.language);
+        // Determine filename: use original name if it's a File, otherwise generate chunk name (MP3)
+        const chunkName = chunk instanceof File ? chunk.name : `chunk-${i}.mp3`;
+
+        const { transcript } = await transcribeAudio(chunk, config.openaiKey, config.language, chunkName);
         fullTranscript += (fullTranscript ? '\n\n' : '') + transcript;
       }
 
       setProcessingData({ step: 'transcribing', progress: 70 });
 
+      // Check if aborted after transcription
+      if (abortController.signal.aborted) throw new Error('Processing cancelled');
+
       // Step 2: Generate summary with selected provider
       setProcessingData({ step: 'summarizing', progress: 70 });
 
       const apiKey = config.mode === 'simple' ? config.openaiKey : config.openrouterKey!;
-      
+
       const { summary } = await summarizeTranscript(
         fullTranscript,
         config.contentType,
@@ -188,8 +228,33 @@ function App() {
       setAppState('results');
     } catch (error: any) {
       console.error('Processing error:', error);
-      alert(`Processing failed: ${error.message}\n\nPlease try again or check your API configuration.`);
+      const errorMsg = error.message || 'Unknown error';
+
+      // Check if this is an FFmpeg loading error
+      if (errorMsg.includes('FFmpeg') || errorMsg.includes('CDN')) {
+        // Check if we could potentially skip FFmpeg
+        const isMP3 = audioFile.file.type === 'audio/mpeg';
+        const isSmall = audioFile.file.size < 24 * 1024 * 1024; // 24MB
+
+        if (isMP3 && isSmall) {
+          setSnackbarMessage(
+            `Audio processor failed to load (network issue). Your file is small enough to process without it. ` +
+            `Refresh the page to retry or contact support if the issue persists.`
+          );
+        } else {
+          setSnackbarMessage(
+            `Audio processor failed to load from the network. This is needed for large files (>24MB). ` +
+            `Please check your internet connection and try again. ` +
+            `If the problem persists, try uploading a smaller MP3 file (<24MB).`
+          );
+        }
+      } else {
+        setSnackbarMessage(`Processing failed: ${errorMsg}. Please try again or check your API configuration.`);
+      }
+
       setAppState('configuration');
+    } finally {
+      setProcessingAbortController(null);
     }
   };
 
@@ -208,6 +273,7 @@ function App() {
             onStartRecording={handleStartRecording}
             hasMicrophoneAccess={hasMicrophoneAccess}
             onRecordingAttempt={handleRecordingAttempt}
+            onError={setSnackbarMessage}
           />
         )}
 
@@ -233,7 +299,7 @@ function App() {
         )}
 
         {appState === 'processing' && (
-          <ProcessingState processingData={processingData} />
+          <ProcessingState processingData={processingData} onCancel={handleCancelProcessing} />
         )}
 
         {appState === 'results' && result && audioFile && (

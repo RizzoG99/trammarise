@@ -24,3 +24,6 @@ dist-ssr
 *.sln
 *.sw?
 .env*.local
+
+# FFmpeg WASM files (large binaries)
+public/ffmpeg/*.wasm

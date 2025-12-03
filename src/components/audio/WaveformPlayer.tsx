@@ -50,7 +50,7 @@ export const WaveformPlayer: React.FC<WaveformPlayerProps> = ({
 
   // Notify parent of wavesurfer instance with region methods
   useEffect(() => {
-    if (wavesurfer && onWaveSurferReady) {
+    if (wavesurfer && waveSurferInstance.regions && onWaveSurferReady) {
       const playerRef: WaveformPlayerRef = {
         wavesurfer,
         regions: waveSurferInstance.regions,

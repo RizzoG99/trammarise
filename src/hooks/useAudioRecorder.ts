@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
+import { AUDIO_CONSTANTS } from '../utils/constants';
 
 interface UseAudioRecorderReturn {
   isRecording: boolean;
@@ -22,6 +23,7 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
   const chunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<number | null>(null);
   const startTimeRef = useRef<number>(0);
+  const permissionStatusRef = useRef<PermissionStatus | null>(null);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -32,15 +34,25 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
       if (mediaRecorderRef.current?.state === 'recording') {
         mediaRecorderRef.current.stop();
       }
+      // Clean up permission listener
+      if (permissionStatusRef.current) {
+        permissionStatusRef.current.onchange = null;
+      }
     };
   }, []);
 
   const checkMicrophonePermission = useCallback(async () => {
     try {
       const permissionStatus = await navigator.permissions.query({ name: 'microphone' as PermissionName });
+      // Store reference for cleanup
+      permissionStatusRef.current = permissionStatus;
+
       // Only set to false if explicitly denied, not if it's "prompt"
       setHasMicrophoneAccess(permissionStatus.state === 'denied' ? false : null);
-      
+
+      // Remove previous listener if any
+      permissionStatus.onchange = null;
+
       // Listen for permission changes
       permissionStatus.onchange = () => {
         setHasMicrophoneAccess(permissionStatus.state === 'denied' ? false : null);
@@ -110,7 +122,7 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
         if (mediaRecorder.state === 'recording') {
           mediaRecorder.requestData();
         }
-      }, 100);
+      }, AUDIO_CONSTANTS.RECORDING_TIMER_INTERVAL);
       
       return true; // Success
     } catch (err) {

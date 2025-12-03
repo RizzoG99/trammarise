@@ -10,6 +10,7 @@ interface InitialStateProps {
   onStartRecording: () => void;
   hasMicrophoneAccess: boolean | null;
   onRecordingAttempt: () => void;
+  onError?: (message: string) => void;
 }
 
 const UploadIcon = () => (
@@ -36,6 +37,7 @@ export const InitialState: React.FC<InitialStateProps> = ({
   onStartRecording,
   hasMicrophoneAccess,
   onRecordingAttempt,
+  onError,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -45,7 +47,7 @@ export const InitialState: React.FC<InitialStateProps> = ({
 
   const handleFileValidation = (file: File) => {
     if (!file.type.startsWith('audio/')) {
-      alert('Please select a valid audio file');
+      onError?.('Please select a valid audio file');
       return;
     }
 

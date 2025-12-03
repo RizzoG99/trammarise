@@ -5,8 +5,12 @@ import type { AIProvider, SummarizeParams, ChatParams } from './base';
 export class OpenRouterProvider implements AIProvider {
   name = 'OpenRouter';
 
-  async summarize(params: SummarizeParams & { model: string }): Promise<string> {
+  async summarize(params: SummarizeParams): Promise<string> {
     const { transcript, contentType, apiKey, model } = params;
+
+    if (!model) {
+      throw new Error('Model is required for OpenRouter provider');
+    }
 
     const openrouter = createOpenRouter({
       apiKey,
@@ -32,8 +36,12 @@ ${transcript}`;
     return text;
   }
 
-  async chat(params: ChatParams & { model: string }): Promise<string> {
+  async chat(params: ChatParams): Promise<string> {
     const { transcript, summary, message, history, apiKey, model } = params;
+
+    if (!model) {
+      throw new Error('Model is required for OpenRouter provider');
+    }
 
     const openrouter = createOpenRouter({
       apiKey,

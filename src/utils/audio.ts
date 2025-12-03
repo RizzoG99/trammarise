@@ -11,27 +11,32 @@ export const trimAudioBuffer = async (
 ): Promise<AudioBuffer> => {
   const audioContext = new AudioContext();
 
-  const sampleRate = audioBuffer.sampleRate;
-  const startSample = Math.floor(startTime * sampleRate);
-  const endSample = Math.floor(endTime * sampleRate);
-  const length = endSample - startSample;
+  try {
+    const sampleRate = audioBuffer.sampleRate;
+    const startSample = Math.floor(startTime * sampleRate);
+    const endSample = Math.floor(endTime * sampleRate);
+    const length = endSample - startSample;
 
-  const trimmedBuffer = audioContext.createBuffer(
-    audioBuffer.numberOfChannels,
-    length,
-    sampleRate
-  );
+    const trimmedBuffer = audioContext.createBuffer(
+      audioBuffer.numberOfChannels,
+      length,
+      sampleRate
+    );
 
-  for (let channel = 0; channel < audioBuffer.numberOfChannels; channel++) {
-    const channelData = audioBuffer.getChannelData(channel);
-    const trimmedData = trimmedBuffer.getChannelData(channel);
+    for (let channel = 0; channel < audioBuffer.numberOfChannels; channel++) {
+      const channelData = audioBuffer.getChannelData(channel);
+      const trimmedData = trimmedBuffer.getChannelData(channel);
 
-    for (let i = 0; i < length; i++) {
-      trimmedData[i] = channelData[startSample + i];
+      for (let i = 0; i < length; i++) {
+        trimmedData[i] = channelData[startSample + i];
+      }
     }
-  }
 
-  return trimmedBuffer;
+    return trimmedBuffer;
+  } finally {
+    // Clean up AudioContext to prevent memory leaks
+    await audioContext.close();
+  }
 };
 
 export const audioBufferToWav = (buffer: AudioBuffer): Blob => {

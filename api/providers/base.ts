@@ -9,6 +9,7 @@ export interface SummarizeParams {
   transcript: string;
   contentType?: string;
   apiKey: string;
+  model?: string; // Optional model parameter for providers that support it
 }
 
 export interface ChatParams {
@@ -17,6 +18,7 @@ export interface ChatParams {
   message: string;
   history: ChatMessage[];
   apiKey: string;
+  model?: string; // Optional model parameter for providers that support it
 }
 
 export interface AIProvider {

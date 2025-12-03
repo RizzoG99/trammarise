@@ -69,7 +69,7 @@ export interface ProcessingResult {
 
 // Processing state
 export interface ProcessingStateData {
-  step: 'compressing' | 'transcribing' | 'configuring' | 'summarizing' | 'complete';
+  step: 'loading' | 'compressing' | 'transcribing' | 'configuring' | 'summarizing' | 'complete';
   progress: number;
   transcript?: string;
 }

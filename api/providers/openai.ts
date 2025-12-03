@@ -5,7 +5,7 @@ export class OpenAIProvider implements AIProvider {
   name = 'OpenAI';
 
   async summarize({ transcript, contentType, apiKey, model }: SummarizeParams & { model?: string }): Promise<string> {
-    const openai = new OpenAI({ apiKey });
+    const openai = new OpenAI({ baseURL: 'https://api.openai.com/v1',  apiKey });
 
     const systemPrompt = this.buildSummarizePrompt(contentType || 'general');
 
@@ -22,7 +22,7 @@ export class OpenAIProvider implements AIProvider {
   }
 
   async chat({ transcript, summary, message, history, apiKey, model }: ChatParams & { model?: string }): Promise<string> {
-    const openai = new OpenAI({ apiKey });
+    const openai = new OpenAI({ baseURL: 'https://api.openai.com/v1', apiKey });
 
     const completion = await openai.chat.completions.create({
       model: model || 'gpt-4o',

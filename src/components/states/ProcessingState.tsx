@@ -5,13 +5,16 @@ import './ProcessingState.css';
 
 interface ProcessingStateProps {
   processingData: ProcessingStateData;
+  onCancel?: () => void;
 }
 
-export const ProcessingState: React.FC<ProcessingStateProps> = ({ processingData }) => {
+export const ProcessingState: React.FC<ProcessingStateProps> = ({ processingData, onCancel }) => {
   const { step, progress } = processingData;
 
   const getMessage = () => {
     switch (step) {
+      case 'loading':
+        return 'Loading audio processor...';
       case 'compressing':
         return 'Optimizing audio for processing...';
       case 'transcribing':
@@ -29,6 +32,8 @@ export const ProcessingState: React.FC<ProcessingStateProps> = ({ processingData
 
   const getStepNumber = () => {
     switch (step) {
+      case 'loading':
+        return 'Preparing';
       case 'compressing':
         return 'Optimizing';
       case 'transcribing':
@@ -59,6 +64,28 @@ export const ProcessingState: React.FC<ProcessingStateProps> = ({ processingData
         <p className="processing-note">
           This may take a moment. Please don't close this window.
         </p>
+        {onCancel && (
+          <button
+            className="cancel-button"
+            onClick={onCancel}
+            style={{
+              marginTop: '20px',
+              padding: '10px 20px',
+              backgroundColor: '#ef4444',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              fontSize: '14px',
+              cursor: 'pointer',
+              fontWeight: '500',
+              transition: 'background-color 0.2s'
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#dc2626')}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#ef4444')}
+          >
+            Cancel Processing
+          </button>
+        )}
       </div>
     </div>
   );

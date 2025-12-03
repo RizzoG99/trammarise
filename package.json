@@ -10,7 +10,8 @@
     "dev:vercel": "vercel dev --yes",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "setup:ffmpeg": "bash scripts/setup-ffmpeg.sh"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.0",
@@ -20,6 +21,7 @@
     "@openrouter/sdk": "^0.2.6",
     "@vercel/node": "^5.5.13",
     "ai": "^5.0.106",
+    "busboy": "^1.6.0",
     "jspdf": "^3.0.4",
     "lucide-react": "^0.555.0",
     "openai": "^6.9.1",
@@ -30,6 +32,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@types/busboy": "^1.5.4",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",

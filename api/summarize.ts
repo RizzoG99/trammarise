@@ -1,5 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { ProviderFactory, type ProviderType } from './providers/factory';
+import { API_VALIDATION, CONTENT_TYPES } from '../src/utils/constants';
+
+const { MAX_TRANSCRIPT_LENGTH, MIN_TRANSCRIPT_LENGTH, MIN_API_KEY_LENGTH, MAX_API_KEY_LENGTH } = API_VALIDATION;
 
 export default async function handler(
   req: VercelRequest,
@@ -12,16 +15,42 @@ export default async function handler(
   try {
     const { transcript, contentType, provider, apiKey, model } = req.body;
 
+    // Validate transcript
     if (!transcript || typeof transcript !== 'string') {
-      return res.status(400).json({ error: 'Transcript is required' });
+      return res.status(400).json({ error: 'Transcript is required and must be a string' });
     }
 
-    if (!provider || !apiKey) {
-      return res.status(400).json({ error: 'Provider and API key are required' });
+    if (transcript.length < MIN_TRANSCRIPT_LENGTH) {
+      return res.status(400).json({ error: `Transcript too short. Minimum ${MIN_TRANSCRIPT_LENGTH} characters required` });
     }
 
-    if (provider === 'openrouter' && !model) {
-      return res.status(400).json({ error: 'Model is required for OpenRouter' });
+    if (transcript.length > MAX_TRANSCRIPT_LENGTH) {
+      return res.status(400).json({ error: `Transcript too long. Maximum ${MAX_TRANSCRIPT_LENGTH} characters allowed` });
+    }
+
+    // Validate contentType
+    if (contentType && !CONTENT_TYPES.includes(contentType)) {
+      return res.status(400).json({
+        error: `Invalid content type. Must be one of: ${CONTENT_TYPES.join(', ')}`
+      });
+    }
+
+    // Validate provider and API key
+    if (!provider || typeof provider !== 'string') {
+      return res.status(400).json({ error: 'Provider is required and must be a string' });
+    }
+
+    if (!apiKey || typeof apiKey !== 'string') {
+      return res.status(400).json({ error: 'API key is required and must be a string' });
+    }
+
+    if (apiKey.length < MIN_API_KEY_LENGTH || apiKey.length > MAX_API_KEY_LENGTH) {
+      return res.status(400).json({ error: 'Invalid API key format' });
+    }
+
+    // Validate OpenRouter-specific requirements
+    if (provider === 'openrouter' && (!model || typeof model !== 'string')) {
+      return res.status(400).json({ error: 'Model is required for OpenRouter and must be a string' });
     }
 
     const aiProvider = ProviderFactory.getProvider(provider as ProviderType);
@@ -30,8 +59,8 @@ export default async function handler(
       transcript,
       contentType,
       apiKey,
-      model, // Pass model for OpenRouter
-    } as any); // Type assertion needed due to optional model param
+      model, // Optional: only required for OpenRouter
+    });
 
     return res.status(200).json({ summary });
   } catch (error: any) {

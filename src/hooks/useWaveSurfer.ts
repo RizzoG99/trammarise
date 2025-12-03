@@ -84,9 +84,17 @@ export const useWaveSurfer = (
     wavesurferRef.current = ws;
 
     return () => {
-      ws.destroy();
-      wavesurferRef.current = null;
-      regionsPluginRef.current = null;
+      try {
+        // Safely destroy WaveSurfer instance
+        if (ws && !ws.isDestroyed) {
+          ws.destroy();
+        }
+      } catch (error) {
+        console.error('Error destroying WaveSurfer:', error);
+      } finally {
+        wavesurferRef.current = null;
+        regionsPluginRef.current = null;
+      }
     };
   }, [containerRef, config]);
 
