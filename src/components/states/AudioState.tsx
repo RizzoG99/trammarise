@@ -4,7 +4,6 @@ import type { WaveformPlayerRef } from '../audio/WaveformPlayer';
 import { PlaybackControls } from '../audio/PlaybackControls';
 import { Button } from '../ui/Button';
 import { AUDIO_CONSTANTS } from '../../utils/constants';
-import './AudioState.css';
 
 interface AudioStateProps {
   audioFile: File | Blob;
@@ -140,15 +139,27 @@ export const AudioState: React.FC<AudioStateProps> = ({
     onProcessingStart();
   };
 
+  const getMessageClasses = (type: MessageType) => {
+    const baseClasses = "p-4 rounded-lg mb-4 text-sm animate-[fadeIn_0.3s_ease-out] backdrop-blur-md";
+    switch (type) {
+      case 'success':
+        return `${baseClasses} bg-green-500/10 border border-green-500/30 text-green-400`;
+      case 'error':
+        return `${baseClasses} bg-red-500/10 border border-red-500/30 text-red-400`;
+      case 'info':
+        return `${baseClasses} bg-primary/10 border border-primary/30 text-primary-light`;
+    }
+  };
+
   return (
-    <div className="audio-state">
-      <div className="audio-info">
-        <h2 className="audio-title">{audioName}</h2>
-        <p className="audio-subtitle">Visualize and trim your audio below</p>
+    <div className="w-full max-w-[800px] animate-[fadeIn_0.3s_ease-out]">
+      <div className="text-center mb-8">
+        <h2 className="text-2xl font-semibold mb-1">{audioName}</h2>
+        <p className="text-base text-text-secondary">Visualize and trim your audio below</p>
       </div>
 
       {message && (
-        <div className={`message message-${message.type}`}>
+        <div className={getMessageClasses(message.type)}>
           {message.text}
         </div>
       )}
@@ -174,11 +185,11 @@ export const AudioState: React.FC<AudioStateProps> = ({
         onCancelTrim={handleCancelTrim}
       />
 
-      <div className="action-buttons">
-        <Button variant="large" icon={<ProcessIcon />} onClick={handleProcess}>
+      <div className="flex flex-col gap-4 mt-8 sm:flex-row">
+        <Button variant="large" icon={<ProcessIcon />} onClick={handleProcess} className="w-full sm:flex-[2]">
           Process Audio
         </Button>
-        <Button variant="outline" onClick={onReset}>
+        <Button variant="outline" onClick={onReset} className="w-full sm:flex-1">
           Start Over
         </Button>
       </div>

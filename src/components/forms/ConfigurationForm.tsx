@@ -8,7 +8,6 @@ import { Input } from '../ui/Input';
 import { SelectCard } from '../ui/SelectCard';
 import { ToggleSwitch } from '../ui/ToggleSwitch';
 import { CURATED_MODELS } from '../../constants/models';
-import './ConfigurationForm.css';
 
 interface ConfigurationFormProps {
   onSubmit: (config: AIConfiguration) => void;
@@ -156,21 +155,21 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ onSubmit, 
   };
 
   return (
-    <form className="configuration-form" onSubmit={handleSubmit}>
+    <form className="w-full max-w-[600px] mx-auto" onSubmit={handleSubmit}>
 
       {/* Language Selection */}
-      <div className="form-section">
-        <label className="form-label">
+      <div className="mb-8">
+        <label className="block mb-3 font-semibold text-text-primary text-base">
           Audio Language
-          <span className="required">*</span>
+          <span className="text-accent-error ml-1">*</span>
         </label>
         <select
-          className="model-select"
+          className="w-full p-3 text-base border border-border-glass rounded-lg bg-bg-surface text-text-primary cursor-pointer transition-all hover:bg-bg-surface-hover hover:border-primary-light/30 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
           value={language}
           onChange={(e) => setLanguage(e.target.value)}
         >
           {LANGUAGES.map((lang) => (
-            <option key={lang.value} value={lang.value}>
+            <option key={lang.value} value={lang.value} className="bg-[#1a1a1a] text-white p-2">
               {lang.label}
             </option>
           ))}
@@ -178,12 +177,12 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ onSubmit, 
       </div>
 
       {/* Content Type */}
-      <div className="form-section">
-        <label className="form-label">
+      <div className="mb-8">
+        <label className="block mb-3 font-semibold text-text-primary text-base">
           Content Type
-          <span className="required">*</span>
+          <span className="text-accent-error ml-1">*</span>
         </label>
-        <div className="content-type-grid">
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(140px,1fr))] gap-3">
           {CONTENT_TYPES.map((type) => (
             <SelectCard
               key={type.value}
@@ -195,10 +194,10 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ onSubmit, 
             />
           ))}
         </div>
-        {errors.contentType && <span className="error-message">{errors.contentType}</span>}
+        {errors.contentType && <span className="block mt-2 text-accent-error text-sm">{errors.contentType}</span>}
 
         {contentType === 'other' && (
-          <div className="custom-content-type">
+          <div className="mt-3 animate-[slideDown_0.2s_ease-out]">
             <Input
               placeholder="e.g., Data Science Lesson"
               value={customContentType}
@@ -211,7 +210,7 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ onSubmit, 
       </div>
 
        {/* Mode Toggle */}
-      <div className="form-section">
+      <div className="mb-8">
         <ToggleSwitch
           label="Advanced mode"
           checked={mode === 'advanced'}
@@ -222,31 +221,32 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ onSubmit, 
       {/* Simple Mode */}
       {mode === 'simple' && (
         <>
-          <div className="form-section">
-            <label className="form-label">
+          <div className="mb-8">
+            <label className="block mb-3 font-semibold text-text-primary text-base">
               Performance Level
-              <span className="required">*</span>
+              <span className="text-accent-error ml-1">*</span>
             </label>
-            <div className="performance-options">
+            <div className="flex flex-col gap-3">
               {SIMPLE_MODELS.map((model) => (
-                <label key={model.value} className="performance-option">
+                <label key={model.value} className="flex items-start gap-3 p-4 bg-bg-surface border-2 border-border-glass rounded-lg cursor-pointer transition-all hover:bg-white/10 hover:border-primary-light/30 has-[:checked]:border-primary has-[:checked]:bg-primary/10 has-[:checked]:shadow-[0_0_0_2px_rgba(139,92,246,0.2)]">
                   <input
                     type="radio"
                     name="simpleModel"
                     value={model.value}
                     checked={simpleModel === model.value}
                     onChange={(e) => setSimpleModel(e.target.value)}
+                    className="mt-1 cursor-pointer w-[18px] h-[18px] flex-shrink-0 accent-primary"
                   />
-                  <div className="performance-label">
-                    <strong>{model.label}</strong>
-                    <span className="performance-description">{model.description}</span>
+                  <div className="flex flex-col gap-1 flex-1">
+                    <strong className="text-base text-text-primary">{model.label}</strong>
+                    <span className="text-sm text-text-secondary">{model.description}</span>
                   </div>
                 </label>
               ))}
             </div>
           </div>
 
-          <div className="form-section">
+          <div className="mb-8">
             <Input
               id="openai-key-simple"
               type="password"
@@ -261,12 +261,12 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ onSubmit, 
             />
           </div>
 
-          <div className="info-box">
-            <strong>ℹ️ What's included:</strong>
-            <ul>
-              <li>Whisper transcription (industry-leading accuracy)</li>
-              <li>{simpleModel === 'gpt-4o' ? 'GPT-4o' : 'GPT-o3 Mini'} summarization</li>
-              <li>Single API key for simplicity</li>
+          <div className="p-4 bg-primary/10 border border-primary/30 rounded-lg mt-4">
+            <strong className="block mb-2 text-text-primary">ℹ️ What's included:</strong>
+            <ul className="m-0 pl-6 text-text-secondary">
+              <li className="my-1 text-sm">Whisper transcription (industry-leading accuracy)</li>
+              <li className="my-1 text-sm">{simpleModel === 'gpt-4o' ? 'GPT-4o' : 'GPT-o3 Mini'} summarization</li>
+              <li className="my-1 text-sm">Single API key for simplicity</li>
             </ul>
           </div>
 
@@ -277,26 +277,26 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ onSubmit, 
       {/* Advanced Mode */}
       {mode === 'advanced' && (
         <>
-          <div className="form-section">
-            <label className="form-label">
+          <div className="mb-8">
+            <label className="block mb-3 font-semibold text-text-primary text-base">
               AI Model
-              <span className="required">*</span>
+              <span className="text-accent-error ml-1">*</span>
             </label>
             <select
-              className="model-select"
+              className="w-full p-3 text-base border border-border-glass rounded-lg bg-bg-surface text-text-primary cursor-pointer transition-all hover:bg-bg-surface-hover hover:border-primary-light/30 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
               value={advancedModel}
               onChange={(e) => setAdvancedModel(e.target.value)}
             >
               {CURATED_MODELS.map((m) => (
-                <option key={m.id} value={m.id}>
+                <option key={m.id} value={m.id} className="bg-[#1a1a1a] text-white p-2">
                   {m.name} - {m.provider} ({m.description})
                 </option>
               ))}
             </select>
-            {errors.advancedModel && <span className="error-message">{errors.advancedModel}</span>}
+            {errors.advancedModel && <span className="block mt-2 text-accent-error text-sm">{errors.advancedModel}</span>}
           </div>
 
-          <div className="form-section">
+          <div className="mb-8">
             <Input
               id="openai-key-advanced"
               type="password"
@@ -311,7 +311,7 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ onSubmit, 
             />
           </div>
 
-          <div className="form-section">
+          <div className="mb-8">
             <Input
               id="openrouter-key"
               type="password"
@@ -330,11 +330,11 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ onSubmit, 
         </>
       )}
 
-      <div className="form-actions">
-        <Button type="button" variant="outline" onClick={onCancel} disabled={isValidating}>
+      <div className="flex gap-4 mt-8 pt-8 border-t border-border-glass flex-col-reverse sm:flex-row">
+        <Button type="button" variant="outline" onClick={onCancel} disabled={isValidating} className="w-full sm:w-auto flex-1">
           Back
         </Button>
-        <Button type="submit" variant="primary" disabled={isValidating}>
+        <Button type="submit" variant="primary" disabled={isValidating} className="w-full sm:w-auto flex-1">
           {isValidating ? 'Validating...' : 'Validate & Continue'}
         </Button>
       </div>

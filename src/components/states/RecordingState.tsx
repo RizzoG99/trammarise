@@ -1,7 +1,6 @@
 import React from 'react';
 import { Button } from '../ui/Button';
 import { formatTime } from '../../utils/audio';
-import './RecordingState.css';
 
 interface RecordingStateProps {
   duration: number;
@@ -19,13 +18,13 @@ export const RecordingState: React.FC<RecordingStateProps> = ({
   onStopRecording,
 }) => {
   return (
-    <div className="recording-state">
-      <div className="recording-indicator">
-        <div className="pulse-dot" />
-        <span className="recording-text">Recording...</span>
+    <div className="w-full max-w-[600px] text-center animate-[fadeIn_0.3s_ease-out]">
+      <div className="flex items-center justify-center gap-2 mb-8">
+        <div className="w-3 h-3 rounded-full bg-accent-error animate-[pulse_1.5s_ease-in-out_infinite]" />
+        <span className="text-lg font-medium text-accent-error">Recording...</span>
       </div>
 
-      <div className="recording-timer">{formatTime(duration)}</div>
+      <div className="text-4xl font-light mb-12 tabular-nums">{formatTime(duration)}</div>
 
       <Button variant="danger" icon={<StopIcon />} onClick={onStopRecording}>
         Stop Recording

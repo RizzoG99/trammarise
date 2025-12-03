@@ -6,10 +6,10 @@ import { ConfigurationState } from './components/states/ConfigurationState';
 import { ProcessingState } from './components/states/ProcessingState';
 import { ResultsState } from './components/states/ResultsState';
 import { Snackbar } from './components/ui/Snackbar';
+import { ThemeToggle } from './components/ui/ThemeToggle';
 import { useAudioRecorder } from './hooks/useAudioRecorder';
 import { transcribeAudio, summarizeTranscript } from './utils/api';
 import type { AppState, AudioFile, ProcessingResult, ProcessingStateData, AIConfiguration } from './types/audio';
-import './App.css';
 
 function App() {
   const [appState, setAppState] = useState<AppState>('initial');
@@ -19,7 +19,6 @@ function App() {
     progress: 0,
   });
   const [result, setResult] = useState<ProcessingResult | null>(null);
-  const [aiConfiguration, setAiConfiguration] = useState<AIConfiguration | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [snackbarMessage, setSnackbarMessage] = useState<string | null>(null);
   const [processingAbortController, setProcessingAbortController] = useState<AbortController | null>(null);
@@ -123,7 +122,6 @@ function App() {
   const handleReset = () => {
     setAudioFile(null);
     setResult(null);
-    setAiConfiguration(null);
     lastProcessedBlobRef.current = null; // Clear tracked blob to allow new recordings
     setAppState('initial');
   };
@@ -151,7 +149,6 @@ function App() {
     const abortController = new AbortController();
     setProcessingAbortController(abortController);
 
-    setAiConfiguration(config);
     setAppState('processing');
     setProcessingData({ step: 'loading', progress: 0 });
 
@@ -259,10 +256,13 @@ function App() {
   };
 
   return (
-    <div className="container">
-      <main className="main-content">
+    <div className="max-w-[1200px] mx-auto p-4 md:p-8 min-h-screen flex flex-col relative">
+      <div className="absolute top-4 right-4 z-50">
+        <ThemeToggle />
+      </div>
+      <main className="flex-1 flex flex-col justify-center items-center py-8">
         {errorMessage && (
-          <div className="error-message">
+          <div className="w-full max-w-[800px] p-4 rounded-lg mb-4 text-sm bg-red-500/10 border border-red-500/30 text-red-400 backdrop-blur-md animate-[slideDown_0.3s_ease-out]">
             {errorMessage}
           </div>
         )}
@@ -319,8 +319,8 @@ function App() {
         onClose={() => setSnackbarMessage(null)}
       />
 
-      <footer className="footer">
-        <p>Trammarise &copy; 2025 - Audio Transcription & Summarization</p>
+      <footer className="text-center py-8 text-text-tertiary text-sm border-t border-bg-tertiary mt-auto">
+        <p className="m-0">Trammarise &copy; 2025 - Audio Transcription & Summarization</p>
       </footer>
     </div>
   );

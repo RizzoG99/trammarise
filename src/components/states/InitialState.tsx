@@ -3,7 +3,6 @@ import { Button } from '../ui/Button';
 import { FileSizeWarningModal } from '../ui/FileSizeWarningModal';
 import { getFileSizeStatus } from '../../utils/fileSize';
 import type { FileSizeStatus } from '../../utils/fileSize';
-import './InitialState.css';
 
 interface InitialStateProps {
   onFileUpload: (file: File, shouldCompress: boolean) => void;
@@ -129,15 +128,15 @@ export const InitialState: React.FC<InitialStateProps> = ({
 
   return (
     <>
-      <div className="initial-state">
-        <div className="welcome-text">
-          <h1 className="title">Transform Your Audio</h1>
-          <p className="subtitle">
+      <div className="w-full max-w-[600px] animate-[fadeIn_0.3s_ease-out]">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-center mb-2 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent sm:text-5xl">Transform Your Audio</h1>
+          <p className="text-lg text-text-secondary text-center font-light">
             Upload an audio file or start recording to transcribe and summarize
           </p>
         </div>
 
-        <div className="action-buttons">
+        <div className="flex flex-col gap-4 w-full mb-8 sm:flex-row">
           <input
             ref={fileInputRef}
             type="file"
@@ -146,7 +145,7 @@ export const InitialState: React.FC<InitialStateProps> = ({
             style={{ display: 'none' }}
           />
 
-          <Button variant="primary" icon={<UploadIcon />} onClick={handleUploadClick}>
+          <Button variant="primary" icon={<UploadIcon />} onClick={handleUploadClick} className="w-full sm:flex-1">
             Upload Audio
           </Button>
 
@@ -155,19 +154,26 @@ export const InitialState: React.FC<InitialStateProps> = ({
             icon={<RecordIcon />} 
             onClick={handleRecordClick}
             disabled={hasMicrophoneAccess === false}
+            className="w-full sm:flex-1"
           >
             Start Recording
           </Button>
         </div>
 
         <div
-          className={`drop-zone ${isDragging ? 'drag-over' : ''}`}
+          className={`mt-4 p-12 border-2 border-dashed rounded-xl text-center text-text-tertiary transition-all duration-300 bg-bg-glass backdrop-blur-md flex flex-col items-center justify-center ${
+            isDragging 
+              ? 'border-primary bg-primary/10 text-text-primary' 
+              : 'border-primary/30'
+          }`}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
         >
-          <DropIcon />
-          <p>or drag and drop audio file here</p>
+          <div className="w-12 h-12 mb-4 opacity-50">
+            <DropIcon />
+          </div>
+          <p className="text-sm m-0">or drag and drop audio file here</p>
         </div>
       </div>
 

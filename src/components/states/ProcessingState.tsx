@@ -2,7 +2,6 @@ import React from 'react';
 import { LoadingSpinner } from '../ui/LoadingSpinner';
 import { Button } from '../ui/Button';
 import type { ProcessingStateData } from '../../types/audio';
-import './ProcessingState.css';
 
 interface ProcessingStateProps {
   processingData: ProcessingStateData;
@@ -51,25 +50,25 @@ export const ProcessingState: React.FC<ProcessingStateProps> = ({ processingData
   };
 
   return (
-    <div className="processing-state">
-      <div className="processing-content">
+    <div className="flex flex-col items-center justify-center min-h-[400px] w-full max-w-[600px] mx-auto text-center animate-[fadeIn_0.3s_ease-out]">
+      <div className="w-full p-8 bg-bg-surface border border-border-glass rounded-xl backdrop-blur-md">
         <LoadingSpinner />
-        <h2 className="processing-title">{getMessage()}</h2>
-        <p className="processing-step">Step {getStepNumber()}</p>
-        <div className="progress-bar">
+        <h2 className="mt-6 mb-2 text-2xl font-semibold text-text-primary">{getMessage()}</h2>
+        <p className="mb-8 text-base text-text-secondary">Step {getStepNumber()}</p>
+        <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden mb-6">
           <div
-            className="progress-fill"
+            className="h-full bg-gradient-to-r from-primary to-primary-light rounded-full transition-[width] duration-300 ease-out"
             style={{ width: `${progress}%` }}
           />
         </div>
-        <p className="processing-note">
+        <p className="text-sm text-text-secondary mb-6">
           This may take a moment. Please don't close this window.
         </p>
         {onCancel && (
           <Button
             variant="danger"
             onClick={onCancel}
-            className="cancel-button"
+            className="mt-4"
           >
             Cancel Processing
           </Button>

@@ -2,7 +2,6 @@ import React, { useRef, useEffect } from 'react';
 import { useWaveSurfer } from '../../hooks/useWaveSurfer';
 import WaveSurfer from 'wavesurfer.js';
 import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions.esm.js';
-import './WaveformPlayer.css';
 
 export interface WaveformPlayerRef {
   wavesurfer: WaveSurfer;
@@ -79,8 +78,8 @@ export const WaveformPlayer: React.FC<WaveformPlayerProps> = ({
   }, [currentTime, duration, onTimeUpdate]);
 
   return (
-    <div className="waveform-container">
-      <div ref={containerRef} className="waveform" />
+    <div className="bg-bg-glass backdrop-blur-md border border-primary/20 rounded-xl p-6 mb-6 shadow-lg lg:p-8">
+      <div ref={containerRef} className="min-h-[128px] md:min-h-[160px]" />
     </div>
   );
 };
