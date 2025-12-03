@@ -2,6 +2,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { ProviderFactory, type ProviderType } from './providers/factory';
 import { API_VALIDATION, CONTENT_TYPES } from '../src/utils/constants';
 import busboy from 'busboy';
+import { extractPdfText } from './utils/pdf-extractor';
 
 export const config = {
   api: {
@@ -47,9 +48,12 @@ export default async function handler(
           const buffer = Buffer.concat(chunks);
 
           if (mimeType === 'application/pdf') {
-            // TODO: PDF parsing is temporarily disabled due to ES module compatibility issues
-            // The pdf-parse package (v2.4.5) has issues with ES modules in Node.js
-            console.warn(`PDF file ${info.filename} was uploaded but cannot be processed at this time`);
+            try {
+              const pdfText = await extractPdfText(buffer);
+              contextText += `\n\n[Document Context: ${info.filename}]\n${pdfText}\n`;
+            } catch (e) {
+              console.error('Error parsing PDF:', e);
+            }
           } else if (mimeType === 'text/plain') {
             contextText += `\n\n[Document Context: ${info.filename}]\n${buffer.toString('utf-8')}\n`;
           } else if (mimeType.startsWith('image/')) {
