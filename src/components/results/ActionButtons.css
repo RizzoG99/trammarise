@@ -9,10 +9,10 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 1rem;
-  background: #f3f4f6;
-  border: 1px solid #e5e7eb;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.1));
   border-radius: 8px;
-  color: #374151;
+  color: var(--color-text-primary, #ffffff);
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
@@ -20,8 +20,8 @@
 }
 
 .action-btn:hover {
-  background: #e5e7eb;
-  border-color: #d1d5db;
+  background: rgba(255, 255, 255, 0.15);
+  border-color: var(--color-primary-light, rgba(139, 92, 246, 0.3));
 }
 
 .action-btn:active {

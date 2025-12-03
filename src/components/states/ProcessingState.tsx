@@ -1,5 +1,6 @@
 import React from 'react';
 import { LoadingSpinner } from '../ui/LoadingSpinner';
+import { Button } from '../ui/Button';
 import type { ProcessingStateData } from '../../types/audio';
 import './ProcessingState.css';
 
@@ -65,26 +66,13 @@ export const ProcessingState: React.FC<ProcessingStateProps> = ({ processingData
           This may take a moment. Please don't close this window.
         </p>
         {onCancel && (
-          <button
-            className="cancel-button"
+          <Button
+            variant="danger"
             onClick={onCancel}
-            style={{
-              marginTop: '20px',
-              padding: '10px 20px',
-              backgroundColor: '#ef4444',
-              color: 'white',
-              border: 'none',
-              borderRadius: '8px',
-              fontSize: '14px',
-              cursor: 'pointer',
-              fontWeight: '500',
-              transition: 'background-color 0.2s'
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#dc2626')}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#ef4444')}
+            className="cancel-button"
           >
             Cancel Processing
-          </button>
+          </Button>
         )}
       </div>
     </div>
