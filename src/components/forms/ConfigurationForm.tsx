@@ -57,6 +57,37 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ onSubmit, 
   const [openrouterKey, setOpenrouterKey] = useState('');
   const [isValidating, setIsValidating] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [contextFiles, setContextFiles] = useState<File[]>([]);
+
+  const handleContextFiles = (files: File[]) => {
+    const validFiles: File[] = [];
+    let totalSize = contextFiles.reduce((acc, f) => acc + f.size, 0);
+    const MAX_TOTAL_SIZE = 4.5 * 1024 * 1024; // 4.5MB limit (Vercel serverless limit)
+
+    for (const file of files) {
+      // Validate type
+      if (!file.type.startsWith('image/') && file.type !== 'application/pdf' && file.type !== 'text/plain') {
+        setErrors(prev => ({ ...prev, contextFiles: 'Only images, PDF, and TXT files are allowed' }));
+        return;
+      }
+
+      // Validate size
+      if (totalSize + file.size > MAX_TOTAL_SIZE) {
+        setErrors(prev => ({ ...prev, contextFiles: 'Total file size cannot exceed 4.5MB' }));
+        return;
+      }
+
+      totalSize += file.size;
+      validFiles.push(file);
+    }
+
+    setContextFiles(prev => [...prev, ...validFiles]);
+    setErrors(prev => {
+      const newErrors = { ...prev };
+      delete newErrors.contextFiles;
+      return newErrors;
+    });
+  };
 
   // Load saved config from session storage
   useEffect(() => {
@@ -144,6 +175,7 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ onSubmit, 
         openrouterKey: mode === 'advanced' ? openrouterKey : undefined,
         contentType: finalContentType,
         language,
+        contextFiles,
       };
 
       onSubmit(config);
@@ -329,6 +361,77 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ onSubmit, 
           <ApiKeyInfo provider="openrouter" />
         </>
       )}
+
+      {/* Context Files Upload */}
+      <div className="mb-8">
+        <label className="block mb-3 font-semibold text-slate-900 dark:text-white text-base">
+          Context Files (Optional)
+          <span className="ml-2 text-xs font-normal text-slate-500 dark:text-slate-400">
+            Images, PDF, or TXT (Max 4.5MB total)
+          </span>
+        </label>
+        
+        <div 
+          className="border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-lg p-6 text-center transition-colors hover:border-indigo-400 dark:hover:border-indigo-500 bg-slate-50 dark:bg-slate-800/50 cursor-pointer"
+          onClick={() => document.getElementById('context-file-upload')?.click()}
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={(e) => {
+            e.preventDefault();
+            const files = Array.from(e.dataTransfer.files);
+            handleContextFiles(files);
+          }}
+        >
+          <input
+            id="context-file-upload"
+            type="file"
+            multiple
+            accept="image/*,.pdf,.txt"
+            className="hidden"
+            onChange={(e) => {
+              if (e.target.files) {
+                handleContextFiles(Array.from(e.target.files));
+              }
+            }}
+          />
+          <div className="flex flex-col items-center gap-2">
+            <svg className="w-8 h-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+            </svg>
+            <p className="text-sm text-slate-600 dark:text-slate-300">
+              Click or drag files here to upload
+            </p>
+          </div>
+        </div>
+
+        {contextFiles.length > 0 && (
+          <div className="mt-4 space-y-2">
+            {contextFiles.map((file, index) => (
+              <div key={index} className="flex items-center justify-between p-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg animate-[fadeIn_0.2s_ease-out]">
+                <div className="flex items-center gap-3 overflow-hidden">
+                  <span className="text-xl">
+                    {file.type.startsWith('image/') ? '🖼️' : file.type === 'application/pdf' ? '📄' : '📝'}
+                  </span>
+                  <div className="flex flex-col min-w-0">
+                    <span className="text-sm font-medium text-slate-900 dark:text-white truncate">{file.name}</span>
+                    <span className="text-xs text-slate-500">{(file.size / 1024).toFixed(1)} KB</span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setContextFiles(prev => prev.filter((_, i) => i !== index))}
+                  className="p-1 text-slate-400 hover:text-red-500 transition-colors"
+                  aria-label="Remove file"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+        {errors.contextFiles && <span className="block mt-2 text-red-500 text-sm">{errors.contextFiles}</span>}
+      </div>
 
       <div className="flex gap-4 mt-8 pt-8 border-t border-slate-200 dark:border-slate-700 flex-col-reverse sm:flex-row">
         <Button type="button" variant="outline" onClick={onCancel} disabled={isValidating} className="w-full sm:w-auto flex-1">

@@ -6,7 +6,7 @@ export class OpenRouterProvider implements AIProvider {
   name = 'OpenRouter';
 
   async summarize(params: SummarizeParams): Promise<string> {
-    const { transcript, contentType, apiKey, model } = params;
+    const { transcript, contentType, apiKey, model, context } = params;
 
     if (!model) {
       throw new Error('Model is required for OpenRouter provider');
@@ -16,21 +16,43 @@ export class OpenRouterProvider implements AIProvider {
       apiKey,
     });
 
-    const prompt = `You are an expert at summarizing ${contentType || 'content'}. 
+    const systemPrompt = `You are an expert at summarizing ${contentType || 'content'}. 
 Please provide a clear, well-structured summary of the following transcript.
 
 Include:
 - Main topics and key points
 - Important details and insights
 - Action items (if any)
-- Conclusions or outcomes
+- Conclusions or outcomes`;
 
-Transcript:
-${transcript}`;
+    const userContent: any[] = [
+      { type: 'text', text: `Transcript:\n${transcript}` }
+    ];
+
+    if (context) {
+      if (context.text) {
+        userContent.push({ 
+          type: 'text', 
+          text: `\n\nAdditional Context from Documents:\n${context.text}` 
+        });
+      }
+
+      if (context.images && context.images.length > 0) {
+        context.images.forEach(img => {
+          userContent.push({
+            type: 'image',
+            image: `data:${img.type};base64,${img.data}`
+          });
+        });
+      }
+    }
 
     const { text } = await generateText({
       model: openrouter(model),
-      prompt,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userContent as any }
+      ],
     });
 
     return text;
