@@ -80,7 +80,8 @@ export async function summarizeTranscript(
   provider: string,
   apiKey: string,
   model?: string,
-  contextFiles?: File[]
+  contextFiles?: File[],
+  language?: string
 ): Promise<SummarizationResponse> {
   const formData = new FormData();
   formData.append('transcript', transcript);
@@ -96,6 +97,10 @@ export async function summarizeTranscript(
     contextFiles.forEach((file) => {
       formData.append('contextFiles', file);
     });
+  }
+
+  if (language) {
+    formData.append('language', language);
   }
 
   const response = await fetchWithTimeout('/api/summarize', {

@@ -4,10 +4,10 @@ import type { AIProvider, SummarizeParams, ChatParams } from './base';
 export class OpenAIProvider implements AIProvider {
   name = 'OpenAI';
 
-  async summarize({ transcript, contentType, apiKey, model, context }: SummarizeParams & { model?: string }): Promise<string> {
+  async summarize({ transcript, contentType, apiKey, model, context, language }: SummarizeParams & { model?: string }): Promise<string> {
     const openai = new OpenAI({ baseURL: 'https://api.openai.com/v1',  apiKey });
 
-    const systemPrompt = this.buildSummarizePrompt(contentType || 'general');
+    const systemPrompt = this.buildSummarizePrompt(contentType || 'general', language);
 
     const messages: any[] = [
       { role: 'system', content: systemPrompt }
@@ -83,12 +83,13 @@ Respond concisely and use markdown formatting where appropriate.`
     }
   }
 
-  protected buildSummarizePrompt(contentType: string): string {
+  protected buildSummarizePrompt(contentType: string, language?: string): string {
     const basePrompt = 'You are an expert AI assistant capable of summarizing audio transcripts with high accuracy.';
+    const languageInstruction = language ? `\n\nIMPORTANT: Provide the summary in ${this.getLanguageName(language)}. The summary must be written entirely in ${this.getLanguageName(language)}.` : '';
     
     switch (contentType) {
       case 'meeting':
-        return `${basePrompt}
+        return `${basePrompt}${languageInstruction}
         
 Please summarize the following meeting transcript. Structure your response as follows:
 1. **Executive Summary**: A brief overview of the meeting's purpose and outcome.
@@ -100,7 +101,7 @@ Please summarize the following meeting transcript. Structure your response as fo
 Focus on clarity and actionable information.`;
 
       case 'lecture':
-        return `${basePrompt}
+        return `${basePrompt}${languageInstruction}
         
 Please summarize the following lecture/class transcript. Structure your response as follows:
 1. **Topic Overview**: What was the lecture about?
@@ -112,7 +113,7 @@ Please summarize the following lecture/class transcript. Structure your response
 Focus on educational value and clarity.`;
 
       case 'interview':
-        return `${basePrompt}
+        return `${basePrompt}${languageInstruction}
         
 Please summarize the following interview transcript. Structure your response as follows:
 1. **Interviewee Profile**: Who was interviewed and their background (if mentioned).
@@ -123,7 +124,7 @@ Please summarize the following interview transcript. Structure your response as 
 Focus on capturing the interviewee's perspective and voice.`;
 
       case 'podcast':
-        return `${basePrompt}
+        return `${basePrompt}${languageInstruction}
         
 Please summarize the following podcast episode transcript. Structure your response as follows:
 1. **Episode Theme**: The central topic of the episode.
@@ -134,7 +135,7 @@ Please summarize the following podcast episode transcript. Structure your respon
 Focus on engagement and the narrative flow.`;
 
       case 'voice-memo':
-        return `${basePrompt}
+        return `${basePrompt}${languageInstruction}
         
 Please summarize the following voice memo. Structure your response as follows:
 1. **Main Idea**: The core message or thought recorded.
@@ -144,13 +145,28 @@ Please summarize the following voice memo. Structure your response as follows:
 Keep it concise and personal.`;
 
       default:
-        return `${basePrompt}
+        return `${basePrompt}${languageInstruction}
         
 Please provide a comprehensive summary of the following transcript.
 - Identify the main topic.
 - List key points and details.
 - Provide a clear conclusion.`;
     }
+  }
+
+  private getLanguageName(code: string): string {
+    const languages: Record<string, string> = {
+      'en': 'English',
+      'it': 'Italian',
+      'es': 'Spanish',
+      'fr': 'French',
+      'de': 'German',
+      'pt': 'Portuguese',
+      'nl': 'Dutch',
+      'ja': 'Japanese',
+      'zh': 'Chinese',
+    };
+    return languages[code] || 'English';
   }
 }
 

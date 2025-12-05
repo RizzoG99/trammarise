@@ -6,7 +6,7 @@ export class OpenRouterProvider implements AIProvider {
   name = 'OpenRouter';
 
   async summarize(params: SummarizeParams): Promise<string> {
-    const { transcript, contentType, apiKey, model, context } = params;
+    const { transcript, contentType, apiKey, model, context, language } = params;
 
     if (!model) {
       throw new Error('Model is required for OpenRouter provider');
@@ -16,7 +16,9 @@ export class OpenRouterProvider implements AIProvider {
       apiKey,
     });
 
-    const systemPrompt = `You are an expert at summarizing ${contentType || 'content'}. 
+    const languageInstruction = language ? `\n\nIMPORTANT: Provide the summary in ${this.getLanguageName(language)}. The summary must be written entirely in ${this.getLanguageName(language)}.` : '';
+
+    const systemPrompt = `You are an expert at summarizing ${contentType || 'content'}.${languageInstruction}
 Please provide a clear, well-structured summary of the following transcript.
 
 Include:
@@ -113,5 +115,20 @@ Answer questions about the content, provide insights, or help refine the summary
       console.error('OpenRouter API key validation failed:', error);
       return false;
     }
+  }
+
+  private getLanguageName(code: string): string {
+    const languages: Record<string, string> = {
+      'en': 'English',
+      'it': 'Italian',
+      'es': 'Spanish',
+      'fr': 'French',
+      'de': 'German',
+      'pt': 'Portuguese',
+      'nl': 'Dutch',
+      'ja': 'Japanese',
+      'zh': 'Chinese',
+    };
+    return languages[code] || 'English';
   }
 }

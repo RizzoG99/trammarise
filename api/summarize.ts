@@ -72,7 +72,7 @@ export default async function handler(
     req.pipe(bb);
     await parsePromise;
 
-    const { transcript, contentType, provider, apiKey, model } = fields;
+    const { transcript, contentType, provider, apiKey, model, language } = fields;
 
     // Validate transcript
     if (!transcript) {
@@ -119,6 +119,7 @@ export default async function handler(
       contentType: contentType as any,
       apiKey,
       model,
+      language,
       context: {
         text: contextText,
         images: contextImages

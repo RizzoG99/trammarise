@@ -208,7 +208,8 @@ function App() {
         config.provider,
         config.provider === 'openai' ? config.openaiKey : config.openrouterKey!,
         config.model,
-        config.contextFiles
+        config.contextFiles,
+        config.language
       );
       setProcessingData({ step: 'summarizing', progress: 100 });
 
