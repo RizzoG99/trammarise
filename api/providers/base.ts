@@ -10,6 +10,7 @@ export interface SummarizeParams {
   contentType: string;
   apiKey: string;
   model?: string; // Optional model parameter for providers that support it
+  language?: string; // Optional language for summary generation
   context?: {
     text: string;
     images: { type: string; data: string }[];
