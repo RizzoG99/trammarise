@@ -83,6 +83,18 @@ app.post('/api/chat', async (req, res) => {
   }
 });
 
+// Generate PDF endpoint
+app.post('/api/generate-pdf', async (req, res) => {
+  console.log('POST /api/generate-pdf');
+  try {
+    const handler = await loadHandler('./api/generate-pdf.ts');
+    await handler(req, res);
+  } catch (error) {
+    console.error('Error in generate-pdf:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'API dev server is running' });

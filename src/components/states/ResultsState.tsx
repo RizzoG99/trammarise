@@ -3,7 +3,7 @@ import ReactMarkdown from 'react-markdown';
 import { ActionButtons } from '../results/ActionButtons';
 import { ChatInterface } from '../results/ChatInterface';
 import { Button } from '../ui/Button';
-import { chatWithAI } from '../../utils/api';
+import { chatWithAI, generatePDF } from '../../utils/api';
 import type { ProcessingResult, ChatMessage } from '../../types/audio';
 
 interface ResultsStateProps {
@@ -20,6 +20,7 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
   onUpdateResult,
 }) => {
   const [isLoadingChat, setIsLoadingChat] = useState(false);
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
 
   const handleSendMessage = async (message: string) => {
     setIsLoadingChat(true);
@@ -71,8 +72,43 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
   };
 
   const handleDownloadPDF = async () => {
-    const { generatePDF } = await import('../../utils/pdf-generator');
-    generatePDF(result.summary, result.transcript, result.configuration);
+    console.log('📥 Starting AI-powered PDF generation...');
+    setIsGeneratingPDF(true);
+    
+    try {
+      const apiKey = result.configuration.mode === 'simple' 
+        ? result.configuration.openaiKey 
+        : result.configuration.openrouterKey!;
+
+      const pdfBlob = await generatePDF(
+        result.transcript,
+        result.summary,
+        result.configuration.contentType,
+        result.configuration.provider,
+        apiKey,
+        result.configuration.model,
+        result.configuration.language
+      );
+
+      // Create download link
+      const url = URL.createObjectURL(pdfBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `trammarise-${Date.now()}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      
+      // Small timeout to ensure download started before revoking
+      setTimeout(() => URL.revokeObjectURL(url), 100);
+      
+      console.log('✅ PDF downloaded successfully');
+    } catch (error) {
+      console.error('❌ PDF generation error:', error);
+      alert(`Failed to generate PDF: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setIsGeneratingPDF(false);
+    }
   };
 
   return (
@@ -88,8 +124,12 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
           </div>
         </div>
         <div className="flex items-center gap-4">
-          <Button variant="outline" onClick={handleDownloadPDF}>
-            📄 Download PDF
+          <Button 
+            variant="outline" 
+            onClick={handleDownloadPDF}
+            disabled={isGeneratingPDF}
+          >
+            {isGeneratingPDF ? '⏳ Generating PDF...' : '📄 Download PDF'}
           </Button>
         </div>
       </div>
