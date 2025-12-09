@@ -12,6 +12,7 @@ import {
 } from '@/lib';
 import type { ThemeMode } from '@/lib';
 import { ComponentSection } from '../components/preview/ComponentSection';
+import { AILoadingOrb } from '../components/ui/AILoadingOrb';
 
 /**
  * Preview page for showcasing and testing all library components.
@@ -244,6 +245,41 @@ export const PreviewPage: React.FC = () => {
               <LoadingSpinner size="xl" />
               <p className="text-xs mt-2 text-slate-500">Extra Large</p>
             </div>
+          </div>
+        </ComponentSection>
+
+        {/* AILoadingOrb Component */}
+        <ComponentSection
+          title="AILoadingOrb"
+          description="Advanced AI-themed loading animation with multi-layer SVG morphing, gradient shifts, and particle effects. Perfect for AI processing states."
+          props={[
+            {
+              name: 'size',
+              type: 'number',
+              description: 'Orb size in pixels',
+              defaultValue: '120',
+            },
+          ]}
+        >
+          <div className="flex items-center justify-center gap-12 py-8">
+            <div className="text-center">
+              <AILoadingOrb size={80} />
+              <p className="text-xs mt-4 text-slate-500">Small (80px)</p>
+            </div>
+            <div className="text-center">
+              <AILoadingOrb size={120} />
+              <p className="text-xs mt-4 text-slate-500">Default (120px)</p>
+            </div>
+            <div className="text-center">
+              <AILoadingOrb size={160} />
+              <p className="text-xs mt-4 text-slate-500">Large (160px)</p>
+            </div>
+          </div>
+          <div className="mt-6 p-4 bg-slate-100 dark:bg-slate-800 rounded-lg">
+            <p className="text-sm text-slate-600 dark:text-slate-400">
+              <strong>Features:</strong> Multi-layer morphing ellipses, animated gradients,
+              floating particles, glow effects, and reduced-motion support.
+            </p>
           </div>
         </ComponentSection>
 
@@ -626,7 +662,7 @@ export const PreviewPage: React.FC = () => {
         {/* Footer */}
         <footer className="mt-16 pt-8 border-t border-slate-200 dark:border-slate-700 text-center text-sm text-slate-500">
           <p>
-            Component Library v1.0.0 • 9 Components •{' '}
+            Component Library v1.0.0 • 10 Components •{' '}
             <a
               href="/"
               className="text-indigo-600 dark:text-indigo-400 hover:underline"
