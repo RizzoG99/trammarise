@@ -16,6 +16,7 @@ import { PreviewPage } from './pages/PreviewPage';
 function App() {
   const [appState, setAppState] = useState<AppState>('initial');
   const [audioFile, setAudioFile] = useState<AudioFile | null>(null);
+  const [contextFiles, setContextFiles] = useState<File[]>([]);
   const [processingData, setProcessingData] = useState<ProcessingStateData>({
     step: 'transcribing',
     progress: 0,
@@ -123,6 +124,7 @@ function App() {
 
   const handleReset = () => {
     setAudioFile(null);
+    setContextFiles([]);
     setResult(null);
     lastProcessedBlobRef.current = null; // Clear tracked blob to allow new recordings
     setAppState('initial');
@@ -146,6 +148,9 @@ function App() {
       setAppState('audio');
       return;
     }
+
+    // Merge context files from app state into config
+    const fullConfig = { ...config, contextFiles };
 
     // Create abort controller for cancellable operations
     const abortController = new AbortController();
@@ -193,7 +198,7 @@ function App() {
         // Determine filename: use original name if it's a File, otherwise generate chunk name (MP3)
         const chunkName = chunk instanceof File ? chunk.name : `chunk-${i}.mp3`;
 
-        const { transcript } = await transcribeAudio(chunk, config.openaiKey, config.language, chunkName);
+        const { transcript } = await transcribeAudio(chunk, fullConfig.openaiKey, fullConfig.language, chunkName);
         fullTranscript += (fullTranscript ? '\n\n' : '') + transcript;
       }
 
@@ -206,12 +211,12 @@ function App() {
       setProcessingData({ step: 'summarizing', progress: 50 });
       const { summary } = await summarizeTranscript(
         fullTranscript,
-        config.contentType,
-        config.provider,
-        config.provider === 'openai' ? config.openaiKey : config.openrouterKey!,
-        config.model,
-        config.contextFiles,
-        config.language
+        fullConfig.contentType,
+        fullConfig.provider,
+        fullConfig.provider === 'openai' ? fullConfig.openaiKey : fullConfig.openrouterKey!,
+        fullConfig.model,
+        fullConfig.contextFiles,
+        fullConfig.language
       );
       setProcessingData({ step: 'summarizing', progress: 100 });
 
@@ -220,7 +225,7 @@ function App() {
         transcript: fullTranscript,
         summary,
         chatHistory: [],
-        configuration: config,
+        configuration: fullConfig,
       });
       setAppState('results');
     } catch (error: any) {
@@ -284,6 +289,8 @@ function App() {
                   hasMicrophoneAccess={hasMicrophoneAccess}
                   onRecordingAttempt={handleRecordingAttempt}
                   onError={setSnackbarMessage}
+                  contextFiles={contextFiles}
+                  onContextFilesChange={setContextFiles}
                 />
               )}
 
