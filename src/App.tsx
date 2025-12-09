@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { InitialState } from './components/states/InitialState';
 import { RecordingState } from './components/states/RecordingState';
 import { AudioState } from './components/states/AudioState';
@@ -10,6 +11,7 @@ import { ThemeToggle } from './components/ui/ThemeToggle';
 import { useAudioRecorder } from './hooks/useAudioRecorder';
 import { transcribeAudio, summarizeTranscript } from './utils/api';
 import type { AppState, AudioFile, ProcessingResult, ProcessingStateData, AIConfiguration } from './types/audio';
+import { PreviewPage } from './pages/PreviewPage';
 
 function App() {
   const [appState, setAppState] = useState<AppState>('initial');
@@ -254,73 +256,89 @@ function App() {
   };
 
   return (
-    <div className="max-w-[1200px] mx-auto p-4 md:p-8 min-h-screen flex flex-col relative">
-      <div className="absolute top-4 right-4 z-50">
-        <ThemeToggle />
-      </div>
-      <main className="flex-1 flex flex-col justify-center items-center py-8">
-        {errorMessage && (
-          <div className="w-full max-w-[800px] p-4 rounded-lg mb-4 text-sm bg-red-500/10 border border-red-500/30 text-red-400 backdrop-blur-md animate-[slideDown_0.3s_ease-out]">
-            {errorMessage}
+    <Routes>
+      {/* Preview route - dev only */}
+      {import.meta.env.DEV && (
+        <Route path="/preview" element={<PreviewPage />} />
+      )}
+
+      {/* Main app route */}
+      <Route
+        path="/"
+        element={
+          <div className="max-w-[1200px] mx-auto p-4 md:p-8 min-h-screen flex flex-col relative">
+            <div className="absolute top-4 right-4 z-50">
+              <ThemeToggle />
+            </div>
+            <main className="flex-1 flex flex-col justify-center items-center py-8">
+              {errorMessage && (
+                <div className="w-full max-w-[800px] p-4 rounded-lg mb-4 text-sm bg-red-500/10 border border-red-500/30 text-red-400 backdrop-blur-md animate-[slideDown_0.3s_ease-out]">
+                  {errorMessage}
+                </div>
+              )}
+
+              {appState === 'initial' && (
+                <InitialState
+                  onFileUpload={handleFileUpload}
+                  onStartRecording={handleStartRecording}
+                  hasMicrophoneAccess={hasMicrophoneAccess}
+                  onRecordingAttempt={handleRecordingAttempt}
+                  onError={setSnackbarMessage}
+                />
+              )}
+
+              {appState === 'recording' && (
+                <RecordingState duration={duration} onStopRecording={stopRecording} />
+              )}
+
+              {appState === 'audio' && audioFile && (
+                <AudioState
+                  audioFile={audioFile.blob}
+                  audioName={audioFile.name}
+                  onReset={handleReset}
+                  onProcessingStart={() => setAppState('configuration')}
+                />
+              )}
+
+              {appState === 'configuration' && audioFile && (
+                <ConfigurationState
+                  transcript="Click 'Validate & Continue' to start transcription and summarization"
+                  onConfigure={handleConfigure}
+                  onBack={handleBackToAudio}
+                />
+              )}
+
+              {appState === 'processing' && (
+                <ProcessingState processingData={processingData} onCancel={handleCancelProcessing} />
+              )}
+
+              {appState === 'results' && result && audioFile && (
+                <ResultsState
+                  audioName={audioFile.name}
+                  result={result}
+                  onBack={handleBackToAudio}
+                  onUpdateResult={setResult}
+                />
+              )}
+            </main>
+
+            <Snackbar
+              message={snackbarMessage || ''}
+              variant="error"
+              isOpen={!!snackbarMessage}
+              onClose={() => setSnackbarMessage(null)}
+            />
+
+            <footer className="text-center py-8 text-text-tertiary text-sm border-t border-bg-tertiary mt-auto">
+              <p className="m-0">Trammarise &copy; 2025 - Audio Transcription & Summarization</p>
+            </footer>
           </div>
-        )}
-
-        {appState === 'initial' && (
-          <InitialState
-            onFileUpload={handleFileUpload}
-            onStartRecording={handleStartRecording}
-            hasMicrophoneAccess={hasMicrophoneAccess}
-            onRecordingAttempt={handleRecordingAttempt}
-            onError={setSnackbarMessage}
-          />
-        )}
-
-        {appState === 'recording' && (
-          <RecordingState duration={duration} onStopRecording={stopRecording} />
-        )}
-
-        {appState === 'audio' && audioFile && (
-          <AudioState
-            audioFile={audioFile.blob}
-            audioName={audioFile.name}
-            onReset={handleReset}
-            onProcessingStart={() => setAppState('configuration')}
-          />
-        )}
-
-        {appState === 'configuration' && audioFile && (
-          <ConfigurationState
-            transcript="Click 'Validate & Continue' to start transcription and summarization"
-            onConfigure={handleConfigure}
-            onBack={handleBackToAudio}
-          />
-        )}
-
-        {appState === 'processing' && (
-          <ProcessingState processingData={processingData} onCancel={handleCancelProcessing} />
-        )}
-
-        {appState === 'results' && result && audioFile && (
-          <ResultsState
-            audioName={audioFile.name}
-            result={result}
-            onBack={handleBackToAudio}
-            onUpdateResult={setResult}
-          />
-        )}
-      </main>
-
-      <Snackbar
-        message={snackbarMessage || ''}
-        variant="error"
-        isOpen={!!snackbarMessage}
-        onClose={() => setSnackbarMessage(null)}
+        }
       />
 
-      <footer className="text-center py-8 text-text-tertiary text-sm border-t border-bg-tertiary mt-auto">
-        <p className="m-0">Trammarise &copy; 2025 - Audio Transcription & Summarization</p>
-      </footer>
-    </div>
+      {/* Redirect unknown routes to home */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }
 
