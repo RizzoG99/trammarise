@@ -1,0 +1,95 @@
+.ai-loading-orb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin: 0 auto;
+  filter: drop-shadow(0 0 20px rgba(139, 92, 246, 0.3));
+  animation: orbFloat 3s ease-in-out infinite;
+}
+
+.ai-loading-orb.animating {
+  animation: orbFloat 3s ease-in-out infinite, orbScale 2s ease-in-out infinite;
+}
+
+/* Subtle floating animation */
+@keyframes orbFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Subtle scale pulse */
+@keyframes orbScale {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+/* Layer animations for smooth morphing */
+.orb-layer {
+  transition: all 0.3s ease;
+  transform-origin: center;
+}
+
+.orb-layer-1 {
+  mix-blend-mode: screen;
+}
+
+.orb-layer-2 {
+  mix-blend-mode: screen;
+}
+
+.orb-layer-3 {
+  mix-blend-mode: screen;
+}
+
+.orb-core {
+  mix-blend-mode: screen;
+}
+
+/* Particle effects */
+.particle {
+  mix-blend-mode: screen;
+  filter: blur(0.5px);
+}
+
+/* Dark mode adjustments */
+:root[class~="dark"] .ai-loading-orb {
+  filter: drop-shadow(0 0 30px rgba(139, 92, 246, 0.5));
+}
+
+/* Light mode adjustments */
+:root:not([class~="dark"]) .ai-loading-orb {
+  filter: drop-shadow(0 0 25px rgba(139, 92, 246, 0.4));
+}
+
+/* Responsive sizing */
+@media (max-width: 640px) {
+  .ai-loading-orb {
+    filter: drop-shadow(0 0 15px rgba(139, 92, 246, 0.3));
+  }
+}
+
+/* Accessibility: Respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .ai-loading-orb {
+    animation: none;
+  }
+
+  .ai-loading-orb svg * {
+    animation: none !important;
+  }
+
+  .orb-layer,
+  .orb-core,
+  .particle {
+    opacity: 0.7;
+  }
+}
