@@ -27,3 +27,6 @@ dist-ssr
 
 # FFmpeg WASM files (large binaries)
 public/ffmpeg/*.wasm
+
+# Test data folder (users can add their own test files)
+data/
