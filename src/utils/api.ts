@@ -35,12 +35,14 @@ async function fetchWithTimeout(
 }
 
 /**
- * Transcribe audio using OpenAI Whisper API
+ * Transcribe audio using OpenAI Transcription API
  */
 export async function transcribeAudio(
-  audioBlob: Blob, 
-  apiKey: string, 
+  audioBlob: Blob,
+  apiKey: string,
   language?: string,
+  model?: string,
+  contentType?: string,
   filename: string = 'audio.webm' // Default fallback
 ): Promise<{ transcript: string }> {
   const formData = new FormData();
@@ -48,6 +50,12 @@ export async function transcribeAudio(
   formData.append('apiKey', apiKey);
   if (language) {
     formData.append('language', language);
+  }
+  if (model) {
+    formData.append('model', model);
+  }
+  if (contentType) {
+    formData.append('contentType', contentType);
   }
 
   const response = await fetchWithTimeout('/api/transcribe', {

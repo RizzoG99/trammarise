@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import PDFDocument from 'pdfkit';
 import { ProviderFactory, type ProviderType } from './providers/factory';
+import { getSummarizationModelForLevel, type PerformanceLevel } from '../src/types/performance-levels';
 
 export const config = {
   api: {
@@ -66,7 +67,12 @@ Create a professional document structure with:
 5. If applicable: Action Items, Conclusions, or Recommendations
 
 Format your response as clean, readable text with clear section headers (use "===" for main sections).
-Make it professional and easy to read. Do NOT use markdown formatting.`;
+Make it professional and easy to read. DO NOT use markdown formatting.`;
+
+    // Map performance level to actual model name
+    const actualModel = model
+      ? getSummarizationModelForLevel(model as PerformanceLevel)
+      : undefined;
 
     const formattedContent = await aiProvider.chat({
       transcript,
@@ -74,7 +80,7 @@ Make it professional and easy to read. Do NOT use markdown formatting.`;
       message: formattingMessage,
       history: [],
       apiKey,
-      model,
+      model: actualModel,
     });
 
     console.log('📝 Generating PDF from AI-formatted content...');

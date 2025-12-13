@@ -2,6 +2,8 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { OpenAI } from 'openai';
 import busboy from 'busboy';
 import { API_VALIDATION } from '../src/utils/constants';
+import { getTranscriptionPrompt } from '../src/utils/transcription-prompts';
+import { getTranscriptionModelForLevel, type PerformanceLevel } from '../src/types/performance-levels';
 
 export const config = {
   api: {
@@ -42,6 +44,8 @@ export default async function handler(
     let audioChunks: Buffer[] = [];
     let apiKey: string | null = null;
     let language: string | undefined = undefined;
+    let model: string | undefined = undefined;
+    let contentType: string | undefined = undefined;
     let uploadedFilename: string = 'audio.webm'; // Default fallback
     let fileSizeExceeded = false;
 
@@ -80,6 +84,10 @@ export default async function handler(
           apiKey = value;
         } else if (fieldname === 'language') {
           language = value || undefined;
+        } else if (fieldname === 'model') {
+          model = value || undefined;
+        } else if (fieldname === 'contentType') {
+          contentType = value || undefined;
         }
       });
 
@@ -113,12 +121,19 @@ export default async function handler(
     // However, to be safe in Node environment:
     const file = await OpenAI.toFile(audioData, uploadedFilename);
 
-    // Call Whisper API
+    // Determine transcription model from performance level and generate context prompt
+    const transcriptionModel = model
+      ? getTranscriptionModelForLevel(model as PerformanceLevel)
+      : 'gpt-4o-mini-transcribe';
+    const contextPrompt = contentType ? getTranscriptionPrompt(contentType) : undefined;
+
+    // Call Transcription API with context
     try {
       const transcription = await openai.audio.transcriptions.create({
         file,
-        model: 'whisper-1',
+        model: transcriptionModel,
         language,
+        prompt: contextPrompt,
       });
 
       return res.status(200).json({

@@ -195,7 +195,7 @@ export const InitialState: React.FC<InitialStateProps> = ({
   const handleContextFiles = (files: File[]) => {
     const validFiles: File[] = [];
     let totalSize = contextFiles.reduce((acc, f) => acc + f.size, 0);
-    const MAX_TOTAL_SIZE = 4.5 * 1024 * 1024; // 4.5MB
+    const MAX_TOTAL_SIZE = 24 * 1024 * 1024; // 24MB
 
     for (const file of files) {
       // Validate type
@@ -210,7 +210,7 @@ export const InitialState: React.FC<InitialStateProps> = ({
 
       // Validate size
       if (totalSize + file.size > MAX_TOTAL_SIZE) {
-        setContextErrors('Total file size cannot exceed 4.5MB');
+        setContextErrors('Total file size cannot exceed 24MB');
         return;
       }
 

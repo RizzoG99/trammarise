@@ -3,6 +3,7 @@ import { ProviderFactory, type ProviderType } from './providers/factory';
 import { API_VALIDATION, CONTENT_TYPES } from '../src/utils/constants';
 import busboy from 'busboy';
 import { extractPdfText } from './utils/pdf-extractor';
+import { getSummarizationModelForLevel, type PerformanceLevel } from '../src/types/performance-levels';
 
 export const config = {
   api: {
@@ -114,11 +115,16 @@ export default async function handler(
 
     const aiProvider = ProviderFactory.getProvider(provider as ProviderType);
 
+    // Map performance level to actual model name
+    const actualModel = model
+      ? getSummarizationModelForLevel(model as PerformanceLevel)
+      : undefined;
+
     const summary = await aiProvider.summarize({
       transcript,
       contentType: contentType as any,
       apiKey,
-      model,
+      model: actualModel,
       language,
       context: {
         text: contextText,

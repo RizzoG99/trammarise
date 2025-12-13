@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { ProviderFactory, type ProviderType } from './providers/factory';
 import { API_VALIDATION } from '../src/utils/constants';
+import { getSummarizationModelForLevel, type PerformanceLevel } from '../src/types/performance-levels';
 
 const { MAX_MESSAGE_LENGTH, MAX_HISTORY_ITEMS, MAX_TEXT_LENGTH, MIN_API_KEY_LENGTH, MAX_API_KEY_LENGTH } = API_VALIDATION;
 
@@ -73,13 +74,18 @@ export default async function handler(
 
     const aiProvider = ProviderFactory.getProvider(provider as ProviderType);
 
+    // Map performance level to actual model name
+    const actualModel = model
+      ? getSummarizationModelForLevel(model as PerformanceLevel)
+      : undefined;
+
     const response = await aiProvider.chat({
       transcript,
       summary,
       message,
       history: Array.isArray(history) ? history : [],
       apiKey,
-      model, // Optional: only required for OpenRouter
+      model: actualModel, // Optional: only required for OpenRouter
     });
 
     return res.status(200).json({ response });

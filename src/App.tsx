@@ -198,7 +198,14 @@ function App() {
         // Determine filename: use original name if it's a File, otherwise generate chunk name (MP3)
         const chunkName = chunk instanceof File ? chunk.name : `chunk-${i}.mp3`;
 
-        const { transcript } = await transcribeAudio(chunk, fullConfig.openaiKey, fullConfig.language, chunkName);
+        const { transcript } = await transcribeAudio(
+          chunk,
+          fullConfig.openaiKey,
+          fullConfig.language,
+          fullConfig.model,
+          fullConfig.contentType,
+          chunkName
+        );
         fullTranscript += (fullTranscript ? '\n\n' : '') + transcript;
       }
 

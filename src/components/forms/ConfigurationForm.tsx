@@ -8,6 +8,7 @@ import { Input } from '../ui/Input';
 import { SelectCard } from '../ui/SelectCard';
 import { ToggleSwitch } from '../ui/ToggleSwitch';
 import { CURATED_MODELS } from '../../constants/models';
+import { getTranscriptionModelForLevel, getSummarizationModelForLevel, type PerformanceLevel } from '../../types/performance-levels';
 
 interface ConfigurationFormProps {
   onSubmit: (config: AIConfiguration) => void;
@@ -30,8 +31,8 @@ const CONTENT_TYPES: PredefinedContentType[] = [
 ];
 
 const SIMPLE_MODELS = [
-  { value: 'gpt-4o', label: 'Standard', description: 'Fast & cost-effective (GPT-4o)' },
-  { value: 'o3-mini', label: 'High Performance', description: 'Advanced reasoning (GPT-o3 Mini)' },
+  { value: 'standard', label: 'Standard', description: 'Fast & cost-effective' },
+  { value: 'advanced', label: 'High Performance', description: 'Advanced reasoning capabilities' },
 ];
 
 const LANGUAGES = [
@@ -51,7 +52,7 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ onSubmit, 
   const [contentType, setContentType] = useState('meeting');
   const [customContentType, setCustomContentType] = useState('');
   const [language, setLanguage] = useState('en');
-  const [simpleModel, setSimpleModel] = useState('gpt-4o');
+  const [simpleModel, setSimpleModel] = useState('standard');
   const [advancedModel, setAdvancedModel] = useState(CURATED_MODELS[0].id);
   const [openaiKey, setOpenaiKey] = useState('');
   const [openrouterKey, setOpenrouterKey] = useState('');
@@ -147,7 +148,7 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ onSubmit, 
       };
 
       onSubmit(config);
-    } catch (error) {
+    } catch {
       setErrors({ openaiKey: 'Failed to validate API keys. Please try again.' });
     } finally {
       setIsValidating(false);
@@ -255,7 +256,7 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ onSubmit, 
               value={openaiKey}
               onChange={(e) => setOpenaiKey(e.target.value)}
               error={errors.openaiKey}
-              hint="Used for both transcription (Whisper) and summarization"
+              hint="Used for context-aware transcription and summarization"
               required
               fullWidth
             />
@@ -264,8 +265,16 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ onSubmit, 
           <div className="p-4 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg mt-4">
             <strong className="block mb-2 text-indigo-900 dark:text-indigo-100">ℹ️ What's included:</strong>
             <ul className="m-0 pl-6 text-indigo-800 dark:text-indigo-200">
-              <li className="my-1 text-sm">Whisper transcription (industry-leading accuracy)</li>
-              <li className="my-1 text-sm">{simpleModel === 'gpt-4o' ? 'GPT-4o' : 'GPT-o3 Mini'} summarization</li>
+              <li className="my-1 text-sm">
+                {getTranscriptionModelForLevel(simpleModel as PerformanceLevel)
+                  .replace('gpt-4o-transcribe', 'GPT-4o')
+                  .replace('gpt-4o-mini-transcribe', 'GPT-4o-mini')} transcription with context awareness
+              </li>
+              <li className="my-1 text-sm">
+                {getSummarizationModelForLevel(simpleModel as PerformanceLevel)
+                  .replace('gpt-4o', 'GPT-4o')
+                  .replace('o3-mini', 'GPT-o3 Mini')} summarization
+              </li>
               <li className="my-1 text-sm">Single API key for simplicity</li>
             </ul>
           </div>
@@ -305,7 +314,7 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ onSubmit, 
               value={openaiKey}
               onChange={(e) => setOpenaiKey(e.target.value)}
               error={errors.openaiKey}
-              hint="Used only for audio transcription"
+              hint="Used for context-aware audio transcription"
               required
               fullWidth
             />
