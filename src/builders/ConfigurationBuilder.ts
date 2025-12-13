@@ -1,4 +1,5 @@
 import type { AIConfiguration, AIProvider, ConfigMode } from '../types/audio';
+import { isLanguageCode } from '../types/languages';
 
 /**
  * Validation errors for configuration building
@@ -88,7 +89,11 @@ export class ConfigurationBuilder {
     if (!language || language.trim() === '') {
       throw new ConfigurationValidationError('Language cannot be empty');
     }
-    this.config.language = language.trim();
+    const trimmedLanguage = language.trim();
+    if (!isLanguageCode(trimmedLanguage)) {
+      throw new ConfigurationValidationError(`Invalid language code: ${trimmedLanguage}`);
+    }
+    this.config.language = trimmedLanguage;
     return this;
   }
 

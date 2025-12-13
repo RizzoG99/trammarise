@@ -8,7 +8,8 @@
       "Bash(npm install:*)",
       "Bash(npm test:*)",
       "Bash(git stash:*)",
-      "Bash(npx eslint:*)"
+      "Bash(npx eslint:*)",
+      "Bash(npm run build:*)"
     ],
     "deny": [],
     "ask": []

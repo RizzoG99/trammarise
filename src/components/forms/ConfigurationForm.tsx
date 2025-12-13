@@ -8,51 +8,21 @@ import { Input } from '../ui/Input';
 import { SelectCard } from '../ui/SelectCard';
 import { ToggleSwitch } from '../ui/ToggleSwitch';
 import { CURATED_MODELS } from '../../constants/models';
-import { getTranscriptionModelForLevel, getSummarizationModelForLevel, type PerformanceLevel } from '../../types/performance-levels';
+import { CONTENT_TYPE_OPTIONS, type ContentType } from '../../types/content-types';
+import { LANGUAGE_OPTIONS, type LanguageCode } from '../../types/languages';
+import { PERFORMANCE_LEVEL_OPTIONS, getTranscriptionModelForLevel, getSummarizationModelForLevel, type PerformanceLevel } from '../../types/performance-levels';
 
 interface ConfigurationFormProps {
   onSubmit: (config: AIConfiguration) => void;
   onCancel: () => void;
 }
 
-interface PredefinedContentType {
-  value: string;
-  label: string;
-  icon: string;
-}
-
-const CONTENT_TYPES: PredefinedContentType[] = [
-  { value: 'meeting', label: 'Meeting Notes', icon: '📝' },
-  { value: 'lecture', label: 'Lecture/Class', icon: '🎓' },
-  { value: 'interview', label: 'Interview', icon: '🎤' },
-  { value: 'podcast', label: 'Podcast Episode', icon: '🎙️' },
-  { value: 'voice-memo', label: 'Voice Memo', icon: '🗣️' },
-  { value: 'other', label: 'Other (specify)', icon: '✏️' },
-];
-
-const SIMPLE_MODELS = [
-  { value: 'standard', label: 'Standard', description: 'Fast & cost-effective' },
-  { value: 'advanced', label: 'High Performance', description: 'Advanced reasoning capabilities' },
-];
-
-const LANGUAGES = [
-  { value: 'en', label: 'English' },
-  { value: 'it', label: 'Italian' },
-  { value: 'es', label: 'Spanish' },
-  { value: 'fr', label: 'French' },
-  { value: 'de', label: 'German' },
-  { value: 'pt', label: 'Portuguese' },
-  { value: 'nl', label: 'Dutch' },
-  { value: 'ja', label: 'Japanese' },
-  { value: 'zh', label: 'Chinese' },
-];
-
 export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ onSubmit, onCancel }) => {
   const [mode, setMode] = useState<ConfigMode>('simple');
-  const [contentType, setContentType] = useState('meeting');
+  const [contentType, setContentType] = useState<ContentType>('meeting');
   const [customContentType, setCustomContentType] = useState('');
-  const [language, setLanguage] = useState('en');
-  const [simpleModel, setSimpleModel] = useState('standard');
+  const [language, setLanguage] = useState<LanguageCode>('en');
+  const [simpleModel, setSimpleModel] = useState<PerformanceLevel>('standard');
   const [advancedModel, setAdvancedModel] = useState(CURATED_MODELS[0].id);
   const [openaiKey, setOpenaiKey] = useState('');
   const [openrouterKey, setOpenrouterKey] = useState('');
@@ -167,9 +137,9 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ onSubmit, 
         <select
           className="w-full p-3 text-base border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white cursor-pointer transition-all hover:border-indigo-400 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600/20"
           value={language}
-          onChange={(e) => setLanguage(e.target.value)}
+          onChange={(e) => setLanguage(e.target.value as LanguageCode)}
         >
-          {LANGUAGES.map((lang) => (
+          {LANGUAGE_OPTIONS.map((lang) => (
             <option key={lang.value} value={lang.value} className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white p-2">
               {lang.label}
             </option>
@@ -184,7 +154,7 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ onSubmit, 
           <span className="text-red-500 ml-1">*</span>
         </label>
         <div className="grid grid-cols-[repeat(auto-fit,minmax(140px,1fr))] gap-3">
-          {CONTENT_TYPES.map((type) => (
+          {CONTENT_TYPE_OPTIONS.map((type) => (
             <SelectCard
               key={type.value}
               value={type.value}
@@ -228,14 +198,14 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ onSubmit, 
               <span className="text-red-500 ml-1">*</span>
             </label>
             <div className="flex flex-col gap-3">
-              {SIMPLE_MODELS.map((model) => (
+              {PERFORMANCE_LEVEL_OPTIONS.map((model) => (
                 <label key={model.value} className="flex items-start gap-3 p-4 bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 rounded-lg cursor-pointer transition-all hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-indigo-300 has-[:checked]:border-indigo-600 has-[:checked]:bg-indigo-50 dark:has-[:checked]:bg-indigo-900/20 has-[:checked]:shadow-sm">
                   <input
                     type="radio"
                     name="simpleModel"
                     value={model.value}
                     checked={simpleModel === model.value}
-                    onChange={(e) => setSimpleModel(e.target.value)}
+                    onChange={(e) => setSimpleModel(e.target.value as PerformanceLevel)}
                     className="mt-1 cursor-pointer w-[18px] h-[18px] flex-shrink-0 accent-indigo-600"
                   />
                   <div className="flex flex-col gap-1 flex-1">

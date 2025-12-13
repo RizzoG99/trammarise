@@ -1,3 +1,5 @@
+import type { LanguageCode } from './languages';
+
 // Audio file interface
 export interface AudioFile {
   name: string;
@@ -16,11 +18,11 @@ export type ConfigMode = 'simple' | 'advanced';
 export interface AIConfiguration {
   mode: ConfigMode;
   provider: AIProvider;
-  model: string; // For simple: 'gpt-4o' or 'o3-mini', for advanced: OpenRouter model ID
+  model: string; // For simple: 'standard' or 'advanced', for advanced: OpenRouter model ID
   openaiKey: string; // Always required for Whisper transcription
   openrouterKey?: string; // Only for advanced mode
-  contentType: string;
-  language: string;
+  contentType: string; // ContentType value or custom string when 'other' is selected
+  language: LanguageCode;
   contextFiles?: File[];
 }
 

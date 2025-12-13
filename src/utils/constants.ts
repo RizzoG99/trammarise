@@ -37,13 +37,9 @@ export const API_VALIDATION = {
   TRANSCRIBE_TIMEOUT: 300000, // 5 minutes for large audio files
 } as const;
 
-// Content type options
-export const CONTENT_TYPES = [
-  'meeting',
-  'lecture',
-  'interview',
-  'podcast',
-  'general'
-] as const;
+// Content type options (unified with UI)
+import { CONTENT_TYPE_VALUES, type ContentType } from '../types/content-types';
 
-export type ContentType = typeof CONTENT_TYPES[number];
+// Re-export for backwards compatibility
+export { CONTENT_TYPE_VALUES as CONTENT_TYPES };
+export type { ContentType };
