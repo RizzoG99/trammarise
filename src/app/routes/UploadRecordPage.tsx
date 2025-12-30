@@ -39,7 +39,7 @@ export function UploadRecordPage() {
     setAudioFile(recordingFile);
   };
 
-  const handleProcessAudio = () => {
+  const handleProcessAudio = async () => {
     if (!audioFile) {
       console.warn('No audio file available');
       return;
@@ -48,25 +48,30 @@ export function UploadRecordPage() {
     // Create session ID
     const sessionId = generateSessionId();
 
-    // Save complete session with ALL configuration
-    saveSession(sessionId, {
-      audioFile: {
-        name: audioFile instanceof File ? audioFile.name : 'recording.webm',
-        blob: audioFile,
-        file: audioFile instanceof File ? audioFile : new File([audioFile], 'recording.webm', { type: 'audio/webm' }),
-      },
-      contextFiles,
-      language,        // Save user configuration
-      contentType,     // Save user configuration
-      processingMode,  // Save user configuration
-      sessionId,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    });
+    try {
+      // Save complete session with ALL configuration
+      await saveSession(sessionId, {
+        audioFile: {
+          name: audioFile instanceof File ? audioFile.name : 'recording.webm',
+          blob: audioFile,
+          file: audioFile instanceof File ? audioFile : new File([audioFile], 'recording.webm', { type: 'audio/webm' }),
+        },
+        contextFiles,
+        language,        // Save user configuration
+        contentType,     // Save user configuration
+        processingMode,  // Save user configuration
+        sessionId,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      });
 
-    // NOW navigate to audio editing page
-    const path = buildRoutePath(ROUTES.AUDIO, { sessionId });
-    navigate(path);
+      // Navigate ONLY after successful save
+      const path = buildRoutePath(ROUTES.AUDIO, { sessionId });
+      navigate(path);
+    } catch (error) {
+      console.error('Failed to save session:', error);
+      // TODO: Show error toast/notification to user
+    }
   };
 
   return (

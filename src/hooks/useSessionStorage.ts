@@ -12,35 +12,62 @@ export function useSessionStorage(sessionId: string | null) {
 
   // Load session on mount or when sessionId changes
   useEffect(() => {
-    if (!sessionId) {
-      setSession(null);
-      setIsLoading(false);
-      return;
+    let isMounted = true;
+
+    async function load() {
+      if (!sessionId) {
+        setSession(null);
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const loadedSession = await loadSession(sessionId);
+        if (isMounted) {
+          setSession(loadedSession);
+          setIsLoading(false);
+        }
+      } catch (error) {
+        console.error('Failed to load session:', error);
+        if (isMounted) {
+          setSession(null);
+          setIsLoading(false);
+        }
+      }
     }
 
-    const loadedSession = loadSession(sessionId);
-    setSession(loadedSession);
-    setIsLoading(false);
+    load();
+    return () => {
+      isMounted = false;
+    };
   }, [sessionId]);
 
   // Update session data
   const updateSession = useCallback(
-    (data: Partial<SessionData>) => {
+    async (data: Partial<SessionData>) => {
       if (!sessionId) return;
 
-      saveSession(sessionId, data);
-      const updatedSession = loadSession(sessionId);
-      setSession(updatedSession);
+      try {
+        await saveSession(sessionId, data);
+        const updatedSession = await loadSession(sessionId);
+        setSession(updatedSession);
+      } catch (error) {
+        console.error('Failed to update session:', error);
+      }
     },
     [sessionId]
   );
 
   // Clear session
-  const clearSession = useCallback(() => {
+  const clearSession = useCallback(async () => {
     if (!sessionId) return;
 
-    deleteSession(sessionId);
-    setSession(null);
+    try {
+      await deleteSession(sessionId);
+      setSession(null);
+    } catch (error) {
+      console.error('Failed to clear session:', error);
+    }
   }, [sessionId]);
 
   return {

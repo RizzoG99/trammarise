@@ -1,11 +1,17 @@
 import type { SessionData } from '../types/routing';
-import type { AudioFile } from '../types/audio';
+import {
+  saveAudioFile,
+  loadAudioFile,
+  deleteAudioFile,
+  saveContextFiles,
+  loadContextFiles,
+  deleteContextFiles,
+  cleanupExpiredFiles,
+  deleteAllFiles,
+} from './indexeddb';
 
 const SESSION_KEY_PREFIX = 'trammarise_session_';
 const MAX_SESSION_AGE_MS = 24 * 60 * 60 * 1000; // 24 hours
-
-// In-memory cache for Files and Blobs (cannot be serialized to sessionStorage)
-const fileCache = new Map<string, { audioFile: AudioFile; contextFiles: File[] }>();
 
 /**
  * Generate a unique session ID
@@ -22,25 +28,24 @@ function getSessionKey(sessionId: string): string {
 }
 
 /**
- * Save session data to sessionStorage
- * Files and Blobs are stored in-memory cache, metadata in sessionStorage
+ * Save session data to sessionStorage and IndexedDB
+ * Files and Blobs are stored in IndexedDB, metadata in sessionStorage
  */
-export function saveSession(sessionId: string, data: Partial<SessionData>): void {
+export async function saveSession(sessionId: string, data: Partial<SessionData>): Promise<void> {
   try {
-    const existingData = loadSession(sessionId);
-    
-    // Extract files to store in memory cache
+    const existingData = await loadSession(sessionId);
+
+    // Extract files to store in IndexedDB
     const { audioFile, contextFiles, ...serializableData } = data;
-    
-    // Store files in-memory cache if provided
-    if (audioFile || contextFiles) {
-      const existingFiles = fileCache.get(sessionId);
-      fileCache.set(sessionId, {
-        audioFile: audioFile || existingFiles?.audioFile!,
-        contextFiles: contextFiles !== undefined ? contextFiles : (existingFiles?.contextFiles || []),
-      });
+
+    // Save files to IndexedDB if provided
+    if (audioFile) {
+      await saveAudioFile(sessionId, audioFile.blob, audioFile.name);
     }
-    
+    if (contextFiles !== undefined) {
+      await saveContextFiles(sessionId, contextFiles);
+    }
+
     // Merge with existing data (excluding files)
     const sessionData = {
       ...existingData,
@@ -48,22 +53,20 @@ export function saveSession(sessionId: string, data: Partial<SessionData>): void
       sessionId,
       updatedAt: Date.now(),
       createdAt: existingData?.createdAt || Date.now(),
-      // Add placeholder refs for files (actual files in cache)
-      hasAudioFile: audioFile !== undefined || existingData?.audioFile !== undefined,
-      hasContextFiles: (contextFiles !== undefined ? contextFiles.length > 0 : (existingData?.contextFiles || []).length > 0),
     };
 
     sessionStorage.setItem(getSessionKey(sessionId), JSON.stringify(sessionData));
   } catch (error) {
     console.error('Failed to save session:', error);
+    throw new Error('Failed to save session data');
   }
 }
 
 /**
- * Load session data from sessionStorage
- * Restores files from in-memory cache
+ * Load session data from sessionStorage and IndexedDB
+ * Restores files from IndexedDB
  */
-export function loadSession(sessionId: string): SessionData | null {
+export async function loadSession(sessionId: string): Promise<SessionData | null> {
   try {
     const data = sessionStorage.getItem(getSessionKey(sessionId));
     if (!data) return null;
@@ -72,20 +75,28 @@ export function loadSession(sessionId: string): SessionData | null {
 
     // Check if session has expired
     if (Date.now() - session.createdAt > MAX_SESSION_AGE_MS) {
-      deleteSession(sessionId);
+      await deleteSession(sessionId);
       return null;
     }
 
-    // Restore files from memory cache
-    const cachedFiles = fileCache.get(sessionId);
-    if (cachedFiles) {
-      session.audioFile = cachedFiles.audioFile;
-      session.contextFiles = cachedFiles.contextFiles;
+    // Load files from IndexedDB
+    const audioFileRecord = await loadAudioFile(sessionId);
+    if (audioFileRecord) {
+      session.audioFile = {
+        name: audioFileRecord.audioName,
+        blob: audioFileRecord.audioBlob,
+        file: new File(
+          [audioFileRecord.audioBlob],
+          audioFileRecord.audioName,
+          { type: audioFileRecord.audioBlob.type }
+        ),
+      };
     }
 
-    // Remove internal flags
-    delete session.hasAudioFile;
-    delete session.hasContextFiles;
+    const contextFiles = await loadContextFiles(sessionId);
+    if (contextFiles.length > 0) {
+      session.contextFiles = contextFiles;
+    }
 
     return session as SessionData;
   } catch (error) {
@@ -95,12 +106,15 @@ export function loadSession(sessionId: string): SessionData | null {
 }
 
 /**
- * Delete a session from sessionStorage and clear file cache
+ * Delete a session from sessionStorage and IndexedDB
  */
-export function deleteSession(sessionId: string): void {
+export async function deleteSession(sessionId: string): Promise<void> {
   try {
     sessionStorage.removeItem(getSessionKey(sessionId));
-    fileCache.delete(sessionId);
+    await Promise.all([
+      deleteAudioFile(sessionId),
+      deleteContextFiles(sessionId),
+    ]);
   } catch (error) {
     console.error('Failed to delete session:', error);
   }
@@ -127,22 +141,21 @@ export function getAllSessionIds(): string[] {
 /**
  * Cleanup old sessions (older than MAX_SESSION_AGE_MS)
  */
-export function cleanupOldSessions(): void {
+export async function cleanupOldSessions(): Promise<void> {
   const sessionIds = getAllSessionIds();
-  sessionIds.forEach(sessionId => {
-    const session = loadSession(sessionId);
-    if (!session) {
-      // loadSession already deleted expired session
-      return;
-    }
-  });
+  await Promise.all(
+    sessionIds.map(async (sessionId) => {
+      await loadSession(sessionId); // Auto-deletes expired sessions
+    })
+  );
+  await cleanupExpiredFiles();
 }
 
 /**
  * Clear all sessions (useful for testing/reset)
  */
-export function clearAllSessions(): void {
+export async function clearAllSessions(): Promise<void> {
   const sessionIds = getAllSessionIds();
-  sessionIds.forEach(deleteSession);
-  fileCache.clear();
+  await Promise.all(sessionIds.map(deleteSession));
+  await deleteAllFiles();
 }
