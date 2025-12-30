@@ -1,7 +1,11 @@
 import type { SessionData } from '../types/routing';
+import type { AudioFile } from '../types/audio';
 
 const SESSION_KEY_PREFIX = 'trammarise_session_';
 const MAX_SESSION_AGE_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+// In-memory cache for Files and Blobs (cannot be serialized to sessionStorage)
+const fileCache = new Map<string, { audioFile: AudioFile; contextFiles: File[] }>();
 
 /**
  * Generate a unique session ID
@@ -19,17 +23,35 @@ function getSessionKey(sessionId: string): string {
 
 /**
  * Save session data to sessionStorage
+ * Files and Blobs are stored in-memory cache, metadata in sessionStorage
  */
 export function saveSession(sessionId: string, data: Partial<SessionData>): void {
   try {
     const existingData = loadSession(sessionId);
-    const sessionData: SessionData = {
+    
+    // Extract files to store in memory cache
+    const { audioFile, contextFiles, ...serializableData } = data;
+    
+    // Store files in-memory cache if provided
+    if (audioFile || contextFiles) {
+      const existingFiles = fileCache.get(sessionId);
+      fileCache.set(sessionId, {
+        audioFile: audioFile || existingFiles?.audioFile!,
+        contextFiles: contextFiles !== undefined ? contextFiles : (existingFiles?.contextFiles || []),
+      });
+    }
+    
+    // Merge with existing data (excluding files)
+    const sessionData = {
       ...existingData,
-      ...data,
+      ...serializableData,
       sessionId,
       updatedAt: Date.now(),
       createdAt: existingData?.createdAt || Date.now(),
-    } as SessionData;
+      // Add placeholder refs for files (actual files in cache)
+      hasAudioFile: audioFile !== undefined || existingData?.audioFile !== undefined,
+      hasContextFiles: (contextFiles !== undefined ? contextFiles.length > 0 : (existingData?.contextFiles || []).length > 0),
+    };
 
     sessionStorage.setItem(getSessionKey(sessionId), JSON.stringify(sessionData));
   } catch (error) {
@@ -39,13 +61,14 @@ export function saveSession(sessionId: string, data: Partial<SessionData>): void
 
 /**
  * Load session data from sessionStorage
+ * Restores files from in-memory cache
  */
 export function loadSession(sessionId: string): SessionData | null {
   try {
     const data = sessionStorage.getItem(getSessionKey(sessionId));
     if (!data) return null;
 
-    const session: SessionData = JSON.parse(data);
+    const session = JSON.parse(data);
 
     // Check if session has expired
     if (Date.now() - session.createdAt > MAX_SESSION_AGE_MS) {
@@ -53,7 +76,18 @@ export function loadSession(sessionId: string): SessionData | null {
       return null;
     }
 
-    return session;
+    // Restore files from memory cache
+    const cachedFiles = fileCache.get(sessionId);
+    if (cachedFiles) {
+      session.audioFile = cachedFiles.audioFile;
+      session.contextFiles = cachedFiles.contextFiles;
+    }
+
+    // Remove internal flags
+    delete session.hasAudioFile;
+    delete session.hasContextFiles;
+
+    return session as SessionData;
   } catch (error) {
     console.error('Failed to load session:', error);
     return null;
@@ -61,11 +95,12 @@ export function loadSession(sessionId: string): SessionData | null {
 }
 
 /**
- * Delete a session from sessionStorage
+ * Delete a session from sessionStorage and clear file cache
  */
 export function deleteSession(sessionId: string): void {
   try {
     sessionStorage.removeItem(getSessionKey(sessionId));
+    fileCache.delete(sessionId);
   } catch (error) {
     console.error('Failed to delete session:', error);
   }
@@ -109,4 +144,5 @@ export function cleanupOldSessions(): void {
 export function clearAllSessions(): void {
   const sessionIds = getAllSessionIds();
   sessionIds.forEach(deleteSession);
+  fileCache.clear();
 }
