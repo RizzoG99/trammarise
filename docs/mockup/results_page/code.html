@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Trammarise - Results</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0a47c2",
+                        "background-light": "#f5f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom scrollbar for transcript area */
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 20px;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-[#111318] dark:text-white overflow-x-hidden flex flex-col min-h-screen">
+<!-- Top Navigation -->
+<header class="sticky top-0 z-50 flex items-center justify-between border-b border-solid border-[#dbdfe6] bg-white dark:bg-[#1a202c] dark:border-gray-700 px-4 py-3 lg:px-10">
+<div class="flex items-center gap-4">
+<div class="flex items-center justify-center size-8 bg-primary rounded-lg text-white">
+<span class="material-symbols-outlined">graphic_eq</span>
+</div>
+<div class="hidden md:flex flex-col">
+<h2 class="text-[#111318] dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">Trammarise</h2>
+</div>
+<!-- Separator -->
+<div class="hidden md:block h-6 w-px bg-gray-300 dark:bg-gray-600 mx-2"></div>
+<!-- Document Title (Editable feeling) -->
+<div class="flex items-center gap-2 group cursor-pointer">
+<h1 class="text-[#111318] dark:text-gray-100 text-base lg:text-lg font-semibold truncate max-w-[200px] lg:max-w-md">Meeting with Product Team - Oct 24</h1>
+<span class="material-symbols-outlined text-gray-400 text-sm group-hover:text-primary transition-colors">edit</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="hidden sm:flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-[#dbdfe6] dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-semibold text-[#111318] dark:text-white">
+<span class="material-symbols-outlined text-[20px]">download</span>
+<span>Export</span>
+</button>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-9 border border-gray-200 dark:border-gray-700" data-alt="User profile avatar showing a smiling person" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuD0V8K-T-d2lGKvxck8i09hjfZOLGsbK_5HoEcFplupcu_arh9ELbLkbqriEJfsidUk1uPe88_MVhj4t-H55H7L7AtctROVpEEfqP1SITyRyncFPoOMk0Ll6qvbrS46GT_ouBNP0LWWIyvlM6WvxCIlvAv_vYWb-eSxzsFoKgXkA6wsg9vg4VlmzfGEx9PkYCV_MehTFrY0eLikUk4tK1jDEL0_s-2ePMoExTeN68QetvbKDTfEGMfeZFi1svWAVycSaxnh_kbdqecH");'></div>
+</div>
+</header>
+<!-- Sticky Audio Player -->
+<div class="sticky top-[64px] z-40 w-full bg-white/95 dark:bg-[#1a202c]/95 backdrop-blur-sm border-b border-[#dbdfe6] dark:border-gray-700 shadow-sm transition-all duration-300">
+<div class="max-w-7xl mx-auto px-4 lg:px-8 py-3 flex flex-col md:flex-row items-center gap-4 md:gap-8">
+<!-- Controls -->
+<div class="flex items-center gap-4 order-2 md:order-1">
+<button class="flex items-center justify-center text-[#606e8a] dark:text-gray-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[28px]">skip_previous</span>
+</button>
+<button class="flex items-center justify-center text-[#606e8a] dark:text-gray-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[28px]">replay_10</span>
+</button>
+<button class="flex shrink-0 items-center justify-center rounded-full size-10 bg-primary text-white hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/20">
+<span class="material-symbols-outlined text-[24px] ml-0.5">play_arrow</span>
+</button>
+<button class="flex items-center justify-center text-[#606e8a] dark:text-gray-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[28px]">forward_10</span>
+</button>
+<button class="flex items-center justify-center text-[#606e8a] dark:text-gray-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[28px]">skip_next</span>
+</button>
+</div>
+<!-- Waveform & Progress -->
+<div class="flex-1 w-full order-1 md:order-2 flex flex-col justify-center gap-1">
+<div class="flex items-center justify-between text-xs font-medium text-[#606e8a] dark:text-gray-400 mb-1">
+<span>12:45</span>
+<span>45:30</span>
+</div>
+<!-- Visual waveform representation -->
+<div aria-label="Audio waveform" class="relative h-8 w-full flex items-center gap-[2px] opacity-80 cursor-pointer group">
+<!-- Fake generated waveform bars -->
+<div class="h-3 w-1 bg-primary rounded-full"></div>
+<div class="h-5 w-1 bg-primary rounded-full"></div>
+<div class="h-4 w-1 bg-primary rounded-full"></div>
+<div class="h-6 w-1 bg-primary rounded-full"></div>
+<div class="h-3 w-1 bg-primary rounded-full"></div>
+<div class="h-2 w-1 bg-primary rounded-full"></div>
+<div class="h-5 w-1 bg-primary rounded-full"></div>
+<div class="h-8 w-1 bg-primary rounded-full"></div>
+<div class="h-4 w-1 bg-primary rounded-full"></div>
+<div class="h-3 w-1 bg-primary/40 rounded-full dark:bg-gray-600"></div>
+<div class="h-5 w-1 bg-primary/40 rounded-full dark:bg-gray-600"></div>
+<div class="h-2 w-1 bg-primary/40 rounded-full dark:bg-gray-600"></div>
+<div class="h-4 w-1 bg-primary/40 rounded-full dark:bg-gray-600"></div>
+<div class="h-6 w-1 bg-primary/40 rounded-full dark:bg-gray-600"></div>
+<div class="h-3 w-1 bg-primary/40 rounded-full dark:bg-gray-600"></div>
+<div class="h-5 w-1 bg-primary/40 rounded-full dark:bg-gray-600"></div>
+<div class="h-4 w-1 bg-primary/40 rounded-full dark:bg-gray-600"></div>
+<div class="h-2 w-1 bg-primary/40 rounded-full dark:bg-gray-600"></div>
+<div class="h-5 w-1 bg-primary/40 rounded-full dark:bg-gray-600"></div>
+<div class="h-3 w-1 bg-primary/40 rounded-full dark:bg-gray-600"></div>
+<div class="h-4 w-1 bg-primary/40 rounded-full dark:bg-gray-600"></div>
+<div class="h-2 w-1 bg-primary/40 rounded-full dark:bg-gray-600"></div>
+<div class="h-6 w-1 bg-primary/40 rounded-full dark:bg-gray-600"></div>
+<div class="h-3 w-1 bg-primary/40 rounded-full dark:bg-gray-600"></div>
+<div class="h-5 w-1 bg-primary/40 rounded-full dark:bg-gray-600"></div>
+<!-- Add a faint line for the rest -->
+<div class="h-1 flex-1 bg-gray-200 dark:bg-gray-700 rounded-full ml-1 relative overflow-hidden">
+<div class="absolute inset-y-0 left-0 w-[40%] bg-primary/20"></div>
+</div>
+</div>
+</div>
+<!-- Speed Control -->
+<div class="hidden sm:flex items-center gap-2 order-3">
+<button class="px-2 py-1 text-xs font-bold text-primary bg-blue-50 dark:bg-blue-900/30 dark:text-blue-300 rounded hover:bg-blue-100 transition-colors">1x</button>
+</div>
+</div>
+</div>
+<!-- Main Content Split View -->
+<div class="flex-1 w-full max-w-7xl mx-auto px-4 lg:px-8 py-6 lg:py-8">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full">
+<!-- Left Column: Summary (Span 4) -->
+<div class="lg:col-span-4 flex flex-col gap-6">
+<!-- Summary Header -->
+<div class="flex items-center justify-between">
+<h3 class="text-[#111318] dark:text-white text-xl font-bold leading-tight">Summary</h3>
+<div class="flex gap-2">
+<button class="text-xs font-medium text-primary hover:underline">Copy All</button>
+</div>
+</div>
+<!-- Executive Summary Card -->
+<div class="bg-white dark:bg-[#1a202c] rounded-xl border border-[#dbdfe6] dark:border-gray-700 p-5 shadow-sm">
+<h4 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">Executive Summary</h4>
+<p class="text-[#111318] dark:text-gray-200 text-sm leading-relaxed">
+                        The product team discussed the timeline for the Q4 launch. Key blockers identified include budget approval and finalizing design mockups. The team agreed to prioritize the mobile interface first.
+                    </p>
+</div>
+<!-- Accordions: Key Points -->
+<div class="flex flex-col gap-3">
+<h4 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Key Takeaways</h4>
+<details class="group flex flex-col rounded-lg border border-[#dbdfe6] dark:border-gray-700 bg-white dark:bg-[#1a202c] shadow-sm open">
+<summary class="flex cursor-pointer items-center justify-between px-4 py-3 select-none">
+<div class="flex items-center gap-3">
+<span class="flex items-center justify-center size-6 rounded-full bg-blue-100 text-primary text-xs font-bold">1</span>
+<p class="text-[#111318] dark:text-white text-sm font-medium">Budget approval needed by Friday</p>
+</div>
+<span class="material-symbols-outlined text-gray-400 transition-transform group-open:rotate-180">expand_more</span>
+</summary>
+<div class="px-4 pb-4 pl-[3.25rem]">
+<p class="text-[#606e8a] dark:text-gray-400 text-sm leading-normal">
+                                Sarah emphasized that without the budget sign-off from Finance, the marketing campaign cannot be initiated on time.
+                            </p>
+<div class="mt-2 flex gap-2">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300">High Priority</span>
+</div>
+</div>
+</details>
+<details class="group flex flex-col rounded-lg border border-[#dbdfe6] dark:border-gray-700 bg-white dark:bg-[#1a202c] shadow-sm">
+<summary class="flex cursor-pointer items-center justify-between px-4 py-3 select-none">
+<div class="flex items-center gap-3">
+<span class="flex items-center justify-center size-6 rounded-full bg-blue-100 text-primary text-xs font-bold">2</span>
+<p class="text-[#111318] dark:text-white text-sm font-medium">Design mockups finalized for Q4</p>
+</div>
+<span class="material-symbols-outlined text-gray-400 transition-transform group-open:rotate-180">expand_more</span>
+</summary>
+<div class="px-4 pb-4 pl-[3.25rem]">
+<p class="text-[#606e8a] dark:text-gray-400 text-sm leading-normal">
+                                Mark confirmed the design team is on track. Review meeting set for next Tuesday.
+                            </p>
+</div>
+</details>
+<details class="group flex flex-col rounded-lg border border-[#dbdfe6] dark:border-gray-700 bg-white dark:bg-[#1a202c] shadow-sm">
+<summary class="flex cursor-pointer items-center justify-between px-4 py-3 select-none">
+<div class="flex items-center gap-3">
+<span class="flex items-center justify-center size-6 rounded-full bg-blue-100 text-primary text-xs font-bold">3</span>
+<p class="text-[#111318] dark:text-white text-sm font-medium">Assign tasks by EOD</p>
+</div>
+<span class="material-symbols-outlined text-gray-400 transition-transform group-open:rotate-180">expand_more</span>
+</summary>
+<div class="px-4 pb-4 pl-[3.25rem]">
+<p class="text-[#606e8a] dark:text-gray-400 text-sm leading-normal">
+                                Action items need to be distributed in Jira before the weekend.
+                            </p>
+</div>
+</details>
+</div>
+</div>
+<!-- Right Column: Transcription (Span 8) -->
+<div class="lg:col-span-8 flex flex-col h-[calc(100vh-200px)] min-h-[500px] sticky top-24">
+<!-- Transcription Controls -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 bg-background-light dark:bg-background-dark z-10 pb-2">
+<h3 class="text-[#111318] dark:text-white text-xl font-bold leading-tight">Transcription</h3>
+<div class="relative w-full sm:w-auto min-w-[300px]">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-gray-400 text-[20px]">search</span>
+</div>
+<input class="block w-full pl-10 pr-3 py-2 border border-[#dbdfe6] dark:border-gray-700 rounded-lg leading-5 bg-white dark:bg-[#1a202c] text-gray-900 dark:text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary sm:text-sm transition duration-150 ease-in-out" placeholder="Search transcript..." type="text"/>
+<div class="absolute inset-y-0 right-0 pr-2 flex items-center">
+<kbd class="hidden sm:inline-block border border-gray-200 dark:border-gray-600 rounded px-1 text-[10px] font-medium text-gray-400">⌘K</kbd>
+</div>
+</div>
+</div>
+<!-- Transcription Scroll Area -->
+<div class="flex-1 overflow-y-auto custom-scrollbar bg-white dark:bg-[#1a202c] rounded-xl border border-[#dbdfe6] dark:border-gray-700 shadow-sm relative">
+<div class="p-6 flex flex-col gap-6">
+<!-- Transcript Block 1 -->
+<div class="flex gap-4 group hover:bg-gray-50 dark:hover:bg-gray-800/50 p-2 -m-2 rounded-lg transition-colors">
+<div class="flex-shrink-0 w-16 pt-1">
+<button class="text-primary text-xs font-bold hover:underline bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded">00:00</button>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold text-[#111318] dark:text-white mb-1">Speaker A (Sarah)</p>
+<p class="text-[#374151] dark:text-gray-300 text-base leading-relaxed">
+                                    Alright, let's get started. Thanks everyone for joining on such short notice. We have a few critical items to cover regarding the Q4 launch.
+                                </p>
+</div>
+</div>
+<!-- Transcript Block 2 -->
+<div class="flex gap-4 group hover:bg-gray-50 dark:hover:bg-gray-800/50 p-2 -m-2 rounded-lg transition-colors">
+<div class="flex-shrink-0 w-16 pt-1">
+<button class="text-primary text-xs font-bold hover:underline bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded">00:15</button>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold text-[#111318] dark:text-white mb-1">Speaker B (Mark)</p>
+<p class="text-[#374151] dark:text-gray-300 text-base leading-relaxed">
+                                    Thanks Sarah. I've prepared the design updates, but I think we're going to hit a snag with the development timeline if we don't simplify the onboarding flow.
+                                </p>
+</div>
+</div>
+<!-- Transcript Block 3 (Active) -->
+<div class="flex gap-4 bg-blue-50/50 dark:bg-blue-900/10 p-3 -mx-3 rounded-lg border-l-4 border-primary transition-colors" id="active-transcript">
+<div class="flex-shrink-0 w-16 pt-1">
+<button class="text-primary text-xs font-bold hover:underline bg-blue-100 dark:bg-blue-900/40 px-2 py-1 rounded">00:45</button>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold text-[#111318] dark:text-white mb-1">Speaker A (Sarah)</p>
+<p class="text-[#111318] dark:text-gray-100 text-base leading-relaxed font-medium">
+<span class="bg-yellow-200 dark:bg-yellow-900/50 text-gray-900 dark:text-gray-100 px-1 rounded mx-[-4px]">That's a valid concern.</span> Can we look at the metrics from the last user test? I remember users were getting stuck on the second screen.
+                                </p>
+</div>
+</div>
+<!-- Transcript Block 4 -->
+<div class="flex gap-4 group hover:bg-gray-50 dark:hover:bg-gray-800/50 p-2 -m-2 rounded-lg transition-colors">
+<div class="flex-shrink-0 w-16 pt-1">
+<button class="text-primary text-xs font-bold hover:underline bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded">01:12</button>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold text-[#111318] dark:text-white mb-1">Speaker C (David)</p>
+<p class="text-[#374151] dark:text-gray-300 text-base leading-relaxed">
+                                    I have the data right here. 60% drop-off at the profile photo upload. It's optional, but the UI makes it look mandatory. We should definitely change that.
+                                </p>
+</div>
+</div>
+<!-- Transcript Block 5 -->
+<div class="flex gap-4 group hover:bg-gray-50 dark:hover:bg-gray-800/50 p-2 -m-2 rounded-lg transition-colors">
+<div class="flex-shrink-0 w-16 pt-1">
+<button class="text-primary text-xs font-bold hover:underline bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded">01:45</button>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold text-[#111318] dark:text-white mb-1">Speaker B (Mark)</p>
+<p class="text-[#374151] dark:text-gray-300 text-base leading-relaxed">
+                                    Agreed. I'll mock up a skip button and a clearer label. Should take about a day.
+                                </p>
+</div>
+</div>
+<!-- Transcript Block 6 -->
+<div class="flex gap-4 group hover:bg-gray-50 dark:hover:bg-gray-800/50 p-2 -m-2 rounded-lg transition-colors">
+<div class="flex-shrink-0 w-16 pt-1">
+<button class="text-primary text-xs font-bold hover:underline bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded">02:10</button>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold text-[#111318] dark:text-white mb-1">Speaker A (Sarah)</p>
+<p class="text-[#374151] dark:text-gray-300 text-base leading-relaxed">
+                                    Great. Now about the budget... I haven't heard back from Finance yet. If we don't get approval by Friday, we might have to push the ad spend to next month.
+                                </p>
+</div>
+</div>
+<!-- Padding for scroll -->
+<div class="h-20"></div>
+</div>
+<!-- Fade overlay at bottom -->
+<div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white dark:from-[#1a202c] to-transparent pointer-events-none"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Floating Action Button -->
+<div class="fixed bottom-8 right-8 z-50">
+<button class="flex items-center gap-3 bg-primary hover:bg-blue-700 text-white px-6 py-4 rounded-full shadow-xl hover:shadow-2xl transition-all transform hover:scale-105 active:scale-95 group">
+<span class="material-symbols-outlined text-[24px]">spark</span>
+<span class="font-bold text-base">Refine with Chat</span>
+</button>
+</div>
+</body></html>

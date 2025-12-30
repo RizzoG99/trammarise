@@ -333,7 +333,7 @@ function App() {
   };
 
   return (
-    <div className="max-w-[1200px] mx-auto p-4 md:p-8 min-h-screen flex flex-col relative">
+    <div className="max-w-[1200px] mx-auto min-h-screen flex flex-col relative">
       <div className="absolute top-4 right-4 z-50">
         <ThemeToggle />
       </div>

@@ -21,11 +21,15 @@ export const RadioCard: React.FC<RadioCardProps> = ({
 }) => {
   return (
     <label 
-      className={`block relative cursor-pointer rounded-xl bg-bg-surface border border-border-glass transition-all duration-200 overflow-hidden hover:bg-bg-surface-hover hover:border-primary/30 ${
+      className={`block relative cursor-pointer rounded-2xl border-2 transition-all duration-200 overflow-hidden hover:shadow-md ${
         checked 
-          ? 'bg-primary/10 border-primary shadow-[0_0_0_1px_rgba(139,92,246,1)]' 
-          : ''
+          ? 'shadow-[0_0_0_2px_var(--color-primary)]' 
+          : 'hover:border-primary/30'
       } ${className}`}
+      style={{
+        backgroundColor: checked ? 'var(--color-primary-alpha-10)' : 'var(--color-bg-surface)',
+        borderColor: checked ? 'var(--color-primary)' : 'var(--color-border)',
+      }}
     >
       <input
         type="radio"
@@ -35,18 +39,22 @@ export const RadioCard: React.FC<RadioCardProps> = ({
         onChange={(e) => onChange(e.target.value)}
         className="absolute opacity-0 w-0 h-0"
       />
-      <div className="p-4">
-        <div className="flex justify-between items-center mb-1">
-          <div className="font-semibold text-base text-text-primary">{title}</div>
+      <div className="p-5">
+        <div className="flex justify-between items-start mb-2">
+          <div className="font-semibold text-lg text-text-primary flex-1">{title}</div>
           <div 
-            className={`w-5 h-5 rounded-full border-2 border-text-tertiary relative transition-all duration-200 ${
+            className={`w-6 h-6 rounded-full border-2 relative transition-all duration-200 flex-shrink-0 ml-2 ${
               checked 
-                ? 'border-primary bg-primary after:content-[""] after:absolute after:top-1/2 after:left-1/2 after:-translate-x-1/2 after:-translate-y-1/2 after:w-2 after:h-2 after:rounded-full after:bg-white' 
+                ? 'after:content-[""] after:absolute after:top-1/2 after:left-1/2 after:-translate-x-1/2 after:-translate-y-1/2 after:w-3 after:h-3 after:rounded-full after:bg-white' 
                 : ''
-            }`} 
+            }`}
+            style={{
+              borderColor: checked ? 'var(--color-primary)' : 'var(--color-text-tertiary)',
+              backgroundColor: checked ? 'var(--color-primary)' : 'transparent',
+            }}
           />
         </div>
-        {description && <div className="text-sm text-text-secondary leading-snug">{description}</div>}
+        {description && <div className="text-sm text-text-secondary leading-relaxed mt-1">{description}</div>}
       </div>
     </label>
   );

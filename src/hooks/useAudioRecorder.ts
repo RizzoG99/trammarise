@@ -3,9 +3,12 @@ import { AUDIO_CONSTANTS } from '../utils/constants';
 
 interface UseAudioRecorderReturn {
   isRecording: boolean;
+  isPaused: boolean;
   duration: number;
   audioBlob: Blob | null;
   startRecording: () => Promise<boolean>;
+  pauseRecording: () => void;
+  resumeRecording: () => void;
   stopRecording: () => void;
   error: string | null;
   hasMicrophoneAccess: boolean | null;
@@ -14,6 +17,7 @@ interface UseAudioRecorderReturn {
 
 export const useAudioRecorder = (): UseAudioRecorderReturn => {
   const [isRecording, setIsRecording] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
   const [duration, setDuration] = useState(0);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -23,6 +27,7 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
   const chunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<number | null>(null);
   const startTimeRef = useRef<number>(0);
+  const durationRef = useRef<number>(0);
   const permissionStatusRef = useRef<PermissionStatus | null>(null);
 
   // Cleanup on unmount
@@ -115,8 +120,10 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
 
       // Start timer
       startTimeRef.current = Date.now();
+      durationRef.current = 0;
       timerRef.current = window.setInterval(() => {
         const elapsed = Math.floor((Date.now() - startTimeRef.current) / 1000);
+        durationRef.current = elapsed;
         setDuration(elapsed);
         // Request data periodically for better Safari support
         if (mediaRecorder.state === 'recording') {
@@ -134,17 +141,53 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
     }
   }, []);
 
-  const stopRecording = useCallback(() => {
+  const pauseRecording = useCallback(() => {
     if (mediaRecorderRef.current?.state === 'recording') {
+      mediaRecorderRef.current.pause();
+      setIsPaused(true);
+      
+      // Pause timer
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    }
+  }, []);
+
+  const resumeRecording = useCallback(() => {
+    if (mediaRecorderRef.current?.state === 'paused') {
+      mediaRecorderRef.current.resume();
+      setIsPaused(false);
+      
+      // Resume timer using the ref value
+      const pausedDuration = durationRef.current;
+      startTimeRef.current = Date.now() - (pausedDuration * 1000);
+      timerRef.current = window.setInterval(() => {
+        const elapsed = Math.floor((Date.now() - startTimeRef.current) / 1000);
+        durationRef.current = elapsed;
+        setDuration(elapsed);
+        if (mediaRecorderRef.current?.state === 'recording') {
+          mediaRecorderRef.current.requestData();
+        }
+      }, AUDIO_CONSTANTS.RECORDING_TIMER_INTERVAL);
+    }
+  }, []);
+
+  const stopRecording = useCallback(() => {
+    if (mediaRecorderRef.current?.state === 'recording' || mediaRecorderRef.current?.state === 'paused') {
       mediaRecorderRef.current.stop();
+      setIsPaused(false);
     }
   }, []);
 
   return {
     isRecording,
+    isPaused,
     duration,
     audioBlob,
     startRecording,
+    pauseRecording,
+    resumeRecording,
     stopRecording,
     error,
     hasMicrophoneAccess,

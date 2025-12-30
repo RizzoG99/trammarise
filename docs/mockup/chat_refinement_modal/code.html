@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Trammarise Chat Refinement</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0a47c2",
+                        "background-light": "#f5f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom scrollbar for cleaner look in the chat window */
+        .chat-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .chat-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .chat-scroll::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 20px;
+        }
+        .dark .chat-scroll::-webkit-scrollbar-thumb {
+            background-color: #334155;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display h-screen w-full overflow-hidden flex items-center justify-center">
+<!-- Simulated Background App Content (Blurred) -->
+<div class="absolute inset-0 z-0 p-8 opacity-20 pointer-events-none select-none overflow-hidden">
+<div class="max-w-4xl mx-auto space-y-4">
+<div class="h-8 bg-gray-300 dark:bg-gray-700 rounded w-1/3"></div>
+<div class="h-4 bg-gray-200 dark:bg-gray-800 rounded w-full"></div>
+<div class="h-4 bg-gray-200 dark:bg-gray-800 rounded w-full"></div>
+<div class="h-4 bg-gray-200 dark:bg-gray-800 rounded w-3/4"></div>
+<div class="flex gap-4 mt-8">
+<div class="h-32 bg-gray-200 dark:bg-gray-800 rounded flex-1"></div>
+<div class="h-32 bg-gray-200 dark:bg-gray-800 rounded flex-1"></div>
+</div>
+</div>
+</div>
+<!-- Modal Overlay Backdrop -->
+<div class="absolute inset-0 bg-black/40 backdrop-blur-sm z-10"></div>
+<!-- Main Modal Container -->
+<div class="relative z-20 w-full max-w-3xl h-[85vh] flex flex-col bg-white dark:bg-[#17202e] rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
+<!-- Modal Header -->
+<div class="flex flex-col border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-[#17202e] z-30 shrink-0">
+<div class="flex items-center justify-between px-6 pt-5 pb-2">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-3xl">smart_toy</span>
+<div>
+<h3 class="text-[#111318] dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">Refine Summary</h3>
+<p class="text-xs text-gray-500 dark:text-gray-400">Trammarise AI Assistant</p>
+</div>
+</div>
+<button class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-gray-500 dark:text-gray-400">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<!-- Token Usage Indicator (Integrated) -->
+<div class="px-6 pb-4">
+<div class="flex items-center justify-between mb-1.5">
+<span class="text-xs font-medium text-gray-500 dark:text-gray-400">Daily Token Usage</span>
+<span class="text-xs font-bold text-[#111318] dark:text-white">450/500</span>
+</div>
+<div class="h-1.5 w-full bg-[#dbdfe6] dark:bg-gray-700 rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: 90%;"></div>
+</div>
+</div>
+</div>
+<!-- Chat History Area -->
+<div class="flex-1 overflow-y-auto p-6 space-y-6 bg-[#fafafa] dark:bg-[#101622] chat-scroll">
+<!-- AI Message (Welcome) -->
+<div class="flex items-end gap-3">
+<div class="bg-center bg-no-repeat bg-cover rounded-full w-10 h-10 shrink-0 border border-gray-200 dark:border-gray-700 shadow-sm" data-alt="Abstract gradient avatar representing AI" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDnQIE_k5zj1Ov_kiiLWC4nBKeb-w4JE_uJ6s2A_AKkD7y4FTutBXMxWNOI_fse6iqzEaBaefjbqPfMsufrWoQ2h7vcvp0pq-Ad4nHQ98hmQMhJGjbNZEtof8xMpC_xNlF_QlGA8VoT86G37jMf0aG6vMWs_IrKoPfj57q5VH3CQblkla2-i_2Y0UFhgrW7ZKRVZp5_BaeZjglBEGdv8fYlUOBUXzCIl5RYfk2i7vmRQauO0np0umlyMjj5-OzNMcp13DfuKb4SLjRn");'>
+</div>
+<div class="flex flex-1 flex-col gap-1 items-start">
+<div class="flex items-center gap-2">
+<span class="text-[#606e8a] dark:text-gray-400 text-[13px] font-medium">Trammarise AI</span>
+<span class="text-xs text-gray-400 dark:text-gray-600">10:23 AM</span>
+</div>
+<div class="p-4 bg-white dark:bg-[#1e293b] text-[#111318] dark:text-gray-100 rounded-2xl rounded-bl-none shadow-sm border border-gray-100 dark:border-gray-700 max-w-[85%]">
+<p class="text-[15px] leading-relaxed">
+                            Hello! I've analyzed your audio transcription. How can I help you refine the summary today?
+                        </p>
+</div>
+</div>
+</div>
+<!-- Suggestion Chips -->
+<div class="flex gap-2 pl-12 flex-wrap">
+<button class="group flex h-8 items-center gap-x-1.5 rounded-full bg-white dark:bg-[#1e293b] border border-gray-200 dark:border-gray-700 pl-3 pr-4 hover:border-primary hover:text-primary transition-all shadow-sm">
+<span class="material-symbols-outlined text-[18px] text-primary">format_list_bulleted</span>
+<span class="text-[#111318] dark:text-gray-200 text-xs font-medium group-hover:text-primary">Summarize in bullets</span>
+</button>
+<button class="group flex h-8 items-center gap-x-1.5 rounded-full bg-white dark:bg-[#1e293b] border border-gray-200 dark:border-gray-700 pl-3 pr-4 hover:border-primary hover:text-primary transition-all shadow-sm">
+<span class="material-symbols-outlined text-[18px] text-primary">check_circle</span>
+<span class="text-[#111318] dark:text-gray-200 text-xs font-medium group-hover:text-primary">Extract action items</span>
+</button>
+<button class="group flex h-8 items-center gap-x-1.5 rounded-full bg-white dark:bg-[#1e293b] border border-gray-200 dark:border-gray-700 pl-3 pr-4 hover:border-primary hover:text-primary transition-all shadow-sm">
+<span class="material-symbols-outlined text-[18px] text-primary">spellcheck</span>
+<span class="text-[#111318] dark:text-gray-200 text-xs font-medium group-hover:text-primary">Fix grammar</span>
+</button>
+</div>
+<!-- User Message -->
+<div class="flex items-end gap-3 justify-end">
+<div class="flex flex-1 flex-col gap-1 items-end">
+<div class="flex items-center gap-2">
+<span class="text-xs text-gray-400 dark:text-gray-600">10:24 AM</span>
+<span class="text-[#606e8a] dark:text-gray-400 text-[13px] font-medium">You</span>
+</div>
+<div class="p-4 bg-primary text-white rounded-2xl rounded-br-none shadow-md max-w-[85%]">
+<p class="text-[15px] leading-relaxed">
+                            Can you make the summary more professional and focus on the key decisions made regarding the Q3 budget?
+                        </p>
+</div>
+</div>
+<div class="bg-center bg-no-repeat bg-cover rounded-full w-10 h-10 shrink-0 border-2 border-white dark:border-gray-800 shadow-sm" data-alt="User profile picture placeholder" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCgHjlFvV00ZLnOV_TOJsRGLzIqaiL8MOqesIpD1WMZe_L6hM-goxSWILTD3ZCeK5cC_w_M0x4zJ3jHNJwpPZ9epMKCA44F_lGQ8jNlHZ8I4mwT9ZqLQFaydG9zS-6Q94Ywyn5Lh1kz6VxVFpqmTcR9WOvOCARwvx3UIXKM45EADRGflELFScyEFVMFzYWWOeI0AV7pjzMKBSd_t3drA5ZC9BERqvQCLm9ei557sh2SKkD9rVkL__9StFWHoydzat3G3hj5rtliRhrI");'>
+</div>
+</div>
+<!-- AI Processing / Typing Indicator (Optional Polish) -->
+<div class="flex items-end gap-3 opacity-60">
+<div class="bg-center bg-no-repeat bg-cover rounded-full w-8 h-8 shrink-0 border border-gray-200 dark:border-gray-700" data-alt="Abstract gradient avatar representing AI small" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCB0m2se6I6hpHJbzo3FweB_j9Sa8Le5Ugz9TbEn36KCZ7XHhpsx7WUUHTIKdHaKnMp6zDSt0ZytR51d1r-Qll6kSFgYJ9i4WGKSQN1aXgqhnTlhRwlesIEP1A_xHt7p9KtAKTGsIYp6vsbwRoAp2wlfKNVPRbbYIcFX-iBXu-VFm6lb_MbHEgKZVNDbeRbwWm0eFdyFHWW7vZ0Cp3brxaDGUC2vGlQ8e4lMCaplQRkC565sdZlOy1cngoNDncdkz3rVN-HmXUe1bDo");'>
+</div>
+<div class="p-3 bg-white dark:bg-[#1e293b] rounded-2xl rounded-bl-none shadow-sm border border-gray-100 dark:border-gray-700">
+<div class="flex gap-1">
+<div class="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"></div>
+<div class="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce delay-75"></div>
+<div class="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce delay-150"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Input Footer -->
+<div class="p-4 bg-white dark:bg-[#17202e] border-t border-gray-100 dark:border-gray-800 shrink-0">
+<div class="relative flex items-end gap-2 bg-[#f5f6f8] dark:bg-[#0f1520] p-2 rounded-xl border border-transparent focus-within:border-primary/50 focus-within:bg-white dark:focus-within:bg-[#17202e] transition-all ring-1 ring-transparent focus-within:ring-primary/20">
+<button class="p-2 text-gray-400 hover:text-primary transition-colors self-end mb-0.5" title="Add Attachment">
+<span class="material-symbols-outlined">add_circle</span>
+</button>
+<textarea class="w-full max-h-32 bg-transparent border-none text-[#111318] dark:text-white placeholder-gray-500 dark:placeholder-gray-500 text-[15px] resize-none focus:ring-0 py-3 px-1 leading-normal" placeholder="Ask a follow-up question..." rows="1"></textarea>
+<button class="p-2 bg-primary hover:bg-primary/90 text-white rounded-lg shadow-sm transition-transform active:scale-95 mb-0.5 self-end flex items-center justify-center h-10 w-10 shrink-0">
+<span class="material-symbols-outlined text-[20px]">send</span>
+</button>
+</div>
+<div class="text-center mt-2">
+<p class="text-[11px] text-gray-400 dark:text-gray-600">AI can make mistakes. Please review generated summaries.</p>
+</div>
+</div>
+</div>
+</body></html>

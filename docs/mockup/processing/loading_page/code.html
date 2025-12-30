@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Trammarise - Processing Audio</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0a47c2",
+                        "background-light": "#f5f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    animation: {
+                        'wave': 'wave 1.2s ease-in-out infinite',
+                        'spin-slow': 'spin 3s linear infinite',
+                    },
+                    keyframes: {
+                        wave: {
+                            '0%, 100%': { height: '30%', opacity: '0.4' },
+                            '50%': { height: '100%', opacity: '1' },
+                        }
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom styles for animations that Tailwind config might miss depending on version */
+        .wave-bar {
+            animation: wave 1.2s ease-in-out infinite;
+            transform-origin: center;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display min-h-screen flex flex-col text-slate-900 dark:text-white transition-colors duration-200">
+<!-- Top Navigation -->
+<header class="w-full bg-white dark:bg-[#1a202c] border-b border-slate-200 dark:border-slate-800 px-6 py-4 transition-colors duration-200">
+<div class="max-w-7xl mx-auto flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="size-8 text-primary flex items-center justify-center bg-primary/10 rounded-lg">
+<span class="material-symbols-outlined text-2xl">graphic_eq</span>
+</div>
+<h2 class="text-[#111318] dark:text-white text-xl font-bold tracking-tight">Trammarise</h2>
+</div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary text-sm font-medium transition-colors" href="#">Dashboard</a>
+<a class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary text-sm font-medium transition-colors" href="#">History</a>
+<a class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary text-sm font-medium transition-colors" href="#">Settings</a>
+</nav>
+<div class="flex items-center gap-4">
+<div class="bg-center bg-no-repeat bg-cover rounded-full size-10 border-2 border-slate-100 dark:border-slate-700" data-alt="User profile avatar showing a smiling person" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBvcp-mrBy4CgH0iB__iIPg2cauLsZrSuySCr0EbwdNJPz9cxGhXUaQdA7mCcCPhMPTC6L1bxWXPeEliMvc6TSjcpMJeyjBCcMlGU_iPmkZv7pNKGpM04Q1unsu88f03J0Ui4r21peqYjc0FMlI7ovDHx9uJAXWe_-Jfb5nOA9a5zKXlO8RGFbZkQv-axzIJqid72uyJr1PTUKwPzLo3oWQ0N8qVvrwOZcfbsNMuu6lP3TOpYKk4GKBqE5BObbFhkM9jUvPCaChaSWQ");'>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Layout -->
+<main class="flex-1 flex items-center justify-center p-6 md:p-12">
+<div class="w-full max-w-5xl bg-white dark:bg-[#1a202c] rounded-2xl shadow-xl dark:shadow-2xl overflow-hidden flex flex-col md:flex-row min-h-[500px] border border-slate-100 dark:border-slate-800 transition-colors duration-200">
+<!-- Left Column: Visuals & Primary Status -->
+<div class="flex-1 p-8 md:p-12 flex flex-col items-center justify-center bg-slate-50 dark:bg-[#151b26] border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-800 relative overflow-hidden group">
+<!-- Abstract Background Pattern -->
+<div class="absolute inset-0 opacity-30 dark:opacity-10 pointer-events-none">
+<div class="absolute top-0 left-0 w-64 h-64 bg-primary/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
+<div class="absolute bottom-0 right-0 w-64 h-64 bg-primary/20 rounded-full blur-3xl translate-x-1/2 translate-y-1/2"></div>
+</div>
+<!-- Audio Wave Animation -->
+<div class="flex items-center justify-center gap-1.5 h-32 mb-8 z-10">
+<div class="w-2.5 bg-primary/40 rounded-full wave-bar" style="animation-delay: -1.2s;"></div>
+<div class="w-2.5 bg-primary/60 rounded-full wave-bar" style="animation-delay: -1.0s;"></div>
+<div class="w-2.5 bg-primary/80 rounded-full wave-bar" style="animation-delay: -0.8s;"></div>
+<div class="w-2.5 bg-primary rounded-full wave-bar" style="animation-delay: -0.6s;"></div>
+<div class="w-2.5 bg-primary rounded-full wave-bar" style="animation-delay: -0.4s;"></div>
+<div class="w-2.5 bg-primary/80 rounded-full wave-bar" style="animation-delay: -0.2s;"></div>
+<div class="w-2.5 bg-primary/60 rounded-full wave-bar" style="animation-delay: 0s;"></div>
+<div class="w-2.5 bg-primary/40 rounded-full wave-bar" style="animation-delay: 0.2s;"></div>
+</div>
+<!-- Percentage & Status -->
+<div class="text-center z-10">
+<h1 class="text-6xl font-extrabold text-slate-900 dark:text-white mb-2 tracking-tighter">62%</h1>
+<p class="text-lg font-medium text-primary mb-6 animate-pulse">Analyzing Context...</p>
+<div class="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 rounded-full shadow-sm border border-slate-200 dark:border-slate-700">
+<span class="material-symbols-outlined text-slate-400 text-sm">schedule</span>
+<span class="text-sm text-slate-500 dark:text-slate-400 font-medium">~2 mins remaining</span>
+</div>
+</div>
+</div>
+<!-- Right Column: Detailed Progress List -->
+<div class="flex-1 p-8 md:p-12 flex flex-col justify-center bg-white dark:bg-[#1a202c]">
+<h3 class="text-xl font-bold text-slate-900 dark:text-white mb-8">Processing Steps</h3>
+<div class="space-y-6 relative">
+<!-- Connector Line (Background) -->
+<div class="absolute left-[19px] top-4 bottom-4 w-0.5 bg-slate-100 dark:bg-slate-800 -z-0"></div>
+<!-- Step 1: Completed -->
+<div class="relative flex items-center gap-4 group">
+<div class="relative z-10 flex items-center justify-center size-10 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 border-2 border-green-100 dark:border-green-900/30 transition-all duration-300">
+<span class="material-symbols-outlined text-xl font-bold">check</span>
+</div>
+<div class="flex flex-col">
+<span class="text-base font-semibold text-slate-900 dark:text-white">Uploading Audio</span>
+<span class="text-xs text-green-600 dark:text-green-400 font-medium">Completed</span>
+</div>
+</div>
+<!-- Step 2: Completed -->
+<div class="relative flex items-center gap-4 group">
+<div class="relative z-10 flex items-center justify-center size-10 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 border-2 border-green-100 dark:border-green-900/30 transition-all duration-300">
+<span class="material-symbols-outlined text-xl font-bold">check</span>
+</div>
+<div class="flex flex-col">
+<span class="text-base font-semibold text-slate-900 dark:text-white">Transcribing Speech</span>
+<span class="text-xs text-green-600 dark:text-green-400 font-medium">Completed</span>
+</div>
+</div>
+<!-- Step 3: Active -->
+<div class="relative flex items-center gap-4 group">
+<div class="relative z-10 flex items-center justify-center size-10 rounded-full bg-white dark:bg-[#1a202c] text-primary border-[3px] border-primary shadow-[0_0_0_4px_rgba(10,71,194,0.1)] transition-all duration-300">
+<span class="material-symbols-outlined text-xl animate-spin">progress_activity</span>
+</div>
+<div class="flex flex-col">
+<span class="text-base font-bold text-primary">Analyzing Context</span>
+<span class="text-xs text-slate-500 dark:text-slate-400">Processing...</span>
+</div>
+</div>
+<!-- Step 4: Pending -->
+<div class="relative flex items-center gap-4 group opacity-60">
+<div class="relative z-10 flex items-center justify-center size-10 rounded-full bg-slate-50 dark:bg-slate-800 text-slate-300 dark:text-slate-600 border-2 border-slate-200 dark:border-slate-700">
+<span class="material-symbols-outlined text-xl">radio_button_unchecked</span>
+</div>
+<div class="flex flex-col">
+<span class="text-base font-medium text-slate-500 dark:text-slate-400">Summarizing Key Points</span>
+<span class="text-xs text-slate-400 dark:text-slate-600">Pending</span>
+</div>
+</div>
+</div>
+<!-- Footer Action -->
+<div class="mt-12 pt-8 border-t border-slate-100 dark:border-slate-800 flex justify-center md:justify-start">
+<button class="group flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-slate-500 hover:text-red-600 dark:text-slate-400 dark:hover:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors duration-200">
+<span class="material-symbols-outlined text-lg group-hover:scale-110 transition-transform">close</span>
+                        Cancel Processing
+                    </button>
+</div>
+</div>
+</div>
+</main>
+</body></html>

@@ -59,10 +59,11 @@ export const ThemeToggle: React.FC = () => {
   return (
     <button
       onClick={cycleTheme}
-      className="flex items-center justify-center p-2.5 bg-white dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600 rounded-lg shadow-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-all"
+      className="p-2 rounded-lg hover:bg-[var(--color-bg-surface)] transition-colors"
       title={`Current: ${getLabel()}. Click to cycle themes`}
+      aria-label={`Theme: ${getLabel()}`}
     >
-      <span className="text-slate-900 dark:text-white">{getIcon()}</span>
+      <span className="text-text-secondary">{getIcon()}</span>
     </button>
   );
 };

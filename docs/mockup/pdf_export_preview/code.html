@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Trammarise - PDF Export Preview</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;family=Noto+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0a47c2",
+                        "primary-hover": "#083a9e",
+                        "background-light": "#f5f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "body": ["Noto Sans", "sans-serif"],
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* A4 Aspect Ratio Simulation for Preview */
+        .a4-paper {
+            aspect-ratio: 210/297;
+            width: 100%;
+            max-width: 595px; /* approx A4 width at 72dpi */
+        }
+        /* Hide scrollbar for cleaner look in preview container */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white transition-colors duration-200">
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+<!-- Top Navigation -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-6 py-3 sticky top-0 z-50">
+<div class="flex items-center gap-4 text-slate-900 dark:text-white">
+<div class="size-8 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" style="font-size: 32px;">graphic_eq</span>
+</div>
+<h2 class="text-lg font-bold leading-tight tracking-[-0.015em]">Trammarise</h2>
+</div>
+<div class="flex flex-1 justify-end gap-6 items-center">
+<a class="text-slate-600 dark:text-slate-300 text-sm font-medium leading-normal hover:text-primary transition-colors flex items-center gap-2" href="#">
+<span class="material-symbols-outlined" style="font-size: 18px;">arrow_back</span>
+                    Back to Transcript
+                </a>
+<div class="bg-center bg-no-repeat bg-cover rounded-full size-10 ring-2 ring-slate-100 dark:ring-slate-800" data-alt="User profile avatar showing a smiling person" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBM_vH91nRKHYHCnE9c8D53waX1vu4K_XSweB1zxYyQIosrLZpDXpe_sfjmFXH8nNV_SwyFtat2Q31pAa41Fwdn2GCdoaQwDipa0OtHsMzeUEXsn2nJXfl_IcGmiTYepEIpkQuEir3RWtmGWwiOoIYvegjZFAhxnrAAAP1PZZPIEM0sRN0aSqiK07TYbfePpj2V46lLqo4WiIkojlLxSecs8MPzlxsFROz3GOEcV0ua8eXX5tDNtKO5yz6Uif01RvtMRGiJLPXOx_8N");'>
+</div>
+</div>
+</header>
+<!-- Main Content Area: Split View -->
+<main class="flex-1 w-full max-w-[1600px] mx-auto p-4 md:p-8">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 h-full">
+<!-- Left Column: Controls (Sidebar) -->
+<div class="lg:col-span-4 flex flex-col gap-6">
+<!-- Page Heading -->
+<div class="flex flex-col gap-2">
+<h1 class="text-slate-900 dark:text-white text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]">Export Preview</h1>
+<p class="text-slate-500 dark:text-slate-400 text-base font-normal leading-normal">Configure content sections before downloading your session summary.</p>
+</div>
+<!-- Configuration Panel -->
+<div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+<div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800">
+<h3 class="text-slate-900 dark:text-white text-lg font-bold leading-tight flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">tune</span>
+                                Customize Export
+                            </h3>
+</div>
+<div class="px-6 py-4 flex flex-col gap-1">
+<!-- Checkbox Items -->
+<label class="flex gap-x-3 py-3 flex-row items-center group cursor-pointer">
+<input checked="" class="h-5 w-5 rounded border-slate-300 dark:border-slate-600 bg-transparent text-primary focus:ring-primary focus:ring-offset-0 transition-all cursor-pointer" type="checkbox"/>
+<div class="flex flex-col">
+<span class="text-slate-900 dark:text-slate-100 text-base font-medium leading-normal">Include Metadata</span>
+<span class="text-slate-500 dark:text-slate-400 text-xs">Date, time, duration, and participants</span>
+</div>
+</label>
+<label class="flex gap-x-3 py-3 flex-row items-center group cursor-pointer">
+<input checked="" class="h-5 w-5 rounded border-slate-300 dark:border-slate-600 bg-transparent text-primary focus:ring-primary focus:ring-offset-0 transition-all cursor-pointer" type="checkbox"/>
+<div class="flex flex-col">
+<span class="text-slate-900 dark:text-slate-100 text-base font-medium leading-normal">AI Summary</span>
+<span class="text-slate-500 dark:text-slate-400 text-xs">Executive summary and key points</span>
+</div>
+</label>
+<label class="flex gap-x-3 py-3 flex-row items-center group cursor-pointer">
+<input checked="" class="h-5 w-5 rounded border-slate-300 dark:border-slate-600 bg-transparent text-primary focus:ring-primary focus:ring-offset-0 transition-all cursor-pointer" type="checkbox"/>
+<div class="flex flex-col">
+<span class="text-slate-900 dark:text-slate-100 text-base font-medium leading-normal">Full Transcription</span>
+<span class="text-slate-500 dark:text-slate-400 text-xs">Complete dialogue with speaker labels</span>
+</div>
+</label>
+<label class="flex gap-x-3 py-3 flex-row items-center group cursor-pointer">
+<input class="h-5 w-5 rounded border-slate-300 dark:border-slate-600 bg-transparent text-primary focus:ring-primary focus:ring-offset-0 transition-all cursor-pointer" type="checkbox"/>
+<div class="flex flex-col">
+<span class="text-slate-900 dark:text-slate-100 text-base font-medium leading-normal">Context Notes</span>
+<span class="text-slate-500 dark:text-slate-400 text-xs">Private user notes attached to session</span>
+</div>
+</label>
+</div>
+</div>
+<!-- Actions -->
+<div class="flex flex-col gap-4 pt-2">
+<button class="flex w-full cursor-pointer items-center justify-center rounded-lg h-14 px-5 bg-primary hover:bg-primary-hover text-white gap-3 text-base font-bold tracking-[0.015em] shadow-md transition-all active:scale-[0.99]">
+<span class="material-symbols-outlined">download</span>
+<span>Download PDF</span>
+</button>
+<div class="flex items-center gap-3">
+<button class="flex-1 flex cursor-pointer items-center justify-center rounded-lg h-10 px-4 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 gap-2 text-sm font-semibold transition-colors">
+<span class="material-symbols-outlined text-[18px]">description</span>
+                                Export as TXT
+                            </button>
+<button class="flex-1 flex cursor-pointer items-center justify-center rounded-lg h-10 px-4 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 gap-2 text-sm font-semibold transition-colors">
+<span class="material-symbols-outlined text-[18px]">markdown</span>
+                                Export as MD
+                            </button>
+</div>
+</div>
+</div>
+<!-- Right Column: PDF Preview -->
+<div class="lg:col-span-8 flex flex-col h-full min-h-[600px] relative">
+<!-- Toolbar overlay -->
+<div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1 bg-slate-900/90 text-white backdrop-blur-sm px-2 py-1.5 rounded-full shadow-lg border border-white/10">
+<button class="p-1.5 hover:bg-white/20 rounded-full transition-colors" title="Zoom Out">
+<span class="material-symbols-outlined text-[20px]">remove</span>
+</button>
+<span class="text-xs font-medium px-2 min-w-[3ch] text-center">100%</span>
+<button class="p-1.5 hover:bg-white/20 rounded-full transition-colors" title="Zoom In">
+<span class="material-symbols-outlined text-[20px]">add</span>
+</button>
+<div class="w-px h-4 bg-white/20 mx-1"></div>
+<span class="text-xs font-medium px-2">Page 1 of 3</span>
+</div>
+<!-- Preview Container Background -->
+<div class="flex-1 bg-slate-200 dark:bg-slate-800 rounded-xl border border-slate-300 dark:border-slate-700 p-8 overflow-y-auto overflow-x-hidden flex justify-center items-start shadow-inner">
+<!-- The "Paper" -->
+<div class="a4-paper bg-white shadow-2xl relative flex flex-col p-12 text-slate-800">
+<!-- Header Section -->
+<div class="border-b-2 border-slate-100 pb-6 mb-6">
+<div class="flex justify-between items-start">
+<div>
+<h1 class="text-3xl font-bold text-slate-900 mb-2">Q3 Marketing Strategy</h1>
+<p class="text-slate-500 text-sm">Automated transcription by Trammarise</p>
+</div>
+<div class="size-8 text-primary opacity-50">
+<span class="material-symbols-outlined" style="font-size: 32px;">graphic_eq</span>
+</div>
+</div>
+</div>
+<!-- Metadata Section -->
+<div class="flex flex-wrap gap-y-4 gap-x-8 mb-8 text-sm">
+<div>
+<p class="text-slate-400 text-xs font-semibold uppercase tracking-wider mb-1">Date</p>
+<p class="font-medium text-slate-700">Oct 24, 2023</p>
+</div>
+<div>
+<p class="text-slate-400 text-xs font-semibold uppercase tracking-wider mb-1">Duration</p>
+<p class="font-medium text-slate-700">45 min 12 sec</p>
+</div>
+<div>
+<p class="text-slate-400 text-xs font-semibold uppercase tracking-wider mb-1">Participants</p>
+<div class="flex -space-x-2">
+<div class="size-6 rounded-full bg-slate-200 border border-white bg-cover" data-alt="Small avatar of participant 1" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCCN3iD4ZrdB3f7A6oeUIiXNHBO6xvor-qbXuKzCbbmpxILWETHx1zhdxvVCfXHlg-54PlBoZY_XcNBQSe5r0e16mj6shwfhSS19iqA4Y8jx8QZbvRfBwxO2ePknB47bZTxY1oUIbqDzHQKrL3l6ysJOUWeGlC0FDHk9BACqLWeyaQjJi76OTwdpu5PKTvKDVxEeNChUTY-7fbalJIAlR7aw55mKX5LPh96xkjOuZbj7W8_n1oog8jy1EIeENpcBSVouuoCBTNvalJf");'></div>
+<div class="size-6 rounded-full bg-slate-200 border border-white bg-cover" data-alt="Small avatar of participant 2" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBbp1zniNk2Amlrny2BsQQJHPqr9mLyreLGiFjqMjOZG2TB-56f4SQFytEhkcq6TConMu9IDdzyRRuZNMUw9oqIe7uVsX50_91ihvg04AEwtNN_lgFY4XBszC_nTtOrx2M6O1dhnTyp99pV0eDT1Imq02vlmfEeiiE0v3f8A8VQF2ojxfBIlK3c0Up2o7RzO2OaOzksB3nSuqW8RjS4_isBs34Br2N_sXnDE6n0Iom-y9bLeeynUW1oaBy9oV_MyYoOMWcjbLmZbj-G");'></div>
+<div class="size-6 rounded-full bg-slate-200 border border-white bg-cover flex items-center justify-center text-[10px] font-bold text-slate-600">+2</div>
+</div>
+</div>
+</div>
+<!-- Summary Section -->
+<div class="mb-8">
+<div class="flex items-center gap-2 mb-3">
+<span class="material-symbols-outlined text-primary text-[20px]">auto_awesome</span>
+<h2 class="text-lg font-bold text-slate-900">AI Executive Summary</h2>
+</div>
+<div class="bg-primary/5 p-4 rounded-lg border border-primary/10">
+<p class="text-sm leading-relaxed text-slate-700">
+                                        The team discussed the upcoming Q3 campaign launch, focusing on digital channel allocation. 
+                                        <strong>Sarah</strong> raised concerns about the budget constraints for social media ads, while <strong>Marcus</strong> suggested reallocating funds from the print budget. 
+                                        Key action items include finalizing the creative assets by Friday and scheduling a follow-up meeting with the finance department.
+                                    </p>
+</div>
+</div>
+<!-- Transcription Section -->
+<div>
+<h2 class="text-lg font-bold text-slate-900 mb-4 border-b border-slate-100 pb-2">Full Transcription</h2>
+<div class="space-y-4">
+<!-- Segment 1 -->
+<div class="flex gap-4">
+<div class="text-xs font-mono text-slate-400 pt-1 w-12 text-right">00:00</div>
+<div class="flex-1">
+<p class="text-sm font-bold text-slate-900 mb-1">Sarah Jenkins</p>
+<p class="text-sm text-slate-600 leading-relaxed">Alright everyone, let's get started. Thanks for joining on such short notice. We need to lock down the Q3 strategy today.</p>
+</div>
+</div>
+<!-- Segment 2 -->
+<div class="flex gap-4">
+<div class="text-xs font-mono text-slate-400 pt-1 w-12 text-right">00:15</div>
+<div class="flex-1">
+<p class="text-sm font-bold text-slate-900 mb-1">Marcus Chen</p>
+<p class="text-sm text-slate-600 leading-relaxed">No problem. I've pulled up the analytics from last quarter. Engagement was down 15% on Twitter but up 40% on LinkedIn.</p>
+</div>
+</div>
+<!-- Segment 3 -->
+<div class="flex gap-4">
+<div class="text-xs font-mono text-slate-400 pt-1 w-12 text-right">00:32</div>
+<div class="flex-1">
+<p class="text-sm font-bold text-slate-900 mb-1">Sarah Jenkins</p>
+<p class="text-sm text-slate-600 leading-relaxed">That tracks with what we suspected. We should probably pivot our paid spend towards B2B channels primarily.</p>
+</div>
+</div>
+<!-- Segment 4 (Cut off simulation) -->
+<div class="flex gap-4 opacity-50">
+<div class="text-xs font-mono text-slate-400 pt-1 w-12 text-right">00:45</div>
+<div class="flex-1">
+<p class="text-sm font-bold text-slate-900 mb-1">David Miller</p>
+<p class="text-sm text-slate-600 leading-relaxed">I have the new budget breakdown here if you want to take a look...</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Paper Footer Simulation -->
+<div class="absolute bottom-6 left-0 w-full text-center">
+<span class="text-[10px] text-slate-300 font-mono">Page 1</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>
