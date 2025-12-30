@@ -1,8 +1,9 @@
 export interface WaveformVisualizationProps {
   isRecording: boolean;
+  isPaused?: boolean;
 }
 
-export function WaveformVisualization({ isRecording }: WaveformVisualizationProps) {
+export function WaveformVisualization({ isRecording, isPaused = false }: WaveformVisualizationProps) {
   // Generate 20 bars with varying heights (static pattern)
   const bars = [
     30, 60, 45, 75, 50, 80, 55, 70, 40, 85,
@@ -15,7 +16,7 @@ export function WaveformVisualization({ isRecording }: WaveformVisualizationProp
         <div
           key={index}
           className={`w-1.5 rounded-full transition-all ${
-            isRecording ? 'waveform-bar' : ''
+            isRecording && !isPaused ? 'waveform-bar' : ''
           }`}
           style={{
             height: `${height}%`,

@@ -159,7 +159,6 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ onSubmit, 
               key={type.value}
               value={type.value}
               label={type.label}
-              icon={type.icon}
               selected={contentType === type.value}
               onClick={() => setContentType(type.value)}
             />

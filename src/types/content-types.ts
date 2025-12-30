@@ -21,19 +21,18 @@ export type ContentType = typeof CONTENT_TYPE_VALUES[number];
 export interface ContentTypeOption {
   value: ContentType;
   label: string;
-  icon: string;
 }
 
 /**
  * Predefined content type options for the configuration UI
  */
 export const CONTENT_TYPE_OPTIONS: readonly ContentTypeOption[] = [
-  { value: 'meeting', label: 'Meeting Notes', icon: '📝' },
-  { value: 'lecture', label: 'Lecture/Class', icon: '🎓' },
-  { value: 'interview', label: 'Interview', icon: '🎤' },
-  { value: 'podcast', label: 'Podcast Episode', icon: '🎙️' },
-  { value: 'voice-memo', label: 'Voice Memo', icon: '🗣️' },
-  { value: 'other', label: 'Other (specify)', icon: '✏️' },
+  { value: 'meeting', label: 'Meeting Notes' },
+  { value: 'lecture', label: 'Lecture/Class' },
+  { value: 'interview', label: 'Interview' },
+  { value: 'podcast', label: 'Podcast Episode' },
+  { value: 'voice-memo', label: 'Voice Memo' },
+  { value: 'other', label: 'Other (specify)' },
 ] as const;
 
 /**

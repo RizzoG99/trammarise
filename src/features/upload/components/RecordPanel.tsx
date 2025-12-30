@@ -77,7 +77,7 @@ export function RecordPanel({ onRecordingComplete }: RecordPanelProps) {
 
       <div className="flex flex-col items-center justify-center min-h-[300px] space-y-6">
         {/* Waveform Visualization */}
-        <WaveformVisualization isRecording={isRecording} />
+        <WaveformVisualization isRecording={isRecording} isPaused={isPaused} />
 
         {/* Timer */}
         <div className="text-4xl font-mono font-semibold text-text-primary tabular-nums">
