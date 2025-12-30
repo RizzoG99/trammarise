@@ -25,37 +25,61 @@ The app is deployed on Vercel. API routes in `/api` are serverless functions. No
 **Trammarise** is a React + TypeScript + Vite application for audio recording, transcription, and AI-powered summarization with multi-provider support.
 
 ### State Flow
-The app uses a linear state machine with 6 states managed in `App.tsx`:
+The app uses a **route-based architecture** with React Router, managed in `src/app/App.tsx`:
 
 ```
-initial → recording → audio → configuration → processing → results
-   ↑                             ↑                            ↓
-   └─────────────────────────────┴────────────────────────────┘
+/ (UploadRecordPage) → /audio/:sessionId (AudioEditingPage) → 
+/processing/:sessionId (ProcessingPage) → /results/:sessionId (ResultsPage)
 ```
 
-- **initial**: File upload or start recording
-- **recording**: Active recording with duration timer
-- **audio**: Waveform visualization, playback, and trimming
-- **configuration**: AI provider selection and API key setup
-- **processing**: Shows progress for compression, chunking, transcription, and summarization
-- **results**: Displays transcript, summary, and interactive chat
+**Routes**:
+- **`/`** (UploadRecordPage): File upload/recording + configuration (language, content type, processing mode)
+- **`/audio/:sessionId`** (AudioEditingPage): Waveform visualization, playback, and trimming
+- **`/configure/:sessionId`**: AI provider selection and API key setup (placeholder)
+- **`/processing/:sessionId`** (ProcessingPage): Progress for compression, chunking, transcription, and summarization
+- **`/results/:sessionId`** (ResultsPage): Displays transcript, summary, and interactive chat
+
+**Session-Based Navigation**:
+- Each workflow creates a unique `sessionId` (timestamp + random)
+- Session data stored with `saveSession(sessionId, data)`
+- Navigation uses `buildRoutePath(ROUTES.AUDIO, { sessionId })`
+
+**Legacy Note**: `App.v1.tsx` contains the old state machine implementation (kept for reference)
 
 ### Key Component Architecture
 
+**Route-Based Structure** (`src/app/routes/`):
 ```
-App (orchestrates state, audio processing pipeline)
-├── InitialState (file upload, recording trigger)
-├── RecordingState (duration display, stop button)
-├── AudioState (playback & editing)
-│   ├── WaveformPlayer (WaveSurfer.js visualization)
-│   └── PlaybackControls (play/pause, trim controls)
-├── ConfigurationState (AI provider selection)
-│   └── ConfigurationForm (API key inputs, validation)
-├── ProcessingState (multi-step progress indicator)
-└── ResultsState (transcript, summary, chat)
-    ├── ChatInterface (interactive AI chat)
-    └── ActionButtons (copy, TTS, PDF generation)
+App (React Router with AppLayout wrapper)
+├── UploadRecordPage (upload/record + configuration)
+│   ├── UploadPanel (file upload with drag-and-drop)
+│   ├── RecordPanel (audio recording with controls)
+│   │   ├── WaveformVisualization (animated bars)
+│   │   └── RecordingButtons (RecordButton, PauseButton, StopButton)
+│   ├── ContextUploadArea (PDF context files)
+│   ├── LanguageSelector (50+ languages)
+│   ├── ContentTypeSelector (meeting, lecture, etc.)
+│   ├── ProcessingModeSelector (balanced, quality, speed)
+│   └── ProcessAudioButton (navigate to audio editing)
+│
+├── AudioEditingPage (waveform playback & trimming)
+│   └── AudioState
+│       ├── WaveformPlayer (WaveSurfer.js visualization)
+│       └── PlaybackControls (play/pause, trim controls)
+│
+├── ProcessingPage (multi-step progress indicator)
+│   └── ProcessingState (shows compression, transcription, summarization)
+│
+└── ResultsPage (transcript, summary, chat)
+    └── ResultsState
+        ├── ChatInterface (interactive AI chat)
+        └── ActionButtons (copy, TTS, PDF generation)
 ```
+
+**Shared Components** (`src/components/ui/`):
+- GlassCard, Button, Input, Heading, Text, Icon
+- RecordingButtons (reusable audio control buttons)
+- ThemeToggle (light/dark mode)
 
 ### Audio Processing Pipeline
 
@@ -142,8 +166,47 @@ All types are centralized in `src/types/audio.ts`:
 - `src/utils/audio-processor.ts`: FFmpeg integration for compression/chunking
 - `src/utils/audioCompression.ts`: Legacy compression utility
 - `src/utils/session-storage.ts`: API key storage (sessionStorage, cleared on tab close)
+- `src/utils/session-manager.ts`: Session persistence with in-memory file cache (see Session Management below)
 - `src/utils/constants.ts`: API timeouts, file size limits, validation constants
 - `src/utils/pdf-generator.ts`: AI-powered PDF formatting and generation
+
+### Session Management
+
+**Location**: `src/utils/session-manager.ts`
+
+The app uses a hybrid approach for session persistence:
+- **Metadata** (language, contentType, processingMode, timestamps) stored in `sessionStorage`
+- **Files** (audioFile, contextFiles) stored in **in-memory cache** (Map)
+
+**Why?** Files and Blobs cannot be serialized to JSON/sessionStorage. They become empty objects when stringified.
+
+**Trade-offs**:
+- ✅ Works seamlessly for single-session workflows (upload → configure → process)
+- ✅ No size limits (in-memory storage)
+- ✅ Automatic cleanup when tab closes
+- ❌ Files don't persist across page refreshes
+- ❌ Limited to current browser tab
+
+**Usage**:
+```typescript
+import { saveSession, loadSession, generateSessionId } from '../utils/session-manager';
+
+// Save session
+const sessionId = generateSessionId();
+saveSession(sessionId, {
+  audioFile: { name: 'audio.mp3', blob, file },
+  contextFiles: [],
+  language: 'en',
+  contentType: 'meeting',
+  processingMode: 'balanced',
+  // ...
+});
+
+// Load session (files restored from cache)
+const session = loadSession(sessionId);
+```
+
+**Note**: For persistence across refreshes, consider implementing IndexedDB storage in the future.
 
 ### API Key Security
 
