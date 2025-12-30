@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
-import { Mic, Square, Pause, Play } from 'lucide-react';
 import { GlassCard } from '../../../components/ui/GlassCard';
 import { Heading } from '../../../components/ui/Heading';
 import { WaveformVisualization } from './WaveformVisualization';
 import { useAudioRecorder } from '../../../hooks/useAudioRecorder';
+import { RecordButton, PauseButton, StopButton } from '../../../components/ui/RecordingButtons';
 
 export interface RecordPanelProps {
   onRecordingComplete: (blob: Blob) => void;
@@ -86,80 +86,22 @@ export function RecordPanel({ onRecordingComplete }: RecordPanelProps) {
 
         {/* Controls */}
         <div className="flex items-center gap-4">
-          {/* Pause/Resume Button */}
-          <button
+          <PauseButton
             onClick={isPaused ? handleResumeRecording : handlePauseRecording}
             disabled={!isRecording}
-            className="p-3 rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{ 
-              backgroundColor: isRecording ? 'var(--color-text-secondary)' : 'transparent',
-              color: isRecording ? 'white' : 'var(--color-text-tertiary)'
-            }}
-            onMouseEnter={(e) => {
-              if (isRecording) e.currentTarget.style.backgroundColor = 'var(--color-text-primary)';
-            }}
-            onMouseLeave={(e) => {
-              if (isRecording) e.currentTarget.style.backgroundColor = 'var(--color-text-secondary)';
-            }}
-            aria-label={isPaused ? 'Resume recording' : 'Pause recording'}
-          >
-            {isPaused ? (
-              <Play className="w-7 h-7" />
-            ) : (
-              <Pause className="w-7 h-7" />
-            )}
-          </button>
-          
-          {/* Microphone Button */}
-          <button
+            isPaused={isPaused}
+          />
+
+          <RecordButton
             onClick={handleStartRecording}
             disabled={isRecording}
-            className={`relative rounded-full transition-all group ${
-              isRecording 
-                ? 'cursor-not-allowed opacity-50 p-3' 
-                : 'shadow-lg hover:shadow-xl p-6'
-            }`}
-            style={{ 
-              backgroundColor: isRecording ? 'transparent' : 'var(--color-primary)',
-              color: isRecording ? 'var(--color-text-tertiary)' : 'white'
-            }}
-            onMouseEnter={(e) => {
-              if (!isRecording) e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)';
-            }}
-            onMouseLeave={(e) => {
-              if (!isRecording) e.currentTarget.style.backgroundColor = 'var(--color-primary)';
-            }}
-            aria-label={isRecording ? 'Recording' : 'Start recording'}
-          >
-            <Mic className={isRecording ? 'w-7 h-7' : 'w-8 h-8'} />
-            {/* Pulsing ring effect - only when not recording */}
-            {!isRecording && (
-              <span 
-                className="absolute inset-0 rounded-full opacity-20 pulse-ring"
-                style={{ backgroundColor: 'var(--color-primary)' }}
-              />
-            )}
-          </button>
-          
-          {/* Stop Button */}
-          <button
+            isRecording={isRecording}
+          />
+
+          <StopButton
             onClick={handleStopRecording}
             disabled={!isRecording}
-            className="p-3 rounded-full transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{ 
-              backgroundColor: isRecording ? 'var(--color-accent-error)' : 'transparent',
-              color: isRecording ? 'white' : 'var(--color-text-tertiary)'
-            }}
-            onMouseEnter={(e) => {
-              if (isRecording) e.currentTarget.style.backgroundColor = '#dc2626';
-            }}
-            onMouseLeave={(e) => {
-              if (isRecording) e.currentTarget.style.backgroundColor = 'var(--color-accent-error)';
-            }}
-            aria-label="Stop recording"
-          >
-            <Square className="w-7 h-7" />
-          </button>
+          />
         </div>
       </div>
     </GlassCard>

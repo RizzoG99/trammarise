@@ -20,63 +20,53 @@ import { buildRoutePath, ROUTES } from '../../types/routing';
 
 export function UploadRecordPage() {
   const navigate = useNavigate();
-  const [audioFile] = useState<File | Blob | null>(null);
+  const [audioFile, setAudioFile] = useState<File | Blob | null>(null);
   const [contextFiles, setContextFiles] = useState<File[]>([]);
   const [language, setLanguage] = useState<LanguageCode>('en');
   const [contentType, setContentType] = useState<ContentType>('meeting');
   const [processingMode, setProcessingMode] = useState<ProcessingMode>('balanced');
 
   const handleFileUpload = async (file: File) => {
-    // Create new session
-    const sessionId = generateSessionId();
-
-    // Save session data
-    saveSession(sessionId, {
-      audioFile: {
-        name: file.name,
-        blob: file,
-        file: file,
-      },
-      contextFiles,
-      sessionId,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    });
-
-    // Navigate to audio editing page
-    const path = buildRoutePath(ROUTES.AUDIO, { sessionId });
-    navigate(path);
+    // Only update state - DO NOT navigate
+    setAudioFile(file);
   };
 
   const handleRecordingComplete = async (blob: Blob) => {
-    // Create new session
+    // Convert to File for consistency
+    const recordingFile = new File([blob], 'recording.webm', { type: 'audio/webm' });
+
+    // Only update state - DO NOT navigate
+    setAudioFile(recordingFile);
+  };
+
+  const handleProcessAudio = () => {
+    if (!audioFile) {
+      console.warn('No audio file available');
+      return;
+    }
+
+    // Create session ID
     const sessionId = generateSessionId();
 
-    // Save session data
+    // Save complete session with ALL configuration
     saveSession(sessionId, {
       audioFile: {
-        name: 'recording.webm',
-        blob: blob,
-        file: new File([blob], 'recording.webm', { type: 'audio/webm' }),
+        name: audioFile instanceof File ? audioFile.name : 'recording.webm',
+        blob: audioFile,
+        file: audioFile instanceof File ? audioFile : new File([audioFile], 'recording.webm', { type: 'audio/webm' }),
       },
       contextFiles,
+      language,        // Save user configuration
+      contentType,     // Save user configuration
+      processingMode,  // Save user configuration
       sessionId,
       createdAt: Date.now(),
       updatedAt: Date.now(),
     });
 
-    // Navigate to audio editing page
+    // NOW navigate to audio editing page
     const path = buildRoutePath(ROUTES.AUDIO, { sessionId });
     navigate(path);
-  };
-
-  const handleProcessAudio = () => {
-    if (!audioFile) return;
-
-    // If user wants to skip audio editing and go directly to processing
-    // This could navigate to a configuration or processing page
-    // For now, we'll just show an alert
-    alert('Process Audio clicked! This would navigate to processing.');
   };
 
   return (

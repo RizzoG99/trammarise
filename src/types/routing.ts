@@ -1,4 +1,7 @@
 import type { AudioFile, AIConfiguration, ProcessingResult } from './audio';
+import type { LanguageCode } from './languages';
+import type { ContentType } from './content-types';
+import type { ProcessingMode } from '../features/configuration/components/ProcessingModeSelector';
 
 /**
  * Session data stored in sessionStorage
@@ -8,8 +11,16 @@ export interface SessionData {
   sessionId: string;
   audioFile: AudioFile;
   contextFiles: File[];
+  
+  // Configuration fields captured during upload/record flow
+  language: LanguageCode;
+  contentType: ContentType;
+  processingMode: ProcessingMode;
+  
+  // Optional fields set later in the flow
   configuration?: AIConfiguration;
   result?: ProcessingResult;
+  
   createdAt: number;
   updatedAt: number;
 }
