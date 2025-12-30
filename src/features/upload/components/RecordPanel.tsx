@@ -86,60 +86,80 @@ export function RecordPanel({ onRecordingComplete }: RecordPanelProps) {
 
         {/* Controls */}
         <div className="flex items-center gap-4">
-          {isRecording ? (
-            <>
-              {/* Pause/Resume Button */}
-              <button
-                onClick={isPaused ? handleResumeRecording : handlePauseRecording}
-                className="p-4 rounded-full text-white transition-all shadow-lg hover:shadow-xl"
-                style={{ backgroundColor: 'var(--color-text-secondary)' }}
-                onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
-                onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
-                aria-label={isPaused ? 'Resume recording' : 'Pause recording'}
-              >
-                {isPaused ? (
-                  <Play className="w-6 h-6 fill-current" />
-                ) : (
-                  <Pause className="w-6 h-6" />
-                )}
-              </button>
-              
-              {/* Microphone Button (visual indicator during recording) */}
-              <div
-                className="relative p-6 rounded-full text-white shadow-lg"
-                style={{ backgroundColor: 'var(--color-primary)' }}
-                aria-label="Recording"
-              >
-                <Mic className="w-8 h-8" />
-              </div>
-              
-              {/* Stop Button */}
-              <button
-                onClick={handleStopRecording}
-                className="p-4 rounded-full text-white transition-all shadow-lg hover:bg-red-600"
-                style={{ backgroundColor: 'var(--color-accent-error)' }}
-                aria-label="Stop recording"
-              >
-                <Square className="w-6 h-6" />
-              </button>
-            </>
-          ) : (
-            <button
-              onClick={handleStartRecording}
-              className="relative p-6 rounded-full text-white transition-all shadow-lg hover:shadow-xl group"
-              style={{ backgroundColor: 'var(--color-primary)' }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary)'}
-              aria-label="Start recording"
-            >
-              <Mic className="w-8 h-8" />
-              {/* Pulsing ring effect */}
+          {/* Pause/Resume Button */}
+          <button
+            onClick={isPaused ? handleResumeRecording : handlePauseRecording}
+            disabled={!isRecording}
+            className="p-3 rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{ 
+              backgroundColor: isRecording ? 'var(--color-text-secondary)' : 'transparent',
+              color: isRecording ? 'white' : 'var(--color-text-tertiary)'
+            }}
+            onMouseEnter={(e) => {
+              if (isRecording) e.currentTarget.style.backgroundColor = 'var(--color-text-primary)';
+            }}
+            onMouseLeave={(e) => {
+              if (isRecording) e.currentTarget.style.backgroundColor = 'var(--color-text-secondary)';
+            }}
+            aria-label={isPaused ? 'Resume recording' : 'Pause recording'}
+          >
+            {isPaused ? (
+              <Play className="w-7 h-7" />
+            ) : (
+              <Pause className="w-7 h-7" />
+            )}
+          </button>
+          
+          {/* Microphone Button */}
+          <button
+            onClick={handleStartRecording}
+            disabled={isRecording}
+            className={`relative rounded-full transition-all group ${
+              isRecording 
+                ? 'cursor-not-allowed opacity-50 p-3' 
+                : 'shadow-lg hover:shadow-xl p-6'
+            }`}
+            style={{ 
+              backgroundColor: isRecording ? 'transparent' : 'var(--color-primary)',
+              color: isRecording ? 'var(--color-text-tertiary)' : 'white'
+            }}
+            onMouseEnter={(e) => {
+              if (!isRecording) e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)';
+            }}
+            onMouseLeave={(e) => {
+              if (!isRecording) e.currentTarget.style.backgroundColor = 'var(--color-primary)';
+            }}
+            aria-label={isRecording ? 'Recording' : 'Start recording'}
+          >
+            <Mic className={isRecording ? 'w-7 h-7' : 'w-8 h-8'} />
+            {/* Pulsing ring effect - only when not recording */}
+            {!isRecording && (
               <span 
                 className="absolute inset-0 rounded-full opacity-20 pulse-ring"
                 style={{ backgroundColor: 'var(--color-primary)' }}
               />
-            </button>
-          )}
+            )}
+          </button>
+          
+          {/* Stop Button */}
+          <button
+            onClick={handleStopRecording}
+            disabled={!isRecording}
+            className="p-3 rounded-full transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{ 
+              backgroundColor: isRecording ? 'var(--color-accent-error)' : 'transparent',
+              color: isRecording ? 'white' : 'var(--color-text-tertiary)'
+            }}
+            onMouseEnter={(e) => {
+              if (isRecording) e.currentTarget.style.backgroundColor = '#dc2626';
+            }}
+            onMouseLeave={(e) => {
+              if (isRecording) e.currentTarget.style.backgroundColor = 'var(--color-accent-error)';
+            }}
+            aria-label="Stop recording"
+          >
+            <Square className="w-7 h-7" />
+          </button>
         </div>
       </div>
     </GlassCard>
