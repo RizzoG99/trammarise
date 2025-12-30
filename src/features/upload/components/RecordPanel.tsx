@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { Mic, Square, Pause, Play } from 'lucide-react';
 import { GlassCard } from '../../../components/ui/GlassCard';
 import { Heading } from '../../../components/ui/Heading';
-import { Text } from '../../../components/ui/Text';
 import { WaveformVisualization } from './WaveformVisualization';
 import { useAudioRecorder } from '../../../hooks/useAudioRecorder';
 
@@ -55,22 +54,30 @@ export function RecordPanel({ onRecordingComplete }: RecordPanelProps) {
 
   return (
     <GlassCard variant="light" className="p-6">
-      <Heading level="h3" className="mb-4">Record Now</Heading>
+      {/* Header with Status Indicator */}
+      <div className="flex items-center justify-between mb-4">
+        <Heading level="h3">Record Now</Heading>
+        
+        {/* Status Indicator - Top Right */}
+        <div className="flex items-center gap-2">
+          <div 
+            className={`w-2 h-2 rounded-full ${isRecording && !isPaused ? 'animate-pulse' : ''}`}
+            style={{ backgroundColor: isRecording && !isPaused ? 'var(--color-accent-error)' : 'var(--color-text-tertiary)' }}
+          />
+          <span 
+            className="text-xs font-medium uppercase tracking-wider"
+            style={{ 
+              color: isRecording && !isPaused ? 'var(--color-accent-error)' : 'var(--color-text-secondary)' 
+            }}
+          >
+            {isRecording ? (isPaused ? 'Paused' : 'Recording') : 'Ready'}
+          </span>
+        </div>
+      </div>
 
       <div className="flex flex-col items-center justify-center min-h-[300px] space-y-6">
         {/* Waveform Visualization */}
         <WaveformVisualization isRecording={isRecording} />
-
-        {/* Status Indicator */}
-        <div className="flex items-center gap-2">
-          <div 
-            className={`w-2 h-2 rounded-full ${isRecording && !isPaused ? 'pulse-ring' : ''}`}
-            style={{ backgroundColor: isRecording && !isPaused ? 'var(--color-accent-error)' : 'var(--color-text-tertiary)' }}
-          />
-          <Text variant="caption" color="secondary">
-            {isRecording ? (isPaused ? 'Paused' : 'Recording') : 'Ready'}
-          </Text>
-        </div>
 
         {/* Timer */}
         <div className="text-4xl font-mono font-semibold text-text-primary tabular-nums">

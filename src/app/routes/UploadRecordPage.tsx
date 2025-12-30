@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import type { LanguageCode } from '../../types/languages';
 import type { ContentType } from '../../types/content-types';
 import type { ProcessingMode } from '../../features/configuration/components/ProcessingModeSelector';
+import { SlidersHorizontal } from 'lucide-react';
 import { Heading } from '../../components/ui/Heading';
 import { Text } from '../../components/ui/Text';
 import { GlassCard } from '../../components/ui/GlassCard';
@@ -19,12 +20,11 @@ import { buildRoutePath, ROUTES } from '../../types/routing';
 
 export function UploadRecordPage() {
   const navigate = useNavigate();
-  const [audioFile, setAudioFile] = useState<File | Blob | null>(null);
+  const [audioFile] = useState<File | Blob | null>(null);
   const [contextFiles, setContextFiles] = useState<File[]>([]);
-  const [language, setLanguage] = useState<LanguageCode>('en-US');
+  const [language, setLanguage] = useState<LanguageCode>('en');
   const [contentType, setContentType] = useState<ContentType>('meeting');
   const [processingMode, setProcessingMode] = useState<ProcessingMode>('balanced');
-  const [isRecording, setIsRecording] = useState(false);
 
   const handleFileUpload = async (file: File) => {
     // Create new session
@@ -68,7 +68,6 @@ export function UploadRecordPage() {
     // Navigate to audio editing page
     const path = buildRoutePath(ROUTES.AUDIO, { sessionId });
     navigate(path);
-    setIsRecording(false);
   };
 
   const handleProcessAudio = () => {
@@ -103,12 +102,10 @@ export function UploadRecordPage() {
         {/* Configuration Section (3-column grid) */}
         <GlassCard variant="light" className="p-6 mb-8">
           <div className="flex items-center gap-2 mb-6">
-            <div className="w-5 h-5 grid grid-cols-2 gap-0.5">
-              <div className="rounded-sm" style={{ backgroundColor: 'var(--color-text-tertiary)' }} />
-              <div className="rounded-sm" style={{ backgroundColor: 'var(--color-text-tertiary)' }} />
-              <div className="rounded-sm" style={{ backgroundColor: 'var(--color-text-tertiary)' }} />
-              <div className="rounded-sm" style={{ backgroundColor: 'var(--color-text-tertiary)' }} />
-            </div>
+            <SlidersHorizontal 
+              size={20} 
+              className="text-gray-500" 
+            />
             <Heading level="h3">Configuration</Heading>
           </div>
 
@@ -142,7 +139,6 @@ export function UploadRecordPage() {
         {/* Process Audio Button */}
         <ProcessAudioButton
           disabled={!audioFile}
-          estimatedCredits={processingMode === 'balanced' ? 10 : 25}
           onProcess={handleProcessAudio}
         />
       </main>

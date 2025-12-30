@@ -1,7 +1,3 @@
-import { RadioCard } from '../../../components/ui/RadioCard';
-import { Heading } from '../../../components/ui/Heading';
-import { Text } from '../../../components/ui/Text';
-
 export type ProcessingMode = 'balanced' | 'quality';
 
 export interface ProcessingModeSelectorProps {
@@ -11,48 +7,87 @@ export interface ProcessingModeSelectorProps {
 
 export function ProcessingModeSelector({ value, onChange }: ProcessingModeSelectorProps) {
   return (
-    <div className="space-y-4">
-      <div>
-        <Heading level="h3" className="mb-2">Processing Mode</Heading>
-        <Text variant="caption" color="secondary">
-          Choose the quality level for transcription and summarization
-        </Text>
-      </div>
+    <div className="space-y-3">
+      <label className="block text-sm font-semibold mb-1" style={{ color: 'var(--color-text-primary)' }}>
+        Processing Mode
+      </label>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+      <div className="flex flex-col gap-3">
         {/* Balanced Mode */}
-        <RadioCard
-          name="processing-mode"
-          value="balanced"
-          checked={value === 'balanced'}
-          onChange={(val) => onChange(val as ProcessingMode)}
-          title={
-            <div className="flex flex-col gap-1">
-              <div className="flex items-baseline gap-2">
-                <span>Balanced</span>
-                <span className="text-sm font-normal" style={{ color: 'var(--color-primary)' }}>~10 credits</span>
-              </div>
+        <label
+          className={`relative flex items-center p-3 rounded-lg border cursor-pointer transition-colors ${
+            value === 'balanced'
+              ? 'bg-primary/5'
+              : 'hover:bg-gray-50 dark:hover:bg-gray-800'
+          }`}
+          style={{
+            borderColor: value === 'balanced' ? 'var(--color-primary)' : 'var(--color-border)',
+          }}
+        >
+          <input
+            type="radio"
+            name="mode"
+            value="balanced"
+            checked={value === 'balanced'}
+            onChange={(e) => onChange(e.target.value as ProcessingMode)}
+            className="h-4 w-4 border-gray-300 focus:ring-2 focus:ring-offset-0"
+            style={{
+              accentColor: 'var(--color-primary)',
+            }}
+          />
+          <div className="ml-3 flex-1">
+            <div className="flex justify-between">
+              <span className="block text-sm font-medium text-gray-900 dark:text-white">
+                Balanced
+              </span>
+              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium
+                             bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                ~10 credits
+              </span>
             </div>
-          }
-          description="Fast processing with good quality"
-        />
+            <span className="block text-xs text-gray-500 dark:text-gray-400">
+              Standard accuracy, faster processing.
+            </span>
+          </div>
+        </label>
 
         {/* Quality Mode */}
-        <RadioCard
-          name="processing-mode"
-          value="quality"
-          checked={value === 'quality'}
-          onChange={(val) => onChange(val as ProcessingMode)}
-          title={
-            <div className="flex flex-col gap-1">
-              <div className="flex items-baseline gap-2">
-                <span>Quality</span>
-                <span className="text-sm font-normal" style={{ color: 'var(--color-primary)' }}>~25 credits</span>
-              </div>
+        <label
+          className={`relative flex items-center p-3 rounded-lg border cursor-pointer transition-colors ${
+            value === 'quality'
+              ? 'bg-primary/5'
+              : 'hover:bg-gray-50 dark:hover:bg-gray-800'
+          }`}
+          style={{
+            borderColor: value === 'quality' ? 'var(--color-primary)' : 'var(--color-border)',
+          }}
+        >
+          <input
+            type="radio"
+            name="mode"
+            value="quality"
+            checked={value === 'quality'}
+            onChange={(e) => onChange(e.target.value as ProcessingMode)}
+            className="h-4 w-4 border-gray-300 focus:ring-2 focus:ring-offset-0"
+            style={{
+              accentColor: 'var(--color-primary)',
+            }}
+          />
+          <div className="ml-3 flex-1">
+            <div className="flex justify-between">
+              <span className="block text-sm font-medium text-gray-900 dark:text-white">
+                Quality
+              </span>
+              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium
+                             bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                ~25 credits
+              </span>
             </div>
-          }
-          description="Best quality, longer processing time"
-        />
+            <span className="block text-xs text-gray-500 dark:text-gray-400">
+              GPT-4 enhanced analysis & summary.
+            </span>
+          </div>
+        </label>
       </div>
     </div>
   );

@@ -29,7 +29,7 @@ export function ContentTypeSelector({ value, onChange }: ContentTypeSelectorProp
       >
         {CONTENT_TYPE_OPTIONS.map((option) => (
           <option key={option.value} value={option.value}>
-            {option.icon} {option.label}
+            {option.label}
           </option>
         ))}
       </select>
