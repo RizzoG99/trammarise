@@ -89,11 +89,12 @@ export default async function handler(
     });
 
     return res.status(200).json({ response });
-  } catch (error: any) {
+  } catch (error) {
+    const err = error as { message?: string };
     console.error('Chat error:', error);
     return res.status(500).json({
       error: 'Chat failed',
-      message: error.message
+      message: err.message
     });
   }
 }

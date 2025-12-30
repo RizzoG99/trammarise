@@ -160,7 +160,7 @@ export class AppStateMachine extends EventEmitter<StateMachineEvents> {
    */
   getValidTransitions(): AppState[] {
     const validTransitions: AppState[] = [];
-    for (const [key, transition] of this.transitions.entries()) {
+    for (const transition of this.transitions.values()) {
       if (transition.from === this.currentState) {
         validTransitions.push(transition.to);
       }
@@ -220,7 +220,7 @@ export class AppStateMachine extends EventEmitter<StateMachineEvents> {
 
     // Show transitions
     lines.push('Transitions:');
-    for (const [key, transition] of this.transitions.entries()) {
+    for (const transition of this.transitions.values()) {
       const isCurrent = transition.from === this.currentState;
       const prefix = isCurrent ? '→ ' : '  ';
       lines.push(`${prefix}${transition.from} → ${transition.to}`);

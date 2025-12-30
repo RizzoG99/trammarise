@@ -179,7 +179,7 @@ describe('RadioCard', () => {
 
   describe('Radio Group', () => {
     it('works in a group with multiple options', () => {
-      const { rerender } = render(
+      render(
         <div>
           <RadioCard
             name="plan"

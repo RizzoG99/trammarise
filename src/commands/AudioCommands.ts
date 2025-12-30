@@ -2,6 +2,12 @@ import type { Command } from '../patterns/Command';
 import type WaveSurfer from 'wavesurfer.js';
 import type { Region } from 'wavesurfer.js/dist/plugins/regions';
 
+// Type for regions plugin
+type RegionsPlugin = {
+  clearRegions: () => void;
+  addRegion: (options: RegionState) => Region;
+};
+
 /**
  * Region state for undo/redo
  */
@@ -20,13 +26,15 @@ interface RegionState {
 export class AddTrimRegionCommand implements Command {
   private region: Region | null = null;
   private regionState: RegionState;
+  private regionsPlugin: RegionsPlugin;
 
   constructor(
-    private wavesurfer: WaveSurfer,
-    private regionsPlugin: any,
+    _wavesurfer: WaveSurfer,
+    regionsPlugin: RegionsPlugin,
     start: number,
     end: number
   ) {
+    this.regionsPlugin = regionsPlugin;
     this.regionState = {
       id: `trim-region-${Date.now()}`,
       start,
@@ -69,12 +77,16 @@ export class AddTrimRegionCommand implements Command {
  */
 export class RemoveTrimRegionCommand implements Command {
   private regionState: RegionState | null = null;
+  private regionsPlugin: RegionsPlugin;
+  private region: Region;
 
   constructor(
-    private wavesurfer: WaveSurfer,
-    private regionsPlugin: any,
-    private region: Region
+    _wavesurfer: WaveSurfer,
+    regionsPlugin: RegionsPlugin,
+    region: Region
   ) {
+    this.regionsPlugin = regionsPlugin;
+    this.region = region;
     // Store region state for undo
     this.regionState = {
       id: region.id,
@@ -114,12 +126,18 @@ export class RemoveTrimRegionCommand implements Command {
 export class UpdateRegionCommand implements Command {
   private oldStart: number;
   private oldEnd: number;
+  private region: Region;
+  private newStart: number;
+  private newEnd: number;
 
   constructor(
-    private region: Region,
-    private newStart: number,
-    private newEnd: number
+    region: Region,
+    newStart: number,
+    newEnd: number
   ) {
+    this.region = region;
+    this.newStart = newStart;
+    this.newEnd = newEnd;
     this.oldStart = region.start;
     this.oldEnd = region.end;
   }
@@ -148,11 +166,15 @@ export class UpdateRegionCommand implements Command {
  */
 export class ChangePlaybackSpeedCommand implements Command {
   private oldSpeed: number;
+  private wavesurfer: WaveSurfer;
+  private newSpeed: number;
 
   constructor(
-    private wavesurfer: WaveSurfer,
-    private newSpeed: number
+    wavesurfer: WaveSurfer,
+    newSpeed: number
   ) {
+    this.wavesurfer = wavesurfer;
+    this.newSpeed = newSpeed;
     this.oldSpeed = wavesurfer.getPlaybackRate();
   }
 
@@ -174,11 +196,15 @@ export class ChangePlaybackSpeedCommand implements Command {
  */
 export class ChangeVolumeCommand implements Command {
   private oldVolume: number;
+  private wavesurfer: WaveSurfer;
+  private newVolume: number;
 
   constructor(
-    private wavesurfer: WaveSurfer,
-    private newVolume: number
+    wavesurfer: WaveSurfer,
+    newVolume: number
   ) {
+    this.wavesurfer = wavesurfer;
+    this.newVolume = newVolume;
     this.oldVolume = wavesurfer.getVolume();
   }
 
@@ -199,10 +225,16 @@ export class ChangeVolumeCommand implements Command {
  * Macro command to execute multiple commands as one
  */
 export class MacroCommand implements Command {
+  private commands: Command[];
+  private description: string;
+
   constructor(
-    private commands: Command[],
-    private description: string = 'Macro command'
-  ) {}
+    commands: Command[],
+    description: string = 'Macro command'
+  ) {
+    this.commands = commands;
+    this.description = description;
+  }
 
   async execute(): Promise<void> {
     for (const command of this.commands) {

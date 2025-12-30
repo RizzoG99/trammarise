@@ -128,7 +128,7 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
   /**
    * Gets the icon component for current theme
    */
-  const getIcon = (): JSX.Element => {
+  const getIcon = (): React.JSX.Element => {
     switch (theme) {
       case 'light':
         return <SunIcon />;

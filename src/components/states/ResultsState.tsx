@@ -55,7 +55,7 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
         ...result,
         chatHistory: [...updatedHistory, assistantMessage],
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error('Chat error:', error);
       // Add error message to chat
       const errorMessage: ChatMessage = {

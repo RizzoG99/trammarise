@@ -213,17 +213,29 @@ export async function validateApiKey(
       body: JSON.stringify({ provider, apiKey }),
     }, VALIDATION_TIMEOUT);
 
-    if (!response.ok) return false;
+    if (!response.ok) {
+      console.error('API key validation failed:', {
+        status: response.status,
+        statusText: response.statusText
+      });
+      return false;
+    }
 
     const data = await response.json();
 
     // Validate response structure
     if (typeof data.valid !== 'boolean') {
+      console.error('Invalid validation response structure:', data);
       return false;
     }
 
     return data.valid;
-  } catch {
+  } catch (error) {
+    const err = error as { message?: string; name?: string };
+    console.error('API key validation error:', {
+      message: err?.message,
+      name: err?.name
+    });
     return false;
   }
 }

@@ -99,9 +99,10 @@ async function getFFmpeg(): Promise<FFmpeg> {
       await loadFFmpegWithFallback(instance, 120000); // 120s per attempt, 2 attempts
       ffmpeg = instance;
       return instance;
-    } catch (error: any) {
+    } catch (error) {
+      const err = error as { message?: string };
       console.error('FFmpeg loading failed:', error);
-      throw new Error(`Failed to load audio processor: ${error.message}`);
+      throw new Error(`Failed to load audio processor: ${err.message || 'Unknown error'}`);
     }
   })();
 
@@ -144,11 +145,14 @@ export async function compressAudio(file: File, onProgress?: (progress: number) 
     await ffmpeg.deleteFile(inputName);
     await ffmpeg.deleteFile(outputName);
 
+    // Ensure data is Uint8Array (ffmpeg.readFile returns FileData which can be Uint8Array or string)
+    const uint8Data = data instanceof Uint8Array ? data : new Uint8Array(0);
     // Wrap in new Uint8Array to ensure ArrayBuffer (not SharedArrayBuffer) backing
-    return new Blob([new Uint8Array(data)], { type: 'audio/mp3' });
-  } catch (error: any) {
+    return new Blob([new Uint8Array(uint8Data)], { type: 'audio/mp3' });
+  } catch (error) {
+    const err = error as { message?: string };
     console.error('Audio compression failed:', error);
-    throw new Error(`Audio compression failed: ${error.message}. Your file may be corrupted or unsupported.`);
+    throw new Error(`Audio compression failed: ${err.message || 'Unknown error'}. Your file may be corrupted or unsupported.`);
   }
 }
 
@@ -183,20 +187,23 @@ export async function chunkAudio(file: Blob): Promise<Blob[]> {
       const chunkName = `chunk${i.toString().padStart(3, '0')}.mp3`;
       try {
         const data = await ffmpeg.readFile(chunkName);
+        // Ensure data is Uint8Array
+        const uint8Data = data instanceof Uint8Array ? data : new Uint8Array(0);
         // Wrap in new Uint8Array to ensure ArrayBuffer (not SharedArrayBuffer) backing
-        chunks.push(new Blob([new Uint8Array(data)], { type: 'audio/mp3' }));
+        chunks.push(new Blob([new Uint8Array(uint8Data)], { type: 'audio/mp3' }));
         await ffmpeg.deleteFile(chunkName);
         i++;
-      } catch (e) {
+      } catch {
         break; // No more chunks
       }
     }
 
     await ffmpeg.deleteFile(inputName);
     return chunks;
-  } catch (error: any) {
+  } catch (error) {
+    const err = error as { message?: string };
     console.error('Audio chunking failed:', error);
-    throw new Error(`Audio chunking failed: ${error.message}. Your file may be too large or corrupted.`);
+    throw new Error(`Audio chunking failed: ${err.message || 'Unknown error'}. Your file may be too large or corrupted.`);
   }
 }
 

@@ -1,4 +1,4 @@
-import React, { type InputHTMLAttributes } from 'react';
+import React, { useId, type InputHTMLAttributes } from 'react';
 
 /**
  * Input component properties
@@ -72,8 +72,9 @@ export const Input: React.FC<InputProps> = ({
   id,
   ...props
 }) => {
-  // Generate unique ID from props or random string
-  const inputId = id || props.name || Math.random().toString(36).substr(2, 9);
+  // Generate unique ID from props or useId hook
+  const generatedId = useId();
+  const inputId = id || props.name || generatedId;
 
   return (
     <div

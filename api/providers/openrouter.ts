@@ -1,5 +1,6 @@
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
 import { generateText } from 'ai';
+import type { TextPart, ImagePart } from 'ai';
 import type { AIProvider, SummarizeParams, ChatParams } from './base';
 
 export class OpenRouterProvider implements AIProvider {
@@ -46,8 +47,8 @@ The team will reconvene in two weeks to review progress on retention initiatives
 
 NOW: Analyze the transcript provided and create a summary following this structure and level of detail. Adapt the sections naturally to fit the ${contentType || 'content'} being summarized. Ensure your summary is comprehensive, well-organized, and professionally formatted.`;
 
-    const userContent: any[] = [
-      { type: 'text', text: `Transcript:\n${transcript}` }
+    const userContent: (TextPart | ImagePart)[] = [
+      { type: 'text', text: `Transcript:\\n${transcript}` }
     ];
 
     if (context) {
@@ -62,7 +63,7 @@ NOW: Analyze the transcript provided and create a summary following this structu
         context.images.forEach(img => {
           userContent.push({
             type: 'image',
-            image: `data:${img.type};base64,${img.data}`
+            image: `data:${img.type};base64,${img.data}` as `data:${string}`
           });
         });
       }
@@ -72,7 +73,7 @@ NOW: Analyze the transcript provided and create a summary following this structu
       model: openrouter(model),
       messages: [
         { role: 'system', content: systemPrompt },
-        { role: 'user', content: userContent as any }
+        { role: 'user', content: userContent }
       ],
     });
 

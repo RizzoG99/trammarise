@@ -148,14 +148,15 @@ Make it professional and easy to read. DO NOT use markdown formatting.`;
     
     console.log('✅ PDF generated and sent successfully');
 
-  } catch (error: any) {
+  } catch (error) {
+    const err = error as { message?: string };
     console.error('❌ PDF generation error:', error);
     
     // If headers not sent yet, send error response
     if (!res.headersSent) {
       return res.status(500).json({
         error: 'PDF generation failed',
-        message: error.message
+        message: err.message
       });
     }
   }

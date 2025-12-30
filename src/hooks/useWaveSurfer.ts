@@ -51,8 +51,7 @@ export const useWaveSurfer = (
       ...config,
     };
 
-    // Create audio context for Safari compatibility
-    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    // Note: WaveSurfer creates its own audio context internally
 
     const ws = WaveSurfer.create({
       container: containerRef.current,
@@ -86,7 +85,8 @@ export const useWaveSurfer = (
     return () => {
       try {
         // Safely destroy WaveSurfer instance
-        if (ws && !ws.isDestroyed) {
+        // WaveSurfer.destroy() is safe to call multiple times in v7.x
+        if (ws) {
           ws.destroy();
         }
       } catch (error) {

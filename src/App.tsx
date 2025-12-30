@@ -85,7 +85,7 @@ function App() {
           file: compressedFile,
         });
         setAppState('audio');
-      } catch (error: any) {
+      } catch (error) {
         console.error('Compression error:', error);
         setErrorMessage('Failed to compress audio. Loading original file...');
         // Fallback to original file
@@ -235,9 +235,10 @@ function App() {
         configuration: fullConfig,
       });
       setAppState('results');
-    } catch (error: any) {
+    } catch (error) {
+      const err = error as { message?: string };
       console.error('Processing error:', error);
-      const errorMsg = error.message || 'Unknown error';
+      const errorMsg = err.message || 'Unknown error';
 
       // Check if this is an FFmpeg loading error
       if (errorMsg.includes('FFmpeg') || errorMsg.includes('CDN')) {

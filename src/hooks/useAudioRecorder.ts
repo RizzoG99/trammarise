@@ -57,7 +57,7 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
       permissionStatus.onchange = () => {
         setHasMicrophoneAccess(permissionStatus.state === 'denied' ? false : null);
       };
-    } catch (err) {
+    } catch {
       // Fallback: if Permissions API is unavailable, assume permission needs to be requested
       setHasMicrophoneAccess(null);
     }

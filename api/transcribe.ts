@@ -41,7 +41,7 @@ export default async function handler(
     });
 
     let audioData: Buffer | null = null;
-    let audioChunks: Buffer[] = [];
+    const audioChunks: Buffer[] = [];
     let apiKey: string | null = null;
     let language: string | undefined = undefined;
     let model: string | undefined = undefined;
@@ -139,40 +139,42 @@ export default async function handler(
       return res.status(200).json({
         transcript: transcription.text,
       });
-    } catch (apiError: any) {
+    } catch (apiError) {
+      const err = apiError as { status?: number; message?: string };
       console.error('OpenAI transcription error:', apiError);
 
       // Provide specific error messages based on OpenAI API response
       let errorMessage = 'Transcription failed';
       let statusCode = 500;
 
-      if (apiError.status === 401) {
+      if (err.status === 401) {
         errorMessage = 'Invalid OpenAI API key';
         statusCode = 401;
-      } else if (apiError.status === 429) {
+      } else if (err.status === 429) {
         errorMessage = 'OpenAI rate limit exceeded. Please try again later.';
         statusCode = 429;
-      } else if (apiError.status === 413) {
+      } else if (err.status === 413) {
         errorMessage = 'Audio file too large for OpenAI API';
         statusCode = 413;
-      } else if (apiError.status === 400) {
+      } else if (err.status === 400) {
         errorMessage = 'Invalid audio file format or corrupted file';
         statusCode = 400;
       }
 
       return res.status(statusCode).json({
         error: errorMessage,
-        message: apiError.message
+        message: err.message
       });
     }
-  } catch (error: any) {
+  } catch (error) {
     clearTimeout(timeoutId);
+    const err = error as { message?: string };
     console.error('Transcription error:', error);
 
     // Return appropriate error status based on error type
-    const status = error.message?.includes('File size') ? 413 :
-                   error.message?.includes('Invalid file type') ? 415 :
-                   error.message?.includes('API key') ? 401 : 500;
+    const status = err.message?.includes('File size') ? 413 :
+                   err.message?.includes('Invalid file type') ? 415 :
+                   err.message?.includes('API key') ? 401 : 500;
 
     return res.status(status).json({
       error: 'Transcription failed',

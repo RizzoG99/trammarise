@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import './AILoadingOrb.css';
 
 interface AILoadingOrbProps {
@@ -6,12 +6,8 @@ interface AILoadingOrbProps {
 }
 
 export function AILoadingOrb({ size = 120 }: AILoadingOrbProps) {
-  const [isAnimating, setIsAnimating] = useState(false);
-
-  useEffect(() => {
-    // Trigger animation after mount
-    setIsAnimating(true);
-  }, []);
+  // Start animating immediately on mount
+  const [isAnimating] = useState(true);
 
   return (
     <div

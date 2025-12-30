@@ -9,7 +9,7 @@ export interface WaveformPlayerRef {
   enableRegions: (enable: boolean) => void;
   enableRegionSelection: () => void;
   disableRegionSelection: () => void;
-  getActiveRegion: () => any;
+  getActiveRegion: () => { start: number; end: number } | null;
   clearRegions: () => void;
 }
 

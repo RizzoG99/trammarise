@@ -89,7 +89,7 @@ export default async function handler(
     }
 
     // Validate contentType
-    if (contentType && !CONTENT_TYPES.includes(contentType as any)) {
+    if (contentType && !CONTENT_TYPES.includes(contentType)) {
       return res.status(400).json({
         error: `Invalid content type. Must be one of: ${CONTENT_TYPES.join(', ')}`
       });
@@ -122,7 +122,7 @@ export default async function handler(
 
     const summary = await aiProvider.summarize({
       transcript,
-      contentType: contentType as any,
+      contentType,
       apiKey,
       model: actualModel,
       language,
@@ -133,11 +133,12 @@ export default async function handler(
     });
 
     return res.status(200).json({ summary });
-  } catch (error: any) {
+  } catch (error) {
+    const err = error as { message?: string };
     console.error('Summarization error:', error);
     return res.status(500).json({
       error: 'Summarization failed',
-      message: error.message
+      message: err.message
     });
   }
 }

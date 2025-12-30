@@ -37,13 +37,14 @@ export default async function handler(
       // Return 401 Unauthorized instead of 200 for invalid keys
       return res.status(401).json({ valid: false, error: 'Invalid API key' });
     }
-  } catch (error: any) {
+  } catch (error) {
+    const err = error as { message?: string };
     console.error('Validation error:', error);
     // Return 500 for server errors, not 200
     return res.status(500).json({
       valid: false,
       error: 'Validation failed',
-      message: error.message
+      message: err.message
     });
   }
 }

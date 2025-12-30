@@ -1,20 +1,21 @@
 import { OpenAI } from 'openai';
+import type { ChatCompletionMessageParam, ChatCompletionContentPart } from 'openai/resources/chat/completions';
 import type { AIProvider, SummarizeParams, ChatParams } from './base';
 
 export class OpenAIProvider implements AIProvider {
   name = 'OpenAI';
 
   async summarize({ transcript, contentType, apiKey, model, context, language }: SummarizeParams & { model?: string }): Promise<string> {
-    const openai = new OpenAI({ baseURL: 'https://api.openai.com/v1',  apiKey });
+    const openai = new OpenAI({ baseURL: 'https://api.openai.com/v1', apiKey });
 
     const systemPrompt = this.buildSummarizePrompt(contentType || 'general', language);
 
-    const messages: any[] = [
+    const messages: ChatCompletionMessageParam[] = [
       { role: 'system', content: systemPrompt }
     ];
 
-    const userContent: any[] = [
-      { type: 'text', text: `Please summarize this transcript:\n\n${transcript}` }
+    const userContent: ChatCompletionContentPart[] = [
+      { type: 'text', text: `Please summarize this transcript:\\n\\n${transcript}` }
     ];
 
     if (context) {
@@ -41,7 +42,7 @@ export class OpenAIProvider implements AIProvider {
 
     const completion = await openai.chat.completions.create({
       model: model || 'gpt-4o', // Default to gpt-4o if not specified
-      messages: messages as any,
+      messages: messages,
       temperature: 0.7,
     });
 
@@ -78,7 +79,14 @@ Respond concisely and use markdown formatting where appropriate.`
       const openai = new OpenAI({ baseURL: 'https://api.openai.com/v1', apiKey });
       await openai.models.list();
       return true;
-    } catch {
+    } catch (error) {
+      const err = error as { message?: string; status?: number; type?: string; code?: string };
+      console.error('OpenAI API key validation error:', {
+        message: err?.message,
+        status: err?.status,
+        type: err?.type,
+        code: err?.code
+      });
       return false;
     }
   }

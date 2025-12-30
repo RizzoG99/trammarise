@@ -19,6 +19,7 @@ import { audioAdapterRegistry } from './adapters/AudioAdapterRegistry';
 function App() {
   const [appState, setAppState] = useState<AppState>('initial');
   const [audioFile, setAudioFile] = useState<AudioFile | null>(null);
+  const [contextFiles, setContextFiles] = useState<File[]>([]);
   const [processingData, setProcessingData] = useState<ProcessingStateData>({
     step: 'transcribing',
     progress: 0,
@@ -149,7 +150,7 @@ function App() {
             file: compressedFile,
           });
           appStateMachine.transition('audio');
-        } catch (error: any) {
+        } catch (error) {
           console.error('Compression error:', error);
           setErrorMessage('Failed to compress audio. Loading original file...');
           // Fallback to original file
@@ -168,8 +169,9 @@ function App() {
         });
         appStateMachine.transition('audio');
       }
-    } catch (error: any) {
-      setSnackbarMessage(error.message);
+    } catch (error) {
+      const err = error as { message?: string };
+      setSnackbarMessage(err.message || 'An error occurred');
     }
   };
 
@@ -297,9 +299,10 @@ function App() {
       });
 
       processingEventEmitter.complete(fullTranscript, summary);
-    } catch (error: any) {
+    } catch (error) {
+      const err = error as { message?: string };
       console.error('Processing error:', error);
-      const errorMsg = error.message || 'Unknown error';
+      const errorMsg = err.message || 'Unknown error';
 
       // Check if this is an FFmpeg loading error
       if (errorMsg.includes('FFmpeg') || errorMsg.includes('CDN')) {
@@ -348,6 +351,8 @@ function App() {
             hasMicrophoneAccess={hasMicrophoneAccess}
             onRecordingAttempt={handleRecordingAttempt}
             onError={setSnackbarMessage}
+            contextFiles={contextFiles}
+            onContextFilesChange={setContextFiles}
           />
         )}
 
