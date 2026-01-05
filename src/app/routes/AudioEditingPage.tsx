@@ -41,12 +41,12 @@ export function AudioEditingPage() {
       if (regionsPlugin) {
         const handleRegionCreated = () => {
           const activeRegion = playerRef.current?.getActiveRegion();
-          setRegion(activeRegion);
+          setRegion(activeRegion ?? null);
         };
 
         const handleRegionUpdated = () => {
           const activeRegion = playerRef.current?.getActiveRegion();
-          setRegion(activeRegion);
+          setRegion(activeRegion ?? null);
         };
 
         const handleRegionRemoved = () => {
