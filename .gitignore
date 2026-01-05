@@ -30,3 +30,7 @@ public/ffmpeg/*.wasm
 
 # Test data folder (users can add their own test files)
 data/
+
+# MCP server directories (local cache and testing artifacts)
+.serena/
+.playwright-mcp/
