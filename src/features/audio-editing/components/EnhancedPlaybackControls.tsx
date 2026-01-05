@@ -35,7 +35,7 @@ export function EnhancedPlaybackControls({
           <button
             key={speed}
             onClick={() => onSpeedChange(speed)}
-            className={`text-xs font-${playbackSpeed === speed ? 'bold' : 'medium'} px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition ${
+            className={`text-xs ${playbackSpeed === speed ? 'font-bold' : 'font-medium'} px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition ${
               playbackSpeed === speed
                 ? 'text-gray-900 dark:text-gray-100'
                 : 'text-gray-600 dark:text-gray-400'

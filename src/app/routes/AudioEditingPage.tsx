@@ -29,43 +29,36 @@ export function AudioEditingPage() {
   const [volume, setVolume] = useState(0.75);
   const playerRef = useRef<WaveformPlayerRef | null>(null);
 
-  // Enable region selection when player is ready
-  useEffect(() => {
-    if (playerRef.current) {
-      // Enable drag selection
-      playerRef.current.enableRegionSelection();
+  // Setup region selection when WaveSurfer player is ready
+  const handleWaveSurferReady = useCallback((player: WaveformPlayerRef) => {
+    playerRef.current = player;
+    
+    // Enable drag selection
+    player.enableRegionSelection();
 
-      // Listen for region changes
-      const regionsPlugin = playerRef.current.regions;
+    // Listen for region changes
+    const regionsPlugin = player.regions;
 
-      if (regionsPlugin) {
-        const handleRegionCreated = () => {
-          const activeRegion = playerRef.current?.getActiveRegion();
-          setRegion(activeRegion ?? null);
-        };
+    if (regionsPlugin) {
+      const handleRegionCreated = () => {
+        const activeRegion = playerRef.current?.getActiveRegion();
+        setRegion(activeRegion ?? null);
+      };
 
-        const handleRegionUpdated = () => {
-          const activeRegion = playerRef.current?.getActiveRegion();
-          setRegion(activeRegion ?? null);
-        };
+      const handleRegionUpdated = () => {
+        const activeRegion = playerRef.current?.getActiveRegion();
+        setRegion(activeRegion ?? null);
+      };
 
-        const handleRegionRemoved = () => {
-          setRegion(null);
-        };
+      const handleRegionRemoved = () => {
+        setRegion(null);
+      };
 
-        regionsPlugin.on('region-created', handleRegionCreated);
-        regionsPlugin.on('region-updated', handleRegionUpdated);
-        regionsPlugin.on('region-removed', handleRegionRemoved);
-
-        // Cleanup
-        return () => {
-          regionsPlugin.un('region-created', handleRegionCreated);
-          regionsPlugin.un('region-updated', handleRegionUpdated);
-          regionsPlugin.un('region-removed', handleRegionRemoved);
-        };
-      }
+      regionsPlugin.on('region-created', handleRegionCreated);
+      regionsPlugin.on('region-updated', handleRegionUpdated);
+      regionsPlugin.on('region-removed', handleRegionRemoved);
     }
-  }, [playerRef.current]);
+  }, []);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -220,21 +213,13 @@ export function AudioEditingPage() {
           </div>
           <AudioStatusBadges
             totalDuration={duration}
-            qualityStatus="clean"
           />
         </div>
 
         {/* Waveform Card */}
         <GlassCard variant="light" className="overflow-hidden flex flex-col mb-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg">
           {/* Toolbar */}
-          <div className="flex flex-wrap items-center justify-between gap-4 p-4 border-b border-gray-200 dark:border-gray-700">
-            <div className="flex items-center gap-3">
-              {/* Zoom placeholder - not implemented yet */}
-              <span className="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
-                Zoom
-              </span>
-            </div>
-
+          <div className="flex flex-wrap items-center justify-end gap-4 p-4 border-b border-gray-200 dark:border-gray-700">
             {/* Region Time Display */}
             <RegionTimeDisplay
               startTime={region?.start ?? null}
@@ -246,7 +231,7 @@ export function AudioEditingPage() {
           <div className="p-6">
             <WaveformPlayer
               audioFile={session.audioFile.blob}
-              onWaveSurferReady={(player) => (playerRef.current = player)}
+              onWaveSurferReady={handleWaveSurferReady}
               onPlaybackChange={setIsPlaying}
               onTimeUpdate={(time, dur) => {
                 setCurrentTime(time);

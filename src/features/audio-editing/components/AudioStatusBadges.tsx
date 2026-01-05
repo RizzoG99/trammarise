@@ -27,8 +27,8 @@ export function AudioStatusBadges({ totalDuration, qualityStatus = 'unknown' }: 
       borderColor: 'border-yellow-100 dark:border-yellow-800',
     },
     unknown: {
-      icon: Clock,
-      label: 'Processing',
+      icon: CheckCircle,
+      label: 'Ready',
       bgColor: 'bg-gray-50 dark:bg-gray-900/30',
       textColor: 'text-gray-700 dark:text-gray-300',
       borderColor: 'border-gray-100 dark:border-gray-800',
