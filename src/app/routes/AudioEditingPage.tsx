@@ -18,7 +18,7 @@ import { formatTime } from '../../utils/audio';
 export function AudioEditingPage() {
   const { sessionId } = useParams();
   const { session, isLoading, updateSession } = useSessionStorage(sessionId || null);
-  const { goToProcessing, goToHome } = useRouteState();
+  const { goToProcessing } = useRouteState();
 
   // State management
   const [region, setRegion] = useState<{ start: number; end: number } | null>(null);
@@ -148,6 +148,7 @@ export function AudioEditingPage() {
       goToProcessing();
     } catch (error) {
       console.error('Failed to update session:', error);
+      alert('Failed to save selection. Please try again.');
     }
   }, [updateSession, goToProcessing]);
 
@@ -161,6 +162,7 @@ export function AudioEditingPage() {
       goToProcessing();
     } catch (error) {
       console.error('Failed to update session:', error);
+      alert('Failed to save settings. Please try again.');
     }
   }, [updateSession, goToProcessing]);
 

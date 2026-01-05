@@ -82,12 +82,12 @@ export function EnhancedPlaybackControls({
 
       {/* Volume Control */}
       <div className="hidden md:flex items-center justify-end gap-2 w-1/4 group">
-        <button
-          className="p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400"
-          aria-label="Volume"
+        <div
+          className="p-1.5 text-gray-600 dark:text-gray-400"
+          aria-hidden="true"
         >
           <Volume2 size={20} />
-        </button>
+        </div>
         <div className="w-24 h-1 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden cursor-pointer relative">
           <input
             type="range"
