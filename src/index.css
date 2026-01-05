@@ -36,10 +36,10 @@
     --color-accent-warning: #f59e0b; /* Amber 500 */
     --color-accent-info: #3B82F6; /* Blue 500 */
 
-    /* Glassmorphism Effects (v2) */
-    --glass-bg: rgba(255, 255, 255, 0.08);
-    --glass-bg-light: rgba(255, 255, 255, 0.12);
-    --glass-border: rgba(255, 255, 255, 0.12);
+    /* Glassmorphism Effects (v2) - Light Mode */
+    --glass-bg: rgba(255, 255, 255, 0.9);
+    --glass-bg-light: rgba(255, 255, 255, 0.95);
+    --glass-border: rgba(0, 0, 0, 0.1);
     --glass-blur: 24px;
     --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 
