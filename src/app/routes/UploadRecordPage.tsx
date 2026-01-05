@@ -7,7 +7,7 @@ import { SlidersHorizontal } from 'lucide-react';
 import { Heading } from '../../components/ui/Heading';
 import { Text } from '../../components/ui/Text';
 import { GlassCard } from '../../components/ui/GlassCard';
-import { AppHeader } from '../../components/layout/AppHeader';
+import { PageLayout } from '../../components/layout/PageLayout';
 import { UploadPanel } from '../../features/upload/components/UploadPanel';
 import { RecordPanel } from '../../features/upload/components/RecordPanel';
 import { ContextUploadArea } from '../../features/upload/components/ContextUploadArea';
@@ -75,11 +75,7 @@ export function UploadRecordPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Header */}
-      <AppHeader />
-
-      <main className="mx-auto px-6 py-6 max-w-[1400px]">
+    <PageLayout>
         {/* Page Title */}
         <div className="mb-8">
           <Heading level="h1">New Session</Heading>
@@ -136,7 +132,6 @@ export function UploadRecordPage() {
           disabled={!audioFile}
           onProcess={handleProcessAudio}
         />
-      </main>
-    </div>
+    </PageLayout>
   );
 }

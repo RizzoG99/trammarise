@@ -4,7 +4,7 @@ import { ArrowRight } from 'lucide-react';
 import { Heading } from '../../components/ui/Heading';
 import { Text } from '../../components/ui/Text';
 import { GlassCard } from '../../components/ui/GlassCard';
-import { AppHeader } from '../../components/layout/AppHeader';
+import { PageLayout } from '../../components/layout/PageLayout';
 import { WaveformPlayer } from '../../components/audio/WaveformPlayer';
 import type { WaveformPlayerRef } from '../../components/audio/WaveformPlayer';
 import { useSessionStorage } from '../../hooks/useSessionStorage';
@@ -169,29 +169,23 @@ export function AudioEditingPage() {
   // Loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <AppHeader />
-        <main className="flex items-center justify-center py-8 px-4">
-          <Text variant="body" color="secondary">Loading session...</Text>
-        </main>
-      </div>
+      <PageLayout className="flex items-center justify-center">
+        <Text variant="body" color="secondary">Loading session...</Text>
+      </PageLayout>
     );
   }
 
   // Error state
   if (!session || !session.audioFile) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <AppHeader />
-        <main className="flex items-center justify-center py-8 px-4">
-          <div className="text-center">
-            <Heading level="h2" className="mb-2">Session Not Found</Heading>
-            <Text variant="body" color="secondary">
-              The requested audio session could not be found.
-            </Text>
-          </div>
-        </main>
-      </div>
+      <PageLayout className="flex items-center justify-center">
+        <div className="text-center">
+          <Heading level="h2" className="mb-2">Session Not Found</Heading>
+          <Text variant="body" color="secondary">
+            The requested audio session could not be found.
+          </Text>
+        </div>
+      </PageLayout>
     );
   }
 
@@ -200,11 +194,7 @@ export function AudioEditingPage() {
   const regionDuration = hasRegion ? formatTime(region.end - region.start) : null;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Header */}
-      <AppHeader />
-
-      <main className="mx-auto px-6 py-6 max-w-[1400px]">
+    <PageLayout>
         {/* Page Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-6">
           <div className="flex flex-col gap-2">
@@ -319,7 +309,6 @@ export function AudioEditingPage() {
             {' '}to seek
           </Text>
         </div>
-      </main>
-    </div>
+    </PageLayout>
   );
 }
