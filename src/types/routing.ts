@@ -11,16 +11,21 @@ export interface SessionData {
   sessionId: string;
   audioFile: AudioFile;
   contextFiles: File[];
-  
+
   // Configuration fields captured during upload/record flow
   language: LanguageCode;
   contentType: ContentType;
   processingMode: ProcessingMode;
-  
+
+  // Audio editing fields (set in AudioEditingPage)
+  selectionMode?: 'full' | 'selection';
+  regionStart?: number;
+  regionEnd?: number;
+
   // Optional fields set later in the flow
   configuration?: AIConfiguration;
   result?: ProcessingResult;
-  
+
   createdAt: number;
   updatedAt: number;
 }
