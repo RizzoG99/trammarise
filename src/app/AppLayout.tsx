@@ -3,9 +3,9 @@ import { Text } from '../components/ui/Text';
 
 export function AppLayout() {
   return (
-    <div className="max-w-[1200px] mx-auto min-h-screen flex flex-col relative">
+    <div className="max-w-[1400px] mx-auto min-h-screen flex flex-col relative">
       {/* Main content area - rendered by routes */}
-      <main className="flex-1 flex flex-col justify-center items-center py-8">
+      <main className="flex-1 flex flex-col py-8">
         <Outlet />
       </main>
 

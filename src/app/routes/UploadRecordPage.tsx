@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { LanguageCode } from '../../types/languages';
 import type { ContentType } from '../../types/content-types';
@@ -31,13 +31,13 @@ export function UploadRecordPage() {
     setAudioFile(file);
   };
 
-  const handleRecordingComplete = async (blob: Blob) => {
+  const handleRecordingComplete = useCallback(async (blob: Blob) => {
     // Convert to File for consistency
     const recordingFile = new File([blob], 'recording.webm', { type: 'audio/webm' });
 
     // Only update state - DO NOT navigate
     setAudioFile(recordingFile);
-  };
+  }, []);
 
   const handleProcessAudio = async () => {
     if (!audioFile) {
@@ -75,7 +75,7 @@ export function UploadRecordPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg-primary)]">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
       <AppHeader />
 
@@ -95,7 +95,7 @@ export function UploadRecordPage() {
         </div>
 
         {/* Configuration Section (3-column grid) */}
-        <GlassCard variant="light" className="p-6 mb-8">
+        <GlassCard variant="light" className="p-6 mb-8 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg">
           <div className="flex items-center gap-2 mb-6">
             <SlidersHorizontal 
               size={20} 
