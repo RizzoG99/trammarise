@@ -45,7 +45,8 @@
       "Bash(git branch:*)",
       "Bash(gh pr list:*)",
       "Bash(git worktree:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Skill(commit-commands:commit-push-pr)"
     ],
     "deny": [],
     "ask": []
