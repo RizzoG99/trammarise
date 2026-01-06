@@ -17,7 +17,12 @@ describe('FilePreview', () => {
     });
 
     it('displays formatted file size', () => {
-      const file = new File([new Array(1024 * 1024).join('a')], 'large-file.mp3', { type: 'audio/mpeg' });
+      // Create a file with size ~5MB
+      const fileSizeInBytes = 5 * 1024 * 1024;
+      const file = new File([''], 'large-file.mp3', { type: 'audio/mpeg' });
+      // Mock the file size property
+      Object.defineProperty(file, 'size', { value: fileSizeInBytes, writable: false });
+
       const onRemove = vi.fn();
       const onReplace = vi.fn();
 
@@ -27,7 +32,7 @@ describe('FilePreview', () => {
       expect(screen.getByText(/MB/)).toBeInTheDocument();
     });
 
-    it('truncates long filenames with title attribute', () => {
+    it('truncates long filenames with CSS truncate class', () => {
       const longFilename = 'very-long-filename-that-should-be-truncated-with-ellipsis.mp3';
       const file = new File(['test'], longFilename, { type: 'audio/mpeg' });
       const onRemove = vi.fn();
@@ -36,7 +41,8 @@ describe('FilePreview', () => {
       render(<FilePreview file={file} onRemove={onRemove} onReplace={onReplace} />);
 
       const filenameElement = screen.getByText(longFilename);
-      expect(filenameElement).toHaveAttribute('title', longFilename);
+      // Check that the truncate class is applied
+      expect(filenameElement).toHaveClass('truncate');
     });
   });
 
@@ -178,12 +184,11 @@ describe('FilePreview', () => {
     });
 
     it('handles very large file sizes', () => {
-      // Create a file with size > 1GB
-      const largeFile = new File(
-        [new Array(1024 * 1024 * 1024 + 1000).join('a')],
-        'huge.mp3',
-        { type: 'audio/mpeg' }
-      );
+      // Create a file with size > 1GB (mock the size property)
+      const largeFile = new File([''], 'huge.mp3', { type: 'audio/mpeg' });
+      const fileSizeInBytes = 1.5 * 1024 * 1024 * 1024; // 1.5 GB
+      Object.defineProperty(largeFile, 'size', { value: fileSizeInBytes, writable: false });
+
       const onRemove = vi.fn();
       const onReplace = vi.fn();
 

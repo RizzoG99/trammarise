@@ -33,14 +33,11 @@ describe('UploadPanel', () => {
       render(<UploadPanel onFileUpload={mockOnFileUpload} />);
 
       const file = new File(['audio content'], 'test.mp3', { type: 'audio/mpeg' });
-      const input = screen.getByRole('textbox', { hidden: true }) as HTMLInputElement;
+      const input = document.querySelector('input[type="file"]') as HTMLInputElement;
 
-      Object.defineProperty(input, 'files', {
-        value: [file],
-        writable: false,
+      fireEvent.change(input, {
+        target: { files: [file] },
       });
-
-      fireEvent.change(input);
 
       expect(mockOnFileUpload).toHaveBeenCalledWith(file);
     });
@@ -56,12 +53,10 @@ describe('UploadPanel', () => {
       );
 
       const input = document.querySelector('input[type="file"]') as HTMLInputElement;
-      Object.defineProperty(input, 'files', {
-        value: [largeFile],
-        writable: false,
-      });
 
-      fireEvent.change(input);
+      fireEvent.change(input, {
+        target: { files: [largeFile] },
+      });
 
       // Should show error, not call onFileUpload
       expect(screen.getByText(/File too large/)).toBeInTheDocument();
@@ -75,12 +70,9 @@ describe('UploadPanel', () => {
       const nonAudioFile = new File(['video content'], 'test.mp4', { type: 'video/mp4' });
       const input = document.querySelector('input[type="file"]') as HTMLInputElement;
 
-      Object.defineProperty(input, 'files', {
-        value: [nonAudioFile],
-        writable: false,
+      fireEvent.change(input, {
+        target: { files: [nonAudioFile] },
       });
-
-      fireEvent.change(input);
 
       // Should show error
       expect(screen.getByText(/Unsupported file type/)).toBeInTheDocument();
@@ -93,12 +85,9 @@ describe('UploadPanel', () => {
       const emptyFile = new File([], 'empty.mp3', { type: 'audio/mpeg' });
       const input = document.querySelector('input[type="file"]') as HTMLInputElement;
 
-      Object.defineProperty(input, 'files', {
-        value: [emptyFile],
-        writable: false,
+      fireEvent.change(input, {
+        target: { files: [emptyFile] },
       });
-
-      fireEvent.change(input);
 
       expect(screen.getByText(/File is empty/)).toBeInTheDocument();
       expect(mockOnFileUpload).not.toHaveBeenCalled();
@@ -233,24 +222,21 @@ describe('UploadPanel', () => {
     });
 
     it('clears validation error when file is removed', () => {
-      render(<UploadPanel onFileUpload={mockOnFileUpload} onFileRemove={mockOnFileRemove} />);
+      const { rerender } = render(<UploadPanel onFileUpload={mockOnFileUpload} onFileRemove={mockOnFileRemove} />);
 
       // First, trigger a validation error
       const invalidFile = new File([], 'empty.mp3', { type: 'audio/mpeg' });
       const input = document.querySelector('input[type="file"]') as HTMLInputElement;
 
-      Object.defineProperty(input, 'files', {
-        value: [invalidFile],
-        writable: false,
+      fireEvent.change(input, {
+        target: { files: [invalidFile] },
       });
-
-      fireEvent.change(input);
       expect(screen.getByText(/File is empty/)).toBeInTheDocument();
 
       // Now upload a valid file
       const validFile = new File(['audio'], 'valid.mp3', { type: 'audio/mpeg' });
 
-      render(
+      rerender(
         <UploadPanel
           onFileUpload={mockOnFileUpload}
           uploadedFile={validFile}
@@ -261,7 +247,16 @@ describe('UploadPanel', () => {
       const removeButton = screen.getByText('Remove');
       fireEvent.click(removeButton);
 
-      // Error should be cleared
+      // Rerender without uploaded file to see if error was cleared
+      rerender(
+        <UploadPanel
+          onFileUpload={mockOnFileUpload}
+          uploadedFile={null}
+          onFileRemove={mockOnFileRemove}
+        />
+      );
+
+      // Error should be cleared after remove
       expect(screen.queryByText(/File is empty/)).not.toBeInTheDocument();
     });
   });
@@ -273,12 +268,9 @@ describe('UploadPanel', () => {
       const emptyFile = new File([], 'empty.mp3', { type: 'audio/mpeg' });
       const input = document.querySelector('input[type="file"]') as HTMLInputElement;
 
-      Object.defineProperty(input, 'files', {
-        value: [emptyFile],
-        writable: false,
+      fireEvent.change(input, {
+        target: { files: [emptyFile] },
       });
-
-      fireEvent.change(input);
 
       const errorMessage = screen.getByText(/File is empty/);
       expect(errorMessage).toBeInTheDocument();
@@ -292,23 +284,17 @@ describe('UploadPanel', () => {
       const emptyFile = new File([], 'empty.mp3', { type: 'audio/mpeg' });
       const input = document.querySelector('input[type="file"]') as HTMLInputElement;
 
-      Object.defineProperty(input, 'files', {
-        value: [emptyFile],
-        writable: false,
+      fireEvent.change(input, {
+        target: { files: [emptyFile] },
       });
-
-      fireEvent.change(input);
       expect(screen.getByText(/File is empty/)).toBeInTheDocument();
 
       // Now select a valid file
       const validFile = new File(['audio content'], 'valid.mp3', { type: 'audio/mpeg' });
 
-      Object.defineProperty(input, 'files', {
-        value: [validFile],
-        writable: false,
+      fireEvent.change(input, {
+        target: { files: [validFile] },
       });
-
-      fireEvent.change(input);
 
       expect(screen.queryByText(/File is empty/)).not.toBeInTheDocument();
       expect(mockOnFileUpload).toHaveBeenCalledWith(validFile);
@@ -378,12 +364,9 @@ describe('UploadPanel', () => {
         const file = new File(['audio'], `test.${type.split('/')[1]}`, { type });
         const input = document.querySelector('input[type="file"]') as HTMLInputElement;
 
-        Object.defineProperty(input, 'files', {
-          value: [file],
-          writable: false,
+        fireEvent.change(input, {
+          target: { files: [file] },
         });
-
-        fireEvent.change(input);
 
         expect(mockOnFileUpload).toHaveBeenCalledWith(file);
         mockOnFileUpload.mockClear();
