@@ -1,10 +1,11 @@
-import type { ReactNode } from 'react';
+import type { ReactNode, CSSProperties } from 'react';
 
 export interface GlassCardProps {
   variant?: 'light' | 'dark' | 'primary';
   blur?: 'sm' | 'md' | 'lg';
   children: ReactNode;
   className?: string;
+  style?: CSSProperties;
 }
 
 export function GlassCard({
@@ -12,6 +13,7 @@ export function GlassCard({
   blur = 'md',
   children,
   className = '',
+  style,
 }: GlassCardProps) {
   const variantClasses = {
     light: 'bg-[var(--glass-bg-light)] border-[var(--glass-border)]',
@@ -36,6 +38,7 @@ export function GlassCard({
         transition-all duration-[var(--transition-normal)]
         ${className}
       `.trim().replace(/\s+/g, ' ')}
+      style={style}
     >
       {children}
     </div>
