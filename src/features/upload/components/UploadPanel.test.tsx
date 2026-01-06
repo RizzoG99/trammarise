@@ -261,6 +261,53 @@ describe('UploadPanel', () => {
     });
   });
 
+  describe('File Replacement', () => {
+    it('replaces existing file with new file', () => {
+      const oldFile = new File(['old'], 'old.mp3', { type: 'audio/mpeg' });
+      const { rerender } = render(
+        <UploadPanel
+          onFileUpload={mockOnFileUpload}
+          uploadedFile={oldFile}
+          onFileRemove={mockOnFileRemove}
+        />
+      );
+
+      // Verify old file is displayed
+      expect(screen.getByText('old.mp3')).toBeInTheDocument();
+
+      // Click replace button
+      const replaceButton = screen.getByText('Replace File');
+      fireEvent.click(replaceButton);
+
+      // Select new file
+      const newFile = new File(['new'], 'new.mp3', { type: 'audio/mpeg' });
+      const input = document.querySelector('input[type="file"]') as HTMLInputElement;
+      fireEvent.change(input, { target: { files: [newFile] } });
+
+      // Should call onFileUpload with new file
+      expect(mockOnFileUpload).toHaveBeenCalledWith(newFile);
+    });
+
+    it('triggers file input click when replace button is clicked', () => {
+      const uploadedFile = new File(['audio'], 'test.mp3', { type: 'audio/mpeg' });
+      render(
+        <UploadPanel
+          onFileUpload={mockOnFileUpload}
+          uploadedFile={uploadedFile}
+          onFileRemove={mockOnFileRemove}
+        />
+      );
+
+      const replaceButton = screen.getByText('Replace File');
+      const input = document.querySelector('input[type="file"]') as HTMLInputElement;
+      const clickSpy = vi.spyOn(input, 'click');
+
+      fireEvent.click(replaceButton);
+
+      expect(clickSpy).toHaveBeenCalled();
+    });
+  });
+
   describe('Validation Error Display', () => {
     it('displays validation error with alert icon', () => {
       render(<UploadPanel onFileUpload={mockOnFileUpload} />);
