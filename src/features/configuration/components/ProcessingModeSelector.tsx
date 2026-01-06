@@ -18,7 +18,7 @@ export function ProcessingModeSelector({ value, onChange }: ProcessingModeSelect
           className={`relative flex items-center p-3 rounded-lg border cursor-pointer transition-colors ${
             value === 'balanced'
               ? 'bg-primary/5'
-              : 'hover:bg-gray-50 dark:hover:bg-gray-800'
+              : 'hover:bg-gray-100/30'
           }`}
           style={{
             borderColor: value === 'balanced' ? 'var(--color-primary)' : 'var(--color-border)',
@@ -37,15 +37,14 @@ export function ProcessingModeSelector({ value, onChange }: ProcessingModeSelect
           />
           <div className="ml-3 flex-1">
             <div className="flex justify-between">
-              <span className="block text-sm font-medium text-gray-900 dark:text-white">
+              <span className="block text-sm font-medium text-[var(--color-text-primary)]">
                 Balanced
               </span>
-              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium
-                             bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium" style={{ backgroundColor: 'var(--color-primary-alpha-10)', color: 'var(--color-primary)' }}>
                 ~10 credits
               </span>
             </div>
-            <span className="block text-xs text-gray-500 dark:text-gray-400">
+            <span className="block text-xs text-[var(--color-text-secondary)]">
               Standard accuracy, faster processing.
             </span>
           </div>
@@ -56,7 +55,7 @@ export function ProcessingModeSelector({ value, onChange }: ProcessingModeSelect
           className={`relative flex items-center p-3 rounded-lg border cursor-pointer transition-colors ${
             value === 'quality'
               ? 'bg-primary/5'
-              : 'hover:bg-gray-50 dark:hover:bg-gray-800'
+              : 'hover:bg-gray-100/30'
           }`}
           style={{
             borderColor: value === 'quality' ? 'var(--color-primary)' : 'var(--color-border)',
@@ -75,15 +74,14 @@ export function ProcessingModeSelector({ value, onChange }: ProcessingModeSelect
           />
           <div className="ml-3 flex-1">
             <div className="flex justify-between">
-              <span className="block text-sm font-medium text-gray-900 dark:text-white">
+              <span className="block text-sm font-medium text-[var(--color-text-primary)]">
                 Quality
               </span>
-              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium
-                             bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium" style={{ backgroundColor: 'rgba(168, 85, 247, 0.1)', color: '#a855f7' }}>
                 ~25 credits
               </span>
             </div>
-            <span className="block text-xs text-gray-500 dark:text-gray-400">
+            <span className="block text-xs text-[var(--color-text-secondary)]">
               GPT-4 enhanced analysis & summary.
             </span>
           </div>

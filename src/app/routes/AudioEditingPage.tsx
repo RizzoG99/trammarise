@@ -209,9 +209,9 @@ export function AudioEditingPage() {
         </div>
 
         {/* Waveform Card */}
-        <GlassCard variant="light" className="overflow-hidden flex flex-col mb-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg">
+        <GlassCard variant="light" className="overflow-hidden flex flex-col mb-6 border rounded-xl shadow-lg" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-border)' }}>
           {/* Toolbar */}
-          <div className="flex flex-wrap items-center justify-end gap-4 p-4 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex flex-wrap items-center justify-end gap-4 p-4 border-b" style={{ borderColor: 'var(--color-border)' }}>
             {/* Region Time Display */}
             <RegionTimeDisplay
               startTime={region?.start ?? null}
@@ -249,7 +249,7 @@ export function AudioEditingPage() {
         </GlassCard>
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 border-t border-gray-300 dark:border-gray-600 pt-4">
+        <div className="flex flex-col sm:flex-row gap-4 border-t pt-4" style={{ borderColor: 'var(--color-border)' }}>
           {hasRegion ? (
             <>
               {/* Primary: Process Selection */}
@@ -269,12 +269,17 @@ export function AudioEditingPage() {
               {/* Secondary: Process Full Audio */}
               <button
                 onClick={handleProcessFullAudio}
-                className="flex-1 flex flex-col items-center justify-center py-4 px-6 rounded-xl bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 text-gray-900 dark:text-gray-100 transition-all transform active:scale-[0.99]"
+                className="flex-1 flex flex-col items-center justify-center py-4 px-6 rounded-xl border-2 transition-all transform active:scale-[0.99]"
+                style={{ 
+                  backgroundColor: 'var(--color-bg-secondary)', 
+                  borderColor: 'var(--color-border)',
+                  color: 'var(--color-text-primary)'
+                }}
               >
                 <span className="text-lg font-bold flex items-center gap-2">
                   Process Full Audio
                 </span>
-                <span className="text-gray-600 dark:text-gray-400 text-sm font-medium mt-1">
+                <span className="text-sm font-medium mt-1" style={{ color: 'var(--color-text-secondary)' }}>
                   Transcribe all {formatTime(duration)}
                 </span>
               </button>
@@ -301,11 +306,11 @@ export function AudioEditingPage() {
         {/* Keyboard Shortcuts Hint */}
         <div className="text-center mt-4">
           <Text variant="small" color="tertiary" className="opacity-60">
-            <span className="font-mono bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded text-[10px] border border-gray-200 dark:border-gray-700">SPACE</span>
+            <span className="font-mono px-1.5 py-0.5 rounded text-[10px] border" style={{ backgroundColor: 'var(--color-bg-tertiary)', borderColor: 'var(--color-border)' }}>SPACE</span>
             {' '}to play/pause · {' '}
-            <span className="font-mono bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded text-[10px] border border-gray-200 dark:border-gray-700">←</span>
+            <span className="font-mono px-1.5 py-0.5 rounded text-[10px] border" style={{ backgroundColor: 'var(--color-bg-tertiary)', borderColor: 'var(--color-border)' }}>←</span>
             {' '}
-            <span className="font-mono bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded text-[10px] border border-gray-200 dark:border-gray-700">→</span>
+            <span className="font-mono px-1.5 py-0.5 rounded text-[10px] border" style={{ backgroundColor: 'var(--color-bg-tertiary)', borderColor: 'var(--color-border)' }}>→</span>
             {' '}to seek
           </Text>
         </div>

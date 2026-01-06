@@ -20,7 +20,7 @@ export function TimelineRuler({ duration, markerCount = 6 }: TimelineRulerProps)
   });
 
   return (
-    <div className="h-8 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 flex justify-between px-8 text-[10px] text-gray-600 dark:text-gray-400 items-start pt-1 font-mono select-none">
+    <div className="h-8 border-t flex justify-between px-8 text-[10px] items-start pt-1 font-mono select-none" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-border)', color: 'var(--color-text-secondary)' }}>
       {markers.map((marker, index) => (
         <span key={index}>{marker.label}</span>
       ))}

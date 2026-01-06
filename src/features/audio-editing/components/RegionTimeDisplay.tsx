@@ -19,16 +19,16 @@ export function RegionTimeDisplay({ startTime, endTime }: RegionTimeDisplayProps
   };
 
   return (
-    <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg border border-gray-200 dark:border-gray-700">
-      <div className="flex items-center px-3 gap-2 border-r border-gray-200 dark:border-gray-700">
-        <span className="text-xs text-gray-600 dark:text-gray-400 font-medium">Start</span>
-        <span className="text-sm font-mono font-semibold text-gray-900 dark:text-gray-100">
+    <div className="flex items-center gap-2 p-1 rounded-lg border" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-border)' }}>
+      <div className="flex items-center px-3 gap-2 border-r" style={{ borderColor: 'var(--color-border)' }}>
+        <span className="text-xs text-[var(--color-text-secondary)] font-medium">Start</span>
+        <span className="text-sm font-mono font-semibold text-[var(--color-text-primary)]">
           {formatTimeWithMs(startTime)}
         </span>
       </div>
       <div className="flex items-center px-3 gap-2">
-        <span className="text-xs text-gray-600 dark:text-gray-400 font-medium">End</span>
-        <span className="text-sm font-mono font-semibold text-gray-900 dark:text-gray-100">
+        <span className="text-xs text-[var(--color-text-secondary)] font-medium">End</span>
+        <span className="text-sm font-mono font-semibold text-[var(--color-text-primary)]">
           {formatTimeWithMs(endTime)}
         </span>
       </div>

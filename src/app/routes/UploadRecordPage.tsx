@@ -91,7 +91,7 @@ export function UploadRecordPage() {
         </div>
 
         {/* Configuration Section (3-column grid) */}
-        <GlassCard variant="light" className="p-6 mb-8 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg">
+        <GlassCard variant="light" className="p-6 mb-8 border rounded-xl shadow-lg" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-border)' }}>
           <div className="flex items-center gap-2 mb-6">
             <SlidersHorizontal 
               size={20} 

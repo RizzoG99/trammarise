@@ -24,7 +24,7 @@ export function PageLayout({
     : `max-w-[${maxWidth}]`;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--color-bg-primary)' }}>
       <AppHeader />
       <main className={`mx-auto px-6 py-6 ${maxWidthClass} ${className}`}>
         {children}

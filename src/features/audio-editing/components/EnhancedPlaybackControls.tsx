@@ -28,17 +28,17 @@ export function EnhancedPlaybackControls({
   onVolumeChange,
 }: EnhancedPlaybackControlsProps) {
   return (
-    <div className="p-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 flex flex-col md:flex-row items-center justify-between gap-4">
+    <div className="p-4 border-t flex flex-col md:flex-row items-center justify-between gap-4" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-border)' }}>
       {/* Speed Control */}
       <div className="hidden md:flex items-center gap-2 w-1/4">
         {PLAYBACK_SPEEDS.map((speed) => (
           <button
             key={speed}
             onClick={() => onSpeedChange(speed)}
-            className={`text-xs ${playbackSpeed === speed ? 'font-bold' : 'font-medium'} px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition ${
+            className={`text-xs ${playbackSpeed === speed ? 'font-bold' : 'font-medium'} px-2 py-1 rounded hover:bg-gray-100/50 transition ${
               playbackSpeed === speed
-                ? 'text-gray-900 dark:text-gray-100'
-                : 'text-gray-600 dark:text-gray-400'
+                ? 'text-[var(--color-text-primary)]'
+                : 'text-[var(--color-text-secondary)]'
             }`}
             aria-label={`Set playback speed to ${speed}x`}
           >
@@ -52,7 +52,7 @@ export function EnhancedPlaybackControls({
         <button
           onClick={onSkipBack}
           aria-label="Skip Back 10s"
-          className="group p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors"
+          className="group p-2 rounded-full hover:bg-gray-100/50 text-[var(--color-text-primary)] transition-colors"
         >
           <SkipBack
             size={28}
@@ -71,7 +71,7 @@ export function EnhancedPlaybackControls({
         <button
           onClick={onSkipForward}
           aria-label="Skip Forward 10s"
-          className="group p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors"
+          className="group p-2 rounded-full hover:bg-gray-100/50 text-[var(--color-text-primary)] transition-colors"
         >
           <SkipForward
             size={28}
@@ -83,12 +83,12 @@ export function EnhancedPlaybackControls({
       {/* Volume Control */}
       <div className="hidden md:flex items-center justify-end gap-2 w-1/4 group">
         <div
-          className="p-1.5 text-gray-600 dark:text-gray-400"
+          className="p-1.5 text-[var(--color-text-secondary)]"
           aria-hidden="true"
         >
           <Volume2 size={20} />
         </div>
-        <div className="w-24 h-1 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden cursor-pointer relative">
+        <div className="w-24 h-1 rounded-full overflow-hidden cursor-pointer relative" style={{ backgroundColor: 'var(--color-bg-tertiary)' }}>
           <input
             type="range"
             min="0"
@@ -100,7 +100,8 @@ export function EnhancedPlaybackControls({
             aria-label="Volume slider"
           />
           <div
-            className="h-full bg-gray-600 dark:bg-gray-400 group-hover:bg-blue-500 transition-colors"
+            className="h-full group-hover:bg-blue-500 transition-colors"
+            style={{ backgroundColor: 'var(--color-text-secondary)' }}
             style={{ width: `${volume * 100}%` }}
           />
         </div>
