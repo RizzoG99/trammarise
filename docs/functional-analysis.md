@@ -398,11 +398,43 @@ User Input → Local Processing → OpenAI API (user's key) → Results Display 
 - Storage quota exceeded
 - JavaScript disabled
 
+### 6.6 Concurrent Audio Input Operations
+**Scenario**: User performs multiple audio input actions simultaneously
+
+**Upload File While Recording**:
+- Behavior: Recording automatically stops
+- Priority: Uploaded file takes precedence
+- State: Recording timer resets, partial recording discarded
+- Visual feedback: FilePreview shows uploaded file
+- Rationale: User's explicit file selection indicates intent to use that file
+
+**Start Recording While File Uploaded**:
+- Behavior: Uploaded file automatically cleared
+- Priority: Recording takes precedence
+- State: FilePreview disappears, recording timer starts
+- Visual feedback: Recording indicator active
+- Rationale: User's explicit recording action indicates intent to create new audio
+
+**Remove File While Recording**:
+- Behavior: Recording automatically stops and resets
+- Priority: Remove action takes precedence
+- State: Recording timer resets to 00:00:00, recording state cleared
+- Visual feedback: Both panels return to initial state
+- Rationale: User's explicit removal indicates intent to start fresh
+
+**Test Cases**:
+- TC-1: Start recording → Upload file mid-recording → Verify recording stops, uploaded file active
+- TC-2: Upload file → Start recording → Verify file removed, recording active
+- TC-3: Start recording → Remove file via FilePreview → Verify recording stops and resets
+- TC-4: Upload file → Remove file → Start recording → Verify clean state
+- TC-5: Record → Stop → Upload file → Verify recording replaced with uploaded file
+
 **Handling Strategy**:
-- Graceful degradation
-- Clear error messages
-- Retry mechanisms
-- Offline capabilities where possible
+- Automatic conflict resolution (no user prompts)
+- Latest user action takes precedence
+- Clean state transitions with no orphaned data
+- Visual feedback for all state changes
+- No data loss on explicit user actions
 
 ---
 
