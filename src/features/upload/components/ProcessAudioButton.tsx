@@ -14,7 +14,7 @@ export function ProcessAudioButton({ disabled, onProcess }: ProcessAudioButtonPr
         className="w-full sm:w-auto flex items-center justify-center gap-2
                    text-white font-bold py-4 px-10 rounded-xl shadow-lg
                    hover:shadow-xl transition-all disabled:opacity-50
-                   disabled:cursor-not-allowed group"
+                   disabled:cursor-not-allowed cursor-pointer group"
         style={{
           backgroundColor: disabled ? 'var(--color-text-tertiary)' : 'var(--color-primary)',
         }}

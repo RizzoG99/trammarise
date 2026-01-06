@@ -101,8 +101,10 @@ export function EnhancedPlaybackControls({
           />
           <div
             className="h-full group-hover:bg-blue-500 transition-colors"
-            style={{ backgroundColor: 'var(--color-text-secondary)' }}
-            style={{ width: `${volume * 100}%` }}
+            style={{ 
+              backgroundColor: 'var(--color-text-secondary)',
+              width: `${volume * 100}%`
+            }}
           />
         </div>
       </div>

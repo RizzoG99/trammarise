@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { LanguageCode } from '../../types/languages';
 import type { ContentType } from '../../types/content-types';
@@ -9,7 +9,7 @@ import { Text } from '../../components/ui/Text';
 import { GlassCard } from '../../components/ui/GlassCard';
 import { PageLayout } from '../../components/layout/PageLayout';
 import { UploadPanel } from '../../features/upload/components/UploadPanel';
-import { RecordPanel } from '../../features/upload/components/RecordPanel';
+import { RecordPanel, type RecordPanelRef } from '../../features/upload/components/RecordPanel';
 import { ContextUploadArea } from '../../features/upload/components/ContextUploadArea';
 import { LanguageSelector } from '../../features/configuration/components/LanguageSelector';
 import { ContentTypeSelector } from '../../features/configuration/components/ContentTypeSelector';
@@ -20,6 +20,7 @@ import { buildRoutePath, ROUTES } from '../../types/routing';
 
 export function UploadRecordPage() {
   const navigate = useNavigate();
+  const recordPanelRef = useRef<RecordPanelRef>(null);
   const [audioFile, setAudioFile] = useState<File | Blob | null>(null);
   const [contextFiles, setContextFiles] = useState<File[]>([]);
   const [language, setLanguage] = useState<LanguageCode>('en');
@@ -27,17 +28,33 @@ export function UploadRecordPage() {
   const [processingMode, setProcessingMode] = useState<ProcessingMode>('balanced');
 
   const handleFileUpload = async (file: File) => {
+    // Stop any active recording when uploading a file
+    recordPanelRef.current?.reset();
+    
     // Only update state - DO NOT navigate
     setAudioFile(file);
   };
 
   const handleRecordingComplete = useCallback(async (blob: Blob) => {
-    // Convert to File for consistency
-    const recordingFile = new File([blob], 'recording.webm', { type: 'audio/webm' });
+    // Convert to File for consistency, using the blob's actual type
+    // (Safari uses audio/mp4, others use audio/webm)
+    const fileExtension = blob.type.split('/')[1] || 'webm';
+    const recordingFile = new File([blob], `recording.${fileExtension}`, { type: blob.type });
 
     // Only update state - DO NOT navigate
     setAudioFile(recordingFile);
   }, []);
+
+  const handleFileRemove = () => {
+    setAudioFile(null);
+    // Reset the recording panel when file is removed
+    recordPanelRef.current?.reset();
+  };
+
+  const handleRecordingStart = () => {
+    // Clear any uploaded file when recording starts
+    setAudioFile(null);
+  };
 
   const handleProcessAudio = async () => {
     if (!audioFile) {
@@ -86,8 +103,16 @@ export function UploadRecordPage() {
 
         {/* Upload/Record Split Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <UploadPanel onFileUpload={handleFileUpload} />
-          <RecordPanel onRecordingComplete={handleRecordingComplete} />
+          <UploadPanel 
+            onFileUpload={handleFileUpload}
+            uploadedFile={audioFile}
+            onFileRemove={handleFileRemove}
+          />
+          <RecordPanel 
+            ref={recordPanelRef}
+            onRecordingComplete={handleRecordingComplete}
+            onRecordingStart={handleRecordingStart}
+          />
         </div>
 
         {/* Configuration Section (3-column grid) */}

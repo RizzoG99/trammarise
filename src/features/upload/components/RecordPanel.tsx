@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useImperativeHandle, forwardRef } from 'react';
 import { GlassCard } from '../../../components/ui/GlassCard';
 import { Heading } from '../../../components/ui/Heading';
 import { WaveformVisualization } from './WaveformVisualization';
@@ -7,19 +7,31 @@ import { RecordButton, PauseButton, StopButton } from '../../../components/ui/Re
 
 export interface RecordPanelProps {
   onRecordingComplete: (blob: Blob) => void;
+  onRecordingStart?: () => void;
 }
 
-export function RecordPanel({ onRecordingComplete }: RecordPanelProps) {
-  const {
-    startRecording,
-    pauseRecording,
-    resumeRecording,
-    stopRecording,
-    duration,
-    isRecording,
-    isPaused,
-    audioBlob,
-  } = useAudioRecorder();
+export interface RecordPanelRef {
+  reset: () => void;
+}
+
+export const RecordPanel = forwardRef<RecordPanelRef, RecordPanelProps>(
+  ({ onRecordingComplete, onRecordingStart }, ref) => {
+    const {
+      startRecording,
+      pauseRecording,
+      resumeRecording,
+      stopRecording,
+      resetRecording,
+      duration,
+      isRecording,
+      isPaused,
+      audioBlob,
+    } = useAudioRecorder();
+
+    // Expose reset method to parent via ref
+    useImperativeHandle(ref, () => ({
+      reset: resetRecording,
+    }));
 
   // When recording stops and we have a blob, call the callback
   useEffect(() => {
@@ -29,7 +41,10 @@ export function RecordPanel({ onRecordingComplete }: RecordPanelProps) {
   }, [isRecording, audioBlob, onRecordingComplete]);
 
   const handleStartRecording = async () => {
-    await startRecording();
+    const success = await startRecording();
+    if (success && onRecordingStart) {
+      onRecordingStart();
+    }
   };
 
   const handlePauseRecording = () => {
@@ -106,4 +121,6 @@ export function RecordPanel({ onRecordingComplete }: RecordPanelProps) {
       </div>
     </GlassCard>
   );
-}
+});
+
+RecordPanel.displayName = 'RecordPanel';

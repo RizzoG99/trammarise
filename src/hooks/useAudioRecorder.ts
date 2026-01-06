@@ -10,6 +10,7 @@ interface UseAudioRecorderReturn {
   pauseRecording: () => void;
   resumeRecording: () => void;
   stopRecording: () => void;
+  resetRecording: () => void;
   error: string | null;
   hasMicrophoneAccess: boolean | null;
   checkMicrophonePermission: () => Promise<void>;
@@ -29,6 +30,7 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
   const startTimeRef = useRef<number>(0);
   const durationRef = useRef<number>(0);
   const permissionStatusRef = useRef<PermissionStatus | null>(null);
+  const shouldProcessResultRef = useRef<boolean>(true);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -99,6 +101,14 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
       };
 
       mediaRecorder.onstop = () => {
+        // Check if we should process the result (not a forced stop/reset)
+        if (!shouldProcessResultRef.current) {
+          shouldProcessResultRef.current = true; // Reset flag for next recording
+          // Stop all tracks
+          stream.getTracks().forEach((track) => track.stop());
+          return; // Don't process the blob
+        }
+
         const blob = new Blob(chunksRef.current, { type: mimeType });
         setAudioBlob(blob);
         setIsRecording(false);
@@ -117,6 +127,7 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
       mediaRecorderRef.current = mediaRecorder;
       setIsRecording(true);
       setAudioBlob(null);
+      shouldProcessResultRef.current = true; // Ensure we process the result for normal recordings
 
       // Start timer
       startTimeRef.current = Date.now();
@@ -180,6 +191,40 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
     }
   }, []);
 
+  const resetRecording = useCallback(() => {
+    // Set flag to prevent processing the result
+    shouldProcessResultRef.current = false;
+
+    // Get the stream before stopping (for cleanup)
+    const stream = mediaRecorderRef.current?.stream;
+
+    // Stop recording if active
+    if (mediaRecorderRef.current?.state === 'recording' || mediaRecorderRef.current?.state === 'paused') {
+      mediaRecorderRef.current.stop();
+    }
+
+    // Always stop MediaStream tracks immediately to prevent memory leak
+    // Even if MediaRecorder is in unexpected state or onstop doesn't run
+    if (stream) {
+      stream.getTracks().forEach((track) => track.stop());
+    }
+
+    // Clear timer
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+
+    // Reset all state
+    setIsRecording(false);
+    setIsPaused(false);
+    setDuration(0);
+    setAudioBlob(null);
+    durationRef.current = 0;
+    startTimeRef.current = 0;
+    chunksRef.current = [];
+  }, []);
+
   return {
     isRecording,
     isPaused,
@@ -189,6 +234,7 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
     pauseRecording,
     resumeRecording,
     stopRecording,
+    resetRecording,
     error,
     hasMicrophoneAccess,
     checkMicrophonePermission,
