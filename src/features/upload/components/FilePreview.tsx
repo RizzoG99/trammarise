@@ -31,7 +31,7 @@ export function FilePreview({ file, onRemove, onReplace }: FilePreviewProps) {
       <div className="flex items-center gap-2 p-3 rounded-lg bg-[var(--color-accent-success)]/10 border border-[var(--color-accent-success)]/20">
         <CheckCircle className="w-5 h-5 text-[var(--color-accent-success)] flex-shrink-0" />
         <Text variant="caption" className="font-medium" style={{ color: 'var(--color-accent-success)' }}>
-          File uploaded successfully
+          {file instanceof File ? 'File uploaded successfully' : 'Recording saved'}
         </Text>
       </div>
 

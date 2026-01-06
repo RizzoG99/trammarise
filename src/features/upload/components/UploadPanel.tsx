@@ -1,10 +1,19 @@
 import { useState, useRef } from 'react';
 import type { DragEvent } from 'react';
-import { Upload } from 'lucide-react';
+import { Upload, AlertCircle } from 'lucide-react';
 import { GlassCard } from '../../../components/ui/GlassCard';
 import { Heading } from '../../../components/ui/Heading';
 import { Text } from '../../../components/ui/Text';
 import { FilePreview } from './FilePreview';
+
+// File validation constants
+const SUPPORTED_AUDIO_TYPES = ['audio/mpeg', 'audio/wav', 'audio/mp4', 'audio/m4a', 'audio/webm', 'audio/ogg', 'audio/flac'];
+const MAX_FILE_SIZE = 500 * 1024 * 1024; // 500MB
+
+interface FileValidationResult {
+  valid: boolean;
+  error?: string;
+}
 
 export interface UploadPanelProps {
   onFileUpload: (file: File) => void;
@@ -14,7 +23,28 @@ export interface UploadPanelProps {
 
 export function UploadPanel({ onFileUpload, uploadedFile, onFileRemove }: UploadPanelProps) {
   const [isDragging, setIsDragging] = useState(false);
+  const [validationError, setValidationError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const validateFile = (file: File): FileValidationResult => {
+    // Check file type
+    if (!file.type.startsWith('audio/') && !SUPPORTED_AUDIO_TYPES.includes(file.type)) {
+      return { valid: false, error: 'Unsupported file type. Please upload an audio file (MP3, WAV, M4A, etc.).' };
+    }
+
+    // Check file size
+    if (file.size > MAX_FILE_SIZE) {
+      const sizeMB = Math.round(file.size / (1024 * 1024));
+      return { valid: false, error: `File too large (${sizeMB}MB). Maximum size is 500MB.` };
+    }
+
+    // Check for empty file
+    if (file.size === 0) {
+      return { valid: false, error: 'File is empty. Please select a valid audio file.' };
+    }
+
+    return { valid: true };
+  };
 
   const handleDragOver = (e: DragEvent) => {
     e.preventDefault();
@@ -28,20 +58,42 @@ export function UploadPanel({ onFileUpload, uploadedFile, onFileRemove }: Upload
   const handleDrop = (e: DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
+    setValidationError(null);
 
     const files = Array.from(e.dataTransfer.files);
     const audioFile = files.find(file => file.type.startsWith('audio/'));
 
-    if (audioFile) {
-      onFileUpload(audioFile);
+    if (!audioFile) {
+      setValidationError('No audio file found. Please drop an audio file.');
+      return;
     }
+
+    const validation = validateFile(audioFile);
+    if (!validation.valid) {
+      setValidationError(validation.error || 'Invalid file');
+      return;
+    }
+
+    onFileUpload(audioFile);
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      onFileUpload(file);
+    setValidationError(null);
+
+    if (!file) return;
+
+    const validation = validateFile(file);
+    if (!validation.valid) {
+      setValidationError(validation.error || 'Invalid file');
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      return;
     }
+
+    onFileUpload(file);
   };
 
   const handleClick = () => {
@@ -52,6 +104,8 @@ export function UploadPanel({ onFileUpload, uploadedFile, onFileRemove }: Upload
     if (onFileRemove) {
       onFileRemove();
     }
+    // Clear validation error
+    setValidationError(null);
     // Reset file input
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -65,6 +119,16 @@ export function UploadPanel({ onFileUpload, uploadedFile, onFileRemove }: Upload
   return (
     <GlassCard variant="light" className="p-6">
       <Heading level="h3" className="mb-4">Upload Audio</Heading>
+
+      {/* Validation Error Message */}
+      {validationError && (
+        <div className="mb-4 p-3 rounded-lg border flex items-start gap-2" style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', borderColor: 'rgba(239, 68, 68, 0.2)' }}>
+          <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: '#ef4444' }} />
+          <Text variant="caption" className="font-medium" style={{ color: '#ef4444' }}>
+            {validationError}
+          </Text>
+        </div>
+      )}
 
       {/* Show FilePreview if file is uploaded, otherwise show drop zone */}
       {uploadedFile ? (

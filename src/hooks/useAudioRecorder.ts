@@ -195,9 +195,18 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
     // Set flag to prevent processing the result
     shouldProcessResultRef.current = false;
 
+    // Get the stream before stopping (for cleanup)
+    const stream = mediaRecorderRef.current?.stream;
+
     // Stop recording if active
     if (mediaRecorderRef.current?.state === 'recording' || mediaRecorderRef.current?.state === 'paused') {
       mediaRecorderRef.current.stop();
+    }
+
+    // Always stop MediaStream tracks immediately to prevent memory leak
+    // Even if MediaRecorder is in unexpected state or onstop doesn't run
+    if (stream) {
+      stream.getTracks().forEach((track) => track.stop());
     }
 
     // Clear timer

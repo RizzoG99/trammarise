@@ -36,8 +36,10 @@ export function UploadRecordPage() {
   };
 
   const handleRecordingComplete = useCallback(async (blob: Blob) => {
-    // Convert to File for consistency
-    const recordingFile = new File([blob], 'recording.webm', { type: 'audio/webm' });
+    // Convert to File for consistency, using the blob's actual type
+    // (Safari uses audio/mp4, others use audio/webm)
+    const fileExtension = blob.type.split('/')[1] || 'webm';
+    const recordingFile = new File([blob], `recording.${fileExtension}`, { type: blob.type });
 
     // Only update state - DO NOT navigate
     setAudioFile(recordingFile);
