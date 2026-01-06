@@ -264,7 +264,7 @@ describe('UploadPanel', () => {
   describe('File Replacement', () => {
     it('replaces existing file with new file', () => {
       const oldFile = new File(['old'], 'old.mp3', { type: 'audio/mpeg' });
-      const { rerender } = render(
+      render(
         <UploadPanel
           onFileUpload={mockOnFileUpload}
           uploadedFile={oldFile}

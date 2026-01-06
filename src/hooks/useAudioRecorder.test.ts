@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { renderHook, act, waitFor } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react';
 import { useAudioRecorder } from './useAudioRecorder';
 
 // Mock MediaRecorder
@@ -10,7 +10,7 @@ class MockMediaRecorder {
   onstop: (() => void) | null = null;
   onerror: ((event: Event) => void) | null = null;
 
-  constructor(stream: MediaStream, _options?: MediaRecorderOptions) {
+  constructor(stream: MediaStream) {
     this.stream = stream;
   }
 
@@ -41,7 +41,7 @@ class MockMediaRecorder {
     }
   }
 
-  static isTypeSupported(_type: string) {
+  static isTypeSupported() {
     return true;
   }
 }
@@ -82,7 +82,7 @@ describe('useAudioRecorder', () => {
     // Setup mocks
     mockMediaTrack = new MockMediaStreamTrack();
     mockMediaStream = new MockMediaStream();
-    mockMediaStream.addTrack(mockMediaTrack as any);
+    mockMediaStream.addTrack(mockMediaTrack as unknown as MediaStreamTrack);
 
     mockGetUserMedia = vi.fn().mockResolvedValue(mockMediaStream);
 
@@ -95,7 +95,7 @@ describe('useAudioRecorder', () => {
     });
 
     // Mock MediaRecorder
-    global.MediaRecorder = MockMediaRecorder as any;
+    global.MediaRecorder = MockMediaRecorder as unknown as typeof MediaRecorder;
 
     // Mock permissions API
     Object.defineProperty(global.navigator, 'permissions', {
