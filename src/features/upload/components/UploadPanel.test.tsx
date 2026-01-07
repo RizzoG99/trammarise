@@ -49,12 +49,12 @@ describe('UploadPanel', () => {
     it('validates file size (rejects >500MB)', () => {
       render(<UploadPanel onFileUpload={mockOnFileUpload} />);
 
-      // Create a mock file >500MB
-      const largeFile = new File(
-        [new ArrayBuffer(501 * 1024 * 1024)],
-        'huge.mp3',
-        { type: 'audio/mpeg' }
-      );
+      // Create a mock file >500MB using size property (optimized)
+      const largeFile = new File([], 'huge.mp3', { type: 'audio/mpeg' });
+      Object.defineProperty(largeFile, 'size', { 
+        value: 501 * 1024 * 1024,
+        writable: false 
+      });
 
       const input = screen.getByTestId('file-input');
 
@@ -66,6 +66,27 @@ describe('UploadPanel', () => {
       expect(screen.getByText(/File too large/)).toBeInTheDocument();
       expect(screen.getByText(/Maximum size is 500MB/)).toBeInTheDocument();
       expect(mockOnFileUpload).not.toHaveBeenCalled();
+    });
+
+    it('accepts files at exactly 500MB limit (boundary condition)', () => {
+      render(<UploadPanel onFileUpload={mockOnFileUpload} />);
+
+      // Create a mock file at exactly 500MB using size property
+      const boundaryFile = new File(['audio content'], 'boundary.mp3', { type: 'audio/mpeg' });
+      Object.defineProperty(boundaryFile, 'size', { 
+        value: 500 * 1024 * 1024, // Exactly 500MB
+        writable: false 
+      });
+
+      const input = screen.getByTestId('file-input');
+
+      fireEvent.change(input, {
+        target: { files: [boundaryFile] },
+      });
+
+      // Should accept the file at exactly 500MB
+      expect(mockOnFileUpload).toHaveBeenCalledWith(boundaryFile);
+      expect(screen.queryByText(/File too large/)).not.toBeInTheDocument();
     });
 
     it('validates file type (rejects non-audio)', () => {
@@ -144,11 +165,12 @@ describe('UploadPanel', () => {
     it('validates dropped file size', () => {
       render(<UploadPanel onFileUpload={mockOnFileUpload} />);
 
-      const largeFile = new File(
-        [new ArrayBuffer(501 * 1024 * 1024)],
-        'huge.mp3',
-        { type: 'audio/mpeg' }
-      );
+      // Create a mock file >500MB using size property (optimized)
+      const largeFile = new File([], 'huge.mp3', { type: 'audio/mpeg' });
+      Object.defineProperty(largeFile, 'size', { 
+        value: 501 * 1024 * 1024,
+        writable: false 
+      });
       const dropZone = screen.getByText('Drop your audio file here or click to browse').closest('div')!;
 
       fireEvent.drop(dropZone, {

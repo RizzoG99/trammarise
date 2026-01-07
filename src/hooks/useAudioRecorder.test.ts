@@ -9,9 +9,12 @@ class MockMediaRecorder {
   ondataavailable: ((event: { data: Blob }) => void) | null = null;
   onstop: (() => void) | null = null;
   onerror: ((event: Event) => void) | null = null;
+  options?: MediaRecorderOptions;
+  static supportedTypes: Set<string> = new Set(['audio/webm', 'audio/mp4']);
 
-  constructor(stream: MediaStream) {
+  constructor(stream: MediaStream, options?: MediaRecorderOptions) {
     this.stream = stream;
+    this.options = options;
   }
 
   start() {
@@ -36,13 +39,14 @@ class MockMediaRecorder {
 
   requestData() {
     if (this.ondataavailable) {
-      const blob = new Blob(['audio data'], { type: 'audio/webm' });
+      const mimeType = this.options?.mimeType || 'audio/webm';
+      const blob = new Blob(['audio data'], { type: mimeType });
       this.ondataavailable({ data: blob });
     }
   }
 
-  static isTypeSupported() {
-    return true;
+  static isTypeSupported(type: string) {
+    return MockMediaRecorder.supportedTypes.has(type);
   }
 }
 
@@ -493,6 +497,73 @@ describe('useAudioRecorder', () => {
           result.current.resumeRecording();
         });
       }).not.toThrow();
+    });
+  });
+
+  describe('MIME Type Fallback (Safari)', () => {
+    it('should use audio/webm when supported', async () => {
+      // Default: both webm and mp4 are supported
+      MockMediaRecorder.supportedTypes = new Set(['audio/webm', 'audio/mp4']);
+
+      const { result } = renderHook(() => useAudioRecorder());
+
+      await act(async () => {
+        await result.current.startRecording();
+      });
+
+      expect(result.current.isRecording).toBe(true);
+
+      // Verify blob will use webm type
+      await act(async () => {
+        result.current.stopRecording();
+      });
+
+      expect(result.current.audioBlob?.type).toBe('audio/webm');
+    });
+
+    it('should fallback to audio/mp4 when webm is not supported (Safari)', async () => {
+      // Simulate Safari: only mp4 is supported
+      MockMediaRecorder.supportedTypes = new Set(['audio/mp4']);
+
+      const { result } = renderHook(() => useAudioRecorder());
+
+      await act(async () => {
+        await result.current.startRecording();
+      });
+
+      expect(result.current.isRecording).toBe(true);
+
+      // Verify blob uses mp4 type (Safari fallback)
+      await act(async () => {
+        result.current.stopRecording();
+      });
+
+      expect(result.current.audioBlob?.type).toBe('audio/mp4');
+    });
+
+    it('should use browser default when neither webm nor mp4 is supported', async () => {
+      // Extreme case: neither format supported
+      MockMediaRecorder.supportedTypes = new Set([]);
+
+      const { result } = renderHook(() => useAudioRecorder());
+
+      await act(async () => {
+        await result.current.startRecording();
+      });
+
+      expect(result.current.isRecording).toBe(true);
+
+      // Should still record, using browser default
+      await act(async () => {
+        result.current.stopRecording();
+      });
+
+      expect(result.current.audioBlob).not.toBeNull();
+    });
+
+    afterEach(() => {
+      // Reset to default supported types
+      MockMediaRecorder.supportedTypes = new Set(['audio/webm', 'audio/mp4']);
     });
   });
 });

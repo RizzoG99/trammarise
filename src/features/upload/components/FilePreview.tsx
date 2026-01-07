@@ -74,13 +74,14 @@ export function FilePreview({ file, onRemove, onReplace }: FilePreviewProps) {
       <div className="flex gap-3">
         <button
           onClick={onReplace}
+          aria-label="Replace audio file"
           className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 border-border hover:border-primary hover:bg-[var(--color-primary-alpha-5)] transition-all cursor-pointer"
           style={{ 
             backgroundColor: 'var(--color-bg-surface)',
             color: 'var(--color-text-primary)'
           }}
         >
-          <RefreshCw className="w-4 h-4" />
+          <RefreshCw className="w-4 h-4" aria-hidden="true" />
           <Text variant="caption" className="font-medium">
             Replace File
           </Text>
@@ -88,6 +89,7 @@ export function FilePreview({ file, onRemove, onReplace }: FilePreviewProps) {
 
         <button
           onClick={onRemove}
+          aria-label="Remove audio file"
           className="flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all cursor-pointer"
           style={{ 
             backgroundColor: 'var(--color-bg-surface)',
@@ -101,7 +103,7 @@ export function FilePreview({ file, onRemove, onReplace }: FilePreviewProps) {
             e.currentTarget.style.backgroundColor = 'var(--color-bg-surface)';
           }}
         >
-          <Trash2 className="w-4 h-4" />
+          <Trash2 className="w-4 h-4" aria-hidden="true" />
           <Text variant="caption" className="font-medium">
             Remove
           </Text>

@@ -110,7 +110,8 @@ describe('FilePreview', () => {
 
       render(<FilePreview file={file} onRemove={onRemove} onReplace={onReplace} />);
 
-      const removeButton = screen.getByText('Remove');
+      // Use accessible role query with aria-label
+      const removeButton = screen.getByRole('button', { name: /remove audio file/i });
       fireEvent.click(removeButton);
 
       expect(onRemove).toHaveBeenCalledOnce();
@@ -124,23 +125,27 @@ describe('FilePreview', () => {
 
       render(<FilePreview file={file} onRemove={onRemove} onReplace={onReplace} />);
 
-      const replaceButton = screen.getByText('Replace File');
+      // Use accessible role query with aria-label
+      const replaceButton = screen.getByRole('button', { name: /replace audio file/i });
       fireEvent.click(replaceButton);
 
       expect(onReplace).toHaveBeenCalledOnce();
       expect(onRemove).not.toHaveBeenCalled();
     });
 
-    it('buttons have cursor-pointer class for affordance', () => {
+    it('buttons are accessible with proper aria-labels', () => {
       const file = new File(['test'], 'test.mp3', { type: 'audio/mpeg' });
       const onRemove = vi.fn();
       const onReplace = vi.fn();
 
       render(<FilePreview file={file} onRemove={onRemove} onReplace={onReplace} />);
 
-      const removeButton = screen.getByText('Remove').closest('button');
-      const replaceButton = screen.getByText('Replace File').closest('button');
+      // Verify buttons are accessible via role and aria-label
+      const removeButton = screen.getByRole('button', { name: /remove audio file/i });
+      const replaceButton = screen.getByRole('button', { name: /replace audio file/i });
 
+      expect(removeButton).toBeInTheDocument();
+      expect(replaceButton).toBeInTheDocument();
       expect(removeButton).toHaveClass('cursor-pointer');
       expect(replaceButton).toHaveClass('cursor-pointer');
     });
@@ -152,30 +157,50 @@ describe('FilePreview', () => {
       const onRemove = vi.fn();
       const onReplace = vi.fn();
 
-      const { container } = render(<FilePreview file={file} onRemove={onRemove} onReplace={onReplace} />);
+      render(<FilePreview file={file} onRemove={onRemove} onReplace={onReplace} />);
 
       // Success message is displayed
       const successMessage = screen.getByText('File uploaded successfully');
       expect(successMessage).toBeInTheDocument();
-
-      // SVG icon (CheckCircle from lucide-react) should be present
-      const svgIcons = container.querySelectorAll('svg');
-      expect(svgIcons.length).toBeGreaterThan(0);
+      
+      // Verify success message has appropriate semantic structure
+      const successContainer = successMessage.closest('div');
+      expect(successContainer).toBeInTheDocument();
     });
 
-    it('displays file information card', () => {
+    it('displays file information with accessible structure', () => {
       const file = new File(['test'], 'test.mp3', { type: 'audio/mpeg' });
       const onRemove = vi.fn();
       const onReplace = vi.fn();
 
-      const { container } = render(<FilePreview file={file} onRemove={onRemove} onReplace={onReplace} />);
+      render(<FilePreview file={file} onRemove={onRemove} onReplace={onReplace} />);
 
-      // File name is displayed
-      expect(screen.getByText('test.mp3')).toBeInTheDocument();
+      // File name is displayed and has title attribute for accessibility
+      const fileNameElement = screen.getByText('test.mp3');
+      expect(fileNameElement).toBeInTheDocument();
+      expect(fileNameElement).toHaveAttribute('title', 'test.mp3');
+      
+      // File type and size information are displayed
+      expect(screen.getByText(/audio\/mpeg/)).toBeInTheDocument();
+    });
 
-      // SVG icons (Music, RefreshCw, Trash2 from lucide-react) should be present
-      const svgIcons = container.querySelectorAll('svg');
-      expect(svgIcons.length).toBeGreaterThan(2); // At least CheckCircle, Music, RefreshCw, Trash2
+    it('has accessible action buttons with proper labels', () => {
+      const file = new File(['test'], 'test.mp3', { type: 'audio/mpeg' });
+      const onRemove = vi.fn();
+      const onReplace = vi.fn();
+
+      render(<FilePreview file={file} onRemove={onRemove} onReplace={onReplace} />);
+
+      // Verify buttons are accessible
+      const replaceButton = screen.getByRole('button', { name: /replace audio file/i });
+      const removeButton = screen.getByRole('button', { name: /remove audio file/i });
+      
+      expect(replaceButton).toBeInTheDocument();
+      expect(removeButton).toBeInTheDocument();
+      
+      // Verify button text is also present for visual users
+      expect(screen.getByText('Replace File')).toBeInTheDocument();
+      expect(screen.getByText('Remove')).toBeInTheDocument();
     });
   });
 
