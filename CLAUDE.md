@@ -19,7 +19,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Test specific files**: `npm test path/to/file.test.tsx` - Run tests for specific files
 - **Watch mode**: Tests run in watch mode by default during development
 - **Coverage report**: `npm test -- --coverage` - Generate test coverage report with detailed metrics
-- **Test coverage**: 64+ comprehensive tests covering:
+- **Test coverage**: 300+ comprehensive tests covering:
   - File upload validation and drag-and-drop functionality
   - Audio recording lifecycle (start, pause, resume, stop, reset)
   - Memory leak prevention (MediaStream track cleanup)
