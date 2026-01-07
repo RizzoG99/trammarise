@@ -222,17 +222,37 @@ describe('ThemeToggle', () => {
 
   describe('Edge Cases', () => {
     it('handles multiple rapid clicks', () => {
-      render(<ThemeToggle {...defaultProps} theme="system" />);
+      const { rerender } = render(<ThemeToggle {...defaultProps} theme="system" />);
       const button = screen.getByRole('button');
 
+      // First click: system → light
       fireEvent.click(button);
+      expect(mockOnThemeChange).toHaveBeenNthCalledWith(1, 'light');
+
+      // Simulate parent updating theme
+      rerender(<ThemeToggle {...defaultProps} theme="light" />);
+
+      // Second click: light → dark
       fireEvent.click(button);
+      expect(mockOnThemeChange).toHaveBeenNthCalledWith(2, 'dark');
+
+      // Simulate parent updating theme
+      rerender(<ThemeToggle {...defaultProps} theme="dark" />);
+
+      // Third click: dark → system
       fireEvent.click(button);
+      expect(mockOnThemeChange).toHaveBeenNthCalledWith(3, 'system');
+
+      // Simulate parent updating theme
+      rerender(<ThemeToggle {...defaultProps} theme="system" />);
+
+      // Fourth click: system → light
       fireEvent.click(button);
+      expect(mockOnThemeChange).toHaveBeenNthCalledWith(4, 'light');
 
       expect(mockOnThemeChange).toHaveBeenCalledTimes(4);
-      // Last call should cycle back to system
-      expect(mockOnThemeChange).toHaveBeenLastCalledWith('system');
+      // Last call should be 'light' (full cycle + 1)
+      expect(mockOnThemeChange).toHaveBeenLastCalledWith('light');
     });
 
     it('works with showLabel and className together', () => {
