@@ -34,3 +34,6 @@ data/
 # MCP server directories (local cache and testing artifacts)
 .serena/
 .playwright-mcp/
+
+*storybook.log
+storybook-static

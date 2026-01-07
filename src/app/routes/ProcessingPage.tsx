@@ -15,13 +15,37 @@ export function ProcessingPage() {
   const { goToResults, goToConfigure } = useRouteState();
 
   const [progress, setProgress] = useState(0);
-  const [currentStep, setCurrentStep] = useState('uploading');
-  const [steps, setSteps] = useState<ProcessingStep[]>([
-    { id: 'uploading', label: 'Uploading Audio', status: 'processing' },
-    { id: 'transcribing', label: 'Transcribing Speech', status: 'pending' },
-    { id: 'analyzing', label: 'Analyzing Context', status: 'pending' },
-    { id: 'summarizing', label: 'Summarizing Key Points', status: 'pending' },
-  ]);
+
+  // Derive currentStep from progress (avoid cascading renders)
+  const currentStep =
+    progress >= 75 ? 'summarizing' :
+    progress >= 50 ? 'analyzing' :
+    progress >= 25 ? 'transcribing' :
+    'uploading';
+
+  // Derive steps from progress (avoid setState in effect)
+  const steps: ProcessingStep[] = [
+    {
+      id: 'uploading',
+      label: 'Uploading Audio',
+      status: progress >= 25 ? 'completed' : 'processing'
+    },
+    {
+      id: 'transcribing',
+      label: 'Transcribing Speech',
+      status: progress >= 50 ? 'completed' : progress >= 25 ? 'processing' : 'pending'
+    },
+    {
+      id: 'analyzing',
+      label: 'Analyzing Context',
+      status: progress >= 75 ? 'completed' : progress >= 50 ? 'processing' : 'pending'
+    },
+    {
+      id: 'summarizing',
+      label: 'Summarizing Key Points',
+      status: progress >= 100 ? 'completed' : progress >= 75 ? 'processing' : 'pending'
+    },
+  ];
 
   // Simulate processing progress (Phase 3 will integrate real API calls)
   useEffect(() => {
@@ -39,32 +63,6 @@ export function ProcessingPage() {
 
     return () => clearInterval(interval);
   }, [goToResults]);
-
-  // Update steps based on progress
-  useEffect(() => {
-    const newSteps = [...steps];
-
-    if (progress >= 25) {
-      newSteps[0].status = 'completed';
-      newSteps[1].status = 'processing';
-      setCurrentStep('transcribing');
-    }
-    if (progress >= 50) {
-      newSteps[1].status = 'completed';
-      newSteps[2].status = 'processing';
-      setCurrentStep('analyzing');
-    }
-    if (progress >= 75) {
-      newSteps[2].status = 'completed';
-      newSteps[3].status = 'processing';
-      setCurrentStep('summarizing');
-    }
-    if (progress >= 100) {
-      newSteps[3].status = 'completed';
-    }
-
-    setSteps(newSteps);
-  }, [progress]);
 
   const handleCancel = () => {
     goToConfigure();
