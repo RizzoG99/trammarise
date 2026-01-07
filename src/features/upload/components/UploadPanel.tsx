@@ -182,6 +182,7 @@ export function UploadPanel({ onFileUpload, uploadedFile, onFileRemove }: Upload
         accept="audio/*"
         onChange={handleFileSelect}
         className="hidden"
+        data-testid="file-input"
       />
     </GlassCard>
   );

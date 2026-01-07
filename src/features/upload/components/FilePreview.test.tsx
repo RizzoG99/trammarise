@@ -147,28 +147,35 @@ describe('FilePreview', () => {
   });
 
   describe('Visual Elements', () => {
-    it('displays success checkmark icon', () => {
+    it('displays success message with proper styling', () => {
       const file = new File(['test'], 'test.mp3', { type: 'audio/mpeg' });
       const onRemove = vi.fn();
       const onReplace = vi.fn();
 
-      render(<FilePreview file={file} onRemove={onRemove} onReplace={onReplace} />);
+      const { container } = render(<FilePreview file={file} onRemove={onRemove} onReplace={onReplace} />);
 
-      // CheckCircle icon should be present
-      const successMessage = screen.getByText('File uploaded successfully').closest('div');
+      // Success message is displayed
+      const successMessage = screen.getByText('File uploaded successfully');
       expect(successMessage).toBeInTheDocument();
+
+      // SVG icon (CheckCircle from lucide-react) should be present
+      const svgIcons = container.querySelectorAll('svg');
+      expect(svgIcons.length).toBeGreaterThan(0);
     });
 
-    it('displays music icon for audio file', () => {
+    it('displays file information card', () => {
       const file = new File(['test'], 'test.mp3', { type: 'audio/mpeg' });
       const onRemove = vi.fn();
       const onReplace = vi.fn();
 
-      render(<FilePreview file={file} onRemove={onRemove} onReplace={onReplace} />);
+      const { container } = render(<FilePreview file={file} onRemove={onRemove} onReplace={onReplace} />);
 
-      // Music icon should be in the file card
-      const fileCard = screen.getByText('test.mp3').closest('div');
-      expect(fileCard).toBeInTheDocument();
+      // File name is displayed
+      expect(screen.getByText('test.mp3')).toBeInTheDocument();
+
+      // SVG icons (Music, RefreshCw, Trash2 from lucide-react) should be present
+      const svgIcons = container.querySelectorAll('svg');
+      expect(svgIcons.length).toBeGreaterThan(2); // At least CheckCircle, Music, RefreshCw, Trash2
     });
   });
 
