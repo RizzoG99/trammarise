@@ -8,7 +8,7 @@ import { FilePreview } from './FilePreview';
 
 // File validation constants
 const SUPPORTED_AUDIO_TYPES = ['audio/mpeg', 'audio/wav', 'audio/mp4', 'audio/m4a', 'audio/webm', 'audio/ogg', 'audio/flac'];
-const MAX_FILE_SIZE = 500 * 1024 * 1024; // 500MB
+export const MAX_FILE_SIZE = 500 * 1024 * 1024; // 500MB
 
 interface FileValidationResult {
   valid: boolean;
@@ -182,6 +182,7 @@ export function UploadPanel({ onFileUpload, uploadedFile, onFileRemove }: Upload
         accept="audio/*"
         onChange={handleFileSelect}
         className="hidden"
+        data-testid="file-input"
       />
     </GlassCard>
   );

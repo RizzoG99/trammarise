@@ -32,7 +32,9 @@
 
     /* Accents (Shared) */
     --color-accent-success: #10b981; /* Emerald 500 */
+    --color-accent-success-alpha-10: rgba(16, 185, 129, 0.1);
     --color-accent-error: #ef4444; /* Red 500 */
+    --color-accent-error-alpha-10: rgba(239, 68, 68, 0.1);
     --color-accent-warning: #f59e0b; /* Amber 500 */
     --color-accent-info: #3B82F6; /* Blue 500 */
 
