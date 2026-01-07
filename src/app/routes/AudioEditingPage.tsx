@@ -78,31 +78,35 @@ export function AudioEditingPage() {
           ws.playPause();
           break;
 
-        case 'ArrowRight':
+        case 'ArrowRight': {
           e.preventDefault();
           const seekForward = e.shiftKey ? 10 : 5;
           ws.setTime(Math.min(duration, currentTime + seekForward));
           break;
+        }
 
-        case 'ArrowLeft':
+        case 'ArrowLeft': {
           e.preventDefault();
           const seekBack = e.shiftKey ? 10 : 5;
           ws.setTime(Math.max(0, currentTime - seekBack));
           break;
+        }
 
-        case 'ArrowUp':
+        case 'ArrowUp': {
           e.preventDefault();
           const newVolumeUp = Math.min(1, volume + 0.1);
           setVolume(newVolumeUp);
           ws.setVolume(newVolumeUp);
           break;
+        }
 
-        case 'ArrowDown':
+        case 'ArrowDown': {
           e.preventDefault();
           const newVolumeDown = Math.max(0, volume - 0.1);
           setVolume(newVolumeDown);
           ws.setVolume(newVolumeDown);
           break;
+        }
       }
     };
 
