@@ -1,10 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { UploadPanel } from './UploadPanel';
 
 describe('UploadPanel', () => {
-  let mockOnFileUpload: ReturnType<typeof vi.fn>;
-  let mockOnFileRemove: ReturnType<typeof vi.fn>;
+  let mockOnFileUpload: Mock<(file: File) => void>;
+  let mockOnFileRemove: Mock<() => void>;
 
   beforeEach(() => {
     mockOnFileUpload = vi.fn();

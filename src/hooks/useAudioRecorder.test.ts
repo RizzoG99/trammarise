@@ -87,7 +87,7 @@ describe('useAudioRecorder', () => {
     mockGetUserMedia = vi.fn().mockResolvedValue(mockMediaStream);
 
     // Mock navigator.mediaDevices
-    Object.defineProperty(global.navigator, 'mediaDevices', {
+    Object.defineProperty(globalThis.navigator, 'mediaDevices', {
       writable: true,
       value: {
         getUserMedia: mockGetUserMedia,
@@ -95,10 +95,10 @@ describe('useAudioRecorder', () => {
     });
 
     // Mock MediaRecorder
-    global.MediaRecorder = MockMediaRecorder as unknown as typeof MediaRecorder;
+    globalThis.MediaRecorder = MockMediaRecorder as unknown as typeof MediaRecorder;
 
     // Mock permissions API
-    Object.defineProperty(global.navigator, 'permissions', {
+    Object.defineProperty(globalThis.navigator, 'permissions', {
       writable: true,
       value: {
         query: vi.fn().mockResolvedValue({
