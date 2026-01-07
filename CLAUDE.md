@@ -18,6 +18,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Run tests**: `npm test` - Runs vitest test suite with React Testing Library
 - **Test specific files**: `npm test path/to/file.test.tsx` - Run tests for specific files
 - **Watch mode**: Tests run in watch mode by default during development
+- **Coverage report**: `npm test -- --coverage` - Generate test coverage report with detailed metrics
 - **Test coverage**: 64+ comprehensive tests covering:
   - File upload validation and drag-and-drop functionality
   - Audio recording lifecycle (start, pause, resume, stop, reset)
@@ -35,6 +36,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   - `src/hooks/useAudioRecorder.test.ts` - Audio recording hook tests
   - `src/features/upload/components/UploadPanel.test.tsx` - File upload tests
   - `src/features/upload/components/FilePreview.test.tsx` - File preview tests
+- **CI/CD Integration**: Tests run automatically on PR creation via GitHub Actions
+- **Coverage Requirements**: Aim for comprehensive coverage of critical user flows and edge cases
 
 ### Deployment
 The app is deployed on Vercel. API routes in `/api` are serverless functions. Note:
@@ -287,6 +290,29 @@ Each type provides tailored prompts to the AI for optimal summary structure.
 - `refactor/` - Code refactoring
 - `test/` - Test additions/improvements
 - `docs/` - Documentation updates
+
+**Branch Protection Rules**:
+- Main branch requires PR approval before merge
+- All status checks must pass (tests, linting)
+- No direct pushes to main
+- No force pushes allowed
+
+**Example Workflow**:
+```bash
+# Start new feature
+git checkout -b feature/add-dark-mode-toggle
+
+# Make changes and commit
+git add src/components/ThemeToggle.tsx
+git commit -m "feat: add dark mode toggle component"
+
+# Push branch and create PR
+git push -u origin feature/add-dark-mode-toggle
+gh pr create --title "feat: Add dark mode toggle" --body "Adds toggle component for theme switching"
+
+# After review approval, merge via GitHub UI or CLI
+gh pr merge --squash --delete-branch
+```
 
 ## Design Patterns
 
