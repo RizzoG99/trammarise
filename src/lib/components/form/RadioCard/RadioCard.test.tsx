@@ -90,7 +90,8 @@ describe('RadioCard', () => {
       render(<RadioCard {...defaultProps} value="option2" />);
       const radio = screen.getByRole('radio', { hidden: true });
 
-      fireEvent.change(radio, { target: { value: 'option2' } });
+      // Trigger click on radio input (simulates user clicking)
+      fireEvent.click(radio);
 
       expect(mockOnChange).toHaveBeenCalledWith('option2');
     });
@@ -99,8 +100,10 @@ describe('RadioCard', () => {
       render(<RadioCard {...defaultProps} value="option3" />);
       const radio = screen.getByRole('radio', { hidden: true });
 
+      // Focus and press Space key (standard radio button interaction)
       radio.focus();
-      fireEvent.change(radio, { target: { value: 'option3' } });
+      fireEvent.keyDown(radio, { key: ' ' });
+      fireEvent.click(radio); // Space key triggers click on radio buttons
 
       expect(mockOnChange).toHaveBeenCalledWith('option3');
     });

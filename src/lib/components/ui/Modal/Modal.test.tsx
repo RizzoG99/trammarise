@@ -229,13 +229,17 @@ describe('Modal', () => {
   describe('Custom Styling', () => {
     it('applies custom className to modal content', () => {
       render(<Modal {...defaultProps} className="custom-modal-class" />);
-      const modalContent = screen.getByText('Modal content').closest('div');
+      // The className is on the modal content div (child of backdrop)
+      const backdrop = screen.getByRole('dialog');
+      const modalContent = backdrop.querySelector('div');
       expect(modalContent?.className).toContain('custom-modal-class');
     });
 
     it('preserves default classes when custom className is added', () => {
       render(<Modal {...defaultProps} className="custom-class" />);
-      const modalContent = screen.getByText('Modal content').closest('div');
+      // The className is on the modal content div (child of backdrop)
+      const backdrop = screen.getByRole('dialog');
+      const modalContent = backdrop.querySelector('div');
       expect(modalContent?.className).toContain('bg-white');
       expect(modalContent?.className).toContain('custom-class');
     });

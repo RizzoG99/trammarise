@@ -314,6 +314,149 @@ gh pr create --title "feat: Add dark mode toggle" --body "Adds toggle component 
 gh pr merge --squash --delete-branch
 ```
 
+## Component Creation Workflow
+
+When creating new UI components, follow this TDD-based workflow to ensure quality, consistency, and proper documentation:
+
+### 1. Functional Analysis
+Before writing any code, document the component's requirements:
+- **Purpose**: What problem does this solve?
+- **Props Interface**: All props with TypeScript types
+- **Visual States**: Default, hover, active, disabled, loading, error
+- **User Interactions**: Click, focus, keyboard navigation
+- **Edge Cases**: Empty state, long content, rapid interactions
+- **Accessibility**: ARIA labels, keyboard support, screen reader compatibility
+- **Responsive Behavior**: How it adapts to mobile/tablet/desktop
+
+### 2. Write Tests (TDD Approach)
+Create `ComponentName.test.tsx` with Vitest + Testing Library covering:
+- **Rendering**: Default props, all variants, different states
+- **Interactions**: Click handlers, keyboard events, focus management
+- **Edge Cases**: Null/undefined props, extreme values, rapid clicks
+- **Accessibility**: ARIA attributes, keyboard navigation, focus indicators
+
+**Test Structure**:
+```typescript
+describe('ComponentName', () => {
+  describe('Rendering', () => { /* ... */ });
+  describe('Interactions', () => { /* ... */ });
+  describe('Edge Cases', () => { /* ... */ });
+  describe('Accessibility', () => { /* ... */ });
+});
+```
+
+### 3. Implement Component
+Build `ComponentName.tsx` to pass all tests:
+- Use TypeScript for type safety
+- Follow existing component patterns (GlassCard, Button, etc.)
+- Use Tailwind classes with CSS variables (`var(--color-*)`)
+- Support dark mode with `dark:` classes
+- Add JSDoc comments for complex props
+
+### 4. Create Storybook Story
+Create `ComponentName.stories.tsx` for visual documentation:
+- Use CSF v3 format with `tags: ['autodocs']`
+- Include story for each variant/state
+- Add interactive controls with `argTypes`
+- Include usage code examples in story descriptions
+- Group related stories (Core UI / Features / Forms)
+
+**Story Template**:
+```typescript
+import type { Meta, StoryObj } from '@storybook/react';
+import { ComponentName } from './ComponentName';
+
+const meta: Meta<typeof ComponentName> = {
+  title: 'Category/ComponentName',
+  component: ComponentName,
+  tags: ['autodocs'],
+};
+
+export default meta;
+type Story = StoryObj<typeof ComponentName>;
+
+export const Default: Story = { args: { /* ... */ } };
+export const AllVariants: Story = { render: () => <>{/* ... */}</> };
+```
+
+### 5. Verify Against Mockups
+- Compare implementation with mockup in `/docs/mockup/`
+- Check colors match design system (Primary: #0A47C2, etc.)
+- Verify spacing, typography, and animations
+- Test in light and dark modes
+- Test at mobile/tablet/desktop viewports in Storybook
+
+### 6. Run Quality Checks
+```bash
+npm test                    # Run Vitest tests
+npm run lint                # ESLint validation
+npm run storybook           # Visual verification
+npm run build               # Production build check
+```
+
+### Example: Creating a Button Component
+
+**1. Functional Analysis**
+- Purpose: Primary action trigger
+- Props: `variant`, `children`, `onClick`, `disabled`, `icon`
+- States: Default, Hover, Active, Disabled, Loading
+- Interactions: Click, keyboard (Enter/Space), focus
+- Edge Cases: Very long text, no children, rapid clicks
+- Accessibility: ARIA role="button", focus ring, disabled state
+
+**2. Tests** (`Button.test.tsx`)
+```typescript
+describe('Button', () => {
+  it('renders children text');
+  it('calls onClick when clicked');
+  it('supports keyboard activation');
+  it('shows loading spinner when loading=true');
+  it('has proper ARIA attributes');
+});
+```
+
+**3. Implementation** (`Button.tsx`)
+```typescript
+interface ButtonProps {
+  variant?: 'primary' | 'secondary';
+  children: React.ReactNode;
+  onClick?: () => void;
+  disabled?: boolean;
+}
+
+export function Button({ variant = 'primary', ...props }: ButtonProps) {
+  // Implementation with Tailwind + accessibility
+}
+```
+
+**4. Story** (`Button.stories.tsx`)
+```typescript
+export const Primary: Story = { args: { variant: 'primary', children: 'Click Me' } };
+export const AllVariants: Story = { render: () => <>{/* Show all variants */}</> };
+```
+
+### Component Categories
+
+**Core UI** (`src/components/ui/`): Button, Input, Modal, Card, etc.
+**Features** (`src/features/*/components/`): Domain-specific components
+**Layout** (`src/components/layout/`): Page structure components
+**Audio** (`src/components/audio/`): Audio visualization & controls
+**Forms** (`src/lib/components/form/`): Form controls & validation
+
+### Quality Standards
+
+- ✅ **Test Coverage**: Aim for 80%+ coverage on UI components
+- ✅ **Accessibility**: WCAG 2.1 AA compliance
+- ✅ **TypeScript**: No `any` types, strict mode enabled
+- ✅ **Dark Mode**: All components support light/dark themes
+- ✅ **Responsive**: Mobile-first approach with breakpoints
+- ✅ **Documentation**: Props documented in TypeScript + Storybook
+
+### Storybook Commands
+
+- **Run Storybook**: `npm run storybook` - Start Storybook dev server on http://localhost:6006
+- **Build Storybook**: `npm run build-storybook` - Generate static Storybook build
+
 ## Design Patterns
 
 The codebase implements several design patterns for maintainability and scalability. See `docs/DESIGN_PATTERNS.md` for detailed documentation.

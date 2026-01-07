@@ -29,44 +29,44 @@ describe('Button', () => {
   describe('Variants', () => {
     it('applies primary variant by default', () => {
       render(<Button>Primary</Button>);
-      const button = screen.getByText('Primary');
+      const button = screen.getByRole('button');
       expect(button).toHaveClass('bg-indigo-600');
     });
 
     it('applies secondary variant classes', () => {
       render(<Button variant="secondary">Secondary</Button>);
-      const button = screen.getByText('Secondary');
+      const button = screen.getByRole('button');
       expect(button).toHaveClass('bg-slate-100');
     });
 
     it('applies success variant classes', () => {
       render(<Button variant="success">Success</Button>);
-      const button = screen.getByText('Success');
+      const button = screen.getByRole('button');
       expect(button).toHaveClass('bg-emerald-600');
     });
 
     it('applies danger variant classes', () => {
       render(<Button variant="danger">Danger</Button>);
-      const button = screen.getByText('Danger');
+      const button = screen.getByRole('button');
       expect(button).toHaveClass('bg-red-600');
     });
 
     it('applies outline variant classes', () => {
       render(<Button variant="outline">Outline</Button>);
-      const button = screen.getByText('Outline');
+      const button = screen.getByRole('button');
       expect(button).toHaveClass('bg-slate-50');
     });
 
     it('applies small variant classes', () => {
       render(<Button variant="small">Small</Button>);
-      const button = screen.getByText('Small');
+      const button = screen.getByRole('button');
       expect(button).toHaveClass('px-3');
       expect(button).toHaveClass('py-1');
     });
 
     it('applies large variant classes', () => {
       render(<Button variant="large">Large</Button>);
-      const button = screen.getByText('Large');
+      const button = screen.getByRole('button');
       expect(button).toHaveClass('px-8');
       expect(button).toHaveClass('py-4');
     });
@@ -109,7 +109,7 @@ describe('Button', () => {
 
     it('applies disabled styles when disabled', () => {
       render(<Button disabled>Disabled</Button>);
-      const button = screen.getByText('Disabled');
+      const button = screen.getByRole('button');
 
       expect(button).toBeDisabled();
       expect(button).toHaveClass('disabled:opacity-50');
@@ -120,7 +120,7 @@ describe('Button', () => {
   describe('Props', () => {
     it('merges custom className with variant classes', () => {
       render(<Button className="custom-class">Custom</Button>);
-      const button = screen.getByText('Custom');
+      const button = screen.getByRole('button');
 
       expect(button).toHaveClass('custom-class');
       expect(button).toHaveClass('bg-indigo-600'); // Primary variant
@@ -155,7 +155,7 @@ describe('Button', () => {
 
     it('handles undefined variant (uses default)', () => {
       render(<Button variant={undefined}>Default</Button>);
-      const button = screen.getByText('Default');
+      const button = screen.getByRole('button');
       expect(button).toHaveClass('bg-indigo-600');
     });
 

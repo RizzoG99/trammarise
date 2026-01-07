@@ -1,13 +1,16 @@
 /**
  * Generic event listener type
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type EventListener<T = any> = (data: T) => void;
 
 /**
  * Event emitter for implementing the Observer pattern
  * Allows components to subscribe to events and receive notifications
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export class EventEmitter<EventMap extends Record<string, any> = Record<string, any>> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private listeners: Map<keyof EventMap, Set<EventListener<any>>> = new Map();
 
   /**
