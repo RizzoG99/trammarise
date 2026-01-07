@@ -97,7 +97,7 @@ export function FilePreview({ file, onRemove, onReplace }: FilePreviewProps) {
             color: 'var(--color-accent-error)'
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
+            e.currentTarget.style.backgroundColor = 'var(--color-accent-error-alpha-10)';
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.backgroundColor = 'var(--color-bg-surface)';

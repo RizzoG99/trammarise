@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { UploadPanel } from './UploadPanel';
+import { UploadPanel, MAX_FILE_SIZE } from './UploadPanel';
 
 describe('UploadPanel', () => {
   let mockOnFileUpload: Mock<(file: File) => void>;
@@ -52,7 +52,7 @@ describe('UploadPanel', () => {
       // Create a mock file >500MB using size property (optimized)
       const largeFile = new File([], 'huge.mp3', { type: 'audio/mpeg' });
       Object.defineProperty(largeFile, 'size', { 
-        value: 501 * 1024 * 1024,
+        value: MAX_FILE_SIZE + 1,
         writable: false 
       });
 
@@ -74,7 +74,7 @@ describe('UploadPanel', () => {
       // Create a mock file at exactly 500MB using size property
       const boundaryFile = new File(['audio content'], 'boundary.mp3', { type: 'audio/mpeg' });
       Object.defineProperty(boundaryFile, 'size', { 
-        value: 500 * 1024 * 1024, // Exactly 500MB
+        value: MAX_FILE_SIZE, // Exactly 500MB
         writable: false 
       });
 
@@ -168,7 +168,7 @@ describe('UploadPanel', () => {
       // Create a mock file >500MB using size property (optimized)
       const largeFile = new File([], 'huge.mp3', { type: 'audio/mpeg' });
       Object.defineProperty(largeFile, 'size', { 
-        value: 501 * 1024 * 1024,
+        value: MAX_FILE_SIZE + 1,
         writable: false 
       });
       const dropZone = screen.getByText('Drop your audio file here or click to browse').closest('div')!;

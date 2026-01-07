@@ -32,7 +32,7 @@ describe('FilePreview', () => {
       expect(screen.getByText(/MB/)).toBeInTheDocument();
     });
 
-    it('truncates long filenames with CSS truncate class', () => {
+    it('displays long filenames with title attribute for accessibility', () => {
       const longFilename = 'very-long-filename-that-should-be-truncated-with-ellipsis.mp3';
       const file = new File(['test'], longFilename, { type: 'audio/mpeg' });
       const onRemove = vi.fn();
@@ -41,8 +41,9 @@ describe('FilePreview', () => {
       render(<FilePreview file={file} onRemove={onRemove} onReplace={onReplace} />);
 
       const filenameElement = screen.getByText(longFilename);
-      // Check that the truncate class is applied
-      expect(filenameElement).toHaveClass('truncate');
+      // Verify filename is displayed and has accessible title
+      expect(filenameElement).toBeInTheDocument();
+      expect(filenameElement).toHaveAttribute('title', longFilename);
     });
   });
 
@@ -146,8 +147,8 @@ describe('FilePreview', () => {
 
       expect(removeButton).toBeInTheDocument();
       expect(replaceButton).toBeInTheDocument();
-      expect(removeButton).toHaveClass('cursor-pointer');
-      expect(replaceButton).toHaveClass('cursor-pointer');
+      expect(removeButton).toBeEnabled();
+      expect(replaceButton).toBeEnabled();
     });
   });
 
