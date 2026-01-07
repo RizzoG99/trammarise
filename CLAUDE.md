@@ -14,6 +14,31 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Preview**: `npm run preview` - Preview production build locally
 - **Setup FFmpeg**: `npm run setup:ffmpeg` - Run FFmpeg setup script for audio processing
 
+### Testing
+- **Run tests**: `npm test` - Runs vitest test suite with React Testing Library
+- **Test specific files**: `npm test path/to/file.test.tsx` - Run tests for specific files
+- **Watch mode**: Tests run in watch mode by default during development
+- **Coverage report**: `npm test -- --coverage` - Generate test coverage report with detailed metrics
+- **Test coverage**: 64+ comprehensive tests covering:
+  - File upload validation and drag-and-drop functionality
+  - Audio recording lifecycle (start, pause, resume, stop, reset)
+  - Memory leak prevention (MediaStream track cleanup)
+  - Browser compatibility (Safari MIME type fallback for audio formats)
+  - Boundary conditions and edge cases (file size limits, empty files, etc.)
+  - Accessibility (ARIA labels, keyboard navigation)
+- **Test infrastructure**:
+  - Vitest with React Testing Library for component testing
+  - jest-dom matchers for DOM assertions (`toBeInTheDocument`, `toHaveAttribute`, etc.)
+  - Fake timers for time-based functionality testing
+  - Custom mocks for Web APIs (MediaRecorder, MediaStream, getUserMedia)
+  - Accessibility-focused test patterns (prefer `getByRole`, `getByLabelText`)
+- **Test files**:
+  - `src/hooks/useAudioRecorder.test.ts` - Audio recording hook tests
+  - `src/features/upload/components/UploadPanel.test.tsx` - File upload tests
+  - `src/features/upload/components/FilePreview.test.tsx` - File preview tests
+- **CI/CD Integration**: Tests run automatically on PR creation via GitHub Actions
+- **Coverage Requirements**: Aim for comprehensive coverage of critical user flows and edge cases
+
 ### Deployment
 The app is deployed on Vercel. API routes in `/api` are serverless functions. Note:
 - Transcription API has 300s max duration (configured in vercel.json)
@@ -65,6 +90,9 @@ App (React Router with AppLayout wrapper)
 ├── AudioEditingPage (waveform playback & trimming)
 │   └── AudioState
 │       ├── WaveformPlayer (WaveSurfer.js visualization)
+│       │   - Simple ref container, parent controls styling
+│       │   - Regions plugin for audio trimming via drag selection
+│       │   - No internal wrapper (removed for width constraint fix)
 │       └── PlaybackControls (play/pause, trim controls)
 │
 ├── ProcessingPage (multi-step progress indicator)
@@ -243,6 +271,48 @@ Each type provides tailored prompts to the AI for optimal summary structure.
 - WaveSurfer regions plugin enables audio trimming (drag to select, click scissors icon)
 - CSS uses Tailwind 4 with custom CSS variables for theming
 - ESLint configured with React 19 hooks and refresh rules
+
+### Development Workflow
+
+**IMPORTANT: Always use Pull Requests - Never push directly to main!**
+
+1. **Create feature branch**: `git checkout -b feature/your-feature-name`
+2. **Make changes**: Implement your feature/fix with commits
+3. **Push branch**: `git push -u origin feature/your-feature-name`
+4. **Create PR**: Use `gh pr create` or GitHub UI to create pull request
+5. **Review**: Wait for code review and approval
+6. **Merge**: Use squash merge to keep history clean
+7. **Cleanup**: Delete branch after merge (`gh pr merge --squash --delete-branch`)
+
+**Branch Naming Conventions**:
+- `feature/` - New features
+- `fix/` - Bug fixes
+- `refactor/` - Code refactoring
+- `test/` - Test additions/improvements
+- `docs/` - Documentation updates
+
+**Branch Protection Rules**:
+- Main branch requires PR approval before merge
+- All status checks must pass (tests, linting)
+- No direct pushes to main
+- No force pushes allowed
+
+**Example Workflow**:
+```bash
+# Start new feature
+git checkout -b feature/add-dark-mode-toggle
+
+# Make changes and commit
+git add src/components/ThemeToggle.tsx
+git commit -m "feat: add dark mode toggle component"
+
+# Push branch and create PR
+git push -u origin feature/add-dark-mode-toggle
+gh pr create --title "feat: Add dark mode toggle" --body "Adds toggle component for theme switching"
+
+# After review approval, merge via GitHub UI or CLI
+gh pr merge --squash --delete-branch
+```
 
 ## Component Creation Workflow
 
