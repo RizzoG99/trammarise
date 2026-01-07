@@ -1,4 +1,5 @@
 import type { StorybookConfig } from '@storybook/react-vite';
+import { resolve } from 'path';
 
 const config: StorybookConfig = {
   stories: [
@@ -22,8 +23,8 @@ const config: StorybookConfig = {
         ...config.resolve,
         alias: {
           ...config.resolve?.alias,
-          '@': '/src',
-          '@/lib': '/src/lib',
+          '@': resolve(__dirname, '../src'),
+          '@/lib': resolve(__dirname, '../src/lib'),
         },
       },
     };
