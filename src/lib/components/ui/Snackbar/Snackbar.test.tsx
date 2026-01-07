@@ -16,7 +16,8 @@ describe('Snackbar', () => {
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
+    vi.runOnlyPendingTimers();
+    vi.useRealTimers();
     cleanup();
   });
 
@@ -76,11 +77,9 @@ describe('Snackbar', () => {
 
       expect(mockOnClose).not.toHaveBeenCalled();
 
-      vi.advanceTimersByTime(4000);
+      await vi.advanceTimersByTimeAsync(4000);
 
-      await waitFor(() => {
-        expect(mockOnClose).toHaveBeenCalledTimes(1);
-      });
+      expect(mockOnClose).toHaveBeenCalledTimes(1);
     });
 
     it('auto-dismisses after custom duration', async () => {
@@ -88,11 +87,9 @@ describe('Snackbar', () => {
 
       expect(mockOnClose).not.toHaveBeenCalled();
 
-      vi.advanceTimersByTime(2000);
+      await vi.advanceTimersByTimeAsync(2000);
 
-      await waitFor(() => {
-        expect(mockOnClose).toHaveBeenCalledTimes(1);
-      });
+      expect(mockOnClose).toHaveBeenCalledTimes(1);
     });
 
     it('does not auto-dismiss when duration is 0', async () => {
@@ -114,19 +111,17 @@ describe('Snackbar', () => {
     it('resets timer when isOpen changes', async () => {
       const { rerender } = render(<Snackbar {...defaultProps} duration={2000} />);
 
-      vi.advanceTimersByTime(1000);
+      await vi.advanceTimersByTimeAsync(1000);
 
       // Close and reopen
       rerender(<Snackbar {...defaultProps} isOpen={false} duration={2000} />);
       rerender(<Snackbar {...defaultProps} isOpen={true} duration={2000} />);
 
-      vi.advanceTimersByTime(1000);
+      await vi.advanceTimersByTimeAsync(1000);
       expect(mockOnClose).not.toHaveBeenCalled();
 
-      vi.advanceTimersByTime(1000);
-      await waitFor(() => {
-        expect(mockOnClose).toHaveBeenCalledTimes(1);
-      });
+      await vi.advanceTimersByTimeAsync(1000);
+      expect(mockOnClose).toHaveBeenCalledTimes(1);
     });
 
     it('cleans up timer on unmount', () => {
@@ -228,40 +223,34 @@ describe('Snackbar', () => {
     it('handles very short duration', async () => {
       render(<Snackbar {...defaultProps} duration={1} />);
 
-      vi.advanceTimersByTime(1);
+      await vi.advanceTimersByTimeAsync(1);
 
-      await waitFor(() => {
-        expect(mockOnClose).toHaveBeenCalledTimes(1);
-      });
+      expect(mockOnClose).toHaveBeenCalledTimes(1);
     });
 
     it('handles very long duration', async () => {
       render(<Snackbar {...defaultProps} duration={999999} />);
 
-      vi.advanceTimersByTime(999998);
+      await vi.advanceTimersByTimeAsync(999998);
       expect(mockOnClose).not.toHaveBeenCalled();
 
-      vi.advanceTimersByTime(1);
-      await waitFor(() => {
-        expect(mockOnClose).toHaveBeenCalledTimes(1);
-      });
+      await vi.advanceTimersByTimeAsync(1);
+      expect(mockOnClose).toHaveBeenCalledTimes(1);
     });
 
     it('handles multiple rapid opens and closes', async () => {
       const { rerender } = render(<Snackbar {...defaultProps} duration={1000} />);
 
-      vi.advanceTimersByTime(500);
+      await vi.advanceTimersByTimeAsync(500);
       rerender(<Snackbar {...defaultProps} isOpen={false} duration={1000} />);
       rerender(<Snackbar {...defaultProps} isOpen={true} duration={1000} />);
-      vi.advanceTimersByTime(500);
+      await vi.advanceTimersByTimeAsync(500);
       rerender(<Snackbar {...defaultProps} isOpen={false} duration={1000} />);
       rerender(<Snackbar {...defaultProps} isOpen={true} duration={1000} />);
 
-      vi.advanceTimersByTime(1000);
+      await vi.advanceTimersByTimeAsync(1000);
 
-      await waitFor(() => {
-        expect(mockOnClose).toHaveBeenCalled();
-      });
+      expect(mockOnClose).toHaveBeenCalled();
     });
   });
 
@@ -272,10 +261,8 @@ describe('Snackbar', () => {
       const alert = screen.getByRole('alert');
       expect(alert.className).toContain('bg-[#4caf50]');
 
-      vi.advanceTimersByTime(1000);
-      await waitFor(() => {
-        expect(mockOnClose).toHaveBeenCalledTimes(1);
-      });
+      await vi.advanceTimersByTimeAsync(1000);
+      expect(mockOnClose).toHaveBeenCalledTimes(1);
     });
 
     it('error variant with no auto-dismiss', () => {
