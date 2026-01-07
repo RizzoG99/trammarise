@@ -224,18 +224,28 @@ describe('ToggleSwitch', () => {
     });
 
     it('handles multiple rapid clicks', () => {
-      render(<ToggleSwitch {...defaultProps} checked={false} />);
+      const { rerender } = render(<ToggleSwitch {...defaultProps} checked={false} />);
       const toggle = screen.getByRole('switch');
 
+      // First click: false → true
       fireEvent.click(toggle);
+      expect(mockOnChange).toHaveBeenNthCalledWith(1, true);
+
+      // Simulate parent updating state
+      rerender(<ToggleSwitch {...defaultProps} checked={true} />);
+
+      // Second click: true → false
       fireEvent.click(toggle);
+      expect(mockOnChange).toHaveBeenNthCalledWith(2, false);
+
+      // Simulate parent updating state
+      rerender(<ToggleSwitch {...defaultProps} checked={false} />);
+
+      // Third click: false → true
       fireEvent.click(toggle);
+      expect(mockOnChange).toHaveBeenNthCalledWith(3, true);
 
       expect(mockOnChange).toHaveBeenCalledTimes(3);
-      // Alternates between true and false
-      expect(mockOnChange).toHaveBeenNthCalledWith(1, true);
-      expect(mockOnChange).toHaveBeenNthCalledWith(2, false);
-      expect(mockOnChange).toHaveBeenNthCalledWith(3, true);
     });
 
     it('handles label with special characters', () => {
