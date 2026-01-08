@@ -1,7 +1,7 @@
 import React from 'react';
-import { PlayIcon, PauseIcon, TrimIcon, CheckIcon, XIcon } from '../icons';
+import { PlayIcon, PauseIcon, TrimIcon, CheckIcon, XIcon } from '../../../../components/icons';
 import { Button } from '@/lib';
-import { formatTime } from '../../utils/audio';
+import { formatTime } from '../../../../utils/audio';
 
 interface PlaybackControlsProps {
   isPlaying: boolean;

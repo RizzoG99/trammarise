@@ -1,10 +1,9 @@
 import { useParams } from 'react-router-dom';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { ArrowRight } from 'lucide-react';
-import { Heading, Text, GlassCard } from '@/lib';
+import { Heading, Text, GlassCard, WaveformPlayer } from '@/lib';
+import type { WaveformPlayerRef } from '@/lib';
 import { PageLayout } from '../../components/layout/PageLayout';
-import { WaveformPlayer } from '../../components/audio/WaveformPlayer';
-import type { WaveformPlayerRef } from '../../components/audio/WaveformPlayer';
 import { useSessionStorage } from '../../hooks/useSessionStorage';
 import { useRouteState } from '../../hooks/useRouteState';
 import { EnhancedPlaybackControls } from '../../features/audio-editing/components/EnhancedPlaybackControls';

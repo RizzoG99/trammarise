@@ -14,8 +14,8 @@ export * from './ui';
 // Re-export all Form components
 export * from './form';
 
-// Audio components will be added here
-// export * from './audio';
+// Re-export all Audio components
+export * from './audio';
 
 // Chat components will be added here
 // export * from './chat';

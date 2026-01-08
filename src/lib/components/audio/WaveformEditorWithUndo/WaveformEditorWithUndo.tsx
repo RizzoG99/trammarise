@@ -2,13 +2,13 @@ import { useEffect, useRef, useState } from 'react';
 import WaveSurfer from 'wavesurfer.js';
 import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions';
 import { Button } from '@/lib';
-import { useCommandHistory } from '../../hooks/useCommandHistory';
+import { useCommandHistory } from '../../../../hooks/useCommandHistory';
 import {
   AddTrimRegionCommand,
   RemoveTrimRegionCommand,
   ChangePlaybackSpeedCommand,
   ChangeVolumeCommand,
-} from '../../commands/AudioCommands';
+} from '../../../../commands/AudioCommands';
 
 /**
  * Example component demonstrating Command Pattern usage
