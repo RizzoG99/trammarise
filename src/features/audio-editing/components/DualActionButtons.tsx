@@ -1,4 +1,4 @@
-import { Button } from '../../../components/ui/Button';
+import { Button } from '@/lib';
 import { Scissors, FileAudio } from 'lucide-react';
 
 export interface DualActionButtonsProps {

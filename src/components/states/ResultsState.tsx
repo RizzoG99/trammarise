@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { ActionButtons } from '../results/ActionButtons';
 import { ChatInterface } from '../results/ChatInterface';
-import { Button } from '../ui/Button';
+import { Button } from '@/lib';
 import { chatWithAI, generatePDF } from '../../utils/api';
 import type { ProcessingResult, ChatMessage } from '../../types/audio';
 

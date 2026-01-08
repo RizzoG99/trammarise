@@ -1,6 +1,6 @@
 import React from 'react';
 import { PlayIcon, PauseIcon, TrimIcon, CheckIcon, XIcon } from '../icons';
-import { Button } from '../ui/Button';
+import { Button } from '@/lib';
 import { formatTime } from '../../utils/audio';
 
 interface PlaybackControlsProps {

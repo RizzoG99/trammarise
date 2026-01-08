@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import WaveSurfer from 'wavesurfer.js';
 import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions';
-import { Button } from '../ui/Button';
+import { Button } from '@/lib';
 import { useCommandHistory } from '../../hooks/useCommandHistory';
 import {
   AddTrimRegionCommand,
