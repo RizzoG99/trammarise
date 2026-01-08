@@ -1,10 +1,40 @@
 import { useState } from 'react';
 import './AILoadingOrb.css';
 
-interface AILoadingOrbProps {
+/**
+ * AILoadingOrb component properties
+ */
+export interface AILoadingOrbProps {
+  /** Size of the orb in pixels (default: 120) */
   size?: number;
 }
 
+/**
+ * Animated AI loading orb with multi-layered blob effects.
+ *
+ * Features:
+ * - **Multi-layer blobs**: 3 animated gradient layers with radial gradients
+ * - **Floating particles**: 4 independent particles with unique animations
+ * - **Glow effects**: SVG blur filters for depth and luminosity
+ * - **Color animations**: Smooth transitions between purple, blue, pink, and cyan
+ * - **Dark mode**: Adaptive glow intensity based on theme
+ * - **Accessibility**: Respects `prefers-reduced-motion` setting
+ * - **Responsive**: Configurable size for different use cases
+ *
+ * @example
+ * ```tsx
+ * // Default size (120px)
+ * <AILoadingOrb />
+ *
+ * // Custom size
+ * <AILoadingOrb size={160} />
+ * ```
+ *
+ * @param props - AILoadingOrb properties
+ * @param props.size - Size of the orb in pixels (default: 120)
+ *
+ * @returns Animated AI loading orb element
+ */
 export function AILoadingOrb({ size = 120 }: AILoadingOrbProps) {
   // Start animating immediately on mount
   const [isAnimating] = useState(true);

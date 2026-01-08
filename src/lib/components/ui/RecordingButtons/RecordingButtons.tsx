@@ -7,11 +7,33 @@ interface RecordingButtonProps {
   'aria-label'?: string;
 }
 
-// 1. RecordButton - Large circular with pulse ring
+/**
+ * RecordButton properties
+ */
 export interface RecordButtonProps extends RecordingButtonProps {
+  /** Whether recording is currently active */
   isRecording?: boolean;
 }
 
+/**
+ * Large circular record button with pulse ring animation.
+ *
+ * Features:
+ * - **Primary action**: Starts audio recording
+ * - **Pulse animation**: Visual indicator when ready to record
+ * - **Disabled state**: Grayed out when recording or disabled
+ * - **Hover effect**: Color change on mouse over
+ * - **Accessibility**: Proper ARIA labels
+ *
+ * @example
+ * ```tsx
+ * <RecordButton
+ *   onClick={handleStartRecording}
+ *   isRecording={isRecording}
+ *   aria-label="Start recording"
+ * />
+ * ```
+ */
 export function RecordButton({
   onClick,
   disabled = false,
@@ -22,7 +44,7 @@ export function RecordButton({
   return (
     <button
       onClick={onClick}
-      disabled={disabled}
+      disabled={disabled || isRecording}
       className={`relative rounded-full transition-all group ${
         disabled || isRecording
           ? 'cursor-not-allowed opacity-50 p-3'
@@ -56,11 +78,33 @@ export function RecordButton({
   );
 }
 
-// 2. PauseButton - Gray circular for pause/resume
+/**
+ * PauseButton properties
+ */
 export interface PauseButtonProps extends RecordingButtonProps {
+  /** Whether recording is currently paused */
   isPaused?: boolean;
 }
 
+/**
+ * Gray circular pause/resume button.
+ *
+ * Features:
+ * - **Toggle behavior**: Shows pause icon when recording, play icon when paused
+ * - **Gray styling**: Less prominent than record button
+ * - **Hover effect**: Darkens on mouse over
+ * - **Disabled state**: Grayed out when unavailable
+ * - **Accessibility**: Dynamic ARIA labels based on state
+ *
+ * @example
+ * ```tsx
+ * <PauseButton
+ *   onClick={handlePauseResume}
+ *   isPaused={isPaused}
+ *   aria-label={isPaused ? "Resume recording" : "Pause recording"}
+ * />
+ * ```
+ */
 export function PauseButton({
   onClick,
   disabled = false,
@@ -92,7 +136,24 @@ export function PauseButton({
   );
 }
 
-// 3. StopButton - Red circular
+/**
+ * Red circular stop button.
+ *
+ * Features:
+ * - **Destructive action**: Stops and finalizes recording
+ * - **Red styling**: Clear visual indicator of stop action
+ * - **Hover effect**: Darkens to deeper red on mouse over
+ * - **Disabled state**: Grayed out when unavailable
+ * - **Accessibility**: Proper ARIA labels
+ *
+ * @example
+ * ```tsx
+ * <StopButton
+ *   onClick={handleStopRecording}
+ *   aria-label="Stop recording"
+ * />
+ * ```
+ */
 export function StopButton({
   onClick,
   disabled = false,

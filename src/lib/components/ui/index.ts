@@ -40,3 +40,15 @@ export type { HeadingProps, HeadingLevel } from './Heading';
 // Text
 export { Text } from './Text';
 export type { TextProps, TextVariant, TextColor } from './Text';
+
+// RecordingButtons
+export { RecordButton, PauseButton, StopButton } from './RecordingButtons';
+export type { RecordButtonProps, PauseButtonProps } from './RecordingButtons';
+
+// AILoadingOrb
+export { AILoadingOrb } from './AILoadingOrb';
+export type { AILoadingOrbProps } from './AILoadingOrb';
+
+// FileSizeWarningModal
+export { FileSizeWarningModal } from './FileSizeWarningModal';
+export type { FileSizeWarningModalProps } from './FileSizeWarningModal';

@@ -9,10 +9,10 @@ import {
   ToggleSwitch,
   RadioCard,
   SelectCard,
+  AILoadingOrb,
 } from '@/lib';
 import type { ThemeMode } from '@/lib';
 import { ComponentSection } from '../components/preview/ComponentSection';
-import { AILoadingOrb } from '../components/ui/AILoadingOrb';
 
 /**
  * Preview page for showcasing and testing all library components.

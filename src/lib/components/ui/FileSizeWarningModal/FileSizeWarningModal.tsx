@@ -1,15 +1,26 @@
 import React from 'react';
-import { Modal } from './Modal';
-import type { FileSizeStatus } from '../../utils/fileSize';
+import { Modal } from '../Modal';
+import type { FileSizeStatus } from '../../../../utils/fileSize';
 
-interface FileSizeWarningModalProps {
+/**
+ * FileSizeWarningModal component properties
+ */
+export interface FileSizeWarningModalProps {
+  /** Whether the modal is open */
   isOpen: boolean;
+  /** Callback when modal should close */
   onClose: () => void;
+  /** File size status with formatted size and recommendations */
   fileSizeStatus: FileSizeStatus;
+  /** Callback when user chooses to proceed without compression */
   onProceed: () => void;
+  /** Callback when user chooses to compress the file */
   onCompress: () => void;
 }
 
+/**
+ * Warning icon for large files
+ */
 const WarningIcon = () => (
   <svg
     viewBox="0 0 24 24"
@@ -24,6 +35,9 @@ const WarningIcon = () => (
   </svg>
 );
 
+/**
+ * Error icon for files that are too large
+ */
 const ErrorIcon = () => (
   <svg
     viewBox="0 0 24 24"
@@ -38,6 +52,42 @@ const ErrorIcon = () => (
   </svg>
 );
 
+/**
+ * Modal dialog for warning users about large file sizes.
+ *
+ * Features:
+ * - **Two states**: Warning (large file) and Error (file too large)
+ * - **File info**: Displays formatted size and estimated processing time
+ * - **Recommendations**: Provides compression recommendations
+ * - **Benefits list**: Shows advantages of compression for large files
+ * - **Action buttons**: Compress, Continue Anyway (warning only), Cancel
+ * - **Dark mode**: Supports light and dark themes
+ *
+ * @example
+ * ```tsx
+ * <FileSizeWarningModal
+ *   isOpen={showModal}
+ *   onClose={() => setShowModal(false)}
+ *   fileSizeStatus={{
+ *     formattedSize: '28.5 MB',
+ *     isTooLarge: false,
+ *     estimatedTime: '~2 minutes',
+ *     recommendation: 'We recommend compressing this file...'
+ *   }}
+ *   onProceed={handleProceed}
+ *   onCompress={handleCompress}
+ * />
+ * ```
+ *
+ * @param props - FileSizeWarningModal properties
+ * @param props.isOpen - Whether the modal is open
+ * @param props.onClose - Callback when modal should close
+ * @param props.fileSizeStatus - File size status with formatted size and recommendations
+ * @param props.onProceed - Callback when user chooses to proceed without compression
+ * @param props.onCompress - Callback when user chooses to compress the file
+ *
+ * @returns Modal dialog for file size warnings
+ */
 export const FileSizeWarningModal: React.FC<FileSizeWarningModalProps> = ({
   isOpen,
   onClose,

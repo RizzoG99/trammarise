@@ -1,6 +1,5 @@
 import React from 'react';
-import { AILoadingOrb } from '../ui/AILoadingOrb';
-import { Button } from '../ui/Button';
+import { AILoadingOrb, Button } from '@/lib';
 import type { ProcessingStateData } from '../../types/audio';
 
 interface ProcessingStateProps {
