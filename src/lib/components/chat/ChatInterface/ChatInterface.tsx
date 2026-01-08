@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { ChatMessage } from '../../types/audio';
+import type { ChatMessage } from '../../../../types/audio';
 
 interface ChatInterfaceProps {
   onSendMessage: (message: string) => void;

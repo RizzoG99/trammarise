@@ -17,5 +17,5 @@ export * from './form';
 // Re-export all Audio components
 export * from './audio';
 
-// Chat components will be added here
-// export * from './chat';
+// Re-export all Chat components
+export * from './chat';
