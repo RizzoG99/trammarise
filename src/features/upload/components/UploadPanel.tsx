@@ -1,9 +1,7 @@
 import { useState, useRef } from 'react';
 import type { DragEvent } from 'react';
 import { Upload, AlertCircle } from 'lucide-react';
-import { GlassCard } from '../../../components/ui/GlassCard';
-import { Heading } from '../../../components/ui/Heading';
-import { Text } from '../../../components/ui/Text';
+import { GlassCard, Heading, Text } from '@/lib';
 import { FilePreview } from './FilePreview';
 
 // File validation constants

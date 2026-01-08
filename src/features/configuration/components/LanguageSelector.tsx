@@ -1,6 +1,6 @@
 import type { LanguageCode } from '../../../types/languages';
 import { LANGUAGE_OPTIONS } from '../../../types/languages';
-import { Text } from '../../../components/ui/Text';
+import { Text } from '@/lib';
 
 export interface LanguageSelectorProps {
   value: LanguageCode;

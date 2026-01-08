@@ -28,3 +28,15 @@ export type { SnackbarProps, SnackbarVariant } from './Snackbar';
 // ThemeToggle
 export { ThemeToggle } from './ThemeToggle';
 export type { ThemeToggleProps, ThemeMode } from './ThemeToggle';
+
+// GlassCard
+export { GlassCard } from './GlassCard';
+export type { GlassCardProps } from './GlassCard';
+
+// Heading
+export { Heading } from './Heading';
+export type { HeadingProps, HeadingLevel } from './Heading';
+
+// Text
+export { Text } from './Text';
+export type { TextProps, TextVariant, TextColor } from './Text';

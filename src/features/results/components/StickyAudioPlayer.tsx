@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Play, Pause, Volume2, VolumeX } from 'lucide-react';
-import { GlassCard } from '../../../components/ui/GlassCard';
-import { Text } from '../../../components/ui/Text';
+import { GlassCard, Text } from '@/lib';
 
 export interface StickyAudioPlayerProps {
   audioUrl: string;

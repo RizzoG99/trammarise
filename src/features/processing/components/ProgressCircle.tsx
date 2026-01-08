@@ -1,6 +1,4 @@
-import { GlassCard } from '../../../components/ui/GlassCard';
-import { Heading } from '../../../components/ui/Heading';
-import { Text } from '../../../components/ui/Text';
+import { GlassCard, Heading, Text } from '@/lib';
 
 export interface ProgressCircleProps {
   progress: number;
