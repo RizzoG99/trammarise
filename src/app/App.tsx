@@ -12,9 +12,7 @@ import { ResultsPage } from './routes/ResultsPage';
 import { PreviewPage } from '../pages/PreviewPage';
 
 // Placeholder for Configuration page (will be enhanced later)
-import { Heading } from '../components/ui/Heading';
-import { Text } from '../components/ui/Text';
-import { GlassCard } from '../components/ui/GlassCard';
+import { Heading, Text, GlassCard } from '@/lib';
 
 function ConfigurationPlaceholder() {
   return (

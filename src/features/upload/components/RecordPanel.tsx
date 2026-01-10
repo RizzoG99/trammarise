@@ -1,9 +1,7 @@
 import { useEffect, useImperativeHandle, forwardRef } from 'react';
-import { GlassCard } from '../../../components/ui/GlassCard';
-import { Heading } from '../../../components/ui/Heading';
+import { GlassCard, Heading, RecordButton, PauseButton, StopButton } from '@/lib';
 import { WaveformVisualization } from './WaveformVisualization';
 import { useAudioRecorder } from '../../../hooks/useAudioRecorder';
-import { RecordButton, PauseButton, StopButton } from '../../../components/ui/RecordingButtons';
 
 export interface RecordPanelProps {
   onRecordingComplete: (blob: Blob) => void;

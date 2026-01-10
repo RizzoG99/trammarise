@@ -1,7 +1,5 @@
 import { Undo2, Redo2, RotateCcw } from 'lucide-react';
-import { Button } from '../../../components/ui/Button';
-import { GlassCard } from '../../../components/ui/GlassCard';
-import { Text } from '../../../components/ui/Text';
+import { Button, GlassCard, Text } from '@/lib';
 
 export interface UndoRedoToolbarProps {
   canUndo: boolean;

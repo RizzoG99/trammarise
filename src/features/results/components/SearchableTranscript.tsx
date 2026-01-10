@@ -1,7 +1,5 @@
 import { Search, ChevronUp, ChevronDown, X } from 'lucide-react';
-import { GlassCard } from '../../../components/ui/GlassCard';
-import { Heading } from '../../../components/ui/Heading';
-import { Text } from '../../../components/ui/Text';
+import { GlassCard, Heading, Text } from '@/lib';
 import { useTranscriptSearch } from '../hooks/useTranscriptSearch';
 
 export interface SearchableTranscriptProps {

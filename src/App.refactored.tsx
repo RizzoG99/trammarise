@@ -5,8 +5,8 @@ import { AudioState } from './components/states/AudioState';
 import { ConfigurationState } from './components/states/ConfigurationState';
 import { ProcessingState } from './components/states/ProcessingState';
 import { ResultsState } from './components/states/ResultsState';
-import { Snackbar } from './components/ui/Snackbar';
-import { ThemeToggle } from './components/ui/ThemeToggle';
+import { Snackbar, ThemeToggle } from '@/lib';
+import type { ThemeMode } from '@/lib';
 import { useAudioRecorder } from './hooks/useAudioRecorder';
 import type { AppState, AudioFile, ProcessingResult, ProcessingStateData, AIConfiguration } from './types/audio';
 
@@ -28,6 +28,7 @@ function App() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [snackbarMessage, setSnackbarMessage] = useState<string | null>(null);
   const [processingAbortController, setProcessingAbortController] = useState<AbortController | null>(null);
+  const [theme, setTheme] = useState<ThemeMode>('system');
 
   const { isRecording, duration, audioBlob, startRecording, stopRecording, error, hasMicrophoneAccess, checkMicrophonePermission } =
     useAudioRecorder();
@@ -335,7 +336,7 @@ function App() {
   return (
     <div className="max-w-[1200px] mx-auto min-h-screen flex flex-col relative">
       <div className="absolute top-4 right-4 z-50">
-        <ThemeToggle />
+        <ThemeToggle theme={theme} onThemeChange={setTheme} />
       </div>
       <main className="flex-1 flex flex-col justify-center items-center py-8">
         {errorMessage && (

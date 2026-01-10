@@ -1,8 +1,9 @@
 import { Bell, User } from 'lucide-react';
-import { GlassCard } from '../ui/GlassCard';
-import { ThemeToggle } from '../ui/ThemeToggle';
+import { GlassCard, ThemeToggle } from '@/lib';
+import { useTheme } from '../../hooks/useTheme';
 
 export function AppHeader() {
+  const { theme, setTheme } = useTheme();
   return (
     <header className="sticky top-0 z-50 border-b border-border backdrop-blur-md">
       <GlassCard variant="light" className="rounded-none border-x-0 border-t-0">
@@ -34,7 +35,7 @@ export function AppHeader() {
               </button>
 
               {/* Theme Toggle */}
-              <ThemeToggle />
+              <ThemeToggle theme={theme} onThemeChange={setTheme} />
 
               {/* User Avatar */}
               <button

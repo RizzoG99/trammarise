@@ -1,0 +1,1 @@
+export { WaveformEditorWithUndo } from './WaveformEditorWithUndo';

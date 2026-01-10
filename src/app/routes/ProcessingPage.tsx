@@ -3,9 +3,7 @@ import { useParams } from 'react-router-dom';
 import { SplitCardLayout } from '../../features/processing/components/SplitCardLayout';
 import { ProgressCircle } from '../../features/processing/components/ProgressCircle';
 import { StepChecklist, type ProcessingStep } from '../../features/processing/components/StepChecklist';
-import { Button } from '../../components/ui/Button';
-import { Heading } from '../../components/ui/Heading';
-import { Text } from '../../components/ui/Text';
+import { Button, Heading, Text } from '@/lib';
 import { useSessionStorage } from '../../hooks/useSessionStorage';
 import { useRouteState } from '../../hooks/useRouteState';
 

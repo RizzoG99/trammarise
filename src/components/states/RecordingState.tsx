@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from '../ui/Button';
+import { Button } from '@/lib';
 import { formatTime } from '../../utils/audio';
 
 interface RecordingStateProps {

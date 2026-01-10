@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import type { DragEvent } from 'react';
 import { Paperclip, X } from 'lucide-react';
-import { Text } from '../../../components/ui/Text';
+import { Text } from '@/lib';
 
 export interface ContextUploadAreaProps {
   files: File[];

@@ -1,4 +1,4 @@
-import { Text } from '../../../components/ui/Text';
+import { Text } from '@/lib';
 import { AlertCircle } from 'lucide-react';
 
 export interface TokenUsageMeterProps {

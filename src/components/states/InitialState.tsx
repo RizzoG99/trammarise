@@ -1,6 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Button } from '../ui/Button';
-import { FileSizeWarningModal } from '../ui/FileSizeWarningModal';
+import { Button, FileSizeWarningModal } from '@/lib';
 import { AttachmentIcon } from '../icons';
 import { getFileSizeStatus } from '../../utils/fileSize';
 import type { FileSizeStatus } from '../../utils/fileSize';

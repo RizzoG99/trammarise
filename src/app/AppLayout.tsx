@@ -1,5 +1,5 @@
 import { Outlet } from 'react-router-dom';
-import { Text } from '../components/ui/Text';
+import { Text } from '@/lib';
 
 export function AppLayout() {
   return (

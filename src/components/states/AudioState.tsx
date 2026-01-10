@@ -1,8 +1,6 @@
 import React, { useState, useRef } from 'react';
-import { WaveformPlayer } from '../audio/WaveformPlayer';
-import type { WaveformPlayerRef } from '../audio/WaveformPlayer';
-import { PlaybackControls } from '../audio/PlaybackControls';
-import { Button } from '../ui/Button';
+import { Button, WaveformPlayer, PlaybackControls } from '@/lib';
+import type { WaveformPlayerRef } from '@/lib';
 import { AUDIO_CONSTANTS } from '../../utils/constants';
 
 interface AudioStateProps {
