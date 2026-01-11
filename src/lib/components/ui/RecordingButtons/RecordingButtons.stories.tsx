@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { RecordButton, PauseButton, StopButton } from './RecordingButtons';
 
 const meta: Meta<typeof RecordButton> = {
@@ -192,7 +192,6 @@ export const RecordingPanel: Story = {
  * Dark mode comparison.
  */
 export const DarkModeComparison: Story = {
-  name: 'Dark Mode Comparison',
   render: () => (
     <div className="grid grid-cols-2 gap-8 p-8">
       {/* Light Mode */}

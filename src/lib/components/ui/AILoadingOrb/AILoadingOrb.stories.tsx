@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { AILoadingOrb } from './AILoadingOrb';
 
 const meta: Meta<typeof AILoadingOrb> = {
