@@ -2,6 +2,16 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## AI Assistant Guidelines
+
+**Context7 MCP Integration**: Always use Context7 MCP when you need library/API documentation, code generation, setup or configuration steps without the user having to explicitly ask. This ensures you have the most up-to-date information for:
+- Library APIs (React, TypeScript, Vite, WaveSurfer.js, FFmpeg, OpenAI SDK, etc.)
+- Framework documentation and best practices
+- Setup and configuration instructions
+- Code examples following current patterns
+
+Query Context7 proactively whenever working with external dependencies to provide accurate, current guidance.
+
 ## Quick Start Commands
 
 ### Development
