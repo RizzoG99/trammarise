@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { ApiKeyInfo } from './ApiKeyInfo';
-import { Button } from '../ui/Button';
+import { Button, Input, SelectCard, ToggleSwitch } from '@/lib';
 import { validateApiKey } from '../../utils/api';
 import { getApiConfig, saveApiConfig } from '../../utils/session-storage';
 import type { AIConfiguration, ConfigMode } from '../../types/audio';
-import { Input } from '../ui/Input';
-import { SelectCard } from '../ui/SelectCard';
-import { ToggleSwitch } from '../ui/ToggleSwitch';
 import { CURATED_MODELS } from '../../constants/models';
 import { CONTENT_TYPE_OPTIONS, type ContentType } from '../../types/content-types';
 import { LANGUAGE_OPTIONS, type LanguageCode } from '../../types/languages';

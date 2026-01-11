@@ -1,9 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { X, Send, Loader2 } from 'lucide-react';
-import { GlassCard } from '../../../components/ui/GlassCard';
-import { Heading } from '../../../components/ui/Heading';
-import { Text } from '../../../components/ui/Text';
-import { Button } from '../../../components/ui/Button';
+import { Button, GlassCard, Heading, Text } from '@/lib';
 import { TokenUsageMeter } from './TokenUsageMeter';
 import { SuggestionChips } from './SuggestionChips';
 import { useTokenTracking } from '../hooks/useTokenTracking';

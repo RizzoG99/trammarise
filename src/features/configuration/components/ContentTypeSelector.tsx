@@ -1,6 +1,6 @@
 import type { ContentType } from '../../../types/content-types';
 import { CONTENT_TYPE_OPTIONS } from '../../../types/content-types';
-import { Text } from '../../../components/ui/Text';
+import { Text } from '@/lib';
 
 export interface ContentTypeSelectorProps {
   value: ContentType;

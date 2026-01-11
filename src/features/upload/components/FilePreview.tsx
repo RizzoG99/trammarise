@@ -1,5 +1,5 @@
 import { CheckCircle, Music, Trash2, RefreshCw } from 'lucide-react';
-import { Text } from '../../../components/ui/Text';
+import { Text } from '@/lib';
 
 export interface FilePreviewProps {
   file: File | Blob;

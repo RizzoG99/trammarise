@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-import { GlassCard } from '../../../components/ui/GlassCard';
-import { Heading } from '../../../components/ui/Heading';
+import { GlassCard, Heading } from '@/lib';
 import { ProcessingModeSelector, type ProcessingMode } from '../../configuration/components/ProcessingModeSelector';
 import { CostTransparencyCard } from '../../configuration/components/CostTransparencyCard';
 

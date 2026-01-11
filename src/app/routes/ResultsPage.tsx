@@ -1,7 +1,6 @@
 import { useParams } from 'react-router-dom';
 import { ResultsState } from '../../components/states/ResultsState';
-import { Heading } from '../../components/ui/Heading';
-import { Text } from '../../components/ui/Text';
+import { Heading, Text } from '@/lib';
 import { useSessionStorage } from '../../hooks/useSessionStorage';
 import { useRouteState } from '../../hooks/useRouteState';
 

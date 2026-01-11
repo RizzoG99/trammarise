@@ -1,5 +1,4 @@
-import { GlassCard } from '../../../components/ui/GlassCard';
-import { Text } from '../../../components/ui/Text';
+import { GlassCard, Text } from '@/lib';
 import { Info } from 'lucide-react';
 
 export interface CostTransparencyCardProps {

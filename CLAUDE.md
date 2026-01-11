@@ -2,6 +2,16 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## AI Assistant Guidelines
+
+**Context7 MCP Integration**: Always use Context7 MCP when you need library/API documentation, code generation, setup or configuration steps without the user having to explicitly ask. This ensures you have the most up-to-date information for:
+- Library APIs (React, TypeScript, Vite, WaveSurfer.js, FFmpeg, OpenAI SDK, etc.)
+- Framework documentation and best practices
+- Setup and configuration instructions
+- Code examples following current patterns
+
+Query Context7 proactively whenever working with external dependencies to provide accurate, current guidance.
+
 ## Quick Start Commands
 
 ### Development
@@ -19,7 +29,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Test specific files**: `npm test path/to/file.test.tsx` - Run tests for specific files
 - **Watch mode**: Tests run in watch mode by default during development
 - **Coverage report**: `npm test -- --coverage` - Generate test coverage report with detailed metrics
-- **Test coverage**: 300+ comprehensive tests covering:
+- **Test coverage**: 513 comprehensive tests covering:
   - File upload validation and drag-and-drop functionality
   - Audio recording lifecycle (start, pause, resume, stop, reset)
   - Memory leak prevention (MediaStream track cleanup)
@@ -48,6 +58,25 @@ The app is deployed on Vercel. API routes in `/api` are serverless functions. No
 ## Architecture Overview
 
 **Trammarise** is a React + TypeScript + Vite application for audio recording, transcription, and AI-powered summarization with multi-provider support.
+
+### Component Migration (Completed January 2026)
+
+**Status**: ✅ Complete - All 10 phases finished
+**Migration Type**: Complete migration to centralized component library
+
+All reusable components have been migrated from legacy locations to `src/lib/components/`:
+- **Migration Period**: January 8-11, 2026
+- **Components Migrated**: 20+ components (UI, Form, Audio, Chat)
+- **Tests**: 513 tests across 18 test files (all passing)
+- **Import Path**: All imports now use `@/lib` alias
+
+**Key Changes**:
+- Deleted legacy folders: `src/components/ui/`, `src/components/audio/`
+- Centralized exports through `src/lib/components/index.ts`
+- Standardized imports: `import { Button, GlassCard } from '@/lib';`
+- Full Storybook coverage for all migrated components
+
+See `docs/MIGRATION_PLAN_OPTION_A.md` and `docs/MIGRATION_COMPLETION_REPORT.md` for details.
 
 ### State Flow
 The app uses a **route-based architecture** with React Router, managed in `src/app/App.tsx`:
@@ -104,10 +133,14 @@ App (React Router with AppLayout wrapper)
         └── ActionButtons (copy, TTS, PDF generation)
 ```
 
-**Shared Components** (`src/components/ui/`):
-- GlassCard, Button, Input, Heading, Text, Icon
-- RecordingButtons (reusable audio control buttons)
-- ThemeToggle (light/dark mode)
+**Component Library** (`src/lib/components/`):
+All reusable components are now organized in the centralized component library:
+- **UI Components** (`src/lib/components/ui/`): Button, Input, Modal, GlassCard, Heading, Text, LoadingSpinner, Snackbar, ThemeToggle, RecordingButtons, AILoadingOrb, FileSizeWarningModal
+- **Form Components** (`src/lib/components/form/`): ToggleSwitch, RadioCard, SelectCard
+- **Audio Components** (`src/lib/components/audio/`): WaveformPlayer, PlaybackControls, WaveformEditorWithUndo
+- **Chat Components** (`src/lib/components/chat/`): ChatInterface
+
+Import from `@/lib` (e.g., `import { Button, GlassCard, Heading } from '@/lib';`)
 
 ### Audio Processing Pipeline
 
@@ -437,11 +470,15 @@ export const AllVariants: Story = { render: () => <>{/* Show all variants */}</>
 
 ### Component Categories
 
-**Core UI** (`src/components/ui/`): Button, Input, Modal, Card, etc.
-**Features** (`src/features/*/components/`): Domain-specific components
-**Layout** (`src/components/layout/`): Page structure components
-**Audio** (`src/components/audio/`): Audio visualization & controls
-**Forms** (`src/lib/components/form/`): Form controls & validation
+**Component Library** (`src/lib/components/`): Centralized reusable component library
+- **UI Components** (`src/lib/components/ui/`): Button, Input, Modal, GlassCard, Heading, Text, LoadingSpinner, Snackbar, ThemeToggle, RecordingButtons, AILoadingOrb, FileSizeWarningModal
+- **Form Components** (`src/lib/components/form/`): ToggleSwitch, RadioCard, SelectCard
+- **Audio Components** (`src/lib/components/audio/`): WaveformPlayer, PlaybackControls, WaveformEditorWithUndo
+- **Chat Components** (`src/lib/components/chat/`): ChatInterface
+
+**Feature Components** (`src/features/*/components/`): Domain-specific components
+**Layout Components** (`src/components/layout/`): Page structure components
+**State Components** (`src/components/states/`): Page-level state management components
 
 ### Quality Standards
 
