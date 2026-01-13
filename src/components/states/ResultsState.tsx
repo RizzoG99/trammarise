@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { ActionButtons } from '../results/ActionButtons';
 import { Button, ChatInterface } from '@/lib';
 import { chatWithAI, generatePDF } from '../../utils/api';
 import type { ProcessingResult, ChatMessage } from '../../types/audio';
+import { CollapsibleSection } from '../../features/results/components/CollapsibleSection';
+import { parseSummary } from '../../features/results/utils/summaryParser';
 
 interface ResultsStateProps {
   audioName: string;
@@ -20,6 +22,12 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
 }) => {
   const [isLoadingChat, setIsLoadingChat] = useState(false);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(
+    new Set(['executive_summary']) // Executive Summary expanded by default
+  );
+
+  // Parse summary into sections
+  const parsedSections = useMemo(() => parseSummary(result.summary), [result.summary]);
 
   const handleSendMessage = async (message: string) => {
     setIsLoadingChat(true);
@@ -153,10 +161,47 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
               <span className="text-xl">✨</span>
               AI Summary
             </h2>
-            <div className="bg-black/20 border border-border-glass rounded-lg p-5 mb-4 text-[0.9375rem] leading-relaxed text-text-secondary prose prose-invert max-w-none prose-p:my-3 prose-p:first:mt-0 prose-p:last:mb-0 prose-headings:text-text-primary prose-headings:font-semibold prose-h2:text-lg prose-h2:mt-6 prose-h2:mb-3 prose-h2:first:mt-0 prose-ul:my-3 prose-ul:pl-6 prose-li:my-2">
-              <ReactMarkdown>
-                {result.summary}
-              </ReactMarkdown>
+            <div className="space-y-4 mb-4">
+              {parsedSections.map((section, index) => {
+                if (section.type === 'executive_summary' || section.type === 'key_takeaways') {
+                  return (
+                    <CollapsibleSection
+                      key={index}
+                      title={section.title}
+                      isExpanded={expandedSections.has(section.type)}
+                      onToggle={() => {
+                        const newSet = new Set(expandedSections);
+                        if (newSet.has(section.type)) {
+                          newSet.delete(section.type);
+                        } else {
+                          newSet.add(section.type);
+                        }
+                        setExpandedSections(newSet);
+                      }}
+                    >
+                      <div className="text-[0.9375rem] leading-relaxed text-text-secondary prose prose-invert max-w-none prose-p:my-3 prose-p:first:mt-0 prose-p:last:mb-0 prose-headings:text-text-primary prose-headings:font-semibold prose-h2:text-lg prose-h2:mt-6 prose-h2:mb-3 prose-h2:first:mt-0 prose-ul:my-3 prose-ul:pl-6 prose-li:my-2">
+                        <ReactMarkdown>{section.content}</ReactMarkdown>
+                        {section.items && (
+                          <ul className="space-y-2 mt-4">
+                            {section.items.map((item, i) => (
+                              <li key={i} className="flex items-start gap-2">
+                                <span className="text-green-500">✓</span>
+                                <span>{item}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    </CollapsibleSection>
+                  );
+                } else {
+                  return (
+                    <div key={index} className="bg-black/20 border border-border-glass rounded-lg p-5 text-[0.9375rem] leading-relaxed text-text-secondary prose prose-invert max-w-none prose-p:my-3 prose-p:first:mt-0 prose-p:last:mb-0 prose-headings:text-text-primary prose-headings:font-semibold prose-h2:text-lg prose-h2:mt-6 prose-h2:mb-3 prose-h2:first:mt-0 prose-ul:my-3 prose-ul:pl-6 prose-li:my-2">
+                      <ReactMarkdown>{section.content}</ReactMarkdown>
+                    </div>
+                  );
+                }
+              })}
             </div>
             <ActionButtons text={result.summary} />
           </section>

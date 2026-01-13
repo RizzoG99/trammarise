@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { PageLayout } from '../../components/layout/PageLayout';
 import { SplitCardLayout } from '../../features/processing/components/SplitCardLayout';
 import { ProgressCircle } from '../../features/processing/components/ProgressCircle';
 import { StepChecklist, type ProcessingStep } from '../../features/processing/components/StepChecklist';
-import { Button, Heading, Text } from '@/lib';
+import { Button, Text } from '@/lib';
 import { useSessionStorage } from '../../hooks/useSessionStorage';
 import { useRouteState } from '../../hooks/useRouteState';
 
@@ -68,35 +69,30 @@ export function ProcessingPage() {
 
   if (isLoading) {
     return (
-      <div className="text-center">
-        <Text variant="body" color="secondary">Loading session...</Text>
-      </div>
+      <PageLayout maxWidth="1200px">
+        <div className="text-center">
+          <Text variant="body" color="secondary">Loading session...</Text>
+        </div>
+      </PageLayout>
     );
   }
 
   if (!session) {
     return (
-      <div className="text-center">
-        <Heading level="h2" className="mb-2">Session Not Found</Heading>
-        <Text variant="body" color="secondary">
-          The requested session could not be found.
-        </Text>
-      </div>
+      <PageLayout maxWidth="1200px">
+        <div className="text-center">
+          <Text variant="body" color="secondary">
+            The requested session could not be found.
+          </Text>
+        </div>
+      </PageLayout>
     );
   }
 
   const estimatedTime = progress < 50 ? '2-3 min' : progress < 75 ? '1-2 min' : 'Almost done';
 
   return (
-    <div className="w-full max-w-[1000px] mx-auto">
-      {/* Header */}
-      <div className="text-center mb-8">
-        <Heading level="h1" className="mb-2">Processing Audio</Heading>
-        <Text variant="body" color="secondary">
-          {session.audioFile.name}
-        </Text>
-      </div>
-
+    <PageLayout maxWidth="1200px">
       {/* Split Card Layout */}
       <SplitCardLayout
         left={
@@ -121,6 +117,6 @@ export function ProcessingPage() {
           Cancel Processing
         </Button>
       </div>
-    </div>
+    </PageLayout>
   );
 }

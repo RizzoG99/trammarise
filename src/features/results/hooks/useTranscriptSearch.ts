@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 
 export interface SearchMatch {
   index: number;
@@ -6,15 +6,29 @@ export interface SearchMatch {
   position: number;
 }
 
-export function useTranscriptSearch(transcript: string) {
+export interface TranscriptSearchResult {
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
+  matches: SearchMatch[];
+  currentMatchIndex: number;
+  currentMatch: SearchMatch | undefined;
+  totalMatches: number;
+  goToNextMatch: () => void;
+  goToPreviousMatch: () => void;
+  clearSearch: () => void;
+  hasMatches: boolean;
+}
+
+export function useTranscriptSearch(transcript: string): TranscriptSearchResult {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
 
   // Find all matches in the transcript
   const matches = useMemo((): SearchMatch[] => {
-    if (!searchQuery.trim()) return [];
+    const trimmedQuery = searchQuery.trim();
+    if (!trimmedQuery) return [];
 
-    const query = searchQuery.toLowerCase();
+    const query = trimmedQuery.toLowerCase();
     const text = transcript.toLowerCase();
     const results: SearchMatch[] = [];
     let position = 0;
@@ -25,7 +39,7 @@ export function useTranscriptSearch(transcript: string) {
 
       results.push({
         index: results.length,
-        text: transcript.substring(index, index + searchQuery.length),
+        text: transcript.substring(index, index + trimmedQuery.length),
         position: index,
       });
 
@@ -35,20 +49,20 @@ export function useTranscriptSearch(transcript: string) {
     return results;
   }, [transcript, searchQuery]);
 
-  const goToNextMatch = () => {
+  const goToNextMatch = useCallback(() => {
     if (matches.length === 0) return;
     setCurrentMatchIndex((prev) => (prev + 1) % matches.length);
-  };
+  }, [matches.length]);
 
-  const goToPreviousMatch = () => {
+  const goToPreviousMatch = useCallback(() => {
     if (matches.length === 0) return;
     setCurrentMatchIndex((prev) => (prev - 1 + matches.length) % matches.length);
-  };
+  }, [matches.length]);
 
-  const clearSearch = () => {
+  const clearSearch = useCallback(() => {
     setSearchQuery('');
     setCurrentMatchIndex(0);
-  };
+  }, []);
 
   return {
     searchQuery,
