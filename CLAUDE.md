@@ -597,3 +597,155 @@ await execute(new AddTrimRegionCommand(...));
 - `src/App.refactored.tsx`: Example App.tsx using all patterns
 - `src/components/audio/WaveformEditorWithUndo.tsx`: Example component with undo/redo
 - `docs/DESIGN_PATTERNS.md`: Comprehensive pattern documentation
+
+## Token Optimization Guidelines
+
+**Goal**: Maintain high-quality output while minimizing token usage through efficient tool usage and strategic information gathering.
+
+### Core Principles
+
+1. **Need-to-Know**: Only read/search what's directly needed for the task
+2. **Trust Tools**: Edit/Write tools report errors - don't re-read to verify
+3. **Use Free Context**: IDE diagnostics and error messages are already available
+4. **Parallel Operations**: Run independent tool calls in a single message
+5. **Targeted Verification**: Test only changed files, use tail for summaries
+
+### Efficient Tool Usage
+
+#### File Reading
+```typescript
+// ❌ Wasteful - reads entire file
+Read("/path/to/file.ts")
+
+// ✅ Efficient - read only needed section
+Read("/path/to/file.ts", { offset: 70, limit: 100 })
+
+// ✅ Use Grep for pattern matching instead
+Grep({ pattern: "maxWidth", path: "file.ts", output_mode: "content", -C: 3 })
+```
+
+#### Search Operations
+```typescript
+// ❌ Returns all matches (expensive)
+Grep({ pattern: "test", path: "src/" })
+
+// ✅ Limit results
+Grep({ pattern: "test", path: "src/", head_limit: 10 })
+
+// ✅ Files only (cheaper than content)
+Grep({ pattern: "useEffect", path: "src/", output_mode: "files_with_matches" })
+```
+
+#### Testing
+```bash
+# ❌ Runs all 808 tests every time
+npm test
+
+# ✅ Test only changed file
+npm test ProcessingPage.test.tsx
+
+# ✅ Get summary only
+npm test 2>&1 | tail -10
+
+# ✅ Count errors instead of showing all
+npx tsc --noEmit 2>&1 | wc -l
+```
+
+#### Command Chaining
+```bash
+# ❌ Multiple separate Bash calls
+npm test
+npx tsc --noEmit
+npm run lint
+
+# ✅ Single chained command
+npm test && npx tsc --noEmit && npm run lint 2>&1 | tail -20
+```
+
+### Workflow-Specific Optimizations
+
+#### Bugfixing
+1. Use IDE diagnostics (free) - already in system reminders
+2. Grep for exact error location with context: `-C: 2`
+3. Read only relevant section with `offset/limit`
+4. Edit + verify in one command: `Edit(...) && npm test File.test.tsx 2>&1 | grep "passed"`
+5. Skip re-reading - trust Edit tool worked
+
+**Token Savings: ~70%**
+
+#### Feature Creation
+1. Use Glob to find patterns, don't read all files
+2. Read ONE reference component (best example)
+3. Grep for specific design tokens with `head_limit: 5`
+4. Write component + test in parallel (single message)
+5. Single verification: `npm test Component && npx tsc --noEmit src/Component.tsx`
+
+**Token Savings: ~60%**
+
+#### Refactoring
+1. Use `find_symbol()` instead of reading entire files
+2. Use `find_referencing_symbols()` for impact analysis
+3. Use `replace_symbol_body()` or `rename_symbol()` (no re-reading needed)
+4. Batch test: `npm test -- --changed 2>&1 | grep -A5 "Summary"`
+5. Type check only affected: `npx tsc --noEmit src/feature/**/*.ts`
+
+**Token Savings: ~75%**
+
+### High-Value vs Low-Value Actions
+
+**High-Value** (Worth the tokens):
+- ✅ Initial exploration of unfamiliar code
+- ✅ Reading new/complex files first time
+- ✅ Complex refactors needing full context
+- ✅ Architecture decisions with impact analysis
+
+**Low-Value** (Wasteful):
+- ❌ Re-reading files after edits to verify
+- ❌ Running full test suite repeatedly
+- ❌ Verifying successful operations (tools report errors)
+- ❌ Reading files "just in case"
+
+### Quick Reference
+
+| Task | ❌ Wasteful | ✅ Efficient |
+|------|------------|-------------|
+| Find bug location | Read entire file | Use diagnostics + Grep |
+| Understand function | Read whole file | `Read({ offset, limit })` |
+| Check pattern exists | Read files | `Grep + head_limit: 1` |
+| Verify fix | Re-read + full tests | `npm test File \| tail -5` |
+| Find references | Manual search | `find_referencing_symbols()` |
+| Refactor variable | Read all files | `rename_symbol()` |
+| Type check | Full project | Specific file/directory |
+
+### Examples
+
+**Before Optimization:**
+```bash
+Read("ProcessingPage.tsx")           # 800 tokens
+Edit(...)                            # 300 tokens
+Read("ProcessingPage.tsx")           # 800 tokens (verification)
+npm test                             # 2000 tokens (all tests)
+npx tsc --noEmit                     # 1000 tokens (full check)
+# Total: ~5000 tokens
+```
+
+**After Optimization:**
+```bash
+# Use IDE diagnostic (free)
+Grep({ pattern: "maxWidth", -C: 2 }) # 200 tokens
+Edit(...)                            # 300 tokens
+npm test ProcessingPage 2>&1 | tail -5 # 150 tokens
+# Total: ~650 tokens (87% savings!)
+```
+
+### Implementation Notes
+
+- Always prefer `offset/limit` when reading files
+- Use `head_limit` on searches to cap results
+- Chain commands with `&&` and pipe to `tail`
+- Trust tool error reporting
+- Leverage free context (diagnostics, previous results)
+- Run tests in parallel when independent
+- Use Serena symbol tools for refactoring
+
+**Remember**: Quality remains the same, we just gather information more efficiently!

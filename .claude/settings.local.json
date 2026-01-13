@@ -46,7 +46,8 @@
       "Bash(gh pr list:*)",
       "Bash(git worktree:*)",
       "Bash(cat:*)",
-      "Skill(commit-commands:commit-push-pr)"
+      "Skill(commit-commands:commit-push-pr)",
+      "mcp__plugin_serena_serena__get_symbols_overview"
     ],
     "deny": [],
     "ask": []
