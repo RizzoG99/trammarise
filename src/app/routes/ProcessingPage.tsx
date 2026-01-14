@@ -4,69 +4,109 @@ import { PageLayout } from '../../components/layout/PageLayout';
 import { SplitCardLayout } from '../../features/processing/components/SplitCardLayout';
 import { ProgressCircle } from '../../features/processing/components/ProgressCircle';
 import { StepChecklist, type ProcessingStep } from '../../features/processing/components/StepChecklist';
-import { Button, Text } from '@/lib';
+import { Button, Text, Heading } from '@/lib';
 import { useSessionStorage } from '../../hooks/useSessionStorage';
 import { useRouteState } from '../../hooks/useRouteState';
+import { useAudioProcessing, type ProcessingStep as AudioStep } from '../../hooks/useAudioProcessing';
+import { buildDefaultConfiguration, validateEnvironmentConfiguration } from '../../utils/config-helper';
 
 export function ProcessingPage() {
   const { sessionId } = useParams();
-  const { session, isLoading } = useSessionStorage(sessionId || null);
-  const { goToResults, goToConfigure } = useRouteState();
+  const { session, isLoading, updateSession } = useSessionStorage(sessionId || null);
+  const { goToResults, goToAudio } = useRouteState();
 
   const [progress, setProgress] = useState(0);
+  const [currentStep, setCurrentStep] = useState<AudioStep>('uploading');
+  const [error, setError] = useState<string | null>(null);
 
-  // Derive currentStep from progress (avoid cascading renders)
-  const currentStep =
-    progress >= 75 ? 'summarizing' :
-    progress >= 50 ? 'analyzing' :
-    progress >= 25 ? 'transcribing' :
-    'uploading';
+  // Real audio processing hook
+  const { startProcessing, cancel, isProcessing } = useAudioProcessing({
+    onProgress: (step, prog) => {
+      setCurrentStep(step);
+      setProgress(prog);
+    },
+    onComplete: async (result) => {
+      // Save result to session
+      await updateSession({ result });
+      // Navigate to results page
+      setTimeout(() => goToResults(), 500);
+    },
+    onError: (err) => {
+      console.error('Processing error:', err);
+      setError(err.message);
+    },
+  });
 
-  // Derive steps from progress (avoid setState in effect)
+  // Start processing on mount
+  useEffect(() => {
+    if (!session || !session.audioFile || isProcessing || error) return;
+
+    let config;
+    try {
+      // Validate environment configuration
+      validateEnvironmentConfiguration();
+
+      // Build configuration from environment + session
+      config = buildDefaultConfiguration(session);
+    } catch (err) {
+      const error = err as Error;
+      console.error('Configuration error:', error);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setError(error.message);
+      return;
+    }
+
+    // Start real processing
+    startProcessing(session, config);
+  }, [session, isProcessing, error, startProcessing]);
+
+  const handleCancel = () => {
+    cancel();
+    goToAudio();
+  };
+
+  // Derive steps from progress for UI
   const steps: ProcessingStep[] = [
     {
       id: 'uploading',
       label: 'Uploading Audio',
-      status: progress >= 25 ? 'completed' : 'processing'
+      status: progress >= 30 ? 'completed' : 'processing'
     },
     {
       id: 'transcribing',
       label: 'Transcribing Speech',
-      status: progress >= 50 ? 'completed' : progress >= 25 ? 'processing' : 'pending'
+      status: progress >= 70 ? 'completed' : progress >= 30 ? 'processing' : 'pending'
     },
     {
       id: 'analyzing',
       label: 'Analyzing Context',
-      status: progress >= 75 ? 'completed' : progress >= 50 ? 'processing' : 'pending'
+      status: progress >= 80 ? 'completed' : progress >= 70 ? 'processing' : 'pending'
     },
     {
       id: 'summarizing',
       label: 'Summarizing Key Points',
-      status: progress >= 100 ? 'completed' : progress >= 75 ? 'processing' : 'pending'
+      status: progress >= 100 ? 'completed' : progress >= 80 ? 'processing' : 'pending'
     },
   ];
 
-  // Simulate processing progress (Phase 3 will integrate real API calls)
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          // Navigate to results on completion
-          setTimeout(() => goToResults(), 500);
-          return 100;
-        }
-        return prev + 2;
-      });
-    }, 100);
+  // Error state
+  if (error) {
+    return (
+      <PageLayout maxWidth="1200px">
+        <div className="text-center">
+          <Heading level="h2" className="mb-4">Processing Failed</Heading>
+          <div className="max-w-[600px] mx-auto mb-6">
+            <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/30">
+              <Text className="whitespace-pre-line text-red-600 dark:text-red-400">{error}</Text>
+            </div>
+          </div>
+          <Button onClick={() => goToAudio()}>Back to Audio</Button>
+        </div>
+      </PageLayout>
+    );
+  }
 
-    return () => clearInterval(interval);
-  }, [goToResults]);
-
-  const handleCancel = () => {
-    goToConfigure();
-  };
-
+  // Loading session
   if (isLoading) {
     return (
       <PageLayout maxWidth="1200px">
@@ -77,6 +117,7 @@ export function ProcessingPage() {
     );
   }
 
+  // Session not found
   if (!session) {
     return (
       <PageLayout maxWidth="1200px">
@@ -89,7 +130,7 @@ export function ProcessingPage() {
     );
   }
 
-  const estimatedTime = progress < 50 ? '2-3 min' : progress < 75 ? '1-2 min' : 'Almost done';
+  const estimatedTime = progress < 30 ? '2-3 min' : progress < 70 ? '1-2 min' : 'Almost done';
 
   return (
     <PageLayout maxWidth="1200px">

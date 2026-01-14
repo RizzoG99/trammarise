@@ -102,8 +102,6 @@ describe('ProgressCircle', () => {
     it('calculates correct strokeDashoffset for 100%', () => {
       const { container } = render(<ProgressCircle progress={100} step="test" />);
       const progressCircle = container.querySelectorAll('circle')[1];
-      const radius = 80;
-      const circumference = 2 * Math.PI * radius;
       const expectedOffset = 0; // 100% = 0 offset
       expect(progressCircle).toHaveAttribute('stroke-dashoffset', expectedOffset.toString());
     });

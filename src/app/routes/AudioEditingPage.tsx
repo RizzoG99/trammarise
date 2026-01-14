@@ -210,7 +210,7 @@ export function AudioEditingPage() {
         </div>
 
         {/* Waveform Card */}
-        <GlassCard variant="light" className="flex flex-col mb-6 border rounded-xl shadow-lg" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-border)' }}>
+        <GlassCard variant="light" className="flex flex-col mb-6 border rounded-xl shadow-lg overflow-hidden" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-border)' }}>
           {/* Toolbar */}
           <div className="flex flex-wrap items-center justify-end gap-4 p-4 border-b" style={{ borderColor: 'var(--color-border)' }}>
             {/* Region Time Display */}

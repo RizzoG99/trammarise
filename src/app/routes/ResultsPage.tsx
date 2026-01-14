@@ -29,15 +29,14 @@ export function ResultsPage() {
   }
 
   return (
-    <div className="w-full max-w-[1200px] mx-auto">
-      <ResultsState
-        audioName={session.audioFile.name}
-        result={session.result}
-        onBack={goToAudio}
-        onUpdateResult={(newResult) => {
-          updateSession({ result: newResult });
-        }}
-      />
-    </div>
+    <ResultsState
+      audioName={session.audioFile.name}
+      audioFile={session.audioFile}
+      result={session.result}
+      onBack={goToAudio}
+      onUpdateResult={(newResult) => {
+        updateSession({ result: newResult });
+      }}
+    />
   );
 }

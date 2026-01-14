@@ -133,7 +133,7 @@ describe('SplitCardLayout', () => {
 
   describe('Panel Styling', () => {
     it('centers left panel content', () => {
-      const { container } = render(
+      render(
         <SplitCardLayout
           left={<div data-testid="left-content">Left</div>}
           right={<div>Right</div>}
@@ -144,7 +144,7 @@ describe('SplitCardLayout', () => {
     });
 
     it('applies flex column to right panel', () => {
-      const { container } = render(
+      render(
         <SplitCardLayout
           left={<div>Left</div>}
           right={<div data-testid="right-content">Right</div>}
