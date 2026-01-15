@@ -4,7 +4,7 @@
   "version": "1.2.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"npm run dev:api\" \"npm run dev:vite\"",
+    "dev": "concurrently -n \"API,Vite\" -c \"blue,green\" --kill-others-on-fail --restart-tries 3 --raw \"npm run dev:api\" \"npm run dev:vite\"",
     "dev:api": "tsx api-dev-server.js",
     "dev:vite": "vite",
     "dev:vercel": "vercel dev --yes",
