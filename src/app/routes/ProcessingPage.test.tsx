@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, act } from '@testing-library/react';
 import { ProcessingPage } from './ProcessingPage';
 
-
 // Mock dependencies
 vi.mock('react-router-dom', () => ({
   useParams: vi.fn(),
@@ -35,6 +34,17 @@ vi.mock('../../components/layout/PageLayout', () => ({
   ),
 }));
 
+// Mock config-helper to bypass API key validation in tests
+vi.mock('../../utils/config-helper', () => ({
+  validateEnvironmentConfiguration: vi.fn(),
+  buildDefaultConfiguration: vi.fn(() => ({
+    provider: 'openai',
+    model: 'gpt-4',
+    openaiApiKey: 'test-key',
+    contentType: 'meeting',
+  })),
+}));
+
 import { useParams } from 'react-router-dom';
 import { useSessionStorage } from '../../hooks/useSessionStorage';
 import { useRouteState } from '../../hooks/useRouteState';
@@ -43,7 +53,7 @@ describe('ProcessingPage', () => {
   const mockGoToResults = vi.fn();
   const mockGoToConfigure = vi.fn();
   const mockGoToAudio = vi.fn();
-  
+
   const mockSession = {
     sessionId: 'test-session-id',
     audioFile: {
@@ -126,14 +136,14 @@ describe('ProcessingPage', () => {
   describe('Progress Updates', () => {
     it('updates progress when onProgress is called', () => {
       render(<ProcessingPage />);
-      
+
       // Get the callbacks passed to useAudioProcessing
       const { onProgress } = mockUseAudioProcessing.mock.calls[0][0];
-      
+
       act(() => {
         onProgress('uploading', 10);
       });
-      
+
       expect(screen.getByText('10%')).toBeInTheDocument();
     });
 
@@ -149,20 +159,20 @@ describe('ProcessingPage', () => {
         onProgress('transcribing', 30);
       });
       expect(screen.getByText(/processing.steps.transcribing/)).toBeInTheDocument();
-      
+
       // 70%: analyzing
       act(() => {
         onProgress('analyzing', 70);
       });
       expect(screen.getByText(/processing.steps.analyzing/)).toBeInTheDocument();
-      
+
       // 80%: summarizing
       act(() => {
         onProgress('summarizing', 80);
       });
       expect(screen.getByText(/processing.steps.summarizing/)).toBeInTheDocument();
     });
-    
+
     it('updates time estimate based on progress', () => {
       render(<ProcessingPage />);
       const { onProgress } = mockUseAudioProcessing.mock.calls[0][0];
@@ -180,7 +190,9 @@ describe('ProcessingPage', () => {
       act(() => {
         onProgress('analyzing', 75);
       });
-      expect(screen.getByText('processing.estimatedTime: processing.almostDone')).toBeInTheDocument();
+      expect(
+        screen.getByText('processing.estimatedTime: processing.almostDone')
+      ).toBeInTheDocument();
     });
   });
 
@@ -188,11 +200,11 @@ describe('ProcessingPage', () => {
     it('navigates to results page when onComplete is called', async () => {
       render(<ProcessingPage />);
       const { onComplete } = mockUseAudioProcessing.mock.calls[0][0];
-      
+
       await act(async () => {
         await onComplete({ summary: 'test' });
       });
-      
+
       // Advance timers for the navigation delay
       act(() => {
         vi.advanceTimersByTime(500);
@@ -223,11 +235,11 @@ describe('ProcessingPage', () => {
     it('is disabled when progress reaches 100%', () => {
       render(<ProcessingPage />);
       const { onProgress } = mockUseAudioProcessing.mock.calls[0][0];
-      
+
       act(() => {
         onProgress('summarizing', 100);
       });
-      
+
       const cancelButton = screen.getByRole('button', { name: 'common.cancel' });
       expect(cancelButton).toBeDisabled();
     });
@@ -237,26 +249,26 @@ describe('ProcessingPage', () => {
     it('displays error message when onError is called', () => {
       render(<ProcessingPage />);
       const { onError } = mockUseAudioProcessing.mock.calls[0][0];
-      
+
       act(() => {
         onError(new Error('Test processing error'));
       });
-      
+
       expect(screen.getByText('common.error')).toBeInTheDocument();
       expect(screen.getByText('Test processing error')).toBeInTheDocument();
     });
-    
+
     it('offers button to go back to audio on error', () => {
       render(<ProcessingPage />);
       const { onError } = mockUseAudioProcessing.mock.calls[0][0];
-      
+
       act(() => {
         onError(new Error('Test error'));
       });
-      
+
       const backButton = screen.getByRole('button', { name: 'common.back' });
       backButton.click();
-      
+
       expect(mockGoToAudio).toHaveBeenCalled();
     });
   });
