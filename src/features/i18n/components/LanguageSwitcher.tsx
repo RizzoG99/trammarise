@@ -67,7 +67,7 @@ export function LanguageSwitcher() {
                       ? 'bg-[var(--color-primary-alpha-10)] text-primary'
                       : 'text-[var(--color-text-primary)]'
                   }
-                  ${!isSelected && 'hover:bg-gray-100 dark:hover:bg-gray-800'}
+                  ${!isSelected && 'hover:bg-[var(--color-bg-hover)]'}
                 `}
                 onClick={() => changeLanguage(lang.code)}
               >

@@ -8,5 +8,11 @@
   "endOfLine": "lf",
   "bracketSpacing": true,
   "jsxSingleQuote": false,
-  "proseWrap": "preserve"
+  "proseWrap": "preserve",
+  "lint-staged": {
+  "*.{ts,tsx}": [
+    "prettier --write",
+    "eslint --fix"
+  ]
+}
 }
