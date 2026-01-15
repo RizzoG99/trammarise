@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Modal, ChatInterface } from '@/lib';
 import { chatWithAI, generatePDF } from '../../utils/api';
-import type { ProcessingResult, ChatMessage, AudioFile } from '../../types/audio';
+import type { ProcessingResult, ChatMessage, AudioFile, AIConfiguration } from '../../types/audio';
 import { ResultsLayout } from '../../features/results/components/ResultsLayout';
 import { AudioPlayerBar } from '../../features/results/components/AudioPlayerBar';
 import { SummaryPanel } from '../../features/results/components/SummaryPanel';
@@ -10,6 +10,22 @@ import { FloatingChatButton } from '../../features/results/components/FloatingCh
 import { AppHeader } from '../layout/AppHeader';
 import { useAudioPlayer } from '../../features/results/hooks/useAudioPlayer';
 import { parseTranscriptToSegments } from '../../features/results/utils/transcriptParser';
+
+/**
+ * Safely extracts API key from configuration.
+ * Throws error if OpenRouter key is missing in advanced mode.
+ */
+function getApiKey(config: AIConfiguration): string {
+  if (config.mode === 'simple') {
+    return config.openaiKey;
+  }
+
+  if (!config.openrouterKey) {
+    throw new Error('OpenRouter API key is required for advanced mode');
+  }
+
+  return config.openrouterKey;
+}
 
 interface ResultsStateProps {
   audioName: string;
@@ -70,10 +86,8 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
     });
 
     try {
-      // Call chat API with configuration
-      const apiKey = result.configuration.mode === 'simple'
-        ? result.configuration.openaiKey
-        : result.configuration.openrouterKey!;
+      // Call chat API with configuration (safe API key extraction)
+      const apiKey = getApiKey(result.configuration);
 
       const { response } = await chatWithAI(
         result.transcript,
@@ -92,10 +106,13 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
       });
     } catch (error) {
       console.error('Chat error:', error);
-      // Add error message to chat
+      // Add error message to chat with specific error details
       const errorMessage: ChatMessage = {
         role: 'assistant',
-        content: 'Sorry, I encountered an error. Please try again.',
+        content:
+          error instanceof Error
+            ? error.message
+            : 'Sorry, I encountered an error. Please try again.',
       };
       onUpdateResult({
         ...result,
@@ -110,9 +127,7 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
     console.log('📥 Starting AI-powered PDF generation...');
 
     try {
-      const apiKey = result.configuration.mode === 'simple'
-        ? result.configuration.openaiKey
-        : result.configuration.openrouterKey!;
+      const apiKey = getApiKey(result.configuration);
 
       const pdfBlob = await generatePDF(
         result.transcript,
@@ -152,12 +167,8 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
           onExport={handleDownloadPDF}
         />
       }
-      audioPlayer={
-        <AudioPlayerBar audioFile={audioFile} audioPlayer={audioPlayer} />
-      }
-      summaryPanel={
-        <SummaryPanel summary={result.summary} />
-      }
+      audioPlayer={<AudioPlayerBar audioFile={audioFile} audioPlayer={audioPlayer} />}
+      summaryPanel={<SummaryPanel summary={result.summary} />}
       transcriptPanel={
         <SearchableTranscript
           transcript={result.transcript}
@@ -174,11 +185,7 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
       }
       chatModal={
         isChatOpen && (
-          <Modal
-            isOpen={isChatOpen}
-            onClose={() => setIsChatOpen(false)}
-            title="Refine with Chat"
-          >
+          <Modal isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} title="Refine with Chat">
             <div className="h-[600px]">
               <ChatInterface
                 onSendMessage={handleSendMessage}

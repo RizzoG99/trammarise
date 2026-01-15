@@ -4,9 +4,26 @@ import { AUDIO_CONSTANTS } from './constants';
 
 const { TRANSCODE_BITRATE, CHUNK_SIZE_LIMIT, SEGMENT_TIME_SECONDS } = AUDIO_CONSTANTS;
 
+/**
+ * Safely extracts error message from unknown error types.
+ * Handles Error objects, strings, and objects with message property.
+ */
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message;
+  }
+  if (typeof error === 'string') {
+    return error;
+  }
+  if (error && typeof error === 'object' && 'message' in error) {
+    return String(error.message);
+  }
+  return 'Unknown error';
+}
+
 const CDN_SOURCES = [
-  '/ffmpeg',  // Local files (fastest, most reliable)
-  'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd',  // Fallback CDN
+  '/ffmpeg', // Local files (fastest, most reliable)
+  'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd', // Fallback CDN
 ] as const;
 
 let ffmpeg: FFmpeg | null = null;
@@ -15,7 +32,7 @@ let ffmpegLoadPromise: Promise<FFmpeg> | null = null;
 async function loadFFmpegWithRetry(
   instance: FFmpeg,
   baseURL: string,
-  timeout: number = 30000,  // 30s timeout for debugging (was 120s)
+  timeout: number = 30000, // 30s timeout for debugging (was 120s)
   maxAttempts: number = 2
 ): Promise<void> {
   let lastError: Error | null = null;
@@ -24,11 +41,11 @@ async function loadFFmpegWithRetry(
   if (typeof SharedArrayBuffer === 'undefined') {
     throw new Error(
       'SharedArrayBuffer is not available. This is required for FFmpeg.wasm.\n' +
-      'Possible causes:\n' +
-      '1. Browser headers not set (COOP/COEP). Did you restart the dev server?\n' +
-      '2. Using HTTP instead of HTTPS in production\n' +
-      '3. Browser doesn\'t support SharedArrayBuffer\n\n' +
-      'Solution: Restart your dev server and hard refresh the browser.'
+        'Possible causes:\n' +
+        '1. Browser headers not set (COOP/COEP). Did you restart the dev server?\n' +
+        '2. Using HTTP instead of HTTPS in production\n' +
+        "3. Browser doesn't support SharedArrayBuffer\n\n" +
+        'Solution: Restart your dev server and hard refresh the browser.'
     );
   }
 
@@ -36,7 +53,9 @@ async function loadFFmpegWithRetry(
 
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
-      console.log(`Attempting to load FFmpeg from: ${baseURL}/ffmpeg-core.js (attempt ${attempt}/${maxAttempts})`);
+      console.log(
+        `Attempting to load FFmpeg from: ${baseURL}/ffmpeg-core.js (attempt ${attempt}/${maxAttempts})`
+      );
 
       const loadPromise = instance.load({
         coreURL: `${baseURL}/ffmpeg-core.js`,
@@ -51,12 +70,15 @@ async function loadFFmpegWithRetry(
       console.log(`FFmpeg loaded successfully from: ${baseURL} on attempt ${attempt}`);
       return; // Success!
     } catch (error) {
-      console.error(`Failed to load FFmpeg from ${baseURL} (attempt ${attempt}/${maxAttempts}):`, error);
+      console.error(
+        `Failed to load FFmpeg from ${baseURL} (attempt ${attempt}/${maxAttempts}):`,
+        error
+      );
       lastError = error as Error;
 
       if (attempt < maxAttempts) {
         console.log('Retrying in 2 seconds...');
-        await new Promise(resolve => setTimeout(resolve, 2000)); // 2s delay between retries
+        await new Promise((resolve) => setTimeout(resolve, 2000)); // 2s delay between retries
       }
     }
   }
@@ -64,7 +86,7 @@ async function loadFFmpegWithRetry(
   // All attempts failed
   throw new Error(
     `Failed to load FFmpeg after ${maxAttempts} attempts. Last error: ${lastError?.message}. ` +
-    `Please check your internet connection or try again later.`
+      `Please check your internet connection or try again later.`
   );
 }
 
@@ -100,9 +122,9 @@ async function getFFmpeg(): Promise<FFmpeg> {
       ffmpeg = instance;
       return instance;
     } catch (error) {
-      const err = error as { message?: string };
+      const message = getErrorMessage(error);
       console.error('FFmpeg loading failed:', error);
-      throw new Error(`Failed to load audio processor: ${err.message || 'Unknown error'}`);
+      throw new Error(`Failed to load audio processor: ${message}`);
     }
   })();
 
@@ -117,7 +139,10 @@ async function getFFmpeg(): Promise<FFmpeg> {
 /**
  * Compress audio file to MP3 128kbps
  */
-export async function compressAudio(file: File, onProgress?: (progress: number) => void): Promise<Blob> {
+export async function compressAudio(
+  file: File,
+  onProgress?: (progress: number) => void
+): Promise<Blob> {
   try {
     const ffmpeg = await getFFmpeg();
     const inputName = 'input' + getExtension(file.name);
@@ -133,10 +158,13 @@ export async function compressAudio(file: File, onProgress?: (progress: number) 
 
     // Convert to MP3
     await ffmpeg.exec([
-      '-i', inputName,
-      '-b:a', TRANSCODE_BITRATE,
-      '-map', '0:a', // Map audio only
-      outputName
+      '-i',
+      inputName,
+      '-b:a',
+      TRANSCODE_BITRATE,
+      '-map',
+      '0:a', // Map audio only
+      outputName,
     ]);
 
     const data = await ffmpeg.readFile(outputName);
@@ -150,9 +178,11 @@ export async function compressAudio(file: File, onProgress?: (progress: number) 
     // Wrap in new Uint8Array to ensure ArrayBuffer (not SharedArrayBuffer) backing
     return new Blob([new Uint8Array(uint8Data)], { type: 'audio/mp3' });
   } catch (error) {
-    const err = error as { message?: string };
+    const message = getErrorMessage(error);
     console.error('Audio compression failed:', error);
-    throw new Error(`Audio compression failed: ${err.message || 'Unknown error'}. Your file may be corrupted or unsupported.`);
+    throw new Error(
+      `Audio compression failed: ${message}. Your file may be corrupted or unsupported.`
+    );
   }
 }
 
@@ -173,11 +203,15 @@ export async function chunkAudio(file: Blob): Promise<Blob[]> {
     // Split audio into segments
     // Assuming 128kbps = ~1MB/min, 24MB = ~24 mins. Let's split every 20 mins to be safe.
     await ffmpeg.exec([
-      '-i', inputName,
-      '-f', 'segment',
-      '-segment_time', SEGMENT_TIME_SECONDS.toString(),
-      '-c', 'copy',
-      'chunk%03d.mp3'
+      '-i',
+      inputName,
+      '-f',
+      'segment',
+      '-segment_time',
+      SEGMENT_TIME_SECONDS.toString(),
+      '-c',
+      'copy',
+      'chunk%03d.mp3',
     ]);
 
     // Read chunks
@@ -192,18 +226,25 @@ export async function chunkAudio(file: Blob): Promise<Blob[]> {
         // Wrap in new Uint8Array to ensure ArrayBuffer (not SharedArrayBuffer) backing
         chunks.push(new Blob([new Uint8Array(uint8Data)], { type: 'audio/mp3' }));
         await ffmpeg.deleteFile(chunkName);
+        console.log(`✅ Chunk ${i} created: ${(uint8Data.length / 1024 / 1024).toFixed(2)}MB`);
         i++;
-      } catch {
-        break; // No more chunks
+      } catch (error) {
+        // Check if this is expected end (no more chunks) or actual error
+        if (i === 0) {
+          console.error('Failed to create any chunks:', error);
+          throw new Error('Audio chunking failed: No chunks created');
+        }
+        console.log(`✅ Chunking complete: ${i} chunks created`);
+        break; // Expected end - no more chunks
       }
     }
 
     await ffmpeg.deleteFile(inputName);
     return chunks;
   } catch (error) {
-    const err = error as { message?: string };
+    const message = getErrorMessage(error);
     console.error('Audio chunking failed:', error);
-    throw new Error(`Audio chunking failed: ${err.message || 'Unknown error'}. Your file may be too large or corrupted.`);
+    throw new Error(`Audio chunking failed: ${message}. Your file may be too large or corrupted.`);
   }
 }
 
@@ -214,7 +255,9 @@ export async function processLargeAudio(
   file: File,
   onProgress?: (step: string, progress: number) => void
 ): Promise<Blob[]> {
-  console.log(`Processing audio: ${file.name}, size: ${(file.size / 1024 / 1024).toFixed(2)}MB, type: ${file.type}`);
+  console.log(
+    `Processing audio: ${file.name}, size: ${(file.size / 1024 / 1024).toFixed(2)}MB, type: ${file.type}`
+  );
 
   // CRITICAL: Whisper API accepts most audio formats directly (MP3, WAV, M4A, etc.)
   // Only need FFmpeg if file is >24MB (for chunking)
@@ -230,7 +273,9 @@ export async function processLargeAudio(
   }
 
   // File is >24MB - need FFmpeg for chunking
-  console.log(`⚠️ File is large (${(file.size / 1024 / 1024).toFixed(2)}MB) - FFmpeg required for chunking`);
+  console.log(
+    `⚠️ File is large (${(file.size / 1024 / 1024).toFixed(2)}MB) - FFmpeg required for chunking`
+  );
 
   // Need FFmpeg for compression or chunking
   if (onProgress) onProgress('compressing', 0);
