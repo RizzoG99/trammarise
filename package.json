@@ -1,7 +1,7 @@
 {
   "name": "trammarise",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.2.0",
   "type": "module",
   "scripts": {
     "dev": "concurrently \"npm run dev:api\" \"npm run dev:vite\"",
