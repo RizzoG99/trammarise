@@ -42,17 +42,22 @@ export function useSessionStorage(sessionId: string | null) {
     };
   }, [sessionId]);
 
-  // Update session data
+  // Update session data (optimistically updates state, then saves in background)
   const updateSession = useCallback(
     async (data: Partial<SessionData>) => {
       if (!sessionId) return;
 
       try {
+        // Optimistically update state first for immediate UI feedback
+        setSession((prev) => (prev ? { ...prev, ...data } : null));
+
+        // Save in background
         await saveSession(sessionId, data);
-        const updatedSession = await loadSession(sessionId);
-        setSession(updatedSession);
       } catch (error) {
         console.error('Failed to update session:', error);
+        // Revert on error by reloading from storage
+        const reloadedSession = await loadSession(sessionId);
+        setSession(reloadedSession);
       }
     },
     [sessionId]
