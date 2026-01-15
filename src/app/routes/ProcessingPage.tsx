@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { PageLayout } from '../../components/layout/PageLayout';
 import { SplitCardLayout } from '../../features/processing/components/SplitCardLayout';
 import { ProgressCircle } from '../../features/processing/components/ProgressCircle';
@@ -11,6 +12,7 @@ import { useAudioProcessing, type ProcessingStep as AudioStep } from '../../hook
 import { buildDefaultConfiguration, validateEnvironmentConfiguration } from '../../utils/config-helper';
 
 export function ProcessingPage() {
+  const { t } = useTranslation();
   const { sessionId } = useParams();
   const { session, isLoading, updateSession } = useSessionStorage(sessionId || null);
   const { goToResults, goToAudio } = useRouteState();
@@ -69,22 +71,22 @@ export function ProcessingPage() {
   const steps: ProcessingStep[] = [
     {
       id: 'uploading',
-      label: 'Uploading Audio',
+      label: t('processing.steps.uploading'),
       status: progress >= 30 ? 'completed' : 'processing'
     },
     {
       id: 'transcribing',
-      label: 'Transcribing Speech',
+      label: t('processing.steps.transcribing'),
       status: progress >= 70 ? 'completed' : progress >= 30 ? 'processing' : 'pending'
     },
     {
       id: 'analyzing',
-      label: 'Analyzing Context',
+      label: t('processing.steps.analyzing'),
       status: progress >= 80 ? 'completed' : progress >= 70 ? 'processing' : 'pending'
     },
     {
       id: 'summarizing',
-      label: 'Summarizing Key Points',
+      label: t('processing.steps.summarizing'),
       status: progress >= 100 ? 'completed' : progress >= 80 ? 'processing' : 'pending'
     },
   ];
@@ -94,13 +96,13 @@ export function ProcessingPage() {
     return (
       <PageLayout maxWidth="1200px">
         <div className="text-center">
-          <Heading level="h2" className="mb-4">Processing Failed</Heading>
+          <Heading level="h2" className="mb-4">{t('common.error')}</Heading>
           <div className="max-w-[600px] mx-auto mb-6">
             <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/30">
               <Text className="whitespace-pre-line text-red-600 dark:text-red-400">{error}</Text>
             </div>
           </div>
-          <Button onClick={() => goToAudio()}>Back to Audio</Button>
+          <Button onClick={() => goToAudio()}>{t('common.back')}</Button>
         </div>
       </PageLayout>
     );
@@ -111,7 +113,7 @@ export function ProcessingPage() {
     return (
       <PageLayout maxWidth="1200px">
         <div className="text-center">
-          <Text variant="body" color="secondary">Loading session...</Text>
+          <Text variant="body" color="secondary">{t('common.loading')}</Text>
         </div>
       </PageLayout>
     );
@@ -123,14 +125,14 @@ export function ProcessingPage() {
       <PageLayout maxWidth="1200px">
         <div className="text-center">
           <Text variant="body" color="secondary">
-            The requested session could not be found.
+            {t('common.error')} - {t('common.notFound', 'Session not found')}
           </Text>
         </div>
       </PageLayout>
     );
   }
 
-  const estimatedTime = progress < 30 ? '2-3 min' : progress < 70 ? '1-2 min' : 'Almost done';
+  const estimatedTime = progress < 30 ? '2-3 min' : progress < 70 ? '1-2 min' : t('processing.almostDone');
 
   return (
     <PageLayout maxWidth="1200px">
@@ -155,7 +157,7 @@ export function ProcessingPage() {
           onClick={handleCancel}
           disabled={progress >= 100}
         >
-          Cancel Processing
+          {t('common.cancel')}
         </Button>
       </div>
     </PageLayout>

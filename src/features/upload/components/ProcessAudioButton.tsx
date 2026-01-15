@@ -1,4 +1,5 @@
 import { Sparkles } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export interface ProcessAudioButtonProps {
   disabled: boolean;
@@ -6,6 +7,7 @@ export interface ProcessAudioButtonProps {
 }
 
 export function ProcessAudioButton({ disabled, onProcess }: ProcessAudioButtonProps) {
+  const { t } = useTranslation();
   return (
     <div className="mt-8 flex justify-end">
       <button
@@ -29,7 +31,7 @@ export function ProcessAudioButton({ disabled, onProcess }: ProcessAudioButtonPr
           }
         }}
       >
-        Process Audio
+        {t('home.processButton')}
         <Sparkles className="group-hover:animate-bounce" size={20} />
       </button>
     </div>

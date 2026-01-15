@@ -11,8 +11,8 @@ import {
   SelectCard,
   AILoadingOrb,
 } from '@/lib';
-import type { ThemeMode } from '@/lib';
 import { ComponentSection } from '../components/preview/ComponentSection';
+import { useTheme } from '../hooks/useTheme';
 
 /**
  * Preview page for showcasing and testing all library components.
@@ -30,7 +30,7 @@ export const PreviewPage: React.FC = () => {
   const [selectSelected, setSelectSelected] = useState('video');
   const [inputValue, setInputValue] = useState('');
   const [inputError, setInputError] = useState('');
-  const [theme, setTheme] = useState<ThemeMode>('system');
+  const { theme, setTheme } = useTheme();
 
   const handleShowSnackbar = (variant: 'success' | 'error' | 'warning' | 'info') => {
     setSnackbarVariant(variant);

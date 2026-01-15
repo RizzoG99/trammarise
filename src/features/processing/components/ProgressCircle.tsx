@@ -1,4 +1,5 @@
 import { GlassCard, Heading, Text } from '@/lib';
+import { useTranslation } from 'react-i18next';
 
 export interface ProgressCircleProps {
   progress: number;
@@ -7,6 +8,7 @@ export interface ProgressCircleProps {
 }
 
 export function ProgressCircle({ progress, step, timeEstimate }: ProgressCircleProps) {
+  const { t } = useTranslation();
   const radius = 80;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (progress / 100) * circumference;
@@ -52,7 +54,7 @@ export function ProgressCircle({ progress, step, timeEstimate }: ProgressCircleP
 
       {timeEstimate && (
         <Text variant="caption" color="tertiary">
-          Estimated time: {timeEstimate}
+          {t('processing.estimatedTime')}: {timeEstimate}
         </Text>
       )}
 

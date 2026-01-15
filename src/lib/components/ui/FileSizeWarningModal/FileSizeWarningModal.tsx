@@ -1,4 +1,5 @@
 import React from 'react';
+import { AlertTriangle, XCircle } from 'lucide-react';
 import { Modal } from '../Modal';
 import type { FileSizeStatus } from '../../../../utils/fileSize';
 
@@ -21,36 +22,12 @@ export interface FileSizeWarningModalProps {
 /**
  * Warning icon for large files
  */
-const WarningIcon = () => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    className="w-16 h-16 text-amber-500"
-  >
-    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-    <line x1="12" y1="9" x2="12" y2="13" />
-    <line x1="12" y1="17" x2="12.01" y2="17" />
-  </svg>
-);
+const WarningIcon = () => <AlertTriangle className="w-16 h-16 text-amber-500" />;
 
 /**
  * Error icon for files that are too large
  */
-const ErrorIcon = () => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    className="w-16 h-16 text-red-500"
-  >
-    <circle cx="12" cy="12" r="10" />
-    <line x1="15" y1="9" x2="9" y2="15" />
-    <line x1="9" y1="9" x2="15" y2="15" />
-  </svg>
-);
+const ErrorIcon = () => <XCircle className="w-16 h-16 text-red-500" />;
 
 /**
  * Modal dialog for warning users about large file sizes.

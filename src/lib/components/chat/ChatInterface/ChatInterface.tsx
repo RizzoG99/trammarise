@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Loader2, Send } from 'lucide-react';
 import type { ChatMessage } from '../../../../types/audio';
 
 interface ChatInterfaceProps {
@@ -68,14 +69,9 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
           aria-label="Send message"
         >
           {isLoading ? (
-            <svg className="animate-spin" viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" opacity="0.25" />
-              <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" opacity="0.75" />
-            </svg>
+            <Loader2 className="w-5 h-5 animate-spin" />
           ) : (
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5">
-              <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
-            </svg>
+            <Send className="w-5 h-5" />
           )}
         </button>
       </form>

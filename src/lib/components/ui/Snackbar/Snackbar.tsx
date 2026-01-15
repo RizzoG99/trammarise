@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { X } from 'lucide-react';
 
 /**
  * Snackbar visual variants
@@ -22,22 +23,6 @@ export interface SnackbarProps {
   /** Additional CSS classes */
   className?: string;
 }
-
-/**
- * Close icon SVG component
- */
-const CloseIcon = () => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M18 6L6 18M6 6l12 12" />
-  </svg>
-);
 
 /**
  * A notification snackbar component with auto-dismiss and multiple visual variants.
@@ -146,9 +131,7 @@ export const Snackbar: React.FC<SnackbarProps> = ({
         aria-label="Close notification"
         type="button"
       >
-        <div className="w-[18px] h-[18px]">
-          <CloseIcon />
-        </div>
+        <X className="w-[18px] h-[18px]" />
       </button>
     </div>
   );

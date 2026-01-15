@@ -1,0 +1,57 @@
+{
+  "common": {
+    "appName": "Trammarise",
+    "description": "Trascrizione e riassunto audio basati su IA",
+    "loading": "Caricamento...",
+    "error": "Si è verificato un errore",
+    "save": "Salva",
+    "cancel": "Annulla",
+    "back": "Indietro",
+    "next": "Avanti",
+    "processing": "Elaborazione"
+  },
+  "nav": {
+    "home": "Home",
+    "upload": "Carica",
+    "configure": "Configura",
+    "history": "Cronologia"
+  },
+  "header": {
+    "export": "Esporta",
+    "notifications": "Notifiche",
+    "userMenu": "Menu utente"
+  },
+  "home": {
+    "title": "Nuova Sessione",
+    "subtitle": "Configura le impostazioni di trascrizione",
+    "uploadTitle": "Carica Audio",
+    "dropText": "Trascina qui il file audio o clicca per sfogliare",
+    "recordTitle": "Registra Audio",
+    "startRecording": "Avvia Registrazione",
+    "stopRecording": "Ferma e Salva",
+    "processButton": "Elabora Audio",
+    "audioOnly": "Carica solo file audio",
+    "fileTooLarge": "File troppo grande",
+    "maxSize": "Dimensione massima",
+    "emptyFile": "Il file è vuoto",
+    "noAudioFound": "Nessun file audio trovato nei file trascinati",
+    "invalidFile": "File non valido",
+    "supportedFormats": "MP3, WAV, M4A fino a 500MB"
+  },
+  "processing": {
+    "steps": {
+      "uploading": "Caricamento Audio",
+      "transcribing": "Trascrizione",
+      "analyzing": "Analisi del Contesto",
+      "summarizing": "Creazione Riassunto"
+    },
+    "estimatedTime": "Tempo stimato",
+    "almostDone": "Quasi finito"
+  },
+  "languages": {
+    "en": "Inglese",
+    "it": "Italiano",
+    "es": "Spagnolo",
+    "de": "Tedesco"
+  }
+}

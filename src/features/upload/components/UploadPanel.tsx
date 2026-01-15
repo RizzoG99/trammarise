@@ -3,6 +3,7 @@ import type { DragEvent } from 'react';
 import { Upload, AlertCircle } from 'lucide-react';
 import { GlassCard, Heading, Text } from '@/lib';
 import { FilePreview } from './FilePreview';
+import { useTranslation } from 'react-i18next';
 
 // File validation constants
 const SUPPORTED_AUDIO_TYPES = ['audio/mpeg', 'audio/wav', 'audio/mp4', 'audio/m4a', 'audio/webm', 'audio/ogg', 'audio/flac'];
@@ -20,6 +21,7 @@ export interface UploadPanelProps {
 }
 
 export function UploadPanel({ onFileUpload, uploadedFile, onFileRemove }: UploadPanelProps) {
+  const { t } = useTranslation();
   const [isDragging, setIsDragging] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -27,18 +29,18 @@ export function UploadPanel({ onFileUpload, uploadedFile, onFileRemove }: Upload
   const validateFile = (file: File): FileValidationResult => {
     // Check file type
     if (!file.type.startsWith('audio/') && !SUPPORTED_AUDIO_TYPES.includes(file.type)) {
-      return { valid: false, error: 'Unsupported file type. Please upload an audio file (MP3, WAV, M4A, etc.).' };
+      return { valid: false, error: t('home.audioOnly') };
     }
 
     // Check file size
     if (file.size > MAX_FILE_SIZE) {
       const sizeMB = Math.round(file.size / (1024 * 1024));
-      return { valid: false, error: `File too large (${sizeMB}MB). Maximum size is 500MB.` };
+      return { valid: false, error: `${t('home.fileTooLarge')} (${sizeMB}MB). ${t('home.maxSize')} 500MB.` };
     }
 
     // Check for empty file
     if (file.size === 0) {
-      return { valid: false, error: 'File is empty. Please select a valid audio file.' };
+      return { valid: false, error: t('home.emptyFile') };
     }
 
     return { valid: true };
@@ -62,13 +64,13 @@ export function UploadPanel({ onFileUpload, uploadedFile, onFileRemove }: Upload
     const audioFile = files.find(file => file.type.startsWith('audio/'));
 
     if (!audioFile) {
-      setValidationError('No audio file found. Please drop an audio file.');
+      setValidationError(t('home.noAudioFound'));
       return;
     }
 
     const validation = validateFile(audioFile);
     if (!validation.valid) {
-      setValidationError(validation.error || 'Invalid file');
+      setValidationError(validation.error || t('home.invalidFile'));
       return;
     }
 
@@ -83,13 +85,14 @@ export function UploadPanel({ onFileUpload, uploadedFile, onFileRemove }: Upload
 
     const validation = validateFile(file);
     if (!validation.valid) {
-      setValidationError(validation.error || 'Invalid file');
+      setValidationError(validation.error || t('home.invalidFile'));
       // Reset file input
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
       return;
     }
+
 
     onFileUpload(file);
   };
@@ -116,7 +119,7 @@ export function UploadPanel({ onFileUpload, uploadedFile, onFileRemove }: Upload
 
   return (
     <GlassCard variant="light" className="p-6">
-      <Heading level="h3" className="mb-4">Upload Audio</Heading>
+      <Heading level="h3" className="mb-4">{t('home.uploadTitle')}</Heading>
 
       {/* Validation Error Message */}
       {validationError && (
@@ -158,7 +161,7 @@ export function UploadPanel({ onFileUpload, uploadedFile, onFileRemove }: Upload
           </div>
 
           <Text variant="body" color="primary" className="font-medium mb-2">
-            Drop your audio file here or click to browse
+            {t('home.dropText')}
           </Text>
 
           <Text variant="caption" color="tertiary" className="mb-4">
@@ -167,7 +170,7 @@ export function UploadPanel({ onFileUpload, uploadedFile, onFileRemove }: Upload
 
           <div className="inline-flex px-4 py-2 rounded-full bg-[var(--color-bg-surface)] border border-border">
             <Text variant="caption" color="secondary">
-              MP3, WAV, M4A up to 500MB
+              {t('home.supportedFormats')}
             </Text>
           </div>
         </div>

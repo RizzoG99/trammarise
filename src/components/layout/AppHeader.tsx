@@ -1,7 +1,9 @@
 import { Bell, User, FileDown, Edit2, Check, X } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard, ThemeToggle, Button } from '@/lib';
 import { useTheme } from '../../hooks/useTheme';
+import { LanguageSwitcher } from '../../features/i18n/components/LanguageSwitcher';
 
 /**
  * Props for AppHeader component
@@ -16,6 +18,7 @@ interface AppHeaderProps {
 }
 
 export function AppHeader({ fileName, onFileNameChange, onExport }: AppHeaderProps = {}) {
+  const { t } = useTranslation();
   const { theme, setTheme } = useTheme();
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(fileName || '');
@@ -123,35 +126,40 @@ export function AppHeader({ fileName, onFileNameChange, onExport }: AppHeaderPro
                   className="flex items-center gap-2"
                 >
                   <FileDown className="w-4 h-4" />
-                  <span className="hidden sm:inline">Export</span>
+                  <span className="hidden sm:inline">{t('header.export')}</span>
                 </Button>
               )}
 
               {/* Notifications */}
-              <button
-                className="p-2 rounded-lg hover:bg-[var(--color-bg-surface)] transition-colors relative"
-                aria-label="Notifications"
-              >
-                <Bell className="w-5 h-5 text-text-secondary" />
+              <div className="relative">
+                <Button
+                  variant="ghost"
+                  icon={<Bell className="w-5 h-5" fill="currentColor" />}
+                  aria-label={t('header.notifications')}
+                />
                 {/* Notification Badge */}
                 <span className="absolute top-1 right-1 w-2 h-2 bg-accent-error rounded-full" />
-              </button>
+              </div>
+
+              {/* Language Switcher */}
+              <LanguageSwitcher />
 
               {/* Theme Toggle */}
               <ThemeToggle theme={theme} onThemeChange={setTheme} />
 
               {/* User Avatar */}
-              <button
-                className="flex items-center gap-2 p-2 rounded-lg hover:bg-[var(--color-bg-surface)] transition-colors"
-                aria-label="User menu"
-              >
-                <div 
-                  className="w-8 h-8 rounded-full flex items-center justify-center"
-                  style={{ background: 'linear-gradient(to bottom right, var(--color-primary), var(--color-primary-light))' }}
-                >
-                  <User className="w-5 h-5 text-white" />
-                </div>
-              </button>
+              <Button
+                variant="ghost"
+                aria-label={t('header.userMenu')}
+                icon={
+                  <div
+                    className="w-8 h-8 rounded-full flex items-center justify-center"
+                    style={{ background: 'linear-gradient(to bottom right, var(--color-primary), var(--color-primary-light))' }}
+                  >
+                    <User className="w-5 h-5 text-white" />
+                  </div>
+                }
+              />
             </div>
           </div>
         </div>

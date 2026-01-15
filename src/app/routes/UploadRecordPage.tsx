@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import type { LanguageCode } from '../../types/languages';
 import type { ContentType } from '../../types/content-types';
 import type { ProcessingMode } from '../../features/configuration/components/ProcessingModeSelector';
@@ -17,6 +18,7 @@ import { generateSessionId, saveSession } from '../../utils/session-manager';
 import { buildRoutePath, ROUTES } from '../../types/routing';
 
 export function UploadRecordPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const recordPanelRef = useRef<RecordPanelRef>(null);
   const [audioFile, setAudioFile] = useState<File | Blob | null>(null);
@@ -93,9 +95,9 @@ export function UploadRecordPage() {
     <PageLayout>
         {/* Page Title */}
         <div className="mb-8">
-          <Heading level="h1">New Session</Heading>
+          <Heading level="h1">{t('home.title')}</Heading>
           <Text variant="body" color="secondary">
-            Configure your audio transcription settings
+            {t('home.subtitle')}
           </Text>
         </div>
 
@@ -120,7 +122,7 @@ export function UploadRecordPage() {
               size={20} 
               className="text-gray-500" 
             />
-            <Heading level="h3">Configuration</Heading>
+            <Heading level="h3">{t('nav.configure')}</Heading>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

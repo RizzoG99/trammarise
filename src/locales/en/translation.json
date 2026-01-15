@@ -1,0 +1,57 @@
+{
+  "common": {
+    "appName": "Trammarise",
+    "description": "AI-powered audio transcription and summarization",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "save": "Save",
+    "cancel": "Cancel",
+    "back": "Back",
+    "next": "Next",
+    "processing": "Processing"
+  },
+  "nav": {
+    "home": "Home",
+    "upload": "Upload",
+    "configure": "Configure",
+    "history": "History"
+  },
+  "header": {
+    "export": "Export",
+    "notifications": "Notifications",
+    "userMenu": "User menu"
+  },
+  "home": {
+    "title": "New Session",
+    "subtitle": "Configure your audio transcription settings",
+    "uploadTitle": "Upload Audio",
+    "dropText": "Drop your audio file here or click to browse",
+    "recordTitle": "Record Audio",
+    "startRecording": "Start Recording",
+    "stopRecording": "Stop & Save",
+    "processButton": "Process Audio",
+    "audioOnly": "Please upload an audio file only",
+    "fileTooLarge": "File too large",
+    "maxSize": "Maximum size",
+    "emptyFile": "File is empty",
+    "noAudioFound": "No audio file found in the dropped files",
+    "invalidFile": "Invalid file",
+    "supportedFormats": "MP3, WAV, M4A up to 500MB"
+  },
+  "processing": {
+    "steps": {
+      "uploading": "Uploading Audio",
+      "transcribing": "Transcribing Speech",
+      "analyzing": "Analyzing Context",
+      "summarizing": "Summarizing Key Points"
+    },
+    "estimatedTime": "Estimated time",
+    "almostDone": "Almost done"
+  },
+  "languages": {
+    "en": "English",
+    "it": "Italian",
+    "es": "Spanish",
+    "de": "German"
+  }
+}

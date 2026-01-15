@@ -1,0 +1,57 @@
+{
+  "common": {
+    "appName": "Trammarise",
+    "description": "KI-gestützte Audiotranskription und Zusammenfassung",
+    "loading": "Laden...",
+    "error": "Ein Fehler ist aufgetreten",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "back": "Zurück",
+    "next": "Weiter",
+    "processing": "Verarbeitung"
+  },
+  "nav": {
+    "home": "Start",
+    "upload": "Hochladen",
+    "configure": "Konfigurieren",
+    "history": "Verlauf"
+  },
+  "header": {
+    "export": "Exportieren",
+    "notifications": "Benachrichtigungen",
+    "userMenu": "Benutzermenü"
+  },
+  "home": {
+    "title": "Neue Sitzung",
+    "subtitle": "Konfigurieren Sie Ihre Transkriptionseinstellungen",
+    "uploadTitle": "Audio hochladen",
+    "dropText": "Ziehen Sie Ihre Audiodatei hierher oder klicken Sie zum Durchsuchen",
+    "recordTitle": "Audio aufnehmen",
+    "startRecording": "Aufnahme starten",
+    "stopRecording": "Stoppen & Speichern",
+    "processButton": "Audio verarbeiten",
+    "audioOnly": "Bitte laden Sie nur Audiodateien hoch",
+    "fileTooLarge": "Datei zu groß",
+    "maxSize": "Maximale Größe",
+    "emptyFile": "Datei ist leer",
+    "noAudioFound": "Keine Audiodatei in den gezogenen Dateien gefunden",
+    "invalidFile": "Ungültige Datei",
+    "supportedFormats": "MP3, WAV, M4A bis zu 500MB"
+  },
+  "processing": {
+    "steps": {
+      "uploading": "Audio hochladen",
+      "transcribing": "Transkription",
+      "analyzing": "Kontext analysieren",
+      "summarizing": "Zusammenfassung erstellen"
+    },
+    "estimatedTime": "Geschätzte Zeit",
+    "almostDone": "Fast fertig"
+  },
+  "languages": {
+    "en": "Englisch",
+    "it": "Italienisch",
+    "es": "Spanisch",
+    "de": "Deutsch"
+  }
+}
