@@ -85,11 +85,9 @@ export async function loadSession(sessionId: string): Promise<SessionData | null
       session.audioFile = {
         name: audioFileRecord.audioName,
         blob: audioFileRecord.audioBlob,
-        file: new File(
-          [audioFileRecord.audioBlob],
-          audioFileRecord.audioName,
-          { type: audioFileRecord.audioBlob.type }
-        ),
+        file: new File([audioFileRecord.audioBlob], audioFileRecord.audioName, {
+          type: audioFileRecord.audioBlob.type,
+        }),
       };
     }
 
@@ -100,7 +98,12 @@ export async function loadSession(sessionId: string): Promise<SessionData | null
 
     return session as SessionData;
   } catch (error) {
-    console.error('Failed to load session:', error);
+    console.error(`Failed to load session ${sessionId}:`, {
+      error,
+      type: error instanceof Error ? error.name : typeof error,
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     return null;
   }
 }
@@ -111,10 +114,7 @@ export async function loadSession(sessionId: string): Promise<SessionData | null
 export async function deleteSession(sessionId: string): Promise<void> {
   try {
     sessionStorage.removeItem(getSessionKey(sessionId));
-    await Promise.all([
-      deleteAudioFile(sessionId),
-      deleteContextFiles(sessionId),
-    ]);
+    await Promise.all([deleteAudioFile(sessionId), deleteContextFiles(sessionId)]);
   } catch (error) {
     console.error('Failed to delete session:', error);
   }

@@ -1,15 +1,24 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { PageLayout } from '../../components/layout/PageLayout';
 import { SplitCardLayout } from '../../features/processing/components/SplitCardLayout';
 import { ProgressCircle } from '../../features/processing/components/ProgressCircle';
-import { StepChecklist, type ProcessingStep } from '../../features/processing/components/StepChecklist';
+import {
+  StepChecklist,
+  type ProcessingStep,
+} from '../../features/processing/components/StepChecklist';
 import { Button, Text, Heading } from '@/lib';
 import { useSessionStorage } from '../../hooks/useSessionStorage';
 import { useRouteState } from '../../hooks/useRouteState';
-import { useAudioProcessing, type ProcessingStep as AudioStep } from '../../hooks/useAudioProcessing';
-import { buildDefaultConfiguration, validateEnvironmentConfiguration } from '../../utils/config-helper';
+import {
+  useAudioProcessing,
+  type ProcessingStep as AudioStep,
+} from '../../hooks/useAudioProcessing';
+import {
+  buildDefaultConfiguration,
+  validateEnvironmentConfiguration,
+} from '../../utils/config-helper';
 
 export function ProcessingPage() {
   const { t } = useTranslation();
@@ -67,36 +76,41 @@ export function ProcessingPage() {
     goToAudio();
   };
 
-  // Derive steps from progress for UI
-  const steps: ProcessingStep[] = [
-    {
-      id: 'uploading',
-      label: t('processing.steps.uploading'),
-      status: progress >= 30 ? 'completed' : 'processing'
-    },
-    {
-      id: 'transcribing',
-      label: t('processing.steps.transcribing'),
-      status: progress >= 70 ? 'completed' : progress >= 30 ? 'processing' : 'pending'
-    },
-    {
-      id: 'analyzing',
-      label: t('processing.steps.analyzing'),
-      status: progress >= 80 ? 'completed' : progress >= 70 ? 'processing' : 'pending'
-    },
-    {
-      id: 'summarizing',
-      label: t('processing.steps.summarizing'),
-      status: progress >= 100 ? 'completed' : progress >= 80 ? 'processing' : 'pending'
-    },
-  ];
+  // Derive steps from progress for UI (memoized to prevent unnecessary re-renders)
+  const steps: ProcessingStep[] = useMemo(
+    () => [
+      {
+        id: 'uploading',
+        label: t('processing.steps.uploading'),
+        status: progress >= 30 ? 'completed' : 'processing',
+      },
+      {
+        id: 'transcribing',
+        label: t('processing.steps.transcribing'),
+        status: progress >= 70 ? 'completed' : progress >= 30 ? 'processing' : 'pending',
+      },
+      {
+        id: 'analyzing',
+        label: t('processing.steps.analyzing'),
+        status: progress >= 80 ? 'completed' : progress >= 70 ? 'processing' : 'pending',
+      },
+      {
+        id: 'summarizing',
+        label: t('processing.steps.summarizing'),
+        status: progress >= 100 ? 'completed' : progress >= 80 ? 'processing' : 'pending',
+      },
+    ],
+    [progress, t]
+  );
 
   // Error state
   if (error) {
     return (
       <PageLayout maxWidth="1200px">
         <div className="text-center">
-          <Heading level="h2" className="mb-4">{t('common.error')}</Heading>
+          <Heading level="h2" className="mb-4">
+            {t('common.error')}
+          </Heading>
           <div className="max-w-[600px] mx-auto mb-6">
             <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/30">
               <Text className="whitespace-pre-line text-red-600 dark:text-red-400">{error}</Text>
@@ -113,7 +127,9 @@ export function ProcessingPage() {
     return (
       <PageLayout maxWidth="1200px">
         <div className="text-center">
-          <Text variant="body" color="secondary">{t('common.loading')}</Text>
+          <Text variant="body" color="secondary">
+            {t('common.loading')}
+          </Text>
         </div>
       </PageLayout>
     );
@@ -132,31 +148,22 @@ export function ProcessingPage() {
     );
   }
 
-  const estimatedTime = progress < 30 ? '2-3 min' : progress < 70 ? '1-2 min' : t('processing.almostDone');
+  const estimatedTime =
+    progress < 30 ? '2-3 min' : progress < 70 ? '1-2 min' : t('processing.almostDone');
 
   return (
     <PageLayout maxWidth="1200px">
       {/* Split Card Layout */}
       <SplitCardLayout
         left={
-          <ProgressCircle
-            progress={progress}
-            step={currentStep}
-            timeEstimate={estimatedTime}
-          />
+          <ProgressCircle progress={progress} step={currentStep} timeEstimate={estimatedTime} />
         }
-        right={
-          <StepChecklist steps={steps} />
-        }
+        right={<StepChecklist steps={steps} />}
       />
 
       {/* Cancel Button */}
       <div className="mt-6 text-center">
-        <Button
-          variant="outline"
-          onClick={handleCancel}
-          disabled={progress >= 100}
-        >
+        <Button variant="outline" onClick={handleCancel} disabled={progress >= 100}>
           {t('common.cancel')}
         </Button>
       </div>

@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Play, Pause, SkipBack, SkipForward, Gauge } from 'lucide-react';
 import { Button, WaveformPlayer } from '../../../lib';
 import type { AudioFile } from '../../../types/audio';
@@ -24,20 +25,19 @@ interface AudioPlayerBarProps {
  * - Speed control (1x → 1.5x → 2x → 1x)
  * - Responsive: Stacks controls on mobile
  *
+ * Memoized to prevent unnecessary re-renders.
+ *
  * @param audioFile - Audio file from session storage
  */
-export function AudioPlayerBar({ audioFile, audioPlayer: externalPlayer }: AudioPlayerBarProps) {
+export const AudioPlayerBar = memo(function AudioPlayerBar({
+  audioFile,
+  audioPlayer: externalPlayer,
+}: AudioPlayerBarProps) {
   // Use external player if provided, otherwise create internal one
   const internalPlayer = useAudioPlayer(audioFile);
   const player = externalPlayer || internalPlayer;
 
-  const {
-    state,
-    togglePlayPause,
-    skipBy,
-    cycleSpeed,
-  } = player;
-
+  const { state, togglePlayPause, skipBy, cycleSpeed } = player;
 
   return (
     <div className="w-full bg-[var(--color-surface)] border-b border-[var(--color-border)] shadow-md">
@@ -113,4 +113,4 @@ export function AudioPlayerBar({ audioFile, audioPlayer: externalPlayer }: Audio
       </div>
     </div>
   );
-}
+});

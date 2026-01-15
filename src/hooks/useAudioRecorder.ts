@@ -44,13 +44,16 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
       // Clean up permission listener
       if (permissionStatusRef.current) {
         permissionStatusRef.current.onchange = null;
+        permissionStatusRef.current = null;
       }
     };
   }, []);
 
   const checkMicrophonePermission = useCallback(async () => {
     try {
-      const permissionStatus = await navigator.permissions.query({ name: 'microphone' as PermissionName });
+      const permissionStatus = await navigator.permissions.query({
+        name: 'microphone' as PermissionName,
+      });
       // Store reference for cleanup
       permissionStatusRef.current = permissionStatus;
 
@@ -141,7 +144,7 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
           mediaRecorder.requestData();
         }
       }, AUDIO_CONSTANTS.RECORDING_TIMER_INTERVAL);
-      
+
       return true; // Success
     } catch (err) {
       console.error('Error accessing microphone:', err);
@@ -156,7 +159,7 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
     if (mediaRecorderRef.current?.state === 'recording') {
       mediaRecorderRef.current.pause();
       setIsPaused(true);
-      
+
       // Pause timer
       if (timerRef.current) {
         clearInterval(timerRef.current);
@@ -169,10 +172,10 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
     if (mediaRecorderRef.current?.state === 'paused') {
       mediaRecorderRef.current.resume();
       setIsPaused(false);
-      
+
       // Resume timer using the ref value
       const pausedDuration = durationRef.current;
-      startTimeRef.current = Date.now() - (pausedDuration * 1000);
+      startTimeRef.current = Date.now() - pausedDuration * 1000;
       timerRef.current = window.setInterval(() => {
         const elapsed = Math.floor((Date.now() - startTimeRef.current) / 1000);
         durationRef.current = elapsed;
@@ -185,7 +188,10 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
   }, []);
 
   const stopRecording = useCallback(() => {
-    if (mediaRecorderRef.current?.state === 'recording' || mediaRecorderRef.current?.state === 'paused') {
+    if (
+      mediaRecorderRef.current?.state === 'recording' ||
+      mediaRecorderRef.current?.state === 'paused'
+    ) {
       mediaRecorderRef.current.stop();
       setIsPaused(false);
     }
@@ -199,7 +205,10 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
     const stream = mediaRecorderRef.current?.stream;
 
     // Stop recording if active
-    if (mediaRecorderRef.current?.state === 'recording' || mediaRecorderRef.current?.state === 'paused') {
+    if (
+      mediaRecorderRef.current?.state === 'recording' ||
+      mediaRecorderRef.current?.state === 'paused'
+    ) {
       mediaRecorderRef.current.stop();
     }
 

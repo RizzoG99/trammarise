@@ -1,5 +1,5 @@
 import { Search, ChevronUp, ChevronDown, X } from 'lucide-react';
-import { useMemo, useEffect } from 'react';
+import { useMemo, useEffect, memo } from 'react';
 import { GlassCard, Heading, Text } from '@/lib';
 import { useTranscriptSearch } from '../hooks/useTranscriptSearch';
 import { parseTranscriptToSegments } from '../utils/transcriptParser';
@@ -13,7 +13,7 @@ export interface SearchableTranscriptProps {
   onTimestampClick?: (timestampSeconds: number) => void;
 }
 
-export function SearchableTranscript({
+export const SearchableTranscript = memo(function SearchableTranscript({
   transcript,
   activeSegmentId,
   onTimestampClick,
@@ -123,4 +123,4 @@ export function SearchableTranscript({
       </div>
     </GlassCard>
   );
-}
+});

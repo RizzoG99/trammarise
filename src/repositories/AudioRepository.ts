@@ -5,6 +5,7 @@ import type {
   TranscriptionResponse,
 } from '../types/audio';
 import { API_VALIDATION } from '../utils/constants';
+import { fetchWithTimeout } from '../utils/fetch-with-timeout';
 
 const { API_DEFAULT_TIMEOUT, TRANSCRIBE_TIMEOUT, VALIDATION_TIMEOUT } = API_VALIDATION;
 
@@ -64,33 +65,6 @@ export interface GeneratePDFConfig {
  */
 export class AudioRepository {
   /**
-   * Fetch with timeout support
-   */
-  private async fetchWithTimeout(
-    url: string,
-    options: RequestInit,
-    timeout: number
-  ): Promise<Response> {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), timeout);
-
-    try {
-      const response = await fetch(url, {
-        ...options,
-        signal: controller.signal,
-      });
-      clearTimeout(timeoutId);
-      return response;
-    } catch (error) {
-      clearTimeout(timeoutId);
-      if (error instanceof Error && error.name === 'AbortError') {
-        throw new Error('Request timeout. Please try again.');
-      }
-      throw error;
-    }
-  }
-
-  /**
    * Transcribe audio using OpenAI Whisper API
    */
   async transcribe(config: TranscribeConfig): Promise<TranscriptionResponse> {
@@ -101,10 +75,14 @@ export class AudioRepository {
       formData.append('language', config.language);
     }
 
-    const response = await this.fetchWithTimeout('/api/transcribe', {
-      method: 'POST',
-      body: formData,
-    }, TRANSCRIBE_TIMEOUT);
+    const response = await fetchWithTimeout(
+      '/api/transcribe',
+      {
+        method: 'POST',
+        body: formData,
+      },
+      TRANSCRIBE_TIMEOUT
+    );
 
     if (!response.ok) {
       const error = await response.json().catch(() => ({ message: 'Transcription failed' }));
@@ -145,10 +123,14 @@ export class AudioRepository {
       formData.append('language', config.language);
     }
 
-    const response = await this.fetchWithTimeout('/api/summarize', {
-      method: 'POST',
-      body: formData,
-    }, API_DEFAULT_TIMEOUT);
+    const response = await fetchWithTimeout(
+      '/api/summarize',
+      {
+        method: 'POST',
+        body: formData,
+      },
+      API_DEFAULT_TIMEOUT
+    );
 
     if (!response.ok) {
       const error = await response.json().catch(() => ({ message: 'Summarization failed' }));
@@ -169,19 +151,23 @@ export class AudioRepository {
    * Chat with AI to refine summary or ask questions
    */
   async chat(config: ChatConfig): Promise<ChatResponse> {
-    const response = await this.fetchWithTimeout('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        transcript: config.transcript,
-        summary: config.summary,
-        message: config.message,
-        history: config.history,
-        provider: config.provider,
-        apiKey: config.apiKey,
-        model: config.model,
-      }),
-    }, API_DEFAULT_TIMEOUT);
+    const response = await fetchWithTimeout(
+      '/api/chat',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          transcript: config.transcript,
+          summary: config.summary,
+          message: config.message,
+          history: config.history,
+          provider: config.provider,
+          apiKey: config.apiKey,
+          model: config.model,
+        }),
+      },
+      API_DEFAULT_TIMEOUT
+    );
 
     if (!response.ok) {
       const error = await response.json().catch(() => ({ message: 'Chat failed' }));
@@ -202,19 +188,23 @@ export class AudioRepository {
    * Generate PDF from transcript and summary using AI formatting
    */
   async generatePDF(config: GeneratePDFConfig): Promise<Blob> {
-    const response = await this.fetchWithTimeout('/api/generate-pdf', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        transcript: config.transcript,
-        summary: config.summary,
-        contentType: config.contentType,
-        provider: config.provider,
-        apiKey: config.apiKey,
-        model: config.model,
-        language: config.language,
-      }),
-    }, 60000); // 60 second timeout for PDF generation
+    const response = await fetchWithTimeout(
+      '/api/generate-pdf',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          transcript: config.transcript,
+          summary: config.summary,
+          contentType: config.contentType,
+          provider: config.provider,
+          apiKey: config.apiKey,
+          model: config.model,
+          language: config.language,
+        }),
+      },
+      60000
+    ); // 60 second timeout for PDF generation
 
     if (!response.ok) {
       const error = await response.json().catch(() => ({ message: 'PDF generation failed' }));
@@ -231,11 +221,15 @@ export class AudioRepository {
    */
   async validateApiKey(provider: string, apiKey: string): Promise<boolean> {
     try {
-      const response = await this.fetchWithTimeout('/api/validate-key', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ provider, apiKey }),
-      }, VALIDATION_TIMEOUT);
+      const response = await fetchWithTimeout(
+        '/api/validate-key',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ provider, apiKey }),
+        },
+        VALIDATION_TIMEOUT
+      );
 
       if (!response.ok) return false;
 
