@@ -47,7 +47,9 @@
       "Bash(git worktree:*)",
       "Bash(cat:*)",
       "Skill(commit-commands:commit-push-pr)",
-      "mcp__plugin_serena_serena__get_symbols_overview"
+      "mcp__plugin_serena_serena__get_symbols_overview",
+      "Bash(npx tsc:*)",
+      "Bash(npm run lint:*)"
     ],
     "deny": [],
     "ask": []

@@ -32,6 +32,7 @@ export function ThemeProvider({
   useEffect(() => {
     const root = window.document.documentElement;
 
+    // Remove both classes first
     root.classList.remove('light', 'dark');
 
     if (theme === 'system') {
@@ -40,11 +41,18 @@ export function ThemeProvider({
         ? 'dark'
         : 'light';
 
-      root.classList.add(systemTheme);
+      // Only add 'dark' class if system preference is dark
+      if (systemTheme === 'dark') {
+        root.classList.add('dark');
+      }
       return;
     }
 
-    root.classList.add(theme);
+    // Only add 'dark' class when theme is explicitly 'dark'
+    // For 'light' theme, having no class is enough (Tailwind default)
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    }
   }, [theme]);
 
   const value = {

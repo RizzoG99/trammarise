@@ -39,7 +39,7 @@ export interface IndexedDBConfig {
  */
 export class IndexedDBError extends Error {
   public readonly operation: string;
-  public readonly cause?: Error;
+  public override readonly cause?: Error;
 
   constructor(
     message: string,

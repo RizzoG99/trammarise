@@ -38,3 +38,8 @@ data/
 
 *storybook.log
 storybook-static
+
+# Build artifacts and test reports
+stats.html
+playwright-report/
+test-results/

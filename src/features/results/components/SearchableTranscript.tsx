@@ -1,16 +1,26 @@
 import { Search, ChevronUp, ChevronDown, X } from 'lucide-react';
+import { useMemo, useEffect } from 'react';
 import { GlassCard, Heading, Text } from '@/lib';
 import { useTranscriptSearch } from '../hooks/useTranscriptSearch';
+import { parseTranscriptToSegments } from '../utils/transcriptParser';
+import { TranscriptSegmentBlock } from './TranscriptSegmentBlock';
 
 export interface SearchableTranscriptProps {
   transcript: string;
+  /** Optional: ID of currently active segment (during playback) */
+  activeSegmentId?: string;
+  /** Optional: Handler when timestamp is clicked */
+  onTimestampClick?: (timestampSeconds: number) => void;
 }
 
-export function SearchableTranscript({ transcript }: SearchableTranscriptProps) {
+export function SearchableTranscript({
+  transcript,
+  activeSegmentId,
+  onTimestampClick,
+}: SearchableTranscriptProps) {
   const {
     searchQuery,
     setSearchQuery,
-    matches,
     currentMatchIndex,
     totalMatches,
     goToNextMatch,
@@ -19,47 +29,21 @@ export function SearchableTranscript({ transcript }: SearchableTranscriptProps) 
     hasMatches,
   } = useTranscriptSearch(transcript);
 
-  // Highlight search matches in the text
-  const highlightedText = () => {
-    if (!searchQuery.trim()) return transcript;
+  // Parse transcript into segments (memoized)
+  const segments = useMemo(() => parseTranscriptToSegments(transcript), [transcript]);
 
-    const parts = [];
-    let lastIndex = 0;
-
-    matches.forEach((match, index) => {
-      // Add text before match
-      parts.push(
-        <span key={`text-${index}`}>
-          {transcript.substring(lastIndex, match.position)}
-        </span>
-      );
-
-      // Add highlighted match
-      const isCurrentMatch = index === currentMatchIndex;
-      parts.push(
-        <mark
-          key={`match-${index}`}
-          className={`
-            ${isCurrentMatch ? 'bg-primary text-white' : 'bg-yellow-300 dark:bg-yellow-600'}
-            px-0.5 rounded
-          `}
-        >
-          {transcript.substring(match.position, match.position + searchQuery.length)}
-        </mark>
-      );
-
-      lastIndex = match.position + searchQuery.length;
-    });
-
-    // Add remaining text
-    parts.push(
-      <span key="text-end">
-        {transcript.substring(lastIndex)}
-      </span>
-    );
-
-    return parts;
-  };
+  // Auto-scroll to active segment during playback
+  useEffect(() => {
+    if (activeSegmentId) {
+      const element = document.getElementById(activeSegmentId);
+      if (element) {
+        element.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+      }
+    }
+  }, [activeSegmentId]);
 
   return (
     <GlassCard variant="light" className="p-6">
@@ -119,10 +103,23 @@ export function SearchableTranscript({ transcript }: SearchableTranscriptProps) 
       </div>
 
       {/* Transcript Content */}
-      <div className="prose prose-sm dark:prose-invert max-w-none">
-        <div className="whitespace-pre-wrap leading-relaxed text-text-primary">
-          {highlightedText()}
-        </div>
+      <div className="space-y-2">
+        {segments.map((segment) => (
+          <TranscriptSegmentBlock
+            key={segment.id}
+            segment={segment}
+            isActive={segment.id === activeSegmentId}
+            searchQuery={searchQuery}
+            onTimestampClick={onTimestampClick}
+          />
+        ))}
+
+        {/* Fallback: Show notice if no segments */}
+        {segments.length === 0 && (
+          <Text variant="body" color="secondary" className="text-center py-8">
+            No transcript available
+          </Text>
+        )}
       </div>
     </GlassCard>
   );

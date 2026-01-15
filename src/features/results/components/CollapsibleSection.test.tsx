@@ -292,7 +292,7 @@ describe('CollapsibleSection', () => {
     });
 
     it('applies border when expanded', () => {
-      const { container } = render(
+      render(
         <CollapsibleSection title="Section" isExpanded={true} onToggle={mockOnToggle}>
           <div>Content</div>
         </CollapsibleSection>
@@ -302,7 +302,7 @@ describe('CollapsibleSection', () => {
     });
 
     it('does not apply border-b when collapsed', () => {
-      const { container } = render(
+      render(
         <CollapsibleSection title="Section" isExpanded={false} onToggle={mockOnToggle}>
           <div>Content</div>
         </CollapsibleSection>

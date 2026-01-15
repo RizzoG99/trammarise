@@ -385,6 +385,7 @@ function App() {
         {appState === 'results' && result && audioFile && (
           <ResultsState
             audioName={audioFile.name}
+            audioFile={audioFile}
             result={result}
             onBack={handleBackToAudio}
             onUpdateResult={setResult}

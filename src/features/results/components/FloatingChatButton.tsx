@@ -3,22 +3,29 @@ import { MessageSquare } from 'lucide-react';
 export interface FloatingChatButtonProps {
   onClick: () => void;
   hasNewMessages?: boolean;
+  isOpen?: boolean;
 }
 
-export function FloatingChatButton({ onClick, hasNewMessages = false }: FloatingChatButtonProps) {
+export function FloatingChatButton({ onClick, hasNewMessages = false, isOpen = false }: FloatingChatButtonProps) {
+  // Hide button when chat is open
+  if (isOpen) {
+    return null;
+  }
+
   return (
-    <div className="fixed bottom-6 right-6 z-30">
+    <div className="fixed bottom-6 right-6 z-50">
       <button
         onClick={onClick}
         className="
           relative
           p-4 rounded-full
-          bg-primary text-white
-          shadow-lg shadow-primary/30
-          hover:shadow-xl hover:shadow-primary/40
+          bg-[var(--color-primary)] text-white
+          shadow-2xl shadow-black/50
+          hover:shadow-2xl hover:shadow-primary/60
           hover:scale-110
           transition-all duration-[var(--transition-normal)]
           group
+          border-2 border-white/20
         "
       >
         <MessageSquare className="w-6 h-6" />

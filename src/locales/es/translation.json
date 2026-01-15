@@ -1,0 +1,57 @@
+{
+  "common": {
+    "appName": "Trammarise",
+    "description": "Transcripción y resumen de audio con IA",
+    "loading": "Cargando...",
+    "error": "Ocurrió un error",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "processing": "Procesando"
+  },
+  "nav": {
+    "home": "Inicio",
+    "upload": "Subir",
+    "configure": "Configurar",
+    "history": "Historial"
+  },
+  "header": {
+    "export": "Exportar",
+    "notifications": "Notificaciones",
+    "userMenu": "Menú de usuario"
+  },
+  "home": {
+    "title": "Nueva Sesión",
+    "subtitle": "Configura los ajustes de transcripción",
+    "uploadTitle": "Subir Audio",
+    "dropText": "Arrastra tu archivo de audio aquí o haz clic para buscar",
+    "recordTitle": "Grabar Audio",
+    "startRecording": "Iniciar Grabación",
+    "stopRecording": "Detener y Guardar",
+    "processButton": "Procesar Audio",
+    "audioOnly": "Por favor, sube solo archivos de audio",
+    "fileTooLarge": "Archivo demasiado grande",
+    "maxSize": "Tamaño máximo",
+    "emptyFile": "El archivo está vacío",
+    "noAudioFound": "No se encontró ningún archivo de audio en los archivos arrastrados",
+    "invalidFile": "Archivo no válido",
+    "supportedFormats": "MP3, WAV, M4A hasta 500MB"
+  },
+  "processing": {
+    "steps": {
+      "uploading": "Subiendo Audio",
+      "transcribing": "Transcribiendo",
+      "analyzing": "Analizando Contexto",
+      "summarizing": "Generando Resumen"
+    },
+    "estimatedTime": "Tiempo estimado",
+    "almostDone": "Casi listo"
+  },
+  "languages": {
+    "en": "Inglés",
+    "it": "Italiano",
+    "es": "Español",
+    "de": "Alemán"
+  }
+}

@@ -16,7 +16,19 @@
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "format": "prettier --write \"src/**/*.{ts,tsx,css,json}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,css,json}\"",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,css}": [
+      "prettier --write"
+    ]
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.0",
@@ -25,16 +37,19 @@
     "@openrouter/ai-sdk-provider": "^1.3.0",
     "@openrouter/sdk": "^0.2.6",
     "@types/pdfkit": "^0.17.4",
-    "@vercel/node": "^5.5.13",
-    "ai": "^5.0.106",
+    "@vercel/node": "^1.6.1",
+    "ai": "^5.0.121",
     "busboy": "^1.6.0",
-    "jspdf": "^3.0.4",
+    "i18next": "^25.7.4",
+    "i18next-browser-languagedetector": "^8.2.0",
+    "jspdf": "^4.0.0",
     "lucide-react": "^0.555.0",
     "openai": "^6.9.1",
     "pdf-parse": "^2.4.5",
     "pdfkit": "^0.17.2",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "react-i18next": "^16.5.3",
     "react-markdown": "^10.1.0",
     "react-router-dom": "^7.10.1",
     "wavesurfer.js": "^7.11.1"
@@ -47,6 +62,7 @@
   "devDependencies": {
     "@chromatic-com/storybook": "^4.1.3",
     "@eslint/js": "^9.39.1",
+    "@playwright/test": "^1.57.0",
     "@storybook/addon-a11y": "^10.1.11",
     "@storybook/addon-docs": "^10.1.11",
     "@storybook/addon-onboarding": "^10.1.11",
@@ -74,15 +90,19 @@
     "eslint-plugin-storybook": "^10.1.11",
     "express": "^5.1.0",
     "globals": "^16.5.0",
+    "husky": "^9.1.7",
     "jsdom": "^27.3.0",
+    "lint-staged": "^16.2.7",
     "playwright": "^1.57.0",
     "postcss": "^8.5.6",
+    "prettier": "^3.7.4",
+    "rollup-plugin-visualizer": "^6.0.5",
     "storybook": "^10.1.11",
     "tailwindcss": "^4.1.17",
     "tsx": "^4.21.0",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.46.4",
-    "vercel": "^48.12.0",
+    "vercel": "^50.3.3",
     "vite": "^7.2.4",
     "vitest": "^4.0.15"
   }

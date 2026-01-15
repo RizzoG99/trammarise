@@ -1,14 +1,19 @@
 import React, { useState, useMemo } from 'react';
-import ReactMarkdown from 'react-markdown';
-import { ActionButtons } from '../results/ActionButtons';
-import { Button, ChatInterface } from '@/lib';
+import { Modal, ChatInterface } from '@/lib';
 import { chatWithAI, generatePDF } from '../../utils/api';
-import type { ProcessingResult, ChatMessage } from '../../types/audio';
-import { CollapsibleSection } from '../../features/results/components/CollapsibleSection';
-import { parseSummary } from '../../features/results/utils/summaryParser';
+import type { ProcessingResult, ChatMessage, AudioFile } from '../../types/audio';
+import { ResultsLayout } from '../../features/results/components/ResultsLayout';
+import { AudioPlayerBar } from '../../features/results/components/AudioPlayerBar';
+import { SummaryPanel } from '../../features/results/components/SummaryPanel';
+import { SearchableTranscript } from '../../features/results/components/SearchableTranscript';
+import { FloatingChatButton } from '../../features/results/components/FloatingChatButton';
+import { AppHeader } from '../layout/AppHeader';
+import { useAudioPlayer } from '../../features/results/hooks/useAudioPlayer';
+import { parseTranscriptToSegments } from '../../features/results/utils/transcriptParser';
 
 interface ResultsStateProps {
   audioName: string;
+  audioFile: AudioFile;
   result: ProcessingResult;
   onBack: () => void;
   onUpdateResult: (result: ProcessingResult) => void;
@@ -16,18 +21,41 @@ interface ResultsStateProps {
 
 export const ResultsState: React.FC<ResultsStateProps> = ({
   audioName,
+  audioFile,
   result,
-  onBack,
   onUpdateResult,
 }) => {
   const [isLoadingChat, setIsLoadingChat] = useState(false);
-  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
-  const [expandedSections, setExpandedSections] = useState<Set<string>>(
-    new Set(['executive_summary']) // Executive Summary expanded by default
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [fileName, setFileName] = useState(audioName);
+
+  // Audio player state (shared between AudioPlayerBar and SearchableTranscript)
+  const audioPlayer = useAudioPlayer(audioFile);
+
+  // Parse transcript into segments (memoized)
+  const transcriptSegments = useMemo(
+    () => parseTranscriptToSegments(result.transcript),
+    [result.transcript]
   );
 
-  // Parse summary into sections
-  const parsedSections = useMemo(() => parseSummary(result.summary), [result.summary]);
+  // Find active segment based on current audio time
+  const activeSegmentId = useMemo(() => {
+    const currentTime = audioPlayer.state.currentTime;
+    const activeSegment = transcriptSegments.find((seg, index, arr) => {
+      const nextTime = arr[index + 1]?.timestampSeconds ?? Infinity;
+      return currentTime >= seg.timestampSeconds && currentTime < nextTime;
+    });
+    return activeSegment?.id;
+  }, [audioPlayer.state.currentTime, transcriptSegments]);
+
+  // Handle timestamp click to seek audio
+  const handleTimestampClick = (timestampSeconds: number) => {
+    audioPlayer.seek(timestampSeconds);
+    // Auto-play if not already playing
+    if (!audioPlayer.state.isPlaying) {
+      audioPlayer.play();
+    }
+  };
 
   const handleSendMessage = async (message: string) => {
     setIsLoadingChat(true);
@@ -43,10 +71,10 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
 
     try {
       // Call chat API with configuration
-      const apiKey = result.configuration.mode === 'simple' 
-        ? result.configuration.openaiKey 
+      const apiKey = result.configuration.mode === 'simple'
+        ? result.configuration.openaiKey
         : result.configuration.openrouterKey!;
-      
+
       const { response } = await chatWithAI(
         result.transcript,
         result.summary,
@@ -80,11 +108,10 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
 
   const handleDownloadPDF = async () => {
     console.log('📥 Starting AI-powered PDF generation...');
-    setIsGeneratingPDF(true);
-    
+
     try {
-      const apiKey = result.configuration.mode === 'simple' 
-        ? result.configuration.openaiKey 
+      const apiKey = result.configuration.mode === 'simple'
+        ? result.configuration.openaiKey
         : result.configuration.openrouterKey!;
 
       const pdfBlob = await generatePDF(
@@ -101,150 +128,67 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
       const url = URL.createObjectURL(pdfBlob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `trammarise-${Date.now()}.pdf`;
+      a.download = `${fileName}-${Date.now()}.pdf`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      
+
       // Small timeout to ensure download started before revoking
       setTimeout(() => URL.revokeObjectURL(url), 100);
-      
+
       console.log('✅ PDF downloaded successfully');
     } catch (error) {
       console.error('❌ PDF generation error:', error);
       alert(`Failed to generate PDF: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    } finally {
-      setIsGeneratingPDF(false);
     }
   };
 
   return (
-    <div className="flex flex-col h-screen bg-transparent">
-      <div className="bg-bg-surface border-b border-border-glass px-6 py-4 flex items-center gap-4 backdrop-blur-md">
-        <div className="flex items-center gap-4 flex-1">
-          <Button variant="outline" onClick={onBack} className="px-4 py-2 text-sm">
-            ← Back
-          </Button>
-          <div className="flex flex-col">
-            <h2 className="m-0 text-xl font-semibold text-text-primary">Summary & Chat</h2>
-            <span className="text-xs text-text-secondary">{audioName}</span>
-          </div>
-        </div>
-        <div className="flex items-center gap-4">
-          <Button 
-            variant="outline" 
-            onClick={handleDownloadPDF}
-            disabled={isGeneratingPDF}
+    <ResultsLayout
+      header={
+        <AppHeader
+          fileName={fileName}
+          onFileNameChange={setFileName}
+          onExport={handleDownloadPDF}
+        />
+      }
+      audioPlayer={
+        <AudioPlayerBar audioFile={audioFile} audioPlayer={audioPlayer} />
+      }
+      summaryPanel={
+        <SummaryPanel summary={result.summary} />
+      }
+      transcriptPanel={
+        <SearchableTranscript
+          transcript={result.transcript}
+          activeSegmentId={activeSegmentId}
+          onTimestampClick={handleTimestampClick}
+        />
+      }
+      floatingChatButton={
+        <FloatingChatButton
+          onClick={() => setIsChatOpen(true)}
+          isOpen={isChatOpen}
+          hasNewMessages={false}
+        />
+      }
+      chatModal={
+        isChatOpen && (
+          <Modal
+            isOpen={isChatOpen}
+            onClose={() => setIsChatOpen(false)}
+            title="Refine with Chat"
           >
-            {isGeneratingPDF ? '⏳ Generating PDF...' : '📄 Download PDF'}
-          </Button>
-        </div>
-      </div>
-
-      <div className="flex-1 overflow-y-auto pb-8">
-        <div className="max-w-[800px] mx-auto px-6 py-8">
-          {/* Transcript Section */}
-          <section className="bg-bg-surface border border-border-glass rounded-xl p-6 mb-6 backdrop-blur-md">
-            <h2 className="flex items-center gap-2 text-lg font-semibold text-text-primary mb-4">
-              <span className="text-xl">📝</span>
-              Transcript
-            </h2>
-            <div className="bg-black/20 border border-border-glass rounded-lg p-5 mb-4">
-              <p className="font-mono text-[0.9375rem] leading-relaxed text-text-secondary m-0 whitespace-pre-wrap">{result.transcript}</p>
+            <div className="h-[600px]">
+              <ChatInterface
+                onSendMessage={handleSendMessage}
+                isLoading={isLoadingChat}
+                chatHistory={result.chatHistory}
+              />
             </div>
-            <ActionButtons text={result.transcript} />
-          </section>
-
-          {/* Summary Section */}
-          <section className="bg-bg-surface border border-border-glass rounded-xl p-6 mb-6 backdrop-blur-md">
-            <h2 className="flex items-center gap-2 text-lg font-semibold text-text-primary mb-4">
-              <span className="text-xl">✨</span>
-              AI Summary
-            </h2>
-            <div className="space-y-4 mb-4">
-              {parsedSections.map((section, index) => {
-                if (section.type === 'executive_summary' || section.type === 'key_takeaways') {
-                  return (
-                    <CollapsibleSection
-                      key={index}
-                      title={section.title}
-                      isExpanded={expandedSections.has(section.type)}
-                      onToggle={() => {
-                        const newSet = new Set(expandedSections);
-                        if (newSet.has(section.type)) {
-                          newSet.delete(section.type);
-                        } else {
-                          newSet.add(section.type);
-                        }
-                        setExpandedSections(newSet);
-                      }}
-                    >
-                      <div className="text-[0.9375rem] leading-relaxed text-text-secondary prose prose-invert max-w-none prose-p:my-3 prose-p:first:mt-0 prose-p:last:mb-0 prose-headings:text-text-primary prose-headings:font-semibold prose-h2:text-lg prose-h2:mt-6 prose-h2:mb-3 prose-h2:first:mt-0 prose-ul:my-3 prose-ul:pl-6 prose-li:my-2">
-                        <ReactMarkdown>{section.content}</ReactMarkdown>
-                        {section.items && (
-                          <ul className="space-y-2 mt-4">
-                            {section.items.map((item, i) => (
-                              <li key={i} className="flex items-start gap-2">
-                                <span className="text-green-500">✓</span>
-                                <span>{item}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-                      </div>
-                    </CollapsibleSection>
-                  );
-                } else {
-                  return (
-                    <div key={index} className="bg-black/20 border border-border-glass rounded-lg p-5 text-[0.9375rem] leading-relaxed text-text-secondary prose prose-invert max-w-none prose-p:my-3 prose-p:first:mt-0 prose-p:last:mb-0 prose-headings:text-text-primary prose-headings:font-semibold prose-h2:text-lg prose-h2:mt-6 prose-h2:mb-3 prose-h2:first:mt-0 prose-ul:my-3 prose-ul:pl-6 prose-li:my-2">
-                      <ReactMarkdown>{section.content}</ReactMarkdown>
-                    </div>
-                  );
-                }
-              })}
-            </div>
-            <ActionButtons text={result.summary} />
-          </section>
-
-          {/* Chat History */}
-          {result.chatHistory.length > 0 && (
-            <section className="bg-bg-surface border border-border-glass rounded-xl p-6 mb-6 backdrop-blur-md">
-              <h2 className="flex items-center gap-2 text-lg font-semibold text-text-primary mb-4">
-                <span className="text-xl">💬</span>
-                Conversation
-              </h2>
-              <div className="flex flex-col gap-4">
-                {result.chatHistory.map((msg, index) => (
-                  <div
-                    key={index}
-                    className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                  >
-                    <div className={`max-w-[80%] px-[1.125rem] py-[0.875rem] rounded-xl ${
-                      msg.role === 'user' 
-                        ? 'bg-primary text-white' 
-                        : 'bg-white/10 text-text-primary border border-border-glass prose prose-invert max-w-none prose-p:my-0 prose-p:text-text-primary'
-                    }`}>
-                      {msg.role === 'assistant' ? (
-                        <ReactMarkdown>
-                          {msg.content}
-                        </ReactMarkdown>
-                      ) : (
-                        <p className="m-0 text-white">{msg.content}</p>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
-        </div>
-      </div>
-
-      <ChatInterface
-        onSendMessage={handleSendMessage}
-        isLoading={isLoadingChat}
-        chatHistory={result.chatHistory}
-      />
-    </div>
+          </Modal>
+        )
+      }
+    />
   );
 };

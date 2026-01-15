@@ -1,4 +1,5 @@
 import { useEffect, useImperativeHandle, forwardRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard, Heading, RecordButton, PauseButton, StopButton } from '@/lib';
 import { WaveformVisualization } from './WaveformVisualization';
 import { useAudioRecorder } from '../../../hooks/useAudioRecorder';
@@ -14,6 +15,7 @@ export interface RecordPanelRef {
 
 export const RecordPanel = forwardRef<RecordPanelRef, RecordPanelProps>(
   ({ onRecordingComplete, onRecordingStart }, ref) => {
+    const { t } = useTranslation();
     const {
       startRecording,
       pauseRecording,
@@ -69,7 +71,7 @@ export const RecordPanel = forwardRef<RecordPanelRef, RecordPanelProps>(
     <GlassCard variant="light" className="p-6">
       {/* Header with Status Indicator */}
       <div className="flex items-center justify-between mb-4">
-        <Heading level="h3">Record Now</Heading>
+        <Heading level="h3">{t('home.recordTitle')}</Heading>
         
         {/* Status Indicator - Top Right */}
         <div className="flex items-center gap-2">

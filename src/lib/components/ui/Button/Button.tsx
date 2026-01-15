@@ -9,6 +9,7 @@ export type ButtonVariant =
   | 'success'
   | 'danger'
   | 'outline'
+  | 'ghost'
   | 'small'
   | 'large'
   | 'circle'
@@ -29,12 +30,13 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 /**
  * A versatile button component with multiple style variants and built-in icon support.
  *
- * Supports 9 different variants:
+ * Supports 10 different variants:
  * - **primary**: Main call-to-action button with indigo background
  * - **secondary**: Secondary action with lighter styling
  * - **success**: Positive action with emerald background
  * - **danger**: Destructive action with red background
  * - **outline**: Subtle outlined button
+ * - **ghost**: Minimal button with no border/background, only hover effect (perfect for icon buttons)
  * - **small**: Compact button with reduced padding
  * - **large**: Prominent button with increased padding
  * - **circle**: Circular button for icon-only actions
@@ -71,12 +73,13 @@ export const Button: React.FC<ButtonProps> = ({
   icon,
   children,
   className = '',
+  type = 'button',
   ...props
 }) => {
   const baseClasses =
     "inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg " +
     "font-medium transition-all relative overflow-hidden whitespace-nowrap " +
-    "disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none";
+    "cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none";
 
   const variants = {
     primary:
@@ -94,6 +97,9 @@ export const Button: React.FC<ButtonProps> = ({
     outline:
       "bg-slate-50 dark:bg-slate-800/90 border-2 border-slate-400 dark:border-slate-600 " +
       "text-slate-900 dark:text-white hover:border-primary hover:bg-primary/10 shadow-sm",
+    ghost:
+      "bg-transparent text-slate-500 dark:text-slate-400 " +
+      "hover:text-primary dark:hover:text-primary p-2 gap-1.5",
     small:
       "px-3 py-1 text-sm",
     large:
@@ -110,6 +116,13 @@ export const Button: React.FC<ButtonProps> = ({
    * Combines base classes with variant-specific classes
    */
   const getVariantClasses = (v: ButtonVariant): string => {
+    // Ghost variant uses minimal base classes (no default padding/gap)
+    if (v === 'ghost') {
+      return `inline-flex items-center justify-center rounded-full
+              font-medium transition-all relative cursor-pointer
+              disabled:opacity-50 disabled:cursor-not-allowed ${variants[v]}`;
+    }
+
     // Size modifiers build on base classes
     if (v === 'small' || v === 'large') {
       return `${baseClasses} ${variants[v]}`;
@@ -127,7 +140,7 @@ export const Button: React.FC<ButtonProps> = ({
   const classes = `${getVariantClasses(variant)} ${className}`.trim();
 
   return (
-    <button className={classes} {...props}>
+    <button type={type} className={classes} {...props}>
       {icon && (
         <span className="flex items-center justify-center w-5 h-5">
           {icon}

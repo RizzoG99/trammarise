@@ -1,0 +1,18 @@
+node_modules
+dist
+dist-ssr
+coverage
+storybook-static
+.vercel
+*.local
+
+# Test data
+data/
+
+# Generated files
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# Build artifacts
+*.log

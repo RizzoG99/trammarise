@@ -4,26 +4,26 @@ import { BaseAudioAdapter } from './AudioAdapter';
  * MP3 adapter - handles MP3 files (no conversion needed)
  */
 export class MP3Adapter extends BaseAudioAdapter {
-  canHandle(file: File): boolean {
+  override canHandle(file: File): boolean {
     return file.type === 'audio/mpeg' ||
            file.type === 'audio/mp3' ||
            file.name.toLowerCase().endsWith('.mp3');
   }
 
-  async convert(file: File): Promise<Blob> {
+  override async convert(file: File): Promise<Blob> {
     // MP3 files don't need conversion - return as is
     return file;
   }
 
-  getName(): string {
+  override getName(): string {
     return 'MP3Adapter';
   }
 
-  getSupportedTypes(): string[] {
+  override getSupportedTypes(): string[] {
     return ['audio/mpeg', 'audio/mp3'];
   }
 
-  getPriority(): number {
+  override getPriority(): number {
     return 100; // High priority - MP3 is preferred format
   }
 }
@@ -38,20 +38,20 @@ export class WAVAdapter extends BaseAudioAdapter {
            file.name.toLowerCase().endsWith('.wav');
   }
 
-  async convert(file: File): Promise<Blob> {
+  override async convert(file: File): Promise<Blob> {
     // WAV files are supported by Whisper - return as is
     return file;
   }
 
-  getName(): string {
+  override getName(): string {
     return 'WAVAdapter';
   }
 
-  getSupportedTypes(): string[] {
+  override getSupportedTypes(): string[] {
     return ['audio/wav', 'audio/x-wav'];
   }
 
-  getPriority(): number {
+  override getPriority(): number {
     return 90;
   }
 }
@@ -65,20 +65,20 @@ export class WebMAdapter extends BaseAudioAdapter {
            file.name.toLowerCase().endsWith('.webm');
   }
 
-  async convert(file: File): Promise<Blob> {
+  override async convert(file: File): Promise<Blob> {
     // WebM is supported by Whisper - return as is
     return file;
   }
 
-  getName(): string {
+  override getName(): string {
     return 'WebMAdapter';
   }
 
-  getSupportedTypes(): string[] {
+  override getSupportedTypes(): string[] {
     return ['audio/webm'];
   }
 
-  getPriority(): number {
+  override getPriority(): number {
     return 80;
   }
 }
@@ -94,20 +94,20 @@ export class M4AAdapter extends BaseAudioAdapter {
            file.name.toLowerCase().endsWith('.m4a');
   }
 
-  async convert(file: File): Promise<Blob> {
+  override async convert(file: File): Promise<Blob> {
     // M4A is supported by Whisper - return as is
     return file;
   }
 
-  getName(): string {
+  override getName(): string {
     return 'M4AAdapter';
   }
 
-  getSupportedTypes(): string[] {
+  override getSupportedTypes(): string[] {
     return ['audio/m4a', 'audio/mp4', 'audio/x-m4a'];
   }
 
-  getPriority(): number {
+  override getPriority(): number {
     return 70;
   }
 }
@@ -122,20 +122,20 @@ export class OGGAdapter extends BaseAudioAdapter {
            file.name.toLowerCase().endsWith('.ogg');
   }
 
-  async convert(file: File): Promise<Blob> {
+  override async convert(file: File): Promise<Blob> {
     // OGG is supported by Whisper - return as is
     return file;
   }
 
-  getName(): string {
+  override getName(): string {
     return 'OGGAdapter';
   }
 
-  getSupportedTypes(): string[] {
+  override getSupportedTypes(): string[] {
     return ['audio/ogg'];
   }
 
-  getPriority(): number {
+  override getPriority(): number {
     return 60;
   }
 }
@@ -150,20 +150,20 @@ export class FLACAdapter extends BaseAudioAdapter {
            file.name.toLowerCase().endsWith('.flac');
   }
 
-  async convert(file: File): Promise<Blob> {
+  override async convert(file: File): Promise<Blob> {
     // FLAC is supported by Whisper - return as is
     return file;
   }
 
-  getName(): string {
+  override getName(): string {
     return 'FLACAdapter';
   }
 
-  getSupportedTypes(): string[] {
+  override getSupportedTypes(): string[] {
     return ['audio/flac', 'audio/x-flac'];
   }
 
-  getPriority(): number {
+  override getPriority(): number {
     return 50;
   }
 }
@@ -177,21 +177,21 @@ export class GenericAudioAdapter extends BaseAudioAdapter {
     return file.type.startsWith('audio/');
   }
 
-  async convert(file: File): Promise<Blob> {
+  override async convert(file: File): Promise<Blob> {
     // Try to pass through - Whisper might support it
     console.warn(`Using generic adapter for ${file.type}. May require FFmpeg conversion.`);
     return file;
   }
 
-  getName(): string {
+  override getName(): string {
     return 'GenericAudioAdapter';
   }
 
-  getSupportedTypes(): string[] {
+  override getSupportedTypes(): string[] {
     return ['audio/*'];
   }
 
-  getPriority(): number {
+  override getPriority(): number {
     return -1; // Lowest priority - only used as fallback
   }
 }
