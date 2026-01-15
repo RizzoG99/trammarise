@@ -1,38 +1,8 @@
-import type {
-  SummarizationResponse,
-  ChatResponse,
-  ChatMessage,
-} from '../types/audio';
+import type { SummarizationResponse, ChatResponse, ChatMessage } from '../types/audio';
 import { API_VALIDATION } from './constants';
+import { fetchWithTimeout } from './fetch-with-timeout';
 
 const { API_DEFAULT_TIMEOUT, TRANSCRIBE_TIMEOUT, VALIDATION_TIMEOUT } = API_VALIDATION;
-
-/**
- * Fetch with timeout support
- */
-async function fetchWithTimeout(
-  url: string,
-  options: RequestInit,
-  timeout: number
-): Promise<Response> {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeout);
-
-  try {
-    const response = await fetch(url, {
-      ...options,
-      signal: controller.signal,
-    });
-    clearTimeout(timeoutId);
-    return response;
-  } catch (error) {
-    clearTimeout(timeoutId);
-    if (error instanceof Error && error.name === 'AbortError') {
-      throw new Error('Request timeout. Please try again.');
-    }
-    throw error;
-  }
-}
 
 /**
  * Transcribe audio using OpenAI Transcription API
@@ -58,10 +28,14 @@ export async function transcribeAudio(
     formData.append('contentType', contentType);
   }
 
-  const response = await fetchWithTimeout('/api/transcribe', {
-    method: 'POST',
-    body: formData,
-  }, TRANSCRIBE_TIMEOUT);
+  const response = await fetchWithTimeout(
+    '/api/transcribe',
+    {
+      method: 'POST',
+      body: formData,
+    },
+    TRANSCRIBE_TIMEOUT
+  );
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({ message: 'Transcription failed' }));
@@ -95,7 +69,7 @@ export async function summarizeTranscript(
   formData.append('contentType', contentType);
   formData.append('provider', provider);
   formData.append('apiKey', apiKey);
-  
+
   if (model) {
     formData.append('model', model);
   }
@@ -110,10 +84,14 @@ export async function summarizeTranscript(
     formData.append('language', language);
   }
 
-  const response = await fetchWithTimeout('/api/summarize', {
-    method: 'POST',
-    body: formData,
-  }, API_DEFAULT_TIMEOUT);
+  const response = await fetchWithTimeout(
+    '/api/summarize',
+    {
+      method: 'POST',
+      body: formData,
+    },
+    API_DEFAULT_TIMEOUT
+  );
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({ message: 'Summarization failed' }));
@@ -142,11 +120,15 @@ export async function chatWithAI(
   apiKey: string,
   model?: string
 ): Promise<ChatResponse> {
-  const response = await fetchWithTimeout('/api/chat', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ transcript, summary, message, history, provider, apiKey, model }),
-  }, API_DEFAULT_TIMEOUT);
+  const response = await fetchWithTimeout(
+    '/api/chat',
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ transcript, summary, message, history, provider, apiKey, model }),
+    },
+    API_DEFAULT_TIMEOUT
+  );
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({ message: 'Chat failed' }));
@@ -175,19 +157,23 @@ export async function generatePDF(
   model?: string,
   language?: string
 ): Promise<Blob> {
-  const response = await fetchWithTimeout('/api/generate-pdf', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ 
-      transcript, 
-      summary, 
-      contentType,
-      provider, 
-      apiKey, 
-      model,
-      language 
-    }),
-  }, 60000); // 60 second timeout for PDF generation
+  const response = await fetchWithTimeout(
+    '/api/generate-pdf',
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        transcript,
+        summary,
+        contentType,
+        provider,
+        apiKey,
+        model,
+        language,
+      }),
+    },
+    60000
+  ); // 60 second timeout for PDF generation
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({ message: 'PDF generation failed' }));
@@ -202,21 +188,22 @@ export async function generatePDF(
 /**
  * Validate API key for a specific provider
  */
-export async function validateApiKey(
-  provider: string,
-  apiKey: string
-): Promise<boolean> {
+export async function validateApiKey(provider: string, apiKey: string): Promise<boolean> {
   try {
-    const response = await fetchWithTimeout('/api/validate-key', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ provider, apiKey }),
-    }, VALIDATION_TIMEOUT);
+    const response = await fetchWithTimeout(
+      '/api/validate-key',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ provider, apiKey }),
+      },
+      VALIDATION_TIMEOUT
+    );
 
     if (!response.ok) {
       console.error('API key validation failed:', {
         status: response.status,
-        statusText: response.statusText
+        statusText: response.statusText,
       });
       return false;
     }
@@ -234,7 +221,7 @@ export async function validateApiKey(
     const err = error as { message?: string; name?: string };
     console.error('API key validation error:', {
       message: err?.message,
-      name: err?.name
+      name: err?.name,
     });
     return false;
   }

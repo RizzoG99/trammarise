@@ -633,5 +633,5 @@ Each phase is independently deployable and can be rolled back without affecting 
   - [x] 3.2 Fix unsafe type casting in audio-processor
   - [x] 3.3 Fix silent chunking failures
   - [x] 3.4 Improve session-manager error logging
-- [ ] Phase 4: Code Deduplication (Optional)
-  - [ ] 4.1 Deduplicate fetchWithTimeout
+- [x] Phase 4: Code Deduplication (Optional) ✅ **COMPLETED**
+  - [x] 4.1 Deduplicate fetchWithTimeout
