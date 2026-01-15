@@ -28,6 +28,7 @@ export const useWaveSurfer = (
 ): UseWaveSurferReturn => {
   const wavesurferRef = useRef<WaveSurfer | null>(null);
   const regionsPluginRef = useRef<RegionsPlugin | null>(null);
+  const regionHandlerRef = useRef<(() => void) | null>(null);
   const [isReady, setIsReady] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -89,6 +90,11 @@ export const useWaveSurfer = (
         if (ws) {
           ws.destroy();
         }
+        // Cleanup region handler to prevent memory leak
+        if (regionHandlerRef.current && regionsPluginRef.current) {
+          regionsPluginRef.current.un('region-created', regionHandlerRef.current);
+          regionHandlerRef.current = null;
+        }
       } catch (error) {
         console.error('Error destroying WaveSurfer:', error);
       } finally {
@@ -96,7 +102,7 @@ export const useWaveSurfer = (
         regionsPluginRef.current = null;
       }
     };
-  }, [containerRef, config]);
+  }, [containerRef]); // Only reinit if container changes, not config
 
   // Load audio file
   const loadAudio = useCallback((file: File | Blob) => {
@@ -105,13 +111,21 @@ export const useWaveSurfer = (
     setIsReady(false);
 
     // Add error handler for debugging
-    wavesurferRef.current.on('error', (error) => {
+    const errorHandler = (error: unknown) => {
       console.error('WaveSurfer error:', error);
-    });
+    };
 
-    wavesurferRef.current.loadBlob(file).catch((error) => {
-      console.error('Failed to load audio blob:', error, 'File type:', file.type);
-    });
+    wavesurferRef.current.on('error', errorHandler);
+
+    wavesurferRef.current
+      .loadBlob(file)
+      .catch((error) => {
+        console.error('Failed to load audio blob:', error, 'File type:', file.type);
+      })
+      .finally(() => {
+        // Remove listener after load completes to prevent memory leak
+        wavesurferRef.current?.un('error', errorHandler);
+      });
   }, []);
 
   // Playback controls
@@ -162,13 +176,13 @@ export const useWaveSurfer = (
     // Clear any existing regions first
     regionsPluginRef.current.clearRegions();
 
-    // Enable drag selection on the waveform
-    regionsPluginRef.current.enableDragSelection({
-      color: 'rgba(139, 92, 246, 0.3)',
-    });
+    // Remove previous listener if exists to prevent memory leak
+    if (regionHandlerRef.current) {
+      regionsPluginRef.current.un('region-created', regionHandlerRef.current);
+    }
 
-    // Listen for region-created event to ensure only one region exists
-    regionsPluginRef.current.on('region-created', () => {
+    // Store handler reference for cleanup
+    const regionCreatedHandler = () => {
       const regions = regionsPluginRef.current?.getRegions() || [];
       // If more than one region exists, keep only the most recent one
       if (regions.length > 1) {
@@ -177,6 +191,14 @@ export const useWaveSurfer = (
           regions[i].remove();
         }
       }
+    };
+
+    regionHandlerRef.current = regionCreatedHandler;
+    regionsPluginRef.current.on('region-created', regionCreatedHandler);
+
+    // Enable drag selection on the waveform
+    regionsPluginRef.current.enableDragSelection({
+      color: 'rgba(139, 92, 246, 0.3)',
     });
   }, []);
 
