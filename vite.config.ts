@@ -1,6 +1,6 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import path from 'path'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import path from 'path';
 
 import { visualizer } from 'rollup-plugin-visualizer';
 
@@ -14,11 +14,17 @@ export default defineConfig({
       filename: 'stats.html',
     }),
   ],
+  optimizeDeps: {
+    exclude: ['@ffmpeg/ffmpeg', '@ffmpeg/util'], // Exclude FFmpeg from dep optimization (worker issues)
+  },
   resolve: {
     alias: {
       '@/lib': path.resolve(__dirname, './src/lib'),
       '@': path.resolve(__dirname, './src'),
     },
+  },
+  worker: {
+    format: 'es', // Use ES modules for workers
   },
   server: {
     headers: {
@@ -29,7 +35,7 @@ export default defineConfig({
       '/api': {
         target: 'http://localhost:3001',
         changeOrigin: true,
-      }
-    }
-  }
-})
+      },
+    },
+  },
+});

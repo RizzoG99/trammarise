@@ -1,5 +1,10 @@
 import { useState, useRef, useCallback } from 'react';
-import { transcribeAudio, summarizeTranscript } from '../utils/api';
+import {
+  createTranscriptionJob,
+  pollJobStatus,
+  summarizeTranscript,
+  cancelJob,
+} from '../utils/api';
 import type { AIConfiguration, ProcessingResult } from '../types/audio';
 import type { SessionData } from '../types/routing';
 
@@ -21,30 +26,27 @@ interface UseAudioProcessingOptions {
  * Custom hook for orchestrating audio processing workflow.
  *
  * Handles the complete processing pipeline:
- * 1. Compress & chunk large audio files (0-30%)
- * 2. Transcribe audio chunks sequentially (30-70%)
+ * 1. Upload audio and create transcription job (0-10%)
+ * 2. Server-side chunking and transcription (10-70%)
  * 3. Analyze context files (70-80%)
  * 4. Generate AI summary (80-100%)
  *
  * Features:
- * - Real-time progress tracking
+ * - Server-side audio chunking (no client-side FFmpeg)
+ * - Real-time progress tracking via polling
  * - Cancellation support via AbortController
  * - Error handling with user-friendly messages
- * - Extracted from old App.tsx handleConfigure logic
  *
  * @param options - Callbacks for progress, completion, and errors
  * @returns Processing control functions
  */
-export function useAudioProcessing({
-  onProgress,
-  onComplete,
-  onError,
-}: UseAudioProcessingOptions) {
+export function useAudioProcessing({ onProgress, onComplete, onError }: UseAudioProcessingOptions) {
   const [isProcessing, setIsProcessing] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const currentJobIdRef = useRef<string | null>(null);
 
   /**
-   * Start the audio processing workflow
+   * Start the audio processing workflow (server-side chunking)
    */
   const startProcessing = useCallback(
     async (session: SessionData, config: AIConfiguration) => {
@@ -63,60 +65,46 @@ export function useAudioProcessing({
           throw new Error('Processing cancelled');
         }
 
-        // Step 0: Process large audio (Compress & Chunk) - 0-30%
+        // Step 1: Upload audio and create transcription job - 0-10%
         onProgress('uploading', 0);
 
-        // Dynamic import to avoid loading FFmpeg unless needed
-        const { processLargeAudio } = await import('../utils/audio-processor');
+        const { jobId } = await createTranscriptionJob(
+          session.audioFile.file,
+          config.openaiKey,
+          config.language,
+          config.model,
+          config.contentType,
+          config.model, // performance level
+          session.audioFile.file.name
+        );
 
-        const chunks = await processLargeAudio(session.audioFile.file, (step, progress) => {
-          // Check if aborted during processing
-          if (abortController.signal.aborted) {
-            throw new Error('Processing cancelled');
-          }
+        // Store jobId for cancellation
+        currentJobIdRef.current = jobId;
 
-          if (step === 'compressing') {
-            // Compression: 0-20%
-            onProgress('uploading', Math.round(progress * 0.2));
-          } else if (step === 'chunking') {
-            // Chunking: 20-30%
-            onProgress('uploading', 20 + Math.round(progress * 0.1));
-          }
-        });
+        onProgress('uploading', 10);
 
-        // Check if aborted after chunking
+        // Check if aborted after job creation
         if (abortController.signal.aborted) {
           throw new Error('Processing cancelled');
         }
 
-        // Step 1: Transcribe chunks sequentially - 30-70%
-        let fullTranscript = '';
-
-        for (let i = 0; i < chunks.length; i++) {
-          // Check if aborted before each chunk
+        // Step 2: Poll job status for transcription progress - 10-70%
+        const fullTranscript = await pollJobStatus(jobId, (progress, status) => {
+          // Check if aborted during polling
           if (abortController.signal.aborted) {
             throw new Error('Processing cancelled');
           }
 
-          const chunk = chunks[i];
-          const progressBase = 30 + Math.round((i / chunks.length) * 40); // 30-70%
-          onProgress('transcribing', progressBase);
+          // Map job progress (0-100%) to our range (10-70%)
+          const mappedProgress = 10 + Math.round((progress / 100) * 60);
 
-          // Determine filename: use original name if it's a File, otherwise generate chunk name
-          const chunkName = chunk instanceof File ? chunk.name : `chunk-${i}.mp3`;
-
-          const { transcript } = await transcribeAudio(
-            chunk,
-            config.openaiKey,
-            config.language,
-            config.model,
-            config.contentType,
-            chunkName
-          );
-
-          // Concatenate transcripts with double newline separator
-          fullTranscript += (fullTranscript ? '\n\n' : '') + transcript;
-        }
+          // Update step based on status
+          if (status === 'chunking') {
+            onProgress('uploading', mappedProgress);
+          } else if (status === 'transcribing' || status === 'assembling') {
+            onProgress('transcribing', mappedProgress);
+          }
+        });
 
         onProgress('transcribing', 70);
 
@@ -175,6 +163,7 @@ export function useAudioProcessing({
       } finally {
         setIsProcessing(false);
         abortControllerRef.current = null;
+        currentJobIdRef.current = null;
       }
     },
     [isProcessing, onProgress, onComplete, onError]
@@ -183,9 +172,22 @@ export function useAudioProcessing({
   /**
    * Cancel the current processing operation
    */
-  const cancel = useCallback(() => {
+  const cancel = useCallback(async () => {
+    // Abort the client-side polling
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
+    }
+
+    // Cancel the server-side job if it exists
+    if (currentJobIdRef.current) {
+      try {
+        await cancelJob(currentJobIdRef.current);
+        console.log(`[useAudioProcessing] Cancelled job ${currentJobIdRef.current}`);
+      } catch (error) {
+        console.error('[useAudioProcessing] Failed to cancel job:', error);
+      } finally {
+        currentJobIdRef.current = null;
+      }
     }
   }, []);
 
@@ -198,28 +200,14 @@ export function useAudioProcessing({
 function handleError(errorMsg: string, session: SessionData, onError: (error: Error) => void) {
   const message = errorMsg.toLowerCase();
 
-  // FFmpeg-specific errors
-  if (message.includes('ffmpeg') || message.includes('cdn')) {
-    const isMP3 = session.audioFile.file.type === 'audio/mpeg';
-    const isSmall = session.audioFile.file.size < 24 * 1024 * 1024; // 24MB
-
-    if (isMP3 && isSmall) {
-      onError(
-        new Error(
-          'Audio processor failed to load (network issue). Your file is small enough to ' +
-            'process without it. Refresh the page and try again. If the issue persists, ' +
-            'contact support.'
-        )
-      );
-    } else {
-      onError(
-        new Error(
-          'Audio processor failed to load from the network. This is needed for large files (>24MB). ' +
-            'Please check your internet connection and try again. If the problem persists, try ' +
-            'uploading a smaller MP3 file (<24MB).'
-        )
-      );
-    }
+  // Job-specific errors
+  if (message.includes('job not found') || message.includes('job timed out')) {
+    onError(
+      new Error(
+        'Transcription job failed or timed out. This may happen with very long audio files. ' +
+          'Please try again or split your audio into shorter segments.'
+      )
+    );
     return;
   }
 
@@ -257,17 +245,13 @@ function handleError(errorMsg: string, session: SessionData, onError: (error: Er
   // Network errors
   if (message.includes('network') || message.includes('fetch')) {
     onError(
-      new Error(
-        'Network error occurred. Please check your internet connection and try again.'
-      )
+      new Error('Network error occurred. Please check your internet connection and try again.')
     );
     return;
   }
 
   // Generic error (pass through original message)
   onError(
-    new Error(
-      `Processing failed: ${errorMsg}\n\nPlease try again or check your configuration.`
-    )
+    new Error(`Processing failed: ${errorMsg}\n\nPlease try again or check your configuration.`)
   );
 }

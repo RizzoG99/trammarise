@@ -5,7 +5,142 @@ import { fetchWithTimeout } from './fetch-with-timeout';
 const { API_DEFAULT_TIMEOUT, TRANSCRIBE_TIMEOUT, VALIDATION_TIMEOUT } = API_VALIDATION;
 
 /**
+ * Create a transcription job (server-side chunking)
+ */
+export async function createTranscriptionJob(
+  audioBlob: Blob,
+  apiKey: string,
+  language?: string,
+  model?: string,
+  contentType?: string,
+  performanceLevel?: string,
+  filename: string = 'audio.webm'
+): Promise<{ jobId: string; statusUrl: string }> {
+  const formData = new FormData();
+  formData.append('file', audioBlob, filename);
+  formData.append('apiKey', apiKey);
+  if (language) {
+    formData.append('language', language);
+  }
+  if (model) {
+    formData.append('model', model);
+  }
+  if (contentType) {
+    formData.append('contentType', contentType);
+  }
+  if (performanceLevel) {
+    formData.append('performanceLevel', performanceLevel);
+  }
+
+  const response = await fetchWithTimeout(
+    '/api/transcribe',
+    {
+      method: 'POST',
+      body: formData,
+    },
+    TRANSCRIBE_TIMEOUT
+  );
+
+  if (!response.ok) {
+    const error = await response
+      .json()
+      .catch(() => ({ message: 'Failed to create transcription job' }));
+    throw new Error(error.message || 'Failed to create transcription job');
+  }
+
+  const data = await response.json();
+
+  // Validate response structure
+  if (!data || typeof data.jobId !== 'string') {
+    throw new Error('Invalid response from transcription API');
+  }
+
+  return {
+    jobId: data.jobId,
+    statusUrl: data.statusUrl,
+  };
+}
+
+/**
+ * Cancel a transcription job
+ */
+export async function cancelJob(jobId: string): Promise<void> {
+  const response = await fetch(`/api/transcribe-job/${jobId}/cancel`, {
+    method: 'POST',
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ message: 'Failed to cancel job' }));
+    throw new Error(error.message || 'Failed to cancel job');
+  }
+}
+
+/**
+ * Poll job status until completion
+ */
+export async function pollJobStatus(
+  jobId: string,
+  onProgress?: (progress: number, status: string) => void
+): Promise<string> {
+  const POLL_INTERVAL = 2000; // 2 seconds
+  const MAX_POLLS = 150; // 5 minutes total (150 * 2s = 300s)
+
+  let pollCount = 0;
+
+  while (pollCount < MAX_POLLS) {
+    try {
+      const response = await fetch(`/api/transcribe-job/${jobId}/status`);
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          throw new Error('Job not found');
+        }
+        throw new Error('Failed to fetch job status');
+      }
+
+      const data = await response.json();
+
+      // Call progress callback
+      if (onProgress) {
+        onProgress(data.progress, data.status);
+      }
+
+      // Check job status
+      if (data.status === 'completed') {
+        if (!data.transcript) {
+          throw new Error('Job completed but no transcript found');
+        }
+        return data.transcript;
+      }
+
+      if (data.status === 'failed') {
+        throw new Error(data.error || 'Transcription job failed');
+      }
+
+      if (data.status === 'cancelled') {
+        throw new Error('Transcription job was cancelled');
+      }
+
+      // Wait before next poll
+      await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL));
+      pollCount++;
+    } catch (error) {
+      // If it's a network error, retry a few times
+      if (pollCount < 3) {
+        await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL));
+        pollCount++;
+        continue;
+      }
+      throw error;
+    }
+  }
+
+  throw new Error('Transcription job timed out');
+}
+
+/**
  * Transcribe audio using OpenAI Transcription API
+ * @deprecated Use createTranscriptionJob + pollJobStatus for server-side chunking
  */
 export async function transcribeAudio(
   audioBlob: Blob,
