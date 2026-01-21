@@ -17,11 +17,16 @@ const mockFFmpegFactory = vi.hoisted(() => {
 
   const ffmpegConstructor = vi.fn(() => {
     const callbacks: Record<string, (() => void) | undefined> = {};
+    let outputFilePath: string | undefined;
+
     const mockCommand = {
       input: vi.fn().mockReturnThis(),
       seekInput: vi.fn().mockReturnThis(),
       duration: vi.fn().mockReturnThis(),
-      output: vi.fn().mockReturnThis(),
+      output: vi.fn((path: string) => {
+        outputFilePath = path; // Capture output path
+        return mockCommand;
+      }),
       audioCodec: vi.fn().mockReturnThis(),
       outputOptions: vi.fn().mockReturnThis(),
       setStartTime: vi.fn().mockReturnThis(),
@@ -31,18 +36,35 @@ const mockFFmpegFactory = vi.hoisted(() => {
       audioFrequency: vi.fn().mockReturnThis(),
       on: vi.fn((event: string, callback: () => void) => {
         callbacks[event] = callback;
+
+        // Match the unit test pattern: schedule callback in on()
+        if (event === 'end') {
+          // Capture outputFilePath reference at callback registration time
+          const capturedOutputPath = outputFilePath;
+          setImmediate(() => {
+            // Write file before calling callback
+            const pathToUse = capturedOutputPath || outputFilePath;
+            if (pathToUse) {
+              // Create unique content based on file path to ensure different hashes
+              const mockAudioBuffer = Buffer.from(`mock audio data for ${pathToUse}`);
+              globalThis.mockFileSystem.files.set(pathToUse, mockAudioBuffer);
+            }
+            callback();
+          });
+        }
+
         return mockCommand;
       }),
-      run: vi.fn(() => {
-        // Use queueMicrotask for fake timer compatibility
-        if (callbacks['end']) {
-          queueMicrotask(() => callbacks['end']!());
-        }
-      }),
+      run: vi.fn(),
     };
     // Set all methods to return mockCommand for chaining
     Object.keys(mockCommand).forEach((key) => {
-      if (typeof mockCommand[key] === 'function' && key !== 'run' && key !== 'on') {
+      if (
+        typeof mockCommand[key] === 'function' &&
+        key !== 'run' &&
+        key !== 'on' &&
+        key !== 'output'
+      ) {
         mockCommand[key].mockReturnValue(mockCommand);
       }
     });
@@ -114,6 +136,11 @@ const mockFileSystem = vi.hoisted(() => {
 });
 
 vi.mock('fs/promises', () => mockFileSystem);
+
+// Also mock 'fs' module with promises export (used by audio-chunker.ts)
+vi.mock('fs', () => ({
+  promises: mockFileSystem,
+}));
 
 // Mock environment variables
 process.env.OPENAI_API_KEY = 'test-openai-key-12345';

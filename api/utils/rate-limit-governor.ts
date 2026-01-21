@@ -139,9 +139,23 @@ export class RateLimitGovernor {
         this.recordOutcome('rate_limited', duration);
         this.state.stats.rateLimitedRequests++;
 
+        const config = BACKOFF_CONFIGS[this.state.mode];
+
         console.warn(
-          `[Rate Governor] Request ${request.id} rate limited (attempt ${request.attemptCount})`
+          `[Rate Governor] Request ${request.id} rate limited (attempt ${request.attemptCount}/${config.maxRetries})`
         );
+
+        // Check if max retries exceeded
+        if (request.attemptCount >= config.maxRetries) {
+          console.error(
+            `[Rate Governor] Request ${request.id} exceeded max retries (${config.maxRetries}), failing`
+          );
+          request.reject(
+            new Error(`Rate limit retry limit exceeded after ${request.attemptCount} attempts`)
+          );
+          this.checkDegradedMode();
+          return; // Don't retry
+        }
 
         // Calculate backoff and retry
         const backoff = this.calculateBackoff(request.attemptCount);
@@ -197,12 +211,29 @@ export class RateLimitGovernor {
    * Check if error is a rate limit error (HTTP 429)
    */
   private isRateLimitError(error: unknown): boolean {
-    return (
-      error?.status === 429 ||
-      error?.statusCode === 429 ||
-      error?.message?.includes('429') ||
-      error?.message?.toLowerCase().includes('rate limit')
-    );
+    // Type guard for error objects
+    if (!error || typeof error !== 'object') {
+      return false;
+    }
+
+    const err = error as Record<string, unknown>;
+
+    // Check error name property (for test objects)
+    if (err.name === 'RateLimitError') {
+      return true;
+    }
+
+    // Check HTTP status codes
+    if (err.status === 429 || err.statusCode === 429) {
+      return true;
+    }
+
+    // Check error message
+    if (typeof err.message === 'string') {
+      return err.message.includes('429') || err.message.toLowerCase().includes('rate limit');
+    }
+
+    return false;
   }
 
   /**
@@ -313,6 +344,10 @@ export class RateLimitGovernor {
    */
   getStats(): RateLimitStats {
     return { ...this.state.stats };
+  }
+
+  getMaxConcurrency(): number {
+    return this.state.maxConcurrency;
   }
 
   /**

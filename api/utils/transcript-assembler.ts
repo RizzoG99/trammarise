@@ -28,7 +28,7 @@ export async function assembleTranscript(
   }
 
   if (chunks.length === 1) {
-    return transcripts[0];
+    return normalizeSentences(transcripts[0]);
   }
 
   console.log(`[Transcript Assembler] Assembling ${chunks.length} chunks (mode: ${mode})`);
@@ -64,26 +64,57 @@ async function removeOverlaps(chunks: ChunkMetadata[], transcripts: string[]): P
 
     // Extract overlap region from previous transcript
     const previousTranscript = transcripts[i - 1];
-    const overlapDuration = currentChunk.startTime - previousChunk.overlapStartTime!;
+
+    // Calculate overlap duration: difference between previous chunk's end and current chunk's start
+    const previousChunkEnd = previousChunk.startTime + previousChunk.duration;
+    const overlapDuration = previousChunkEnd - currentChunk.startTime;
 
     // Estimate words in overlap (assume ~150 words per minute)
-    const estimatedOverlapWords = Math.ceil((overlapDuration / 60) * 150);
+    const estimatedByDuration = Math.max(1, Math.ceil((overlapDuration / 60) * 150));
 
-    // Get last N words from previous transcript
-    const previousWords = previousTranscript.split(/\s+/);
+    // Get last N words from previous transcript, but cap at 50% of transcript length
+    const previousWords = previousTranscript.split(/\s+/).filter((w) => w.length > 0);
+    const maxOverlapWords = Math.floor(previousWords.length * 0.5);
+    const estimatedOverlapWords = Math.min(estimatedByDuration, maxOverlapWords);
     const overlapWords = previousWords.slice(-estimatedOverlapWords).join(' ');
 
-    // Search for overlap in first 30% of current transcript
+    // Find overlap in current transcript - try multiple strategies
     const currentWords = currentTranscript.split(/\s+/);
-    const searchWindowSize = Math.ceil(currentWords.length * 0.3);
+
+    // Strategy 1: Try first 50% (expanded from 30%)
+    const searchWindowSize = Math.ceil(currentWords.length * 0.5);
     const searchWindow = currentWords.slice(0, searchWindowSize).join(' ');
 
-    // Find best match position
-    const matchPosition = findOverlapMatch(
+    let matchPosition = findOverlapMatch(
       overlapWords,
       searchWindow,
       0.7 // 70% similarity threshold
     );
+
+    // Strategy 2: If not found, try full current transcript
+    if (matchPosition === -1) {
+      matchPosition = findOverlapMatch(overlapWords, currentTranscript, 0.7);
+    }
+
+    // Strategy 3: If still not found, try substring matching
+    if (matchPosition === -1) {
+      const overlapWordsArray = overlapWords.split(/\s+/);
+      const minMatchLength = Math.floor(overlapWordsArray.length * 0.6); // Match at least 60% of words
+
+      for (let startIdx = 0; startIdx < overlapWordsArray.length - minMatchLength + 1; startIdx++) {
+        const phraseToFind = overlapWordsArray.slice(startIdx, startIdx + minMatchLength).join(' ');
+        const lowerCurrentTranscript = currentTranscript.toLowerCase();
+        const index = lowerCurrentTranscript.indexOf(phraseToFind.toLowerCase());
+
+        if (index !== -1) {
+          // Convert character index to word index
+          const beforeMatch = lowerCurrentTranscript.substring(0, index);
+          const wordsBeforeMatch = beforeMatch.split(/\s+/).filter((w) => w.length > 0).length;
+          matchPosition = wordsBeforeMatch + minMatchLength;
+          break;
+        }
+      }
+    }
 
     if (matchPosition !== -1) {
       // Found match, remove overlap from current transcript
@@ -96,13 +127,12 @@ async function removeOverlaps(chunks: ChunkMetadata[], transcripts: string[]): P
 
       deduplicatedTranscripts.push(deduplicated);
     } else {
-      // No match found, use estimated word count
+      // No match found, preserve full current transcript
       console.warn(
-        `[Transcript Assembler] Could not find overlap match for chunk ${i}, using estimate`
+        `[Transcript Assembler] Could not find overlap match for chunk ${i}, preserving full transcript`
       );
 
-      const deduplicated = currentWords.slice(estimatedOverlapWords).join(' ');
-      deduplicatedTranscripts.push(deduplicated);
+      deduplicatedTranscripts.push(currentTranscript);
     }
   }
 
@@ -213,9 +243,14 @@ export function normalizeSentences(text: string): string {
   // Fix multiple spaces
   let normalized = text.replace(/\s+/g, ' ').trim();
 
-  // Fix spacing around punctuation
-  normalized = normalized.replace(/\s+([.,!?;:])/g, '$1');
-  normalized = normalized.replace(/([.,!?;:])\s*/g, '$1 ');
+  // Remove spaces before punctuation
+  normalized = normalized.replace(/\s+([!?;:])/g, '$1');
+
+  // Add space after sentence-ending punctuation (!?;:) if not already present
+  normalized = normalized.replace(/([!?;:])(?!\s)/g, '$1 ');
+
+  // Add space after periods ONLY if followed by a letter (not in numbers like 1.5)
+  normalized = normalized.replace(/(\.)([A-Za-z])/g, '$1 $2');
 
   // Capitalize after sentence endings
   normalized = normalized.replace(/([.!?])\s+([a-z])/g, (match, p1, p2) => {

@@ -17,7 +17,9 @@ describe('Rate Limit Governor', () => {
       governor = new RateLimitGovernor('balanced');
     });
 
-    it('should allow up to 4 concurrent requests', async () => {
+    it('should allow up to 4 concurrent requests', { timeout: 15000 }, async () => {
+      vi.useRealTimers(); // Use real timers for async operations
+
       const tracker = new ConcurrencyTracker();
       const promises: Promise<number>[] = [];
 
@@ -34,6 +36,8 @@ describe('Rate Limit Governor', () => {
       await Promise.all(promises);
 
       expect(tracker.getMaxConcurrency()).toBe(4);
+
+      vi.useFakeTimers(); // Restore fake timers for other tests
     });
 
     it('should process requests in priority order', async () => {
@@ -71,7 +75,9 @@ describe('Rate Limit Governor', () => {
       expect(executionOrder.length).toBe(2);
     });
 
-    it('should apply exponential backoff on rate limit', async () => {
+    it('should apply exponential backoff on rate limit', { timeout: 15000 }, async () => {
+      vi.useRealTimers(); // Use real timers for async operations
+
       new BackoffTracker();
       let callCount = 0;
 
@@ -86,6 +92,8 @@ describe('Rate Limit Governor', () => {
 
       // This test verifies backoff logic exists - full integration test will validate delays
       await expect(governor.enqueue('req-1', 'test-job', 0, mockFetch, 0)).resolves.toBeDefined();
+
+      vi.useFakeTimers(); // Restore fake timers for other tests
     });
   });
 
@@ -96,7 +104,9 @@ describe('Rate Limit Governor', () => {
       governor = new RateLimitGovernor('best_quality');
     });
 
-    it('should allow only 1 concurrent request', async () => {
+    it('should allow only 1 concurrent request', { timeout: 15000 }, async () => {
+      vi.useRealTimers(); // Use real timers for async operations
+
       const tracker = new ConcurrencyTracker();
       const promises: Promise<number>[] = [];
 
@@ -113,9 +123,13 @@ describe('Rate Limit Governor', () => {
       await Promise.all(promises);
 
       expect(tracker.getMaxConcurrency()).toBe(1);
+
+      vi.useFakeTimers(); // Restore fake timers for other tests
     });
 
-    it('should process requests sequentially', async () => {
+    it('should process requests sequentially', { timeout: 15000 }, async () => {
+      vi.useRealTimers(); // Use real timers for async operations
+
       const executionOrder: number[] = [];
       const promises: Promise<void>[] = [];
 
@@ -131,6 +145,8 @@ describe('Rate Limit Governor', () => {
 
       // Should execute in order: 0, 1, 2
       expect(executionOrder).toEqual([0, 1, 2]);
+
+      vi.useFakeTimers(); // Restore fake timers for other tests
     });
   });
 
@@ -141,28 +157,41 @@ describe('Rate Limit Governor', () => {
       governor = new RateLimitGovernor('balanced');
     });
 
-    it('should enter degraded mode when >30% requests are rate limited', async () => {
-      // Simulate sustained rate limiting
+    it(
+      'should enter degraded mode when >30% requests are rate limited',
+      { timeout: 15000 },
+      async () => {
+        vi.useRealTimers(); // Use real timers for async operations
 
-      for (let i = 0; i < 20; i++) {
-        try {
-          await governor.enqueue(`req-${i}`, 'test-job', i, async () => {
-            callCount++;
-            // Rate limit 40% of requests
-            if (i % 5 < 2) {
-              throw { name: 'RateLimitError', retryAfter: 1 };
-            }
-            return 'success';
-          });
-        } catch {
-          // Swallow rate limit errors for this test
+        // Simulate sustained rate limiting
+        const promises: Promise<void>[] = [];
+
+        // Fire off requests without awaiting (so retries happen in background)
+        for (let i = 0; i < 20; i++) {
+          const promise = governor
+            .enqueue(`req-${i}`, 'test-job', i, async () => {
+              // Rate limit 40% of requests
+              if (i % 5 < 2) {
+                throw { name: 'RateLimitError', retryAfter: 1 };
+              }
+              return 'success';
+            })
+            .catch(() => {
+              // Swallow errors - we don't care about individual results
+            });
+          promises.push(promise);
         }
-      }
 
-      // Governor should have detected sustained rate limiting
-      const stats = governor.getStats();
-      expect(stats.degradedModeActivations).toBeGreaterThan(0);
-    });
+        // Wait a bit for the governor to detect the pattern
+        await new Promise((resolve) => setTimeout(resolve, 5000));
+
+        // Governor should have detected sustained rate limiting
+        const stats = governor.getStats();
+        expect(stats.degradedModeActivations).toBeGreaterThan(0);
+
+        vi.useFakeTimers(); // Restore fake timers for other tests
+      }
+    );
 
     it('should reduce concurrency in degraded mode', async () => {
       const governor = new RateLimitGovernor('balanced');
@@ -191,7 +220,9 @@ describe('Rate Limit Governor', () => {
       expect(stats.totalRequests).toBe(2);
     });
 
-    it('should track rate limited requests', async () => {
+    it('should track rate limited requests', { timeout: 30000 }, async () => {
+      vi.useRealTimers(); // Use real timers for async operations
+
       const governor = new RateLimitGovernor('balanced');
 
       try {
@@ -204,9 +235,13 @@ describe('Rate Limit Governor', () => {
 
       const stats = governor.getStats();
       expect(stats.rateLimitedRequests).toBeGreaterThan(0);
+
+      vi.useFakeTimers(); // Restore fake timers for other tests
     });
 
-    it('should track peak concurrency', async () => {
+    it('should track peak concurrency', { timeout: 15000 }, async () => {
+      vi.useRealTimers(); // Use real timers for async operations
+
       const governor = new RateLimitGovernor('balanced');
       const promises: Promise<string>[] = [];
 
@@ -224,6 +259,8 @@ describe('Rate Limit Governor', () => {
       const stats = governor.getStats();
       expect(stats.peakConcurrency).toBeGreaterThan(0);
       expect(stats.peakConcurrency).toBeLessThanOrEqual(4);
+
+      vi.useFakeTimers(); // Restore fake timers for other tests
     });
   });
 

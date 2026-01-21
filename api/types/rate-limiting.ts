@@ -121,6 +121,9 @@ export interface BackoffConfig {
 
   /** Random jitter range (0-1, proportion of delay) */
   jitter: number;
+
+  /** Maximum number of retry attempts before failing */
+  maxRetries: number;
 }
 
 /**
@@ -132,12 +135,14 @@ export const BACKOFF_CONFIGS: Record<ProcessingMode, BackoffConfig> = {
     maxDelay: 10000, // Cap at 10 seconds
     multiplier: 2.5, // Exponential: 2s -> 5s -> 10s
     jitter: 0.3, // ±30% randomization
+    maxRetries: 5, // Maximum 5 retry attempts
   },
   best_quality: {
     baseDelay: 5000, // Start at 5 seconds
     maxDelay: 10000, // Cap at 10 seconds
     multiplier: 1, // Linear: 5s -> 10s
     jitter: 0.2, // ±20% randomization
+    maxRetries: 3, // Maximum 3 retry attempts
   },
 };
 
