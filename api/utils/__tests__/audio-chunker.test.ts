@@ -26,7 +26,7 @@ import * as crypto from 'crypto';
 // Helper to configure ffprobe mock for a specific duration
 function mockFFprobeDuration(duration: number) {
   vi.mocked(ffmpeg.ffprobe).mockImplementation(((
-    path: string,
+    _path: string,
     callback: (err: unknown, data?: unknown) => void
   ) => {
     callback(null, { format: { duration } });
@@ -308,6 +308,11 @@ describe('Audio Chunker', () => {
 
   describe('cleanupChunks()', () => {
     it('should delete all chunk files', async () => {
+      // Pre-populate mock filesystem with chunk files
+      globalThis.mockFileSystem.files.set('/tmp/chunk_0.mp3', Buffer.from('chunk 0'));
+      globalThis.mockFileSystem.files.set('/tmp/chunk_1.mp3', Buffer.from('chunk 1'));
+      globalThis.mockFileSystem.files.set('/tmp/chunk_2.mp3', Buffer.from('chunk 2'));
+
       // Use global mock directly WITHOUT clearing
       const unlinkSpy = globalThis.mockFileSystem.unlink;
       const initialCallCount = unlinkSpy.mock.calls.length;
