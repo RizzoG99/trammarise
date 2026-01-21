@@ -6,6 +6,8 @@
 
 import { describe, it, expect, vi } from 'vitest';
 import * as ffmpeg from 'fluent-ffmpeg';
+import { mockFFmpeg } from '../../vitest.setup';
+import type { ChunkMetadata } from '../../types/chunking';
 import {
   chunkAudio,
   getAudioDuration,
@@ -137,8 +139,9 @@ describe('Audio Chunker', () => {
 
       mockFFprobeDuration(duration);
 
-      const fs = await import('fs/promises');
-      const unlinkSpy = vi.spyOn(fs, 'unlink');
+      // Use global mock directly
+      const unlinkSpy = globalThis.mockFileSystem.unlink;
+      unlinkSpy.mockClear();
 
       await chunkAudio(audioBuffer, 'test.mp3', 'balanced');
 
@@ -254,8 +257,8 @@ describe('Audio Chunker', () => {
       const testBuffer = Buffer.from('test audio data');
       const expectedHash = crypto.createHash('sha256').update(testBuffer).digest('hex');
 
-      const fs = await import('fs/promises');
-      vi.spyOn(fs, 'readFile').mockResolvedValue(testBuffer);
+      // Pre-populate mock filesystem
+      globalThis.mockFileSystem.files.set('/tmp/chunk.mp3', testBuffer);
 
       const hash = await computeChunkHash('/tmp/chunk.mp3');
 
@@ -264,11 +267,9 @@ describe('Audio Chunker', () => {
     });
 
     it('should produce different hashes for different content', async () => {
-      const fs = await import('fs/promises');
-
-      vi.spyOn(fs, 'readFile')
-        .mockResolvedValueOnce(Buffer.from('data 1'))
-        .mockResolvedValueOnce(Buffer.from('data 2'));
+      // Pre-populate mock filesystem with different content
+      globalThis.mockFileSystem.files.set('/tmp/chunk1.mp3', Buffer.from('data 1'));
+      globalThis.mockFileSystem.files.set('/tmp/chunk2.mp3', Buffer.from('data 2'));
 
       const hash1 = await computeChunkHash('/tmp/chunk1.mp3');
       const hash2 = await computeChunkHash('/tmp/chunk2.mp3');
@@ -279,13 +280,38 @@ describe('Audio Chunker', () => {
 
   describe('cleanupChunks()', () => {
     it('should delete all chunk files', async () => {
-      const fs = await import('fs/promises');
-      const unlinkSpy = vi.spyOn(fs, 'unlink').mockResolvedValue();
+      // Use global mock directly
+      const unlinkSpy = globalThis.mockFileSystem.unlink;
+      unlinkSpy.mockClear();
 
-      const chunks = [
-        { index: 0, filePath: '/tmp/chunk_0.mp3' },
-        { index: 1, filePath: '/tmp/chunk_1.mp3' },
-        { index: 2, filePath: '/tmp/chunk_2.mp3' },
+      const chunks: ChunkMetadata[] = [
+        {
+          index: 0,
+          filePath: '/tmp/chunk_0.mp3',
+          startTime: 0,
+          endTime: 180,
+          duration: 180,
+          hash: 'hash0',
+          hasOverlap: false,
+        },
+        {
+          index: 1,
+          filePath: '/tmp/chunk_1.mp3',
+          startTime: 180,
+          endTime: 360,
+          duration: 180,
+          hash: 'hash1',
+          hasOverlap: false,
+        },
+        {
+          index: 2,
+          filePath: '/tmp/chunk_2.mp3',
+          startTime: 360,
+          endTime: 540,
+          duration: 180,
+          hash: 'hash2',
+          hasOverlap: false,
+        },
       ];
 
       await cleanupChunks(chunks);
@@ -297,10 +323,22 @@ describe('Audio Chunker', () => {
     });
 
     it('should not throw if deletion fails', async () => {
-      const fs = await import('fs/promises');
-      vi.spyOn(fs, 'unlink').mockRejectedValue(new Error('ENOENT'));
+      // Use global mock directly
+      const unlinkSpy = globalThis.mockFileSystem.unlink;
+      unlinkSpy.mockClear();
+      unlinkSpy.mockRejectedValue(new Error('ENOENT'));
 
-      const chunks = [{ index: 0, filePath: '/tmp/chunk_0.mp3' }];
+      const chunks: ChunkMetadata[] = [
+        {
+          index: 0,
+          filePath: '/tmp/chunk_0.mp3',
+          startTime: 0,
+          endTime: 180,
+          duration: 180,
+          hash: 'hash0',
+          hasOverlap: false,
+        },
+      ];
 
       // Should not throw
       await expect(cleanupChunks(chunks)).resolves.toBeUndefined();
@@ -311,8 +349,9 @@ describe('Audio Chunker', () => {
     it('should return file size in bytes', async () => {
       const expectedSize = 1024 * 512; // 512KB
 
-      const fs = await import('fs/promises');
-      vi.spyOn(fs, 'stat').mockResolvedValue({ size: expectedSize } as unknown as fs.Stats);
+      // Pre-populate mock filesystem with correct size
+      const testBuffer = Buffer.alloc(expectedSize);
+      globalThis.mockFileSystem.files.set('/tmp/chunk.mp3', testBuffer);
 
       const size = await getChunkSize('/tmp/chunk.mp3');
 

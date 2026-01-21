@@ -34,9 +34,9 @@ const mockFFmpegFactory = vi.hoisted(() => {
         return mockCommand;
       }),
       run: vi.fn(() => {
-        // Trigger 'end' callback asynchronously
+        // Use queueMicrotask for fake timer compatibility
         if (callbacks['end']) {
-          setTimeout(() => callbacks['end']!(), 0);
+          queueMicrotask(() => callbacks['end']!());
         }
       }),
     };
@@ -60,6 +60,9 @@ const mockFFmpegFactory = vi.hoisted(() => {
 
   return ffmpegConstructor;
 });
+
+// Export mock for tests that need direct access
+export const mockFFmpeg = mockFFmpegFactory;
 
 // Mock the module with hoisted factory
 vi.mock('fluent-ffmpeg', () => {
@@ -131,8 +134,8 @@ beforeEach(() => {
   // Reset mock file system
   mockFileSystem.files.clear();
 
-  // Use fake timers for precise time control
-  vi.useFakeTimers();
+  // Use fake timers for precise time control with Date.now() advancement
+  vi.useFakeTimers({ shouldAdvanceTime: true });
 });
 
 // Cleanup after each test
@@ -163,7 +166,9 @@ declare global {
     mkdir: ReturnType<typeof vi.fn>;
     stat: ReturnType<typeof vi.fn>;
   };
+  var mockFFmpeg: typeof mockFFmpegFactory;
 }
 
 globalThis.mockOpenAI = mockOpenAI;
 globalThis.mockFileSystem = mockFileSystem;
+globalThis.mockFFmpeg = mockFFmpegFactory;
