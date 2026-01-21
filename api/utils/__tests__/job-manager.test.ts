@@ -152,6 +152,9 @@ describe('Job Manager', () => {
 
       const job = JobManager.createJob(config, metadata);
 
+      // Advance time to ensure timestamp changes
+      vi.advanceTimersByTime(10);
+
       JobManager.updateJobStatus(job.jobId, 'transcribing');
 
       const updated = JobManager.getJob(job.jobId)!;
@@ -197,6 +200,9 @@ describe('Job Manager', () => {
       };
 
       const job = JobManager.createJob(config, metadata);
+
+      // Advance time to simulate processing
+      vi.advanceTimersByTime(1000);
 
       JobManager.updateJobStatus(job.jobId, 'completed');
 
@@ -446,11 +452,15 @@ describe('Job Manager', () => {
 
       const job = JobManager.createJob(config, metadata);
 
-      // Advance time beyond MAX_JOB_AGE
-      vi.advanceTimersByTime(JOB_SAFEGUARDS.MAX_JOB_AGE + 1000);
+      // Manually update the job's creation time to be old
+      const oldJob = JobManager.getJob(job.jobId)!;
+      oldJob.metadata.createdAt = new Date(Date.now() - JOB_SAFEGUARDS.MAX_JOB_AGE - 1000);
 
-      // Trigger cleanup by advancing timer for CLEANUP_INTERVAL
-      vi.advanceTimersByTime(JOB_SAFEGUARDS.CLEANUP_INTERVAL);
+      // Advance time to trigger cleanup interval
+      vi.advanceTimersByTime(JOB_SAFEGUARDS.CLEANUP_INTERVAL + 100);
+
+      // Run all pending timers
+      vi.runAllTimers();
 
       // Job should be deleted
       const retrieved = JobManager.getJob(job.jobId);

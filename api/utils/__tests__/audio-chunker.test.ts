@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest';
-import type { MockFluentFFmpegModule } from '../__test-helpers__/types';
+import * as ffmpeg from 'fluent-ffmpeg';
 import {
   chunkAudio,
   getAudioDuration,
@@ -19,7 +19,17 @@ import {
   LONG_AUDIO_90MIN,
   VERY_LONG_AUDIO_2H,
 } from '../__test-helpers__/mock-audio-generator';
-import crypto from 'crypto';
+import * as crypto from 'crypto';
+
+// Helper to configure ffprobe mock for a specific duration
+function mockFFprobeDuration(duration: number) {
+  vi.mocked(ffmpeg.ffprobe).mockImplementation(((
+    path: string,
+    callback: (err: unknown, data?: unknown) => void
+  ) => {
+    callback(null, { format: { duration } });
+  }) as unknown as typeof ffmpeg.ffprobe);
+}
 
 describe('Audio Chunker', () => {
   describe('chunkAudio()', () => {
@@ -29,10 +39,7 @@ describe('Audio Chunker', () => {
       const expectedChunks = Math.ceil(duration / 180); // 30 chunks
 
       // Mock ffprobe to return 90min duration
-      const mockFFmpeg = ((await import('fluent-ffmpeg')) as MockFluentFFmpegModule).default;
-      mockFFmpeg.ffprobe = vi.fn((path, callback) => {
-        callback(null, { format: { duration } });
-      });
+      mockFFprobeDuration(duration);
 
       const result = await chunkAudio(audioBuffer, 'test-90min.mp3', 'balanced');
 
@@ -46,10 +53,7 @@ describe('Audio Chunker', () => {
       const audioBuffer = generateMockAudio({ durationSeconds: 600, format: 'mp3' }); // 10min
       const duration = 600;
 
-      const mockFFmpeg = ((await import('fluent-ffmpeg')) as MockFluentFFmpegModule).default;
-      mockFFmpeg.ffprobe = vi.fn((path, callback) => {
-        callback(null, { format: { duration } });
-      });
+      mockFFprobeDuration(duration);
 
       const result = await chunkAudio(audioBuffer, 'test-10min.mp3', 'balanced');
 
@@ -65,10 +69,7 @@ describe('Audio Chunker', () => {
       const audioBuffer = VERY_LONG_AUDIO_2H;
       const duration = 120 * 60; // 7200 seconds
 
-      const mockFFmpeg = ((await import('fluent-ffmpeg')) as MockFluentFFmpegModule).default;
-      mockFFmpeg.ffprobe = vi.fn((path, callback) => {
-        callback(null, { format: { duration } });
-      });
+      mockFFprobeDuration(duration);
 
       const result = await chunkAudio(audioBuffer, 'test-2h.wav', 'best_quality');
 
@@ -87,10 +88,7 @@ describe('Audio Chunker', () => {
       const audioBuffer = generateMockAudio({ durationSeconds: 600, format: 'mp3' });
       const duration = 600;
 
-      const mockFFmpeg = ((await import('fluent-ffmpeg')) as MockFluentFFmpegModule).default;
-      mockFFmpeg.ffprobe = vi.fn((path, callback) => {
-        callback(null, { format: { duration } });
-      });
+      mockFFprobeDuration(duration);
 
       const result = await chunkAudio(audioBuffer, 'test.mp3', 'balanced');
 
@@ -105,10 +103,7 @@ describe('Audio Chunker', () => {
       const audioBuffer = generateMockAudio({ durationSeconds: 60, format: 'mp3' }); // 1min
       const duration = 60;
 
-      const mockFFmpeg = ((await import('fluent-ffmpeg')) as MockFluentFFmpegModule).default;
-      mockFFmpeg.ffprobe = vi.fn((path, callback) => {
-        callback(null, { format: { duration } });
-      });
+      mockFFprobeDuration(duration);
 
       const result = await chunkAudio(audioBuffer, 'test-1min.mp3', 'balanced');
 
@@ -121,10 +116,7 @@ describe('Audio Chunker', () => {
       const audioBuffer = generateMockAudio({ durationSeconds: 400, format: 'mp3' });
       const duration = 400;
 
-      const mockFFmpeg = ((await import('fluent-ffmpeg')) as MockFluentFFmpegModule).default;
-      mockFFmpeg.ffprobe = vi.fn((path, callback) => {
-        callback(null, { format: { duration } });
-      });
+      mockFFprobeDuration(duration);
 
       const result = await chunkAudio(audioBuffer, 'test.mp3', 'balanced');
 
@@ -143,10 +135,7 @@ describe('Audio Chunker', () => {
       const audioBuffer = generateMockAudio({ durationSeconds: 200, format: 'mp3' });
       const duration = 200;
 
-      const mockFFmpeg = ((await import('fluent-ffmpeg')) as MockFluentFFmpegModule).default;
-      mockFFmpeg.ffprobe = vi.fn((path, callback) => {
-        callback(null, { format: { duration } });
-      });
+      mockFFprobeDuration(duration);
 
       const fs = await import('fs/promises');
       const unlinkSpy = vi.spyOn(fs, 'unlink');
@@ -162,10 +151,12 @@ describe('Audio Chunker', () => {
     it('should extract duration from ffprobe metadata', async () => {
       const expectedDuration = 1234.56;
 
-      const mockFFmpeg = ((await import('fluent-ffmpeg')) as MockFluentFFmpegModule).default;
-      mockFFmpeg.ffprobe = vi.fn((path, callback) => {
+      vi.mocked(ffmpeg.ffprobe).mockImplementation(((
+        _path: string,
+        callback: (err: unknown, data?: unknown) => void
+      ) => {
         callback(null, { format: { duration: expectedDuration } });
-      });
+      }) as unknown as typeof ffmpeg.ffprobe);
 
       const duration = await getAudioDuration('/tmp/test.mp3');
 
@@ -173,19 +164,23 @@ describe('Audio Chunker', () => {
     });
 
     it('should reject if ffprobe fails', async () => {
-      const mockFFmpeg = ((await import('fluent-ffmpeg')) as MockFluentFFmpegModule).default;
-      mockFFmpeg.ffprobe = vi.fn((path, callback) => {
+      vi.mocked(ffmpeg.ffprobe).mockImplementation(((
+        _path: string,
+        callback: (err: unknown, data?: unknown) => void
+      ) => {
         callback(new Error('FFprobe failed'), null);
-      });
+      }) as unknown as typeof ffmpeg.ffprobe);
 
       await expect(getAudioDuration('/tmp/test.mp3')).rejects.toThrow('Failed to probe audio file');
     });
 
     it('should reject if duration is not a number', async () => {
-      const mockFFmpeg = ((await import('fluent-ffmpeg')) as MockFluentFFmpegModule).default;
-      mockFFmpeg.ffprobe = vi.fn((path, callback) => {
+      vi.mocked(ffmpeg.ffprobe).mockImplementation(((
+        _path: string,
+        callback: (err: unknown, data?: unknown) => void
+      ) => {
         callback(null, { format: { duration: null } });
-      });
+      }) as unknown as typeof ffmpeg.ffprobe);
 
       await expect(getAudioDuration('/tmp/test.mp3')).rejects.toThrow(
         'Could not determine audio duration'
@@ -212,7 +207,7 @@ describe('Audio Chunker', () => {
         run: vi.fn(),
       };
 
-      const mockFFmpeg = ((await import('fluent-ffmpeg')) as MockFluentFFmpegModule).default;
+      // Mock ffprobe for this test
       vi.mocked(mockFFmpeg).mockReturnValue(mockFFmpegInstance);
 
       await extractChunk('/tmp/input.mp3', 120, 180, '/tmp/output.mp3');
@@ -245,7 +240,7 @@ describe('Audio Chunker', () => {
         run: vi.fn(),
       };
 
-      const mockFFmpeg = ((await import('fluent-ffmpeg')) as MockFluentFFmpegModule).default;
+      // Mock ffprobe for this test
       vi.mocked(mockFFmpeg).mockReturnValue(mockFFmpegInstance);
 
       await expect(extractChunk('/tmp/input.mp3', 0, 180, '/tmp/output.mp3')).rejects.toThrow(
@@ -328,10 +323,8 @@ describe('Audio Chunker', () => {
   describe('Edge cases', () => {
     it('should handle zero duration audio', async () => {
       const audioBuffer = Buffer.from('');
-      const mockFFmpeg = ((await import('fluent-ffmpeg')) as MockFluentFFmpegModule).default;
-      mockFFmpeg.ffprobe = vi.fn((path, callback) => {
-        callback(null, { format: { duration: 0 } });
-      });
+
+      mockFFprobeDuration(0);
 
       const result = await chunkAudio(audioBuffer, 'empty.mp3', 'balanced');
 
@@ -341,10 +334,8 @@ describe('Audio Chunker', () => {
 
     it('should handle exact chunk boundary (no remainder)', async () => {
       const audioBuffer = generateMockAudio({ durationSeconds: 360, format: 'mp3' }); // Exactly 2 chunks
-      const mockFFmpeg = ((await import('fluent-ffmpeg')) as MockFluentFFmpegModule).default;
-      mockFFmpeg.ffprobe = vi.fn((path, callback) => {
-        callback(null, { format: { duration: 360 } });
-      });
+
+      mockFFprobeDuration(360);
 
       const result = await chunkAudio(audioBuffer, 'exact.mp3', 'balanced');
 

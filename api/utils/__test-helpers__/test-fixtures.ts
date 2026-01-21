@@ -4,29 +4,63 @@
  * Shared test data, helper functions, and utilities for testing.
  */
 
-import type { Job, ChunkMetadata } from '../../types/job';
-import type { ProcessingMode } from '../../types/chunking';
+import type { TranscriptionJob, JobConfiguration, JobMetadata } from '../../types/job';
+import type { ChunkMetadata, ProcessingMode } from '../../types/chunking';
 
 /**
  * Create a test job with sensible defaults
  */
-export function createTestJob(overrides?: Partial<Job>): Job {
-  const now = Date.now();
+export function createTestJob(overrides?: {
+  config?: Partial<JobConfiguration>;
+  metadata?: Partial<Omit<JobMetadata, 'createdAt'>>;
+  status?: TranscriptionJob['status'];
+  chunks?: ChunkMetadata[];
+  transcript?: string;
+  error?: string;
+}): TranscriptionJob {
+  const now = new Date();
+
+  const config: JobConfiguration = {
+    apiKey: overrides?.config?.apiKey || 'test-api-key-12345',
+    mode: overrides?.config?.mode || 'balanced',
+    model: overrides?.config?.model || 'whisper-1',
+    language: overrides?.config?.language,
+    temperature: overrides?.config?.temperature,
+    prompt: overrides?.config?.prompt,
+  };
+
+  const chunks = overrides?.chunks || [];
+  const totalChunks = chunks.length;
+
+  const metadata: JobMetadata = {
+    filename: overrides?.metadata?.filename || 'test-audio.mp3',
+    fileSize: overrides?.metadata?.fileSize || 1024 * 1024, // 1MB default
+    duration: overrides?.metadata?.duration || 180, // 3 minutes default
+    totalChunks,
+    createdAt: now,
+    completedAt: overrides?.metadata?.completedAt,
+    processingTime: overrides?.metadata?.processingTime,
+  };
 
   return {
-    id: overrides?.id || `test-job-${now}`,
+    jobId: `test-job-${now.getTime()}`,
     status: overrides?.status || 'pending',
-    mode: overrides?.mode || 'balanced',
-    originalFilename: overrides?.originalFilename || 'test-audio.mp3',
-    totalChunks: overrides?.totalChunks || 0,
-    completedChunks: overrides?.completedChunks || 0,
-    progress: overrides?.progress || 0,
-    chunks: overrides?.chunks || [],
-    transcript: overrides?.transcript || null,
-    error: overrides?.error || null,
-    createdAt: overrides?.createdAt || now,
-    updatedAt: overrides?.updatedAt || now,
-    estimatedTimeRemaining: overrides?.estimatedTimeRemaining || null,
+    config,
+    metadata,
+    chunks,
+    chunkStatuses: chunks.map(() => ({
+      status: 'pending',
+      retryCount: 0,
+      wasSplit: false,
+      lastUpdated: now,
+    })),
+    progress: 0,
+    completedChunks: 0,
+    transcript: overrides?.transcript,
+    error: overrides?.error,
+    totalRetries: 0,
+    chunkingSplits: 0,
+    lastUpdated: now,
   };
 }
 
@@ -34,18 +68,24 @@ export function createTestJob(overrides?: Partial<Job>): Job {
  * Create mock chunk metadata
  */
 export function createTestChunk(index: number, overrides?: Partial<ChunkMetadata>): ChunkMetadata {
+  const startTime = overrides?.startTime ?? index * 180;
+  const duration = overrides?.duration ?? 180;
+  const hasOverlap = overrides?.hasOverlap ?? false;
+  const overlapDuration = overrides?.overlapDuration ?? (hasOverlap ? 15 : 0);
+
   return {
     index,
-    startTime: overrides?.startTime ?? index * 180, // 3min chunks by default
-    duration: overrides?.duration ?? 180,
+    startTime,
+    duration,
+    endTime: overrides?.endTime ?? startTime + duration,
     filePath: overrides?.filePath ?? `/tmp/chunk_${String(index).padStart(2, '0')}.mp3`,
     hash: overrides?.hash ?? `hash_${index}`,
-    status: overrides?.status ?? 'pending',
-    retryCount: overrides?.retryCount ?? 0,
-    transcript: overrides?.transcript ?? null,
-    error: overrides?.error ?? null,
-    hasOverlap: overrides?.hasOverlap ?? false,
-    overlapDuration: overrides?.overlapDuration ?? 0,
+    hasOverlap,
+    overlapStartTime: hasOverlap ? startTime + duration - overlapDuration : undefined,
+    ...(overrides?.status && { status: overrides.status }),
+    ...(overrides?.retryCount !== undefined && { retryCount: overrides.retryCount }),
+    ...(overrides?.transcript !== undefined && { transcript: overrides.transcript }),
+    ...(overrides?.error && { error: overrides.error }),
   };
 }
 
