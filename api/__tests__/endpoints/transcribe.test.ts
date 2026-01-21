@@ -93,15 +93,15 @@ describe('POST /api/transcribe', () => {
     });
 
     it('should have correct file size limit', async () => {
-      const { API_VALIDATION } = await import('../../src/utils/constants');
+      const { API_VALIDATION } = await import('../../../src/utils/constants');
 
       // Verify constants are defined
       expect(API_VALIDATION.MAX_FILE_SIZE).toBeDefined();
       expect(API_VALIDATION.MAX_FILES).toBeDefined();
       expect(API_VALIDATION.MAX_FIELDS).toBeDefined();
 
-      // File size should be reasonable (e.g., 500MB)
-      expect(API_VALIDATION.MAX_FILE_SIZE).toBeGreaterThan(100 * 1024 * 1024); // At least 100MB
+      // File size should be exactly 100MB
+      expect(API_VALIDATION.MAX_FILE_SIZE).toBe(100 * 1024 * 1024);
     });
   });
 
@@ -184,19 +184,20 @@ describe('POST /api/transcribe', () => {
 
   describe('Integration with Utilities', () => {
     it('should use correct processing mode based on performance level', async () => {
-      const { getTranscriptionModelForLevel } = await import('../../src/types/performance-levels');
+      const { getTranscriptionModelForLevel } =
+        await import('../../../src/types/performance-levels');
 
       // Verify model selection logic
-      const balancedModel = getTranscriptionModelForLevel('balanced');
-      const bestQualityModel = getTranscriptionModelForLevel('best_quality');
+      const standardModel = getTranscriptionModelForLevel('standard');
+      const advancedModel = getTranscriptionModelForLevel('advanced');
 
-      expect(balancedModel).toBe('whisper-1');
-      expect(bestQualityModel).toBe('whisper-1');
+      expect(standardModel).toBe('gpt-4o-mini-transcribe');
+      expect(advancedModel).toBe('gpt-4o-transcribe');
 
-      // Mode is passed separately in the API
-      const modes: Array<'balanced' | 'best_quality'> = ['balanced', 'best_quality'];
-      modes.forEach((mode) => {
-        expect(['balanced', 'best_quality']).toContain(mode);
+      // Verify all performance levels are valid
+      const levels: Array<'standard' | 'advanced'> = ['standard', 'advanced'];
+      levels.forEach((level) => {
+        expect(['standard', 'advanced']).toContain(level);
       });
     });
   });
