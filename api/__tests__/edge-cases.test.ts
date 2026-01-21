@@ -113,6 +113,11 @@ describe('Edge Cases', () => {
   });
 
   describe('FFmpeg Failure During Chunking', () => {
+    afterEach(() => {
+      // Clear all mocks to prevent contamination
+      vi.clearAllMocks();
+    });
+
     it('should propagate error when ffprobe fails', async () => {
       const audioBuffer = generateMockAudio({ durationSeconds: 100, format: 'mp3' });
 
@@ -302,6 +307,8 @@ describe('Edge Cases', () => {
 
   describe('Extreme Values', () => {
     it('should handle very short chunks (1 second)', async () => {
+      vi.useRealTimers();
+
       const audioBuffer = generateMockAudio({ durationSeconds: 1, format: 'mp3' });
 
       const mockFFmpeg = ((await import('fluent-ffmpeg')) as MockFluentFFmpegModule).default;
@@ -313,6 +320,8 @@ describe('Edge Cases', () => {
 
       expect(result.totalChunks).toBe(1);
       expect(result.chunks[0].duration).toBeCloseTo(1, 1);
+
+      vi.useFakeTimers();
     });
 
     it('should handle very large job counts', () => {
@@ -343,6 +352,8 @@ describe('Edge Cases', () => {
     });
 
     it('should handle maximum chunk count', async () => {
+      vi.useRealTimers();
+
       // Simulate extremely long audio (10 hours)
       const duration = 10 * 60 * 60; // 36000 seconds
 
@@ -356,6 +367,8 @@ describe('Edge Cases', () => {
 
       // 10 hours / 3 minutes = 200 chunks
       expect(result.totalChunks).toBe(200);
+
+      vi.useFakeTimers();
     });
   });
 
