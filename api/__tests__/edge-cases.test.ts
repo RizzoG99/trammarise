@@ -76,6 +76,9 @@ describe('Edge Cases', () => {
         }
       );
 
+      // Restart cleanup interval with fake timers
+      JobManager.restartCleanup();
+
       // Advance time beyond MAX_JOB_AGE
       vi.advanceTimersByTime(JOB_SAFEGUARDS.MAX_JOB_AGE + 1000);
 
@@ -113,8 +116,21 @@ describe('Edge Cases', () => {
   });
 
   describe('FFmpeg Failure During Chunking', () => {
-    afterEach(() => {
-      // Clear all mocks to prevent contamination
+    let originalFFmpegMock: unknown;
+
+    beforeEach(async () => {
+      // Save original mock implementation
+      const mockFFmpegModule = ((await import('fluent-ffmpeg')) as MockFluentFFmpegModule).default;
+      originalFFmpegMock = vi.mocked(mockFFmpegModule).getMockImplementation();
+    });
+
+    afterEach(async () => {
+      // Restore original mock implementation
+      if (originalFFmpegMock) {
+        const mockFFmpegModule = ((await import('fluent-ffmpeg')) as MockFluentFFmpegModule)
+          .default;
+        vi.mocked(mockFFmpegModule).mockImplementation(originalFFmpegMock as never);
+      }
       vi.clearAllMocks();
     });
 
@@ -306,13 +322,24 @@ describe('Edge Cases', () => {
   });
 
   describe('Extreme Values', () => {
+    let originalFfprobe: unknown;
+
     // Use real timers for chunkAudio() tests
-    beforeEach(() => {
+    beforeEach(async () => {
       vi.useRealTimers();
+      // Save original ffprobe implementation
+      const mockFFmpegModule = (await import('fluent-ffmpeg')) as unknown as MockFluentFFmpegModule;
+      originalFfprobe = mockFFmpegModule.default.ffprobe;
     });
 
-    afterEach(() => {
+    afterEach(async () => {
       vi.useFakeTimers();
+      // Restore original ffprobe implementation
+      if (originalFfprobe) {
+        const mockFFmpegModule =
+          (await import('fluent-ffmpeg')) as unknown as MockFluentFFmpegModule;
+        mockFFmpegModule.default.ffprobe = originalFfprobe as never;
+      }
     });
 
     it('should handle very short chunks (1 second)', async () => {

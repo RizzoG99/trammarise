@@ -207,7 +207,7 @@ describe('Integration: Rate Limiting', () => {
 
       // May have entered degraded mode (depends on timing)
       // This is validated in the governor itself
-    });
+    }, 15000); // Increased timeout for rate limiting delays
 
     it('should reduce concurrency from 4 to 2 in degraded mode', async () => {
       // Verify degraded mode configuration

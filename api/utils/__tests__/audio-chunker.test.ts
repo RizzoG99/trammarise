@@ -201,6 +201,20 @@ describe('Audio Chunker', () => {
   });
 
   describe('extractChunk()', () => {
+    let originalFFmpegMock: unknown;
+
+    beforeEach(() => {
+      // Save original mock implementation
+      originalFFmpegMock = vi.mocked(mockFFmpeg).getMockImplementation();
+    });
+
+    afterEach(() => {
+      // Restore original mock implementation
+      if (originalFFmpegMock) {
+        vi.mocked(mockFFmpeg).mockImplementation(originalFFmpegMock as never);
+      }
+    });
+
     it('should construct correct FFmpeg command', async () => {
       const mockFFmpegInstance = {
         setStartTime: vi.fn().mockReturnThis(),
@@ -374,13 +388,21 @@ describe('Audio Chunker', () => {
   });
 
   describe('Edge cases', () => {
+    let originalFfprobe: unknown;
+
     // Use real timers for chunkAudio() tests
     beforeEach(() => {
       vi.useRealTimers();
+      // Save original ffprobe implementation
+      originalFfprobe = mockFFmpeg.ffprobe;
     });
 
     afterEach(() => {
       vi.useFakeTimers();
+      // Restore original ffprobe implementation
+      if (originalFfprobe) {
+        mockFFmpeg.ffprobe = originalFfprobe as never;
+      }
     });
 
     it('should handle zero duration audio', async () => {

@@ -263,6 +263,14 @@ class JobManagerClass {
   }
 
   /**
+   * Restart cleanup interval (for testing - needed when switching timer modes)
+   */
+  restartCleanup(): void {
+    this.stopCleanup();
+    this.startCleanup();
+  }
+
+  /**
    * Clear all jobs (for testing)
    */
   clearAllJobs(): void {

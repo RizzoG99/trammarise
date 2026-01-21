@@ -135,8 +135,10 @@ describe('Chunk Processor', () => {
 
       const job = createTestJob({
         config: { mode: 'balanced' },
-        chunkingSplits: JOB_SAFEGUARDS.MAX_SPLITS,
       });
+      // Manually set chunkingSplits since createTestJob doesn't support it
+      job.chunkingSplits = JOB_SAFEGUARDS.MAX_SPLITS;
+
       const chunk = createTestChunk(0, { duration: 180 });
       job.chunks = [chunk];
       job.chunkStatuses = [

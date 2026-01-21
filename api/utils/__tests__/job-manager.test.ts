@@ -457,6 +457,9 @@ describe('Job Manager', () => {
       const oldJob = JobManager.getJob(job.jobId)!;
       oldJob.metadata.createdAt = new Date(Date.now() - JOB_SAFEGUARDS.MAX_JOB_AGE - 1000);
 
+      // Restart cleanup interval with fake timers
+      JobManager.restartCleanup();
+
       // Advance time to trigger cleanup interval
       vi.advanceTimersByTime(JOB_SAFEGUARDS.CLEANUP_INTERVAL);
 
