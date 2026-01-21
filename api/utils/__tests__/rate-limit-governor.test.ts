@@ -174,7 +174,6 @@ describe('Rate Limit Governor', () => {
               if (i % 5 < 2) {
                 throw { name: 'RateLimitError', retryAfter: 1 };
               }
-              return 'success';
             })
             .catch(() => {
               // Swallow errors - we don't care about individual results
