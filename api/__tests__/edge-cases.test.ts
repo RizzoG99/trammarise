@@ -318,8 +318,9 @@ describe('Edge Cases', () => {
     it('should handle very short chunks (1 second)', async () => {
       const audioBuffer = generateMockAudio({ durationSeconds: 1, format: 'mp3' });
 
-      const mockFFmpeg = ((await import('fluent-ffmpeg')) as MockFluentFFmpegModule).default;
-      mockFFmpeg.ffprobe = vi.fn((path, callback) => {
+      const mockFFmpeg = ((await import('fluent-ffmpeg')) as unknown as MockFluentFFmpegModule)
+        .default;
+      mockFFmpeg.ffprobe = vi.fn((_path, callback) => {
         callback(null, { format: { duration: 1 } });
       });
 
@@ -360,8 +361,9 @@ describe('Edge Cases', () => {
       // Simulate extremely long audio (10 hours)
       const duration = 10 * 60 * 60; // 36000 seconds
 
-      const mockFFmpeg = ((await import('fluent-ffmpeg')) as MockFluentFFmpegModule).default;
-      mockFFmpeg.ffprobe = vi.fn((path, callback) => {
+      const mockFFmpeg = ((await import('fluent-ffmpeg')) as unknown as MockFluentFFmpegModule)
+        .default;
+      mockFFmpeg.ffprobe = vi.fn((_path, callback) => {
         callback(null, { format: { duration } });
       });
 
