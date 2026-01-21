@@ -4,7 +4,7 @@
  * Tests for audio chunking utilities with mode-aware behavior.
  */
 
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import * as ffmpeg from 'fluent-ffmpeg';
 import { mockFFmpeg } from '../../vitest.setup';
 import type { ChunkMetadata } from '../../types/chunking';
@@ -35,9 +35,16 @@ function mockFFprobeDuration(duration: number) {
 
 describe('Audio Chunker', () => {
   describe('chunkAudio()', () => {
-    it('should create correct number of chunks for balanced mode (90min audio)', async () => {
-      vi.useRealTimers(); // Use real timers for FFmpeg async operations
+    // Use real timers for all chunkAudio() tests
+    beforeEach(() => {
+      vi.useRealTimers();
+    });
 
+    afterEach(() => {
+      vi.useFakeTimers();
+    });
+
+    it('should create correct number of chunks for balanced mode (90min audio)', async () => {
       const audioBuffer = LONG_AUDIO_90MIN;
       const duration = 90 * 60; // 5400 seconds
       const expectedChunks = Math.ceil(duration / 180); // 30 chunks
@@ -51,13 +58,9 @@ describe('Audio Chunker', () => {
       expect(result.chunks).toHaveLength(expectedChunks);
       expect(result.mode).toBe('balanced');
       expect(result.totalDuration).toBe(duration);
-
-      vi.useFakeTimers(); // Restore fake timers
     });
 
     it('should create 3-minute chunks for balanced mode', async () => {
-      vi.useRealTimers();
-
       const audioBuffer = generateMockAudio({ durationSeconds: 600, format: 'mp3' }); // 10min
       const duration = 600;
 
@@ -71,13 +74,9 @@ describe('Audio Chunker', () => {
       expect(result.chunks[1].duration).toBeCloseTo(180, 1);
       expect(result.chunks[2].duration).toBeCloseTo(180, 1);
       expect(result.chunks[3].duration).toBeCloseTo(60, 1); // Last chunk shorter
-
-      vi.useFakeTimers();
     });
 
     it('should create 10-minute chunks with 15s overlap for best_quality mode', async () => {
-      vi.useRealTimers();
-
       const audioBuffer = VERY_LONG_AUDIO_2H;
       const duration = 120 * 60; // 7200 seconds
 
@@ -94,13 +93,9 @@ describe('Audio Chunker', () => {
       // Last chunk should not have overlap
       const lastChunk = result.chunks[result.chunks.length - 1];
       expect(lastChunk.hasOverlap).toBe(false);
-
-      vi.useFakeTimers();
     });
 
     it('should not add overlap for balanced mode', async () => {
-      vi.useRealTimers();
-
       const audioBuffer = generateMockAudio({ durationSeconds: 600, format: 'mp3' });
       const duration = 600;
 
@@ -113,13 +108,9 @@ describe('Audio Chunker', () => {
         expect(chunk.hasOverlap).toBe(false);
         expect(chunk.overlapStartTime).toBeUndefined();
       });
-
-      vi.useFakeTimers();
     });
 
     it('should handle single-chunk audio (duration < chunk size)', async () => {
-      vi.useRealTimers();
-
       const audioBuffer = generateMockAudio({ durationSeconds: 60, format: 'mp3' }); // 1min
       const duration = 60;
 
@@ -130,13 +121,9 @@ describe('Audio Chunker', () => {
       expect(result.chunks).toHaveLength(1);
       expect(result.chunks[0].duration).toBeCloseTo(60, 1);
       expect(result.chunks[0].startTime).toBe(0);
-
-      vi.useFakeTimers();
     });
 
     it('should compute unique hash for each chunk', async () => {
-      vi.useRealTimers();
-
       const audioBuffer = generateMockAudio({ durationSeconds: 400, format: 'mp3' });
       const duration = 400;
 
@@ -153,13 +140,9 @@ describe('Audio Chunker', () => {
       hashes.forEach((hash) => {
         expect(hash).toMatch(/^[a-f0-9]{64}$/);
       });
-
-      vi.useFakeTimers();
     });
 
     it('should clean up input file after chunking', async () => {
-      vi.useRealTimers();
-
       const audioBuffer = generateMockAudio({ durationSeconds: 200, format: 'mp3' });
       const duration = 200;
 
@@ -173,8 +156,6 @@ describe('Audio Chunker', () => {
 
       // Should unlink the temp input file
       expect(unlinkSpy).toHaveBeenCalledWith(expect.stringContaining('input_'));
-
-      vi.useFakeTimers();
     });
   });
 
@@ -393,9 +374,16 @@ describe('Audio Chunker', () => {
   });
 
   describe('Edge cases', () => {
-    it('should handle zero duration audio', async () => {
+    // Use real timers for chunkAudio() tests
+    beforeEach(() => {
       vi.useRealTimers();
+    });
 
+    afterEach(() => {
+      vi.useFakeTimers();
+    });
+
+    it('should handle zero duration audio', async () => {
       const audioBuffer = Buffer.from('');
 
       mockFFprobeDuration(0);
@@ -404,13 +392,9 @@ describe('Audio Chunker', () => {
 
       expect(result.chunks).toHaveLength(0);
       expect(result.totalDuration).toBe(0);
-
-      vi.useFakeTimers();
     });
 
     it('should handle exact chunk boundary (no remainder)', async () => {
-      vi.useRealTimers();
-
       const audioBuffer = generateMockAudio({ durationSeconds: 360, format: 'mp3' }); // Exactly 2 chunks
 
       mockFFprobeDuration(360);
@@ -420,8 +404,6 @@ describe('Audio Chunker', () => {
       expect(result.chunks).toHaveLength(2);
       expect(result.chunks[0].duration).toBeCloseTo(180, 1);
       expect(result.chunks[1].duration).toBeCloseTo(180, 1);
-
-      vi.useFakeTimers();
     });
   });
 });

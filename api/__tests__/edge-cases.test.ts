@@ -4,7 +4,7 @@
  * Tests for unusual scenarios, error conditions, and boundary cases.
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { JobManager } from '../utils/job-manager';
 import { chunkAudio, cleanupChunks, computeChunkHash } from '../utils/audio-chunker';
 import { processChunk } from '../utils/chunk-processor';
@@ -306,9 +306,16 @@ describe('Edge Cases', () => {
   });
 
   describe('Extreme Values', () => {
-    it('should handle very short chunks (1 second)', async () => {
+    // Use real timers for chunkAudio() tests
+    beforeEach(() => {
       vi.useRealTimers();
+    });
 
+    afterEach(() => {
+      vi.useFakeTimers();
+    });
+
+    it('should handle very short chunks (1 second)', async () => {
       const audioBuffer = generateMockAudio({ durationSeconds: 1, format: 'mp3' });
 
       const mockFFmpeg = ((await import('fluent-ffmpeg')) as MockFluentFFmpegModule).default;
@@ -320,8 +327,6 @@ describe('Edge Cases', () => {
 
       expect(result.totalChunks).toBe(1);
       expect(result.chunks[0].duration).toBeCloseTo(1, 1);
-
-      vi.useFakeTimers();
     });
 
     it('should handle very large job counts', () => {
@@ -352,8 +357,6 @@ describe('Edge Cases', () => {
     });
 
     it('should handle maximum chunk count', async () => {
-      vi.useRealTimers();
-
       // Simulate extremely long audio (10 hours)
       const duration = 10 * 60 * 60; // 36000 seconds
 
@@ -367,8 +370,6 @@ describe('Edge Cases', () => {
 
       // 10 hours / 3 minutes = 200 chunks
       expect(result.totalChunks).toBe(200);
-
-      vi.useFakeTimers();
     });
   });
 
