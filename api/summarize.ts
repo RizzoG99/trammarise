@@ -3,7 +3,10 @@ import { ProviderFactory, type ProviderType } from './providers/factory';
 import { API_VALIDATION, CONTENT_TYPES } from '../src/utils/constants';
 import busboy from 'busboy';
 import { extractPdfText } from './utils/pdf-extractor';
-import { getSummarizationModelForLevel, type PerformanceLevel } from '../src/types/performance-levels';
+import {
+  getSummarizationModelForLevel,
+  type PerformanceLevel,
+} from '../src/types/performance-levels';
 
 export const config = {
   api: {
@@ -11,17 +14,15 @@ export const config = {
   },
 };
 
-const { MAX_TRANSCRIPT_LENGTH, MIN_TRANSCRIPT_LENGTH, MIN_API_KEY_LENGTH, MAX_API_KEY_LENGTH } = API_VALIDATION;
+const { MAX_TRANSCRIPT_LENGTH, MIN_TRANSCRIPT_LENGTH, MIN_API_KEY_LENGTH, MAX_API_KEY_LENGTH } =
+  API_VALIDATION;
 
 interface ContextImage {
   type: string;
   data: string; // base64
 }
 
-export default async function handler(
-  req: VercelRequest,
-  res: VercelResponse
-) {
+export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -29,7 +30,7 @@ export default async function handler(
   try {
     console.log('Summarize API called');
     const bb = busboy({ headers: req.headers });
-    
+
     const fields: Record<string, string> = {};
     const contextImages: ContextImage[] = [];
     let contextText = '';
@@ -39,12 +40,12 @@ export default async function handler(
         fields[name] = val;
       });
 
-      bb.on('file', (name, file, info) => {
+      bb.on('file', (_name, file, info) => {
         const { mimeType } = info;
         const chunks: Buffer[] = [];
 
         file.on('data', (chunk) => chunks.push(chunk));
-        
+
         file.on('end', async () => {
           const buffer = Buffer.concat(chunks);
 
@@ -60,7 +61,7 @@ export default async function handler(
           } else if (mimeType.startsWith('image/')) {
             contextImages.push({
               type: mimeType,
-              data: buffer.toString('base64')
+              data: buffer.toString('base64'),
             });
           }
         });
@@ -81,17 +82,21 @@ export default async function handler(
     }
 
     if (transcript.length < MIN_TRANSCRIPT_LENGTH) {
-      return res.status(400).json({ error: `Transcript too short. Minimum ${MIN_TRANSCRIPT_LENGTH} characters required` });
+      return res.status(400).json({
+        error: `Transcript too short. Minimum ${MIN_TRANSCRIPT_LENGTH} characters required`,
+      });
     }
 
     if (transcript.length > MAX_TRANSCRIPT_LENGTH) {
-      return res.status(400).json({ error: `Transcript too long. Maximum ${MAX_TRANSCRIPT_LENGTH} characters allowed` });
+      return res.status(400).json({
+        error: `Transcript too long. Maximum ${MAX_TRANSCRIPT_LENGTH} characters allowed`,
+      });
     }
 
     // Validate contentType
-    if (contentType && !CONTENT_TYPES.includes(contentType)) {
+    if (contentType && !CONTENT_TYPES.includes(contentType as never)) {
       return res.status(400).json({
-        error: `Invalid content type. Must be one of: ${CONTENT_TYPES.join(', ')}`
+        error: `Invalid content type. Must be one of: ${CONTENT_TYPES.join(', ')}`,
       });
     }
 
@@ -128,8 +133,8 @@ export default async function handler(
       language,
       context: {
         text: contextText,
-        images: contextImages
-      }
+        images: contextImages,
+      },
     });
 
     return res.status(200).json({ summary });
@@ -138,7 +143,7 @@ export default async function handler(
     console.error('Summarization error:', error);
     return res.status(500).json({
       error: 'Summarization failed',
-      message: err.message
+      message: err.message || 'Unknown error',
     });
   }
 }

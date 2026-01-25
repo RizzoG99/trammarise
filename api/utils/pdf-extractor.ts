@@ -12,7 +12,7 @@ export async function extractPdfText(buffer: Buffer): Promise<string> {
   try {
     // Convert Buffer to Uint8Array
     const data = new Uint8Array(buffer);
-    
+
     // Load the PDF document
     const loadingTask = pdfjsLib.getDocument({
       data,
@@ -23,31 +23,31 @@ export async function extractPdfText(buffer: Buffer): Promise<string> {
       disableAutoFetch: true,
       disableStream: true,
     });
-    
+
     const pdf = await loadingTask.promise;
     const numPages = pdf.numPages;
-    
+
     let fullText = '';
-    
+
     // Extract text from each page
     for (let pageNum = 1; pageNum <= numPages; pageNum++) {
       const page = await pdf.getPage(pageNum);
       const textContent = await page.getTextContent();
-      
+
       // Combine text items from the page
-      const pageText = textContent.items
-        .map((item: { str: string }) => item.str)
-        .join(' ');
-      
+      const pageText = textContent.items.map((item) => ('str' in item ? item.str : '')).join(' ');
+
       fullText += pageText + '\n\n';
     }
-    
+
     // Clean up
     await pdf.destroy();
-    
+
     return fullText.trim();
   } catch (error) {
     console.error('Error extracting PDF text:', error);
-    throw new Error(`Failed to extract text from PDF: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw new Error(
+      `Failed to extract text from PDF: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
   }
 }

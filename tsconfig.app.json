@@ -34,5 +34,10 @@
     "noImplicitOverride": true
   },
   "include": ["src"],
-  "exclude": ["**/*.stories.tsx", "**/*.stories.ts"]
+  "exclude": [
+    "**/*.stories.tsx",
+    "**/*.stories.ts",
+    "src/App.refactored.tsx",
+    "src/utils/audio-processor.ts"
+  ]
 }

@@ -18,6 +18,19 @@ console.log('Starting API dev server...');
 function wrapHandler(handler) {
   return async (req, res) => {
     try {
+      // Map Express params to Vercel query format
+      // In Vercel: /api/foo/[id] -> req.query.id
+      // In Express: /api/foo/:id -> req.params.id
+      if (req.params && Object.keys(req.params).length > 0) {
+        const mergedQuery = { ...req.query, ...req.params };
+        Object.defineProperty(req, 'query', {
+          value: mergedQuery,
+          writable: true,
+          enumerable: true,
+          configurable: true
+        });
+      }
+
       // Express already provides these, just call the handler
       await handler(req, res);
     } catch (error) {
@@ -91,6 +104,30 @@ app.post('/api/generate-pdf', async (req, res) => {
     await handler(req, res);
   } catch (error) {
     console.error('Error in generate-pdf:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Job status endpoint
+app.get('/api/transcribe-job/:jobId/status', async (req, res) => {
+  console.log(`GET /api/transcribe-job/${req.params.jobId}/status`);
+  try {
+    const handler = await loadHandler('./api/transcribe-job/[jobId]/status.ts');
+    await handler(req, res);
+  } catch (error) {
+    console.error('Error in job status:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Job cancel endpoint
+app.post('/api/transcribe-job/:jobId/cancel', async (req, res) => {
+  console.log(`POST /api/transcribe-job/${req.params.jobId}/cancel`);
+  try {
+    const handler = await loadHandler('./api/transcribe-job/[jobId]/cancel.ts');
+    await handler(req, res);
+  } catch (error) {
+    console.error('Error in job cancel:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

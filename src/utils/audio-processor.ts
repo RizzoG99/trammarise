@@ -2,7 +2,13 @@ import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { fetchFile } from '@ffmpeg/util';
 import { AUDIO_CONSTANTS } from './constants';
 
-const { TRANSCODE_BITRATE, CHUNK_SIZE_LIMIT, SEGMENT_TIME_SECONDS } = AUDIO_CONSTANTS;
+const {
+  TRANSCODE_BITRATE,
+  CHUNK_SIZE_LIMIT,
+  SEGMENT_TIME_SECONDS,
+  MAX_AUDIO_DURATION_MINI_MODEL,
+  MAX_AUDIO_DURATION_SECONDS,
+} = AUDIO_CONSTANTS;
 
 /**
  * Safely extracts error message from unknown error types.
@@ -21,9 +27,33 @@ function getErrorMessage(error: unknown): string {
   return 'Unknown error';
 }
 
+/**
+ * Get audio duration using Web Audio API
+ * @param file - Audio file to analyze
+ * @returns Duration in seconds
+ */
+export async function getAudioDuration(file: File | Blob): Promise<number> {
+  return new Promise((resolve, reject) => {
+    const audio = new Audio();
+    const objectUrl = URL.createObjectURL(file);
+
+    audio.addEventListener('loadedmetadata', () => {
+      URL.revokeObjectURL(objectUrl);
+      resolve(audio.duration);
+    });
+
+    audio.addEventListener('error', () => {
+      URL.revokeObjectURL(objectUrl);
+      reject(new Error('Failed to load audio metadata'));
+    });
+
+    audio.src = objectUrl;
+  });
+}
+
 const CDN_SOURCES = [
-  '/ffmpeg', // Local files (fastest, most reliable)
-  'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd', // Fallback CDN
+  'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/umd', // jsDelivr CDN (better CORS support)
+  'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd', // unpkg CDN fallback
 ] as const;
 
 let ffmpeg: FFmpeg | null = null;
@@ -188,20 +218,43 @@ export async function compressAudio(
 
 /**
  * Split audio into chunks if larger than limit
+ * Handles any audio format (M4A, MP3, WAV, etc.) and outputs chunks in same format
+ *
+ * @param file - The audio file to chunk
+ * @param forceChunk - If true, chunk regardless of file size (for duration-based chunking)
  */
-export async function chunkAudio(file: Blob): Promise<Blob[]> {
-  if (file.size <= CHUNK_SIZE_LIMIT) {
+export async function chunkAudio(file: Blob | File, forceChunk: boolean = false): Promise<Blob[]> {
+  // Only skip chunking if file is small AND we're not forcing chunking
+  if (!forceChunk && file.size <= CHUNK_SIZE_LIMIT) {
     return [file];
   }
 
   try {
     const ffmpeg = await getFFmpeg();
-    const inputName = 'large_input.mp3';
 
+    // Detect input format from file type or name
+    let inputExt = '.mp3';
+    if (file instanceof File) {
+      const match = file.name.match(/\.[^/.]+$/);
+      inputExt = match ? match[0] : '.mp3';
+    } else if (file.type) {
+      // Map MIME type to extension
+      const mimeToExt: Record<string, string> = {
+        'audio/mp3': '.mp3',
+        'audio/mpeg': '.mp3',
+        'audio/x-m4a': '.m4a',
+        'audio/m4a': '.m4a',
+        'audio/mp4': '.m4a',
+        'audio/wav': '.wav',
+        'audio/webm': '.webm',
+      };
+      inputExt = mimeToExt[file.type] || '.mp3';
+    }
+
+    const inputName = `input${inputExt}`;
     await ffmpeg.writeFile(inputName, await fetchFile(file));
 
-    // Split audio into segments
-    // Assuming 128kbps = ~1MB/min, 24MB = ~24 mins. Let's split every 20 mins to be safe.
+    // Split audio into 20-minute segments using -c copy (no re-encoding)
     await ffmpeg.exec([
       '-i',
       inputName,
@@ -211,20 +264,21 @@ export async function chunkAudio(file: Blob): Promise<Blob[]> {
       SEGMENT_TIME_SECONDS.toString(),
       '-c',
       'copy',
-      'chunk%03d.mp3',
+      `chunk%03d${inputExt}`, // Output chunks in same format as input
     ]);
 
     // Read chunks
     const chunks: Blob[] = [];
+    const mimeType = file.type || 'audio/mp3';
     let i = 0;
     while (true) {
-      const chunkName = `chunk${i.toString().padStart(3, '0')}.mp3`;
+      const chunkName = `chunk${i.toString().padStart(3, '0')}${inputExt}`;
       try {
         const data = await ffmpeg.readFile(chunkName);
         // Ensure data is Uint8Array
         const uint8Data = data instanceof Uint8Array ? data : new Uint8Array(0);
         // Wrap in new Uint8Array to ensure ArrayBuffer (not SharedArrayBuffer) backing
-        chunks.push(new Blob([new Uint8Array(uint8Data)], { type: 'audio/mp3' }));
+        chunks.push(new Blob([new Uint8Array(uint8Data)], { type: mimeType }));
         await ffmpeg.deleteFile(chunkName);
         console.log(`✅ Chunk ${i} created: ${(uint8Data.length / 1024 / 1024).toFixed(2)}MB`);
         i++;
@@ -249,22 +303,65 @@ export async function chunkAudio(file: Blob): Promise<Blob[]> {
 }
 
 /**
- * Process large audio file: Compress -> Chunk
+ * Process large audio file: Check duration -> Compress (if needed) -> Chunk (if needed)
  */
 export async function processLargeAudio(
   file: File,
+  model?: string,
   onProgress?: (step: string, progress: number) => void
 ): Promise<Blob[]> {
   console.log(
     `Processing audio: ${file.name}, size: ${(file.size / 1024 / 1024).toFixed(2)}MB, type: ${file.type}`
   );
 
-  // CRITICAL: Whisper API accepts most audio formats directly (MP3, WAV, M4A, etc.)
-  // Only need FFmpeg if file is >24MB (for chunking)
-  const isSmallEnough = file.size < CHUNK_SIZE_LIMIT;
+  // CRITICAL: Check audio duration first (OpenAI limit is 1400s for both models)
+  let duration: number;
+  try {
+    duration = await getAudioDuration(file);
+    console.log(`Audio duration: ${duration.toFixed(1)}s (${(duration / 60).toFixed(1)} min)`);
+  } catch (error) {
+    console.warn('Failed to get audio duration, will proceed and let API validate:', error);
+    duration = 0; // Will fall back to size-based logic
+  }
 
-  if (isSmallEnough) {
-    console.log('✅ File is under 24MB - sending directly to Whisper (no FFmpeg needed)');
+  // Get model-specific limits
+  const isMiniModel = model === 'gpt-4o-mini-transcribe';
+  const maxDuration = isMiniModel
+    ? MAX_AUDIO_DURATION_MINI_MODEL // 900s (15 min) for mini model
+    : MAX_AUDIO_DURATION_SECONDS; // 1400s (23 min) for full model
+
+  // Fallback threshold: if duration detection fails (duration === 0),
+  // chunk conservatively based on file size
+  const fallbackSizeThreshold = isMiniModel
+    ? 10 * 1024 * 1024 // 10MB for mini model (conservative)
+    : CHUNK_SIZE_LIMIT; // 22MB for full model
+
+  console.log(`📊 Model: ${model || 'gpt-4o-transcribe'}, max duration: ${maxDuration}s`);
+
+  // IMPORTANT: Only chunk if file SIZE requires it (>= 22MB)
+  // For small files with long duration, send to API and let auto-retry handle it
+  // This avoids loading 30MB+ FFmpeg library from CDN
+  const needsChunkingBySize = file.size >= CHUNK_SIZE_LIMIT;
+
+  // CRITICAL: If duration detection failed (duration === 0) and file size exceeds
+  // fallback threshold, chunk anyway to prevent API errors
+  const needsChunkingByFallback = duration === 0 && file.size >= fallbackSizeThreshold;
+
+  // Duration warning for small files (won't chunk, but will use API auto-retry)
+  if (duration > 0 && duration > maxDuration && file.size < CHUNK_SIZE_LIMIT) {
+    console.log(
+      `⚠️ Audio duration ${duration.toFixed(1)}s exceeds ${maxDuration}s limit for ${model || 'gpt-4o-transcribe'}`
+    );
+    console.log(
+      `✅ File size is small (${(file.size / 1024 / 1024).toFixed(2)}MB < 22MB) - sending directly to API`
+    );
+    console.log(`📊 API will auto-retry with larger model (gpt-4o-transcribe) if needed`);
+  }
+
+  if (!needsChunkingBySize && !needsChunkingByFallback) {
+    console.log(
+      `✅ File is under limits (duration: ${duration.toFixed(1)}s, size: ${(file.size / 1024 / 1024).toFixed(2)}MB) - sending directly to Whisper`
+    );
     if (onProgress) {
       onProgress('compressing', 100);
       onProgress('chunking', 100);
@@ -272,24 +369,44 @@ export async function processLargeAudio(
     return [file];
   }
 
-  // File is >24MB - need FFmpeg for chunking
-  console.log(
-    `⚠️ File is large (${(file.size / 1024 / 1024).toFixed(2)}MB) - FFmpeg required for chunking`
-  );
-
-  // Need FFmpeg for compression or chunking
-  if (onProgress) onProgress('compressing', 0);
+  // File needs chunking - log reason
+  if (needsChunkingBySize) {
+    console.log(
+      `⚠️ File size ${(file.size / 1024 / 1024).toFixed(2)}MB exceeds ${(CHUNK_SIZE_LIMIT / 1024 / 1024).toFixed(2)}MB limit - FFmpeg chunking required`
+    );
+  }
+  if (needsChunkingByFallback) {
+    console.log(
+      `⚠️ Audio duration detection failed (duration: ${duration}s), using fallback chunking strategy`
+    );
+    console.log(
+      `📊 Fallback size threshold: ${(fallbackSizeThreshold / 1024 / 1024).toFixed(2)}MB (file is ${(file.size / 1024 / 1024).toFixed(2)}MB)`
+    );
+    console.log('✅ Chunking audio into 20-minute segments for safety');
+  }
 
   try {
-    // Compress to MP3 first
-    const compressed = await compressAudio(file, (p) => {
-      if (onProgress) onProgress('compressing', p);
-    });
-    console.log(`Compression complete: ${(compressed.size / 1024 / 1024).toFixed(2)}MB`);
+    // Optimize: Only compress if file size is large
+    // For duration-only issues with reasonable file sizes, chunk directly
+    let fileToChunk: Blob = file;
 
-    // Then chunk if still needed
+    if (needsChunkingBySize) {
+      // File is too large - compress to MP3 first
+      if (onProgress) onProgress('compressing', 0);
+      fileToChunk = await compressAudio(file, (p) => {
+        if (onProgress) onProgress('compressing', p);
+      });
+      console.log(`Compression complete: ${(fileToChunk.size / 1024 / 1024).toFixed(2)}MB`);
+    } else {
+      // File size is OK, just needs duration chunking - skip compression
+      console.log('✅ File size is acceptable - skipping compression, chunking directly');
+      if (onProgress) onProgress('compressing', 100);
+    }
+
+    // Chunk the file (original or compressed)
+    // Force chunking since we've determined it's needed (by duration, size, or fallback)
     if (onProgress) onProgress('chunking', 0);
-    const chunks = await chunkAudio(compressed);
+    const chunks = await chunkAudio(fileToChunk, true); // forceChunk = true
     if (onProgress) onProgress('chunking', 100);
 
     console.log(`Processing complete: ${chunks.length} chunk(s)`);

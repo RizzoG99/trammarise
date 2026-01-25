@@ -1,9 +1,18 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { OpenAI } from 'openai';
 import busboy from 'busboy';
 import { API_VALIDATION } from '../src/utils/constants';
 import { getTranscriptionPrompt } from '../src/utils/transcription-prompts';
-import { getTranscriptionModelForLevel, type PerformanceLevel } from '../src/types/performance-levels';
+import {
+  getTranscriptionModelForLevel,
+  type PerformanceLevel,
+} from '../src/types/performance-levels';
+import { JobManager } from './utils/job-manager';
+import { chunkAudio, cleanupChunks } from './utils/audio-chunker';
+import { RateLimitGovernor } from './utils/rate-limit-governor';
+import { processChunk, createTranscribeFunction } from './utils/chunk-processor';
+import { assembleTranscript } from './utils/transcript-assembler';
+import type { ProcessingMode } from './types/chunking';
+import type { JobConfiguration } from './types/job';
 
 export const config = {
   api: {
@@ -12,22 +21,14 @@ export const config = {
 };
 
 const { MAX_FILE_SIZE, MAX_FILES, MAX_FIELDS } = API_VALIDATION;
-const TRANSCRIBE_TIMEOUT = 300000; // 5 minutes - matches frontend timeout
 
-export default async function handler(
-  req: VercelRequest,
-  res: VercelResponse
-) {
+/**
+ * Main transcription endpoint - creates a job and processes in background
+ */
+export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
-
-  // Set request timeout to 5 minutes for large audio files
-  const timeoutId = setTimeout(() => {
-    if (!res.headersSent) {
-      res.status(408).json({ error: 'Request timeout - audio file took too long to transcribe' });
-    }
-  }, TRANSCRIBE_TIMEOUT);
 
   try {
     // Parse multipart form data with busboy
@@ -37,7 +38,7 @@ export default async function handler(
         fileSize: MAX_FILE_SIZE,
         files: MAX_FILES,
         fields: MAX_FIELDS,
-      }
+      },
     });
 
     let audioData: Buffer | null = null;
@@ -46,17 +47,18 @@ export default async function handler(
     let language: string | undefined = undefined;
     let model: string | undefined = undefined;
     let contentType: string | undefined = undefined;
-    let uploadedFilename: string = 'audio.webm'; // Default fallback
+    let performanceLevel: string | undefined = undefined;
+    let uploadedFilename: string = 'audio.webm';
     let fileSizeExceeded = false;
 
     const parsePromise = new Promise<void>((resolve, reject) => {
-      bb.on('file', (fieldname, file, info) => {
+      bb.on('file', (_fieldname, file, info) => {
         const { filename, mimeType } = info;
         uploadedFilename = filename || 'audio.webm';
 
         // Validate file type
         if (!mimeType.startsWith('audio/')) {
-          file.resume(); // Drain the stream
+          file.resume();
           reject(new Error('Invalid file type. Audio files only.'));
           return;
         }
@@ -67,7 +69,7 @@ export default async function handler(
 
         file.on('limit', () => {
           fileSizeExceeded = true;
-          file.resume(); // Drain the stream
+          file.resume();
         });
 
         file.on('end', () => {
@@ -88,6 +90,8 @@ export default async function handler(
           model = value || undefined;
         } else if (fieldname === 'contentType') {
           contentType = value || undefined;
+        } else if (fieldname === 'performanceLevel') {
+          performanceLevel = value || undefined;
         }
       });
 
@@ -103,8 +107,6 @@ export default async function handler(
     req.pipe(bb);
     await parsePromise;
 
-    clearTimeout(timeoutId);
-
     if (!audioData) {
       return res.status(400).json({ error: 'No audio file found in request' });
     }
@@ -113,72 +115,196 @@ export default async function handler(
       return res.status(400).json({ error: 'API key is required' });
     }
 
-    const openai = new OpenAI({ baseURL: 'https://api.openai.com/v1', apiKey });
+    // Narrow audioData type to Buffer (TypeScript needs explicit assertion in async callbacks)
+    const audioBuffer: Buffer = audioData;
 
-    // Create a File-like object for OpenAI using the SDK's helper if available, or just pass the buffer with name
-    // The OpenAI SDK accepts a File object (from web API) or a ReadStream (from fs).
-    // Since we have a buffer, we can use the 'openai/uploads' helper or construct a File if available.
-    // However, to be safe in Node environment:
-    const file = await OpenAI.toFile(audioData, uploadedFilename);
+    // Determine processing mode from performance level
+    const mode: ProcessingMode = performanceLevel === 'best_quality' ? 'best_quality' : 'balanced';
 
-    // Determine transcription model from performance level and generate context prompt
+    // Determine transcription model
     const transcriptionModel = model
       ? getTranscriptionModelForLevel(model as PerformanceLevel)
       : 'gpt-4o-mini-transcribe';
-    const contextPrompt = contentType ? getTranscriptionPrompt(contentType) : undefined;
 
-    // Call Transcription API with context
-    try {
-      const transcription = await openai.audio.transcriptions.create({
-        file,
-        model: transcriptionModel,
-        language,
-        prompt: contextPrompt,
-      });
+    // Create job configuration
+    const jobConfig: JobConfiguration = {
+      apiKey,
+      mode,
+      model: transcriptionModel,
+      language,
+      prompt: contentType ? getTranscriptionPrompt(contentType) : undefined,
+    };
 
-      return res.status(200).json({
-        transcript: transcription.text,
-      });
-    } catch (apiError) {
-      const err = apiError as { status?: number; message?: string };
-      console.error('OpenAI transcription error:', apiError);
+    // Create job
+    const job = JobManager.createJob(jobConfig, {
+      filename: uploadedFilename,
+      fileSize: audioBuffer.length,
+      duration: 0, // Will be updated after chunking
+      totalChunks: 0,
+    });
 
-      // Provide specific error messages based on OpenAI API response
-      let errorMessage = 'Transcription failed';
-      let statusCode = 500;
+    console.log(
+      `[Transcribe API] Created job ${job.jobId} (mode: ${mode}, size: ${audioBuffer.length}B)`
+    );
 
-      if (err.status === 401) {
-        errorMessage = 'Invalid OpenAI API key';
-        statusCode = 401;
-      } else if (err.status === 429) {
-        errorMessage = 'OpenAI rate limit exceeded. Please try again later.';
-        statusCode = 429;
-      } else if (err.status === 413) {
-        errorMessage = 'Audio file too large for OpenAI API';
-        statusCode = 413;
-      } else if (err.status === 400) {
-        errorMessage = 'Invalid audio file format or corrupted file';
-        statusCode = 400;
-      }
+    // Return job ID immediately (202 Accepted)
+    const statusUrl = `/api/transcribe-job/${job.jobId}/status`;
+    res.status(202).json({
+      jobId: job.jobId,
+      statusUrl,
+      message: 'Transcription job created',
+    });
 
-      return res.status(statusCode).json({
-        error: errorMessage,
-        message: err.message
-      });
-    }
+    // Process job in background (don't await)
+    processJobInBackground(job.jobId, audioBuffer, uploadedFilename).catch((error) => {
+      console.error(`[Transcribe API] Background processing failed for job ${job.jobId}:`, error);
+      JobManager.updateJobStatus(job.jobId, 'failed', error.message);
+    });
   } catch (error) {
-    clearTimeout(timeoutId);
     const err = error as { message?: string };
-    console.error('Transcription error:', error);
+    console.error('[Transcribe API] Error:', error);
 
-    // Return appropriate error status based on error type
-    const status = err.message?.includes('File size') ? 413 :
-                   err.message?.includes('Invalid file type') ? 415 :
-                   err.message?.includes('API key') ? 401 : 500;
+    const status = err.message?.includes('File size')
+      ? 413
+      : err.message?.includes('Invalid file type')
+        ? 415
+        : err.message?.includes('API key')
+          ? 401
+          : 500;
 
     return res.status(status).json({
-      error: 'Transcription failed',
-      message: error.message || 'Unknown error'
+      error: 'Failed to create transcription job',
+      message: err.message || 'Unknown error',
     });
+  }
+}
+
+/**
+ * Process transcription job in background
+ */
+async function processJobInBackground(
+  jobId: string,
+  audioBuffer: Buffer,
+  filename: string
+): Promise<void> {
+  const job = JobManager.getJob(jobId);
+  if (!job) {
+    throw new Error(`Job ${jobId} not found`);
+  }
+
+  try {
+    // Update status to chunking
+    JobManager.updateJobStatus(jobId, 'chunking');
+
+    // Step 1: Chunk audio
+    console.log(`[Job ${jobId}] Starting audio chunking...`);
+    const chunkingResult = await chunkAudio(audioBuffer, filename, job.config.mode);
+
+    // Update job with chunks
+    JobManager.initializeChunks(jobId, chunkingResult.chunks);
+
+    // Update metadata with duration
+    const updatedJob = JobManager.getJob(jobId)!;
+    updatedJob.metadata.duration = chunkingResult.totalDuration;
+
+    console.log(
+      `[Job ${jobId}] Created ${chunkingResult.totalChunks} chunks (${chunkingResult.totalDuration.toFixed(2)}s total)`
+    );
+
+    // Update status to transcribing
+    JobManager.updateJobStatus(jobId, 'transcribing');
+
+    // Step 2: Create rate limit governor
+    const governor = new RateLimitGovernor(job.config.mode);
+
+    // Step 3: Create transcription function
+    const transcribe = createTranscribeFunction(job.config.apiKey);
+
+    // Step 4: Process all chunks
+    console.log(`[Job ${jobId}] Processing chunks with rate governor...`);
+    const transcripts: string[] = [];
+
+    for (const chunk of chunkingResult.chunks) {
+      // Check if job has been cancelled
+      const currentJob = JobManager.getJob(jobId);
+      if (currentJob?.status === 'cancelled') {
+        console.log(`[Job ${jobId}] Job cancelled, stopping chunk processing`);
+        throw new Error('Job was cancelled by user');
+      }
+
+      try {
+        const transcript = await processChunk(chunk, updatedJob, governor, transcribe);
+
+        transcripts.push(transcript);
+
+        // Update chunk status
+        JobManager.updateChunkStatus(jobId, chunk.index, {
+          status: 'completed',
+          transcript,
+        });
+
+        console.log(
+          `[Job ${jobId}] Completed chunk ${chunk.index + 1}/${chunkingResult.totalChunks} (${updatedJob.progress}%)`
+        );
+      } catch (error) {
+        const err = error as { message?: string };
+        console.error(`[Job ${jobId}] Failed to process chunk ${chunk.index}:`, error);
+
+        // Update chunk status to failed
+        JobManager.updateChunkStatus(jobId, chunk.index, {
+          status: 'failed',
+          error: err.message || 'Unknown error',
+        });
+
+        // If a chunk fails after all retries, fail the entire job
+        throw new Error(`Chunk ${chunk.index} failed: ${err.message || 'Unknown error'}`);
+      }
+    }
+
+    // Step 5: Assemble final transcript
+    console.log(`[Job ${jobId}] Assembling final transcript...`);
+    JobManager.updateJobStatus(jobId, 'assembling');
+
+    const finalTranscript = await assembleTranscript(
+      chunkingResult.chunks,
+      transcripts,
+      job.config.mode
+    );
+
+    JobManager.setJobTranscript(jobId, finalTranscript);
+
+    // Step 6: Clean up chunk files
+    await cleanupChunks(chunkingResult.chunks);
+
+    // Step 7: Mark job as completed
+    JobManager.updateJobStatus(jobId, 'completed');
+
+    console.log(
+      `[Job ${jobId}] ✅ Completed successfully (${finalTranscript.length} chars, ${governor.getStats().totalRequests} API calls)`
+    );
+
+    // Log statistics
+    const stats = governor.getStats();
+    console.log(`[Job ${jobId}] Stats:`, {
+      totalRequests: stats.totalRequests,
+      successRate: `${((stats.successfulRequests / stats.totalRequests) * 100).toFixed(1)}%`,
+      rateLimited: stats.rateLimitedRequests,
+      degradedModeActivations: stats.degradedModeActivations,
+      peakConcurrency: stats.peakConcurrency,
+    });
+  } catch (error) {
+    const err = error as { message?: string };
+    console.error(`[Job ${jobId}] ❌ Failed:`, error);
+    JobManager.updateJobStatus(jobId, 'failed', err.message || 'Unknown error');
+
+    // Clean up on failure
+    const failedJob = JobManager.getJob(jobId);
+    if (failedJob && failedJob.chunks.length > 0) {
+      try {
+        await cleanupChunks(failedJob.chunks);
+      } catch (cleanupError) {
+        console.warn(`[Job ${jobId}] Failed to clean up chunks:`, cleanupError);
+      }
+    }
   }
 }

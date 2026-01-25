@@ -2,8 +2,16 @@
 export const AUDIO_CONSTANTS = {
   // FFmpeg transcoding
   TRANSCODE_BITRATE: '128k' as const,
-  CHUNK_SIZE_LIMIT: 24 * 1024 * 1024, // 24MB (safe margin below 25MB API limit)
-  SEGMENT_TIME_SECONDS: 20 * 60, // 20 minutes
+  CHUNK_SIZE_LIMIT: 22 * 1024 * 1024, // 22MB (3MB safety margin below 25MB Whisper API limit, accounts for encoding overhead)
+  SEGMENT_TIME_SECONDS: 20 * 60, // 20 minutes (1200s - safe for both models)
+
+  // OpenAI Transcription API duration limits (informational)
+  // These limits trigger API auto-retry with larger model, NOT frontend chunking
+  // gpt-4o-mini-transcribe: 16K token context (~15 min safe duration)
+  // gpt-4o-transcribe: Larger context (~23 min max duration)
+  MAX_AUDIO_DURATION_MINI_MODEL: 15 * 60, // 900 seconds (15 minutes) - conservative for mini model
+  MAX_AUDIO_DURATION_SECONDS: 1400, // Maximum duration for full model (23.3 minutes)
+  SAFE_CHUNK_DURATION_SECONDS: 20 * 60, // 20 minutes - chunk duration for FFmpeg segmentation
 
   // Recording
   RECORDING_TIMER_INTERVAL: 100, // milliseconds
