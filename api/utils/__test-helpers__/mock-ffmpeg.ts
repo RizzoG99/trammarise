@@ -21,7 +21,7 @@ export interface MockFFmpegConfig {
   operationDelay?: number;
 }
 
-export type MockFFmpegInstance = ReturnType<typeof createMockFFmpeg>;
+export type MockFFmpegInstance = ReturnType<typeof createMockFluentFFmpeg>;
 
 export class MockFFmpeg {
   private config: MockFFmpegConfig = {};
@@ -124,7 +124,7 @@ export function createMockFFprobe(config: MockFFmpegConfig = {}) {
 
     const probeData = {
       format: {
-        duration: duration.toString(),
+        duration: duration,
         size: (duration * 32000).toString(), // 32KB/s
         bit_rate: '128000',
         format_name: 'mp3',
@@ -140,7 +140,7 @@ export function createMockFFprobe(config: MockFFmpegConfig = {}) {
       ],
     };
 
-    callback(null, probeData);
+    callback(null, probeData as unknown as FFprobeData);
   });
 }
 

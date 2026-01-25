@@ -8,6 +8,27 @@ import type { TranscriptionJob, JobConfiguration, JobMetadata } from '../../type
 import type { ChunkMetadata, ProcessingMode } from '../../types/chunking';
 
 /**
+ * Extended ChunkMetadata for testing purposes, including optional tracking properties
+ */
+export interface TestChunkMetadata extends ChunkMetadata {
+  status?: string;
+  retryCount?: number;
+  transcript?: string;
+  error?: string;
+}
+
+/**
+ * Overrides for creating a test chunk
+ */
+export interface TestChunkOverrides extends Partial<ChunkMetadata> {
+  status?: string;
+  retryCount?: number;
+  transcript?: string;
+  error?: string;
+  overlapDuration?: number;
+}
+
+/**
  * Create a test job with sensible defaults
  */
 export function createTestJob(overrides?: {
@@ -67,7 +88,7 @@ export function createTestJob(overrides?: {
 /**
  * Create mock chunk metadata
  */
-export function createTestChunk(index: number, overrides?: Partial<ChunkMetadata>): ChunkMetadata {
+export function createTestChunk(index: number, overrides?: TestChunkOverrides): TestChunkMetadata {
   const startTime = overrides?.startTime ?? index * 180;
   const duration = overrides?.duration ?? 180;
   const hasOverlap = overrides?.hasOverlap ?? false;

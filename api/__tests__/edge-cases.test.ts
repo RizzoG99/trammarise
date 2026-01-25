@@ -13,7 +13,10 @@ import { RateLimitGovernor } from '../utils/rate-limit-governor';
 import { generateMockAudio } from '../utils/__test-helpers__/mock-audio-generator';
 import { createTestJob, createTestChunk } from '../utils/__test-helpers__/test-fixtures';
 import { JOB_SAFEGUARDS } from '../types/job';
-import type { MockFluentFFmpegStatic } from '../utils/__test-helpers__/types';
+import type {
+  MockFluentFFmpegCommand,
+  MockFluentFFmpegStatic,
+} from '../utils/__test-helpers__/types';
 
 describe('Edge Cases', () => {
   beforeEach(() => {
@@ -189,7 +192,9 @@ describe('Edge Cases', () => {
       const mockFFmpeg = (
         (await import('fluent-ffmpeg')) as unknown as { default: MockFluentFFmpegStatic }
       ).default;
-      vi.mocked(mockFFmpeg).mockReturnValue(mockFFmpegInstance);
+      vi.mocked(mockFFmpeg).mockReturnValue(
+        mockFFmpegInstance as unknown as MockFluentFFmpegCommand
+      );
 
       const { extractChunk } = await import('../utils/audio-chunker');
 
