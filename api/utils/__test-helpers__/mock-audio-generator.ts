@@ -44,7 +44,9 @@ export function generateMockAudio(options: MockAudioOptions): Buffer {
  */
 export function generateMockFile(options: MockAudioOptions): File {
   const buffer = generateMockAudio(options);
-  const blob = new Blob([buffer], { type: `audio/${options.format || 'mp3'}` });
+  // Convert Buffer to Uint8Array for browser compatibility
+  const uint8Array = new Uint8Array(buffer);
+  const blob = new Blob([uint8Array], { type: `audio/${options.format || 'mp3'}` });
   const filename = `test-audio-${options.durationSeconds}s.${options.format || 'mp3'}`;
 
   return new File([blob], filename, {

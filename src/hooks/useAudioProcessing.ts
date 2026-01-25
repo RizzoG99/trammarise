@@ -197,7 +197,7 @@ export function useAudioProcessing({ onProgress, onComplete, onError }: UseAudio
 /**
  * Enhanced error handler with user-friendly messages based on error type
  */
-function handleError(errorMsg: string, session: SessionData, onError: (error: Error) => void) {
+function handleError(errorMsg: string, _session: SessionData, onError: (error: Error) => void) {
   const message = errorMsg.toLowerCase();
 
   // Job-specific errors

@@ -65,7 +65,7 @@ export class RateLimitGovernor {
         reject,
       };
 
-      this.state.queue.push(request);
+      this.state.queue.push(request as QueuedRequest<unknown>);
       this.sortQueue();
       this.processQueue();
     });
@@ -91,7 +91,7 @@ export class RateLimitGovernor {
    */
   private async executeRequest<T>(request: QueuedRequest<T>): Promise<void> {
     this.state.currentConcurrency++;
-    this.state.inFlight.set(request.id, request);
+    this.state.inFlight.set(request.id, request as QueuedRequest<unknown>);
 
     // Update peak concurrency
     if (this.state.currentConcurrency > this.state.stats.peakConcurrency) {
@@ -164,7 +164,7 @@ export class RateLimitGovernor {
         // Re-enqueue with higher priority
         setTimeout(() => {
           request.priority += 10; // Increase priority
-          this.state.queue.unshift(request); // Add to front
+          this.state.queue.unshift(request as QueuedRequest<unknown>); // Add to front
           this.sortQueue();
           this.processQueue();
         }, backoff);

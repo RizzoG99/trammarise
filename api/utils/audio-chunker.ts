@@ -6,10 +6,10 @@
  * - Best Quality: 10-minute chunks, 15-second overlap
  */
 
-import ffmpeg from 'fluent-ffmpeg';
+import * as ffmpeg from 'fluent-ffmpeg';
 import { promises as fs } from 'fs';
-import path from 'path';
-import crypto from 'crypto';
+import * as path from 'path';
+import * as crypto from 'crypto';
 import { setupFFmpeg } from './ffmpeg-setup';
 import type { ChunkMetadata, ChunkingResult, ProcessingMode } from '../types/chunking';
 import { CHUNKING_CONFIGS, AUDIO_CONSTANTS } from '../types/chunking';

@@ -60,7 +60,7 @@ export async function processChunk(
         `chunk_${job.jobId}_${chunk.index}_${attempt}`,
         job.jobId,
         chunk.index,
-        () => transcribeFunction(chunk.filePath, job.config),
+        () => transcribeFunction(chunk.filePath, job.config as unknown as TranscriptionConfig),
         chunk.index // Priority based on chunk order
       );
 
@@ -68,9 +68,10 @@ export async function processChunk(
 
       return transcript;
     } catch (error: unknown) {
+      const err = error as Error;
       console.warn(
         `[Chunk Processor] Attempt ${attempt} failed for chunk ${chunk.index}:`,
-        error.message
+        err.message
       );
 
       // If this was the last retry, fall through to auto-split
@@ -186,7 +187,7 @@ async function autoSplitAndProcess(
         `subchunk_${job.jobId}_${chunk.index}_${subChunk.index}`,
         job.jobId,
         chunk.index,
-        () => transcribeFunction(subChunk.filePath, job.config),
+        () => transcribeFunction(subChunk.filePath, job.config as unknown as TranscriptionConfig),
         1000 + chunk.index // Higher priority for sub-chunks
       );
 
@@ -195,13 +196,14 @@ async function autoSplitAndProcess(
 
       console.log(`[Chunk Processor] Sub-chunk ${subChunk.index} transcribed successfully`);
     } catch (error: unknown) {
-      console.error(`[Chunk Processor] Sub-chunk ${subChunk.index} failed:`, error.message);
+      const err = error as Error;
+      console.error(`[Chunk Processor] Sub-chunk ${subChunk.index} failed:`, err.message);
 
       // Clean up sub-chunk files
       await cleanupSubChunks(subChunks);
 
       throw new Error(
-        `Failed to transcribe sub-chunk ${subChunk.index} of chunk ${chunk.index}: ${error.message}`
+        `Failed to transcribe sub-chunk ${subChunk.index} of chunk ${chunk.index}: ${err.message}`
       );
     }
   }
@@ -255,7 +257,7 @@ export function createTranscribeFunction(apiKey: string) {
       formData.append('language', config.language);
     }
 
-    if (config.temperature !== undefined) {
+    if (config.temperature !== undefined && config.temperature !== null) {
       formData.append('temperature', config.temperature.toString());
     }
 
@@ -269,7 +271,8 @@ export function createTranscribeFunction(apiKey: string) {
         Authorization: `Bearer ${apiKey}`,
         ...formData.getHeaders(),
       },
-      body: formData as unknown as BodyInit,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      body: formData as any,
     });
 
     if (!response.ok) {

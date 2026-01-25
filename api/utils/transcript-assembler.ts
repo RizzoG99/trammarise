@@ -253,7 +253,7 @@ export function normalizeSentences(text: string): string {
   normalized = normalized.replace(/(\.)([A-Za-z])/g, '$1 $2');
 
   // Capitalize after sentence endings
-  normalized = normalized.replace(/([.!?])\s+([a-z])/g, (match, p1, p2) => {
+  normalized = normalized.replace(/([.!?])\s+([a-z])/g, (_match, p1, p2) => {
     return p1 + ' ' + p2.toUpperCase();
   });
 

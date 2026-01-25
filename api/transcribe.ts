@@ -52,7 +52,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     let fileSizeExceeded = false;
 
     const parsePromise = new Promise<void>((resolve, reject) => {
-      bb.on('file', (fieldname, file, info) => {
+      bb.on('file', (_fieldname, file, info) => {
         const { filename, mimeType } = info;
         uploadedFilename = filename || 'audio.webm';
 
@@ -115,6 +115,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ error: 'API key is required' });
     }
 
+    // Narrow audioData type to Buffer (TypeScript needs explicit assertion in async callbacks)
+    const audioBuffer: Buffer = audioData;
+
     // Determine processing mode from performance level
     const mode: ProcessingMode = performanceLevel === 'best_quality' ? 'best_quality' : 'balanced';
 
@@ -135,13 +138,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Create job
     const job = JobManager.createJob(jobConfig, {
       filename: uploadedFilename,
-      fileSize: audioData.length,
+      fileSize: audioBuffer.length,
       duration: 0, // Will be updated after chunking
       totalChunks: 0,
     });
 
     console.log(
-      `[Transcribe API] Created job ${job.jobId} (mode: ${mode}, size: ${audioData.length}B)`
+      `[Transcribe API] Created job ${job.jobId} (mode: ${mode}, size: ${audioBuffer.length}B)`
     );
 
     // Return job ID immediately (202 Accepted)
@@ -153,7 +156,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
 
     // Process job in background (don't await)
-    processJobInBackground(job.jobId, audioData, uploadedFilename).catch((error) => {
+    processJobInBackground(job.jobId, audioBuffer, uploadedFilename).catch((error) => {
       console.error(`[Transcribe API] Background processing failed for job ${job.jobId}:`, error);
       JobManager.updateJobStatus(job.jobId, 'failed', error.message);
     });

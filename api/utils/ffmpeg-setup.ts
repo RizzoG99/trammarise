@@ -5,8 +5,8 @@
  * for different environments (local development, Vercel serverless).
  */
 
-import ffmpeg from 'fluent-ffmpeg';
-import ffmpegInstaller from '@ffmpeg-installer/ffmpeg';
+import * as ffmpeg from 'fluent-ffmpeg';
+import * as ffmpegInstaller from '@ffmpeg-installer/ffmpeg';
 import * as ffprobeInstaller from '@ffprobe-installer/ffprobe';
 
 let isSetup = false;

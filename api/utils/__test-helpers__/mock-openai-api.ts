@@ -106,7 +106,8 @@ export class MockOpenAIAPI {
     // Try to extract from filename pattern like "chunk_05_..."
     if (formData && formData.get) {
       const file = formData.get('file');
-      if (file && file.name) {
+      // Type guard: FormDataEntryValue is File | string
+      if (file && typeof file !== 'string' && file instanceof File) {
         const match = file.name.match(/chunk_(\d+)/);
         if (match) {
           return parseInt(match[1], 10);
@@ -131,12 +132,13 @@ export class MockOpenAIAPI {
         return new Response(null, { status: 404, statusText: 'Not Found' });
       }
 
-      // Extract chunk index from request body
-      const chunkIndex = this.extractChunkIndex(options?.body);
+      // Extract chunk index from request body (assert as FormData for testing)
+      const formData = options?.body as FormData;
+      const chunkIndex = this.extractChunkIndex(formData);
 
       // Notify callback if registered
       if (this.transcribeCallback) {
-        this.transcribeCallback(chunkIndex, options?.body);
+        this.transcribeCallback(chunkIndex, formData);
       }
 
       // Apply response delay if configured
@@ -180,7 +182,7 @@ export class MockOpenAIAPI {
         statusText: 'OK',
         headers: { 'content-type': 'application/json' },
       });
-    }) as { text: string; ok: boolean; status?: number };
+    }) as typeof fetch;
   }
 }
 

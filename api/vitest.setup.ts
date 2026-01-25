@@ -58,14 +58,16 @@ const mockFFmpegFactory = vi.hoisted(() => {
       run: vi.fn(),
     };
     // Set all methods to return mockCommand for chaining
-    Object.keys(mockCommand).forEach((key) => {
+    (Object.keys(mockCommand) as Array<keyof typeof mockCommand>).forEach((key) => {
+      const value = mockCommand[key];
       if (
-        typeof mockCommand[key] === 'function' &&
+        typeof value === 'function' &&
         key !== 'run' &&
         key !== 'on' &&
-        key !== 'output'
+        key !== 'output' &&
+        'mockReturnValue' in value
       ) {
-        mockCommand[key].mockReturnValue(mockCommand);
+        value.mockReturnValue(mockCommand);
       }
     });
     return mockCommand;
@@ -147,7 +149,7 @@ process.env.OPENAI_API_KEY = 'test-openai-key-12345';
 process.env.NODE_ENV = 'test';
 
 // Global mock instances
-let mockOpenAI: MockOpenAIAPI;
+let mockOpenAI: MockOpenAIAPI = new MockOpenAIAPI();
 
 // Setup before each test
 beforeEach(() => {
