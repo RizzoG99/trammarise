@@ -29,10 +29,20 @@ describe('Integration: Transcribe Balanced Mode', () => {
       const duration = 90 * 60; // 5400 seconds
 
       // Mock ffprobe to return correct duration
-      const mockFFmpeg = ((await import('fluent-ffmpeg')) as MockFluentFFmpegModule).default;
-      mockFFmpeg.ffprobe = vi.fn((path, callback) => {
+      const mockFFmpegModule = await import('fluent-ffmpeg');
+      const mockFfprobe = vi.fn((path, callback) => {
         callback(null, { format: { duration } });
       });
+
+      // Use structural type to access runtime 'default' export if present (ESM interop)
+      const mockModule = mockFFmpegModule as unknown as {
+        default?: { ffprobe: unknown };
+        ffprobe?: unknown;
+      };
+      mockModule.ffprobe = mockFfprobe;
+      if (mockModule.default) {
+        mockModule.default.ffprobe = mockFfprobe;
+      }
 
       // Setup OpenAI mock
       const mockOpenAI = new MockOpenAIAPI({
@@ -89,10 +99,15 @@ describe('Integration: Transcribe Balanced Mode', () => {
       const audioBuffer = generateMockAudio({ durationSeconds: 200, format: 'mp3' });
       const duration = 200;
 
-      const mockFFmpeg = ((await import('fluent-ffmpeg')) as MockFluentFFmpegModule).default;
-      mockFFmpeg.ffprobe = vi.fn((path, callback) => {
+      const mockFFmpegModule = await import('fluent-ffmpeg');
+      const mockFfprobe = vi.fn((path, callback) => {
         callback(null, { format: { duration } });
       });
+
+      const mockModule = mockFFmpegModule as unknown as { default?: { ffprobe: unknown } };
+      if (mockModule.default) {
+        mockModule.default.ffprobe = mockFfprobe;
+      }
 
       // Chunk audio
       const chunkingResult = await chunkAudio(audioBuffer, 'test.mp3', 'balanced');
@@ -181,10 +196,18 @@ describe('Integration: Transcribe Balanced Mode', () => {
       const audioBuffer = generateMockAudio({ durationSeconds: 600, format: 'mp3' });
       const duration = 600;
 
-      const mockFFmpeg = ((await import('fluent-ffmpeg')) as MockFluentFFmpegModule).default;
-      mockFFmpeg.ffprobe = vi.fn((path, callback) => {
+      const mockFFmpegModule = await import('fluent-ffmpeg');
+      const mockFfprobe = vi.fn((path, callback) => {
         callback(null, { format: { duration } });
       });
+      const mockModule = mockFFmpegModule as unknown as {
+        default?: { ffprobe: unknown };
+        ffprobe?: unknown;
+      };
+      mockModule.ffprobe = mockFfprobe;
+      if (mockModule.default) {
+        mockModule.default.ffprobe = mockFfprobe;
+      }
 
       const chunkingResult = await chunkAudio(audioBuffer, 'test.mp3', 'balanced');
 
@@ -231,10 +254,18 @@ describe('Integration: Transcribe Balanced Mode', () => {
       const audioBuffer = generateMockAudio({ durationSeconds: 400, format: 'mp3' });
       const duration = 400;
 
-      const mockFFmpeg = ((await import('fluent-ffmpeg')) as MockFluentFFmpegModule).default;
-      mockFFmpeg.ffprobe = vi.fn((path, callback) => {
+      const mockFFmpegModule = await import('fluent-ffmpeg');
+      const mockFfprobe = vi.fn((path, callback) => {
         callback(null, { format: { duration } });
       });
+      const mockModule = mockFFmpegModule as unknown as {
+        default?: { ffprobe: unknown };
+        ffprobe?: unknown;
+      };
+      mockModule.ffprobe = mockFfprobe;
+      if (mockModule.default) {
+        mockModule.default.ffprobe = mockFfprobe;
+      }
 
       const chunkingResult = await chunkAudio(audioBuffer, 'test.mp3', 'balanced');
 

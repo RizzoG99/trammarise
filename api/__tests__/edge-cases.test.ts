@@ -13,7 +13,7 @@ import { RateLimitGovernor } from '../utils/rate-limit-governor';
 import { generateMockAudio } from '../utils/__test-helpers__/mock-audio-generator';
 import { createTestJob, createTestChunk } from '../utils/__test-helpers__/test-fixtures';
 import { JOB_SAFEGUARDS } from '../types/job';
-import type { MockFluentFFmpegModule } from '../utils/__test-helpers__/types';
+import type { MockFluentFFmpegStatic } from '../utils/__test-helpers__/types';
 
 describe('Edge Cases', () => {
   beforeEach(() => {
@@ -23,10 +23,18 @@ describe('Edge Cases', () => {
   describe('Empty Audio File', () => {
     it('should handle 0 duration audio gracefully', async () => {
       const audioBuffer = Buffer.from('');
-      const mockFFmpeg = ((await import('fluent-ffmpeg')) as MockFluentFFmpegModule).default;
-      mockFFmpeg.ffprobe = vi.fn((path, callback) => {
+      const mockFFmpegModule = await import('fluent-ffmpeg');
+      const mockFfprobe = vi.fn((path, callback) => {
         callback(null, { format: { duration: 0 } });
       });
+      const mockModule = mockFFmpegModule as unknown as {
+        default?: { ffprobe: unknown };
+        ffprobe?: unknown;
+      };
+      mockModule.ffprobe = mockFfprobe;
+      if (mockModule.default) {
+        mockModule.default.ffprobe = mockFfprobe;
+      }
 
       const result = await chunkAudio(audioBuffer, 'empty.mp3', 'balanced');
 
@@ -43,7 +51,7 @@ describe('Edge Cases', () => {
 
   describe('Job Cancellation During Auto-Split', () => {
     it('should abort auto-split when job is cancelled', async () => {
-      const job = createTestJob({ mode: 'balanced', status: 'transcribing' });
+      const job = createTestJob({ config: { mode: 'balanced' }, status: 'transcribing' });
       const chunk = createTestChunk(0, { duration: 180 });
       job.chunks = [chunk];
       job.chunkStatuses = [
@@ -120,15 +128,20 @@ describe('Edge Cases', () => {
 
     beforeEach(async () => {
       // Save original mock implementation
-      const mockFFmpegModule = ((await import('fluent-ffmpeg')) as MockFluentFFmpegModule).default;
+      const mockFFmpegModule = (
+        (await import('fluent-ffmpeg')) as unknown as { default: MockFluentFFmpegStatic }
+      ).default;
       originalFFmpegMock = vi.mocked(mockFFmpegModule).getMockImplementation();
     });
 
     afterEach(async () => {
       // Restore original mock implementation
       if (originalFFmpegMock) {
-        const mockFFmpegModule = ((await import('fluent-ffmpeg')) as MockFluentFFmpegModule)
-          .default;
+        const mockFFmpegModule = (
+          (await import('fluent-ffmpeg')) as unknown as {
+            default: MockFluentFFmpegStatic;
+          }
+        ).default;
         vi.mocked(mockFFmpegModule).mockImplementation(originalFFmpegMock as never);
       }
       vi.clearAllMocks();
@@ -137,10 +150,18 @@ describe('Edge Cases', () => {
     it('should propagate error when ffprobe fails', async () => {
       const audioBuffer = generateMockAudio({ durationSeconds: 100, format: 'mp3' });
 
-      const mockFFmpeg = ((await import('fluent-ffmpeg')) as MockFluentFFmpegModule).default;
-      mockFFmpeg.ffprobe = vi.fn((path, callback) => {
+      const mockFFmpegModule = await import('fluent-ffmpeg');
+      const mockFfprobe = vi.fn((path, callback) => {
         callback(new Error('FFprobe failed'), null);
       });
+      const mockModule = mockFFmpegModule as unknown as {
+        default?: { ffprobe: unknown };
+        ffprobe?: unknown;
+      };
+      mockModule.ffprobe = mockFfprobe;
+      if (mockModule.default) {
+        mockModule.default.ffprobe = mockFfprobe;
+      }
 
       await expect(chunkAudio(audioBuffer, 'test.mp3', 'balanced')).rejects.toThrow(
         /Failed to probe audio file/
@@ -165,7 +186,9 @@ describe('Edge Cases', () => {
         run: vi.fn(),
       };
 
-      const mockFFmpeg = ((await import('fluent-ffmpeg')) as MockFluentFFmpegModule).default;
+      const mockFFmpeg = (
+        (await import('fluent-ffmpeg')) as unknown as { default: MockFluentFFmpegStatic }
+      ).default;
       vi.mocked(mockFFmpeg).mockReturnValue(mockFFmpegInstance);
 
       const { extractChunk } = await import('../utils/audio-chunker');
@@ -328,7 +351,9 @@ describe('Edge Cases', () => {
     beforeEach(async () => {
       vi.useRealTimers();
       // Save original ffprobe implementation
-      const mockFFmpegModule = (await import('fluent-ffmpeg')) as unknown as MockFluentFFmpegModule;
+      const mockFFmpegModule = (await import('fluent-ffmpeg')) as unknown as {
+        default: MockFluentFFmpegStatic;
+      };
       originalFfprobe = mockFFmpegModule.default.ffprobe;
     });
 
@@ -336,8 +361,9 @@ describe('Edge Cases', () => {
       vi.useFakeTimers();
       // Restore original ffprobe implementation
       if (originalFfprobe) {
-        const mockFFmpegModule =
-          (await import('fluent-ffmpeg')) as unknown as MockFluentFFmpegModule;
+        const mockFFmpegModule = (await import('fluent-ffmpeg')) as unknown as {
+          default: MockFluentFFmpegStatic;
+        };
         mockFFmpegModule.default.ffprobe = originalFfprobe as never;
       }
     });
@@ -345,11 +371,18 @@ describe('Edge Cases', () => {
     it('should handle very short chunks (1 second)', async () => {
       const audioBuffer = generateMockAudio({ durationSeconds: 1, format: 'mp3' });
 
-      const mockFFmpeg = ((await import('fluent-ffmpeg')) as unknown as MockFluentFFmpegModule)
-        .default;
-      mockFFmpeg.ffprobe = vi.fn((_path, callback) => {
+      const mockFFmpegModule = await import('fluent-ffmpeg');
+      const mockFfprobe = vi.fn((_path, callback) => {
         callback(null, { format: { duration: 1 } });
       });
+      const mockModule = mockFFmpegModule as unknown as {
+        default?: { ffprobe: unknown };
+        ffprobe?: unknown;
+      };
+      mockModule.ffprobe = mockFfprobe;
+      if (mockModule.default) {
+        mockModule.default.ffprobe = mockFfprobe;
+      }
 
       const result = await chunkAudio(audioBuffer, 'short.mp3', 'balanced');
 
@@ -388,11 +421,20 @@ describe('Edge Cases', () => {
       // Simulate extremely long audio (10 hours)
       const duration = 10 * 60 * 60; // 36000 seconds
 
-      const mockFFmpeg = ((await import('fluent-ffmpeg')) as unknown as MockFluentFFmpegModule)
-        .default;
-      mockFFmpeg.ffprobe = vi.fn((_path, callback) => {
+      const mockFFmpegModule = await import('fluent-ffmpeg');
+      const mockFfprobe = vi.fn((_path, callback) => {
         callback(null, { format: { duration } });
       });
+
+      // Mock on both namespace and default to catch all import styles
+      const mockModule = mockFFmpegModule as unknown as {
+        default?: { ffprobe: unknown };
+        ffprobe?: unknown;
+      };
+      mockModule.ffprobe = mockFfprobe;
+      if (mockModule.default) {
+        mockModule.default.ffprobe = mockFfprobe;
+      }
 
       const audioBuffer = generateMockAudio({ durationSeconds: 100, format: 'mp3' });
       const result = await chunkAudio(audioBuffer, 'long.mp3', 'balanced');

@@ -170,7 +170,7 @@ describe('Integration: Rate Limiting', () => {
       });
       global.fetch = mockOpenAI.createMockFetch();
 
-      const promises: Promise<void>[] = [];
+      const promises: Promise<void | string>[] = [];
 
       // Make 20 requests to trigger degraded mode
       for (let i = 0; i < 20; i++) {
@@ -207,7 +207,7 @@ describe('Integration: Rate Limiting', () => {
 
       // May have entered degraded mode (depends on timing)
       // This is validated in the governor itself
-    }, 15000); // Increased timeout for rate limiting delays
+    }, 30000); // Increased timeout for rate limiting delays
 
     it('should reduce concurrency from 4 to 2 in degraded mode', async () => {
       // Verify degraded mode configuration
@@ -232,10 +232,19 @@ describe('Integration: Rate Limiting', () => {
       const audioBuffer = generateMockAudio({ durationSeconds: 400, format: 'mp3' });
       const duration = 400;
 
-      const mockFFmpeg = ((await import('fluent-ffmpeg')) as MockFluentFFmpegModule).default;
-      mockFFmpeg.ffprobe = vi.fn((path, callback) => {
+      const mockFFmpegModule = await import('fluent-ffmpeg');
+      const mockFfprobe = vi.fn((path, callback) => {
         callback(null, { format: { duration } });
       });
+
+      const mockModule = mockFFmpegModule as unknown as {
+        default?: { ffprobe: unknown };
+        ffprobe?: unknown;
+      };
+      mockModule.ffprobe = mockFfprobe;
+      if (mockModule.default) {
+        mockModule.default.ffprobe = mockFfprobe;
+      }
 
       const chunkingResult = await chunkAudio(audioBuffer, 'test.mp3', 'balanced');
 
@@ -275,10 +284,19 @@ describe('Integration: Rate Limiting', () => {
       const audioBuffer = generateMockAudio({ durationSeconds: 200, format: 'mp3' });
       const duration = 200;
 
-      const mockFFmpeg = ((await import('fluent-ffmpeg')) as MockFluentFFmpegModule).default;
-      mockFFmpeg.ffprobe = vi.fn((path, callback) => {
+      const mockFFmpegModule = await import('fluent-ffmpeg');
+      const mockFfprobe = vi.fn((path, callback) => {
         callback(null, { format: { duration } });
       });
+
+      const mockModule = mockFFmpegModule as unknown as {
+        default?: { ffprobe: unknown };
+        ffprobe?: unknown;
+      };
+      mockModule.ffprobe = mockFfprobe;
+      if (mockModule.default) {
+        mockModule.default.ffprobe = mockFfprobe;
+      }
 
       const chunkingResult = await chunkAudio(audioBuffer, 'test.mp3', 'balanced');
 

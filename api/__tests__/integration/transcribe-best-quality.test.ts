@@ -29,10 +29,19 @@ describe('Integration: Transcribe Best Quality Mode', () => {
       const duration = 120 * 60; // 7200 seconds
 
       // Mock ffprobe
-      const mockFFmpeg = ((await import('fluent-ffmpeg')) as MockFluentFFmpegModule).default;
-      mockFFmpeg.ffprobe = vi.fn((path, callback) => {
+      const mockFFmpegModule = await import('fluent-ffmpeg');
+      const mockFfprobe = vi.fn((path, callback) => {
         callback(null, { format: { duration } });
       });
+
+      const mockModule = mockFFmpegModule as unknown as {
+        default?: { ffprobe: unknown };
+        ffprobe?: unknown;
+      };
+      mockModule.ffprobe = mockFfprobe;
+      if (mockModule.default) {
+        mockModule.default.ffprobe = mockFfprobe;
+      }
 
       // Setup OpenAI mock with overlapping transcripts
       const mockOpenAI = new MockOpenAIAPI({
@@ -153,10 +162,19 @@ describe('Integration: Transcribe Best Quality Mode', () => {
       const audioBuffer = generateMockAudio({ durationSeconds: 700, format: 'wav' });
       const duration = 700;
 
-      const mockFFmpeg = ((await import('fluent-ffmpeg')) as MockFluentFFmpegModule).default;
-      mockFFmpeg.ffprobe = vi.fn((path, callback) => {
+      const mockFFmpegModule = await import('fluent-ffmpeg');
+      const mockFfprobe = vi.fn((path, callback) => {
         callback(null, { format: { duration } });
       });
+
+      const mockModule = mockFFmpegModule as unknown as {
+        default?: { ffprobe: unknown };
+        ffprobe?: unknown;
+      };
+      mockModule.ffprobe = mockFfprobe;
+      if (mockModule.default) {
+        mockModule.default.ffprobe = mockFfprobe;
+      }
 
       // Chunk audio
       const chunkingResult = await chunkAudio(audioBuffer, 'test.wav', 'best_quality');
@@ -205,10 +223,19 @@ describe('Integration: Transcribe Best Quality Mode', () => {
       const audioBuffer = generateMockAudio({ durationSeconds: 600, format: 'wav' });
       const duration = 600;
 
-      const mockFFmpeg = ((await import('fluent-ffmpeg')) as MockFluentFFmpegModule).default;
-      mockFFmpeg.ffprobe = vi.fn((path, callback) => {
+      const mockFFmpegModule = await import('fluent-ffmpeg');
+      const mockFfprobe = vi.fn((path, callback) => {
         callback(null, { format: { duration } });
       });
+
+      const mockModule = mockFFmpegModule as unknown as {
+        default?: { ffprobe: unknown };
+        ffprobe?: unknown;
+      };
+      mockModule.ffprobe = mockFfprobe;
+      if (mockModule.default) {
+        mockModule.default.ffprobe = mockFfprobe;
+      }
 
       const chunkingResult = await chunkAudio(audioBuffer, 'test.wav', 'best_quality');
 

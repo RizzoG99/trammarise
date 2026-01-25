@@ -9,7 +9,7 @@
 
 import { promises as fs } from 'fs';
 import type { ChunkMetadata } from '../types/chunking';
-import type { TranscriptionJob } from '../types/job';
+import type { TranscriptionJob, JobStatus } from '../types/job';
 import { JOB_SAFEGUARDS } from '../types/job';
 import { CHUNKING_CONFIGS, AUTO_SPLIT_CONFIG } from '../types/chunking';
 import { RateLimitGovernor } from './rate-limit-governor';
@@ -34,9 +34,16 @@ export async function processChunk(
   transcribeFunction: (chunkPath: string, config: TranscriptionConfig) => Promise<string>
 ): Promise<string> {
   const config = CHUNKING_CONFIGS[job.config.mode];
-  const chunkStatus = job.chunkStatuses[chunk.index];
+  if (!chunk) {
+    throw new Error('Chunk is undefined');
+  }
+  const chunkStatus = job.chunkStatuses?.[chunk.index];
 
   console.log(`[Chunk Processor] Processing chunk ${chunk.index} (${chunk.duration.toFixed(2)}s)`);
+
+  if (!chunkStatus) {
+    throw new Error(`Chunk status not found for index ${chunk.index} in job ${job.jobId}`);
+  }
 
   // Try transcribing with retries
   for (let attempt = 1; attempt <= config.maxRetries; attempt++) {
@@ -63,6 +70,14 @@ export async function processChunk(
         () => transcribeFunction(chunk.filePath, job.config as unknown as TranscriptionConfig),
         chunk.index // Priority based on chunk order
       );
+
+      // Check if job was cancelled during the async operation
+      if ((job.status as JobStatus) === 'cancelled') {
+        console.log(
+          `[Chunk Processor] Job ${job.jobId} cancelled during transcription of chunk ${chunk.index}`
+        );
+        throw new Error('Job was cancelled by user');
+      }
 
       console.log(`[Chunk Processor] Successfully transcribed chunk ${chunk.index}`);
 
@@ -238,7 +253,12 @@ async function cleanupSubChunks(subChunks: ChunkMetadata[]): Promise<void> {
  */
 export function createTranscribeFunction(apiKey: string) {
   return async (chunkPath: string, config: TranscriptionConfig): Promise<string> => {
-    const FormData = (await import('form-data')).default;
+    // TypeScript definitions for form-data reflect CommonJS "export =",
+    // but Node.js ESM interop wraps it in a "default" export.
+    // We cast to match the runtime behavior.
+    const FormData = (
+      (await import('form-data')) as unknown as { default: typeof import('form-data') }
+    ).default;
     const fetch = (await import('node-fetch')).default;
 
     const formData = new FormData();
