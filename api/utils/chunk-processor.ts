@@ -132,9 +132,6 @@ async function autoSplitAndProcess(
       ? AUTO_SPLIT_CONFIG.BALANCED_SUBCHUNK_DURATION
       : AUTO_SPLIT_CONFIG.BEST_QUALITY_SUBCHUNK_DURATION;
 
-  // Read original chunk file (for potential future use in metadata)
-  await fs.readFile(chunk.filePath);
-
   // Create sub-chunks
   const subChunks: ChunkMetadata[] = [];
   const numSubChunks = Math.ceil(chunk.duration / subChunkDuration);

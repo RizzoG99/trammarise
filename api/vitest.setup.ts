@@ -94,6 +94,8 @@ vi.mock('fluent-ffmpeg', () => {
   return {
     default: factory,
     ffprobe: factory.ffprobe,
+    setFfmpegPath: factory.setFfmpegPath,
+    setFfprobePath: factory.setFfprobePath,
   };
 });
 

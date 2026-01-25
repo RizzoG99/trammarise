@@ -134,7 +134,10 @@ export async function extractChunk(
   setupFFmpeg();
 
   return new Promise((resolve, reject) => {
-    ffmpeg(inputPath)
+    // Use type assertion for ESM/CJS interop - in tests, ffmpeg is { default: factory, ... }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const ffmpegConstructor = (ffmpeg as any).default || ffmpeg;
+    ffmpegConstructor(inputPath)
       .setStartTime(startTime)
       .setDuration(duration)
       .audioCodec(AUDIO_CONSTANTS.CODEC)
@@ -145,7 +148,7 @@ export async function extractChunk(
       .on('end', () => {
         resolve();
       })
-      .on('error', (err) => {
+      .on('error', (err: Error) => {
         reject(new Error(`FFmpeg extraction failed: ${err.message}`));
       })
       .run();

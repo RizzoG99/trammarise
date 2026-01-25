@@ -82,19 +82,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     if (transcript.length < MIN_TRANSCRIPT_LENGTH) {
-      return res
-        .status(400)
-        .json({
-          error: `Transcript too short. Minimum ${MIN_TRANSCRIPT_LENGTH} characters required`,
-        });
+      return res.status(400).json({
+        error: `Transcript too short. Minimum ${MIN_TRANSCRIPT_LENGTH} characters required`,
+      });
     }
 
     if (transcript.length > MAX_TRANSCRIPT_LENGTH) {
-      return res
-        .status(400)
-        .json({
-          error: `Transcript too long. Maximum ${MAX_TRANSCRIPT_LENGTH} characters allowed`,
-        });
+      return res.status(400).json({
+        error: `Transcript too long. Maximum ${MAX_TRANSCRIPT_LENGTH} characters allowed`,
+      });
     }
 
     // Validate contentType
@@ -147,7 +143,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     console.error('Summarization error:', error);
     return res.status(500).json({
       error: 'Summarization failed',
-      message: err.message,
+      message: err.message || 'Unknown error',
     });
   }
 }
