@@ -73,18 +73,24 @@ describe('Integration: Transcribe Balanced Mode', () => {
       const governor = new RateLimitGovernor('balanced');
       const tracker = new ConcurrencyTracker();
 
-      const mockTranscribe = vi.fn(async (chunkPath: string) => {
-        tracker.start();
-        await new Promise((resolve) => setTimeout(resolve, 10));
-        tracker.end();
-        return `Transcription for ${chunkPath}`;
-      });
+      const mockProvider = {
+        name: 'Mock',
+        summarize: vi.fn(),
+        chat: vi.fn(),
+        validateApiKey: vi.fn(),
+        transcribe: vi.fn(async (params) => {
+          tracker.start();
+          await new Promise((resolve) => setTimeout(resolve, 10));
+          tracker.end();
+          return `Transcription for ${params.filePath}`;
+        }),
+      };
 
       // Process first 8 chunks to verify concurrency (full 30 would take too long)
       const transcripts: string[] = [];
       for (let i = 0; i < 8; i++) {
         const chunk = chunkingResult.chunks[i];
-        const transcript = await processChunk(chunk, job, governor, mockTranscribe);
+        const transcript = await processChunk(chunk, job, governor, mockProvider, 'test-key');
         transcripts.push(transcript);
       }
 
@@ -131,21 +137,27 @@ describe('Integration: Transcribe Balanced Mode', () => {
 
       // Mock transcribe to fail 3 times, then succeed on 4th (after split)
       let attemptCount = 0;
-      const mockTranscribe = vi.fn(async () => {
-        attemptCount++;
-        retryCounter.increment('chunk_0');
+      const mockProvider = {
+        name: 'Mock',
+        summarize: vi.fn(),
+        chat: vi.fn(),
+        validateApiKey: vi.fn(),
+        transcribe: vi.fn(async () => {
+          attemptCount++;
+          retryCounter.increment('chunk_0');
 
-        if (attemptCount <= 3) {
-          throw new Error('Chunk transcription failed');
-        }
+          if (attemptCount <= 3) {
+            throw new Error('Chunk transcription failed');
+          }
 
-        return 'Success after split';
-      });
+          return 'Success after split';
+        }),
+      };
 
       // Note: Full auto-split requires complex FFmpeg mocking
       // This integration test verifies retry logic
       try {
-        await processChunk(chunk, job, governor, mockTranscribe);
+        await processChunk(chunk, job, governor, mockProvider, 'test-key');
       } catch {
         // Expected to fail after retries if auto-split not fully mocked
       }
@@ -226,26 +238,32 @@ describe('Integration: Transcribe Balanced Mode', () => {
       const governor = new RateLimitGovernor('balanced');
       const transcribedChunks = new Set<number>();
 
-      const mockTranscribe = vi.fn(async (chunkPath: string) => {
-        const chunkIndex = parseInt(chunkPath.match(/chunk_(\d+)/)?.[1] || '0');
-        transcribedChunks.add(chunkIndex);
-        return `Transcript ${chunkIndex}`;
-      });
+      const mockProvider = {
+        name: 'Mock',
+        summarize: vi.fn(),
+        chat: vi.fn(),
+        validateApiKey: vi.fn(),
+        transcribe: vi.fn(async (params) => {
+          const chunkIndex = parseInt(params.filePath.match(/chunk_(\d+)/)?.[1] || '0');
+          transcribedChunks.add(chunkIndex);
+          return `Transcript ${chunkIndex}`;
+        }),
+      };
 
       // Process first 2 chunks
-      await processChunk(chunkingResult.chunks[0], job, governor, mockTranscribe);
-      await processChunk(chunkingResult.chunks[1], job, governor, mockTranscribe);
+      await processChunk(chunkingResult.chunks[0], job, governor, mockProvider, 'test-key');
+      await processChunk(chunkingResult.chunks[1], job, governor, mockProvider, 'test-key');
 
       expect(transcribedChunks.size).toBe(2);
 
       // Simulate resumption: process remaining chunks
       // (In real implementation, already-completed chunks wouldn't be re-transcribed)
-      const initialCallCount = mockTranscribe.mock.calls.length;
+      const initialCallCount = mockProvider.transcribe.mock.calls.length;
 
-      await processChunk(chunkingResult.chunks[2], job, governor, mockTranscribe);
+      await processChunk(chunkingResult.chunks[2], job, governor, mockProvider, 'test-key');
 
       // Verify only new chunk was transcribed
-      expect(mockTranscribe.mock.calls.length).toBe(initialCallCount + 1);
+      expect(mockProvider.transcribe.mock.calls.length).toBe(initialCallCount + 1);
     });
   });
 
@@ -282,17 +300,24 @@ describe('Integration: Transcribe Balanced Mode', () => {
       JobManager.initializeChunks(job.jobId, chunkingResult.chunks);
 
       const governor = new RateLimitGovernor('balanced');
-      const mockTranscribe = vi.fn(async () => {
-        await new Promise((resolve) => setTimeout(resolve, 100));
-        return 'Transcript';
-      });
+      const mockProvider = {
+        name: 'Mock',
+        summarize: vi.fn(),
+        chat: vi.fn(),
+        validateApiKey: vi.fn(),
+        transcribe: vi.fn(async () => {
+          await new Promise((resolve) => setTimeout(resolve, 100));
+          return 'Transcript';
+        }),
+      };
 
       // Start processing chunk
       const processingPromise = processChunk(
         chunkingResult.chunks[0],
         job,
         governor,
-        mockTranscribe
+        mockProvider,
+        'test-key'
       );
 
       // Cancel job immediately

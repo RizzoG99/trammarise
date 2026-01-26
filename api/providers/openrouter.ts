@@ -1,10 +1,15 @@
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
 import { generateText } from 'ai';
 import type { TextPart, ImagePart } from 'ai';
-import type { AIProvider, SummarizeParams, ChatParams } from './base';
+import type { AIProvider, SummarizeParams, ChatParams, TranscribeParams } from './base';
 
 export class OpenRouterProvider implements AIProvider {
   name = 'OpenRouter';
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async transcribe(_params: TranscribeParams): Promise<string> {
+    throw new Error('Transcription not supported by OpenRouter provider yet.');
+  }
 
   async summarize(params: SummarizeParams): Promise<string> {
     const { transcript, contentType, apiKey, model, context, language } = params;
@@ -17,7 +22,9 @@ export class OpenRouterProvider implements AIProvider {
       apiKey,
     });
 
-    const languageInstruction = language ? `\n\nIMPORTANT: Generate your summary in ${this.getLanguageName(language)}. Use natural, idiomatic section headers and content appropriate for ${this.getLanguageName(language)}. Follow the structure and quality shown in the example below, but adapt all text naturally to ${this.getLanguageName(language)}.` : '';
+    const languageInstruction = language
+      ? `\n\nIMPORTANT: Generate your summary in ${this.getLanguageName(language)}. Use natural, idiomatic section headers and content appropriate for ${this.getLanguageName(language)}. Follow the structure and quality shown in the example below, but adapt all text naturally to ${this.getLanguageName(language)}.`
+      : '';
 
     const systemPrompt = `You are an expert at summarizing ${contentType || 'content'} with exceptional attention to detail and clarity.${languageInstruction}
 
@@ -48,22 +55,22 @@ The team will reconvene in two weeks to review progress on retention initiatives
 NOW: Analyze the transcript provided and create a summary following this structure and level of detail. Adapt the sections naturally to fit the ${contentType || 'content'} being summarized. Ensure your summary is comprehensive, well-organized, and professionally formatted.`;
 
     const userContent: (TextPart | ImagePart)[] = [
-      { type: 'text', text: `Transcript:\\n${transcript}` }
+      { type: 'text', text: `Transcript:\\n${transcript}` },
     ];
 
     if (context) {
       if (context.text) {
-        userContent.push({ 
-          type: 'text', 
-          text: `\n\nAdditional Context from Documents:\n${context.text}` 
+        userContent.push({
+          type: 'text',
+          text: `\n\nAdditional Context from Documents:\n${context.text}`,
         });
       }
 
       if (context.images && context.images.length > 0) {
-        context.images.forEach(img => {
+        context.images.forEach((img) => {
           userContent.push({
             type: 'image',
-            image: `data:${img.type};base64,${img.data}` as `data:${string}`
+            image: `data:${img.type};base64,${img.data}` as `data:${string}`,
           });
         });
       }
@@ -73,7 +80,7 @@ NOW: Analyze the transcript provided and create a summary following this structu
       model: openrouter(model),
       messages: [
         { role: 'system', content: systemPrompt },
-        { role: 'user', content: userContent }
+        { role: 'user', content: userContent },
       ],
     });
 
@@ -139,15 +146,15 @@ Answer questions about the content, provide insights, or help refine the summary
 
   private getLanguageName(code: string): string {
     const languages: Record<string, string> = {
-      'en': 'English',
-      'it': 'Italian',
-      'es': 'Spanish',
-      'fr': 'French',
-      'de': 'German',
-      'pt': 'Portuguese',
-      'nl': 'Dutch',
-      'ja': 'Japanese',
-      'zh': 'Chinese',
+      en: 'English',
+      it: 'Italian',
+      es: 'Spanish',
+      fr: 'French',
+      de: 'German',
+      pt: 'Portuguese',
+      nl: 'Dutch',
+      ja: 'Japanese',
+      zh: 'Chinese',
     };
     return languages[code] || 'English';
   }

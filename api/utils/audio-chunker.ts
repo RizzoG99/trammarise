@@ -6,13 +6,13 @@
  * - Best Quality: 10-minute chunks, 15-second overlap
  */
 
-import * as ffmpeg from 'fluent-ffmpeg';
+import ffmpeg from 'fluent-ffmpeg';
 import { promises as fs } from 'fs';
 import * as path from 'path';
 import * as crypto from 'crypto';
 import { setupFFmpeg } from './ffmpeg-setup';
 import type { ChunkMetadata, ChunkingResult, ProcessingMode } from '../types/chunking';
-import { CHUNKING_CONFIGS, AUDIO_CONSTANTS } from '../types/chunking';
+import { CHUNKING_CONFIGS } from '../types/chunking';
 
 /**
  * Main chunking function: splits audio file into chunks based on processing mode
@@ -134,16 +134,14 @@ export async function extractChunk(
   setupFFmpeg();
 
   return new Promise((resolve, reject) => {
-    // Use type assertion for ESM/CJS interop - in tests, ffmpeg is { default: factory, ... }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const ffmpegConstructor = (ffmpeg as any).default || ffmpeg;
-    ffmpegConstructor(inputPath)
+    ffmpeg(inputPath)
       .setStartTime(startTime)
       .setDuration(duration)
-      .audioCodec(AUDIO_CONSTANTS.CODEC)
-      .audioBitrate(AUDIO_CONSTANTS.BITRATE)
-      .audioChannels(AUDIO_CONSTANTS.CHANNELS)
-      .audioFrequency(AUDIO_CONSTANTS.SAMPLE_RATE)
+      // Cost optimization: Compress to Mono 64kbps MP3 for efficient Whisper API uploads
+      .audioCodec('libmp3lame')
+      .audioBitrate('64k')
+      .audioChannels(1) // Mono
+      .audioFrequency(16000) // 16kHz sample rate (sufficient for speech)
       .output(outputPath)
       .on('end', () => {
         resolve();

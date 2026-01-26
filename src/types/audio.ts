@@ -9,7 +9,13 @@ export interface AudioFile {
 }
 
 // Application state
-export type AppState = 'initial' | 'recording' | 'audio' | 'configuration' | 'processing' | 'results';
+export type AppState =
+  | 'initial'
+  | 'recording'
+  | 'audio'
+  | 'configuration'
+  | 'processing'
+  | 'results';
 
 // AI Provider types
 export type AIProvider = 'openai' | 'openrouter';
@@ -24,6 +30,7 @@ export interface AIConfiguration {
   contentType: string; // ContentType value or custom string when 'other' is selected
   language: LanguageCode;
   contextFiles?: File[];
+  noiseProfile?: string; // Audio environment: 'quiet', 'meeting_room', 'cafe', 'outdoor', 'phone'
 }
 
 // Recording state
@@ -40,7 +47,14 @@ export interface PlaybackState {
 }
 
 // Button variant types
-export type ButtonVariant = 'primary' | 'secondary' | 'success' | 'danger' | 'outline' | 'small' | 'large';
+export type ButtonVariant =
+  | 'primary'
+  | 'secondary'
+  | 'success'
+  | 'danger'
+  | 'outline'
+  | 'small'
+  | 'large';
 
 // WaveSurfer configuration
 export interface WaveSurferConfig {

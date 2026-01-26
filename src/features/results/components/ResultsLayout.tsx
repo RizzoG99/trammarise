@@ -40,27 +40,21 @@ export function ResultsLayout({
   chatModal,
 }: ResultsLayoutProps) {
   return (
-    <div className="flex flex-col h-screen bg-[var(--color-background)]">
+    <div className="min-h-screen flex flex-col bg-[var(--color-background)]">
       {/* Header: Editable title + Export button */}
       {header}
 
-      {/* Sticky Audio Player Bar */}
-      <div className="sticky top-0 z-40">
-        {audioPlayer}
-      </div>
+      {/* Audio Player Bar */}
+      <div className="z-40">{audioPlayer}</div>
 
       {/* Main Content: Split Panel Layout */}
-      <div className="flex-1 overflow-hidden">
-        <div className="h-full w-full grid grid-cols-1 lg:grid-cols-12 gap-6 p-6">
+      <div className="flex-1 w-full max-w-[1400px] mx-auto p-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Summary Panel - 5 columns (40%) on large screens */}
-          <div className="lg:col-span-5 overflow-y-auto">
-            {summaryPanel}
-          </div>
+          <div className="lg:col-span-5 h-fit">{summaryPanel}</div>
 
           {/* Transcript Panel - 7 columns (60%) on large screens */}
-          <div className="lg:col-span-7 overflow-y-auto">
-            {transcriptPanel}
-          </div>
+          <div className="lg:col-span-7 h-fit">{transcriptPanel}</div>
         </div>
       </div>
 

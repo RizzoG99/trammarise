@@ -43,7 +43,8 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
 }) => {
   const [isLoadingChat, setIsLoadingChat] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [fileName, setFileName] = useState(audioName);
+  // Initialize fileName without extension
+  const [fileName, setFileName] = useState(() => audioName.replace(/\.[^/.]+$/, ''));
 
   // Audio player state (shared between AudioPlayerBar and SearchableTranscript)
   const audioPlayer = useAudioPlayer(audioFile);
@@ -143,7 +144,7 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
       const url = URL.createObjectURL(pdfBlob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `${fileName}-${Date.now()}.pdf`;
+      a.download = `${fileName}.pdf`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);

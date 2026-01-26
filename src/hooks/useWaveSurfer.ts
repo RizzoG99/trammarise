@@ -56,6 +56,7 @@ export const useWaveSurfer = (
 
     const ws = WaveSurfer.create({
       container: containerRef.current,
+      dragToSeek: true,
       ...defaultConfig,
     });
 
@@ -77,8 +78,13 @@ export const useWaveSurfer = (
       setCurrentTime(ws.getCurrentTime());
     });
 
-    ws.on('seeking', () => {
-      setCurrentTime(ws.getCurrentTime());
+    ws.on('seeking', (currentTime) => {
+      setCurrentTime(currentTime);
+    });
+
+    // Update time during interaction (dragging)
+    ws.on('interaction', (newTime) => {
+      setCurrentTime(newTime);
     });
 
     wavesurferRef.current = ws;
@@ -102,7 +108,7 @@ export const useWaveSurfer = (
         regionsPluginRef.current = null;
       }
     };
-  }, [containerRef]); // Only reinit if container changes, not config
+  }, [containerRef]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Load audio file
   const loadAudio = useCallback((file: File | Blob) => {

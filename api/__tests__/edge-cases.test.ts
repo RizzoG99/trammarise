@@ -64,14 +64,22 @@ describe('Edge Cases', () => {
       const governor = new RateLimitGovernor('balanced');
 
       // Mock to always fail to trigger auto-split
-      const mockTranscribe = vi.fn(async () => {
-        throw new Error('Fail');
-      });
+      const mockProvider = {
+        name: 'Mock',
+        summarize: vi.fn(),
+        chat: vi.fn(),
+        validateApiKey: vi.fn(),
+        transcribe: vi.fn(async () => {
+          throw new Error('Fail');
+        }),
+      };
 
       // Cancel job immediately
       job.status = 'cancelled';
 
-      await expect(processChunk(chunk, job, governor, mockTranscribe)).rejects.toThrow(/cancelled/);
+      await expect(processChunk(chunk, job, governor, mockProvider, 'test-key')).rejects.toThrow(
+        /cancelled/
+      );
     });
   });
 

@@ -14,6 +14,7 @@ export interface SummarizeParams {
   context?: {
     text: string;
     images: { type: string; data: string }[];
+    noiseProfile?: string;
   };
 }
 
@@ -37,4 +38,16 @@ export interface AIProvider {
 
   // Validate API key
   validateApiKey(apiKey: string): Promise<boolean>;
+
+  // Transcribe audio file
+  transcribe(params: TranscribeParams): Promise<string>;
+}
+
+export interface TranscribeParams {
+  filePath: string;
+  apiKey: string;
+  model?: string;
+  language?: string;
+  prompt?: string;
+  temperature?: number;
 }

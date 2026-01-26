@@ -16,6 +16,7 @@ export interface SessionData {
   language: LanguageCode;
   contentType: ContentType;
   processingMode: ProcessingMode;
+  noiseProfile?: string; // Audio environment profile
 
   // Audio editing fields (set in AudioEditingPage)
   selectionMode?: 'full' | 'selection';

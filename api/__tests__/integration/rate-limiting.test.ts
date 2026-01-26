@@ -266,12 +266,18 @@ describe('Integration: Rate Limiting', () => {
       const governor = new RateLimitGovernor('balanced');
       const chunk = chunkingResult.chunks[0];
 
-      const mockTranscribe = vi.fn(async () => {
-        throw new Error('Always fails');
-      });
+      const mockProvider = {
+        name: 'Mock',
+        summarize: vi.fn(),
+        chat: vi.fn(),
+        validateApiKey: vi.fn(),
+        transcribe: vi.fn(async () => {
+          throw new Error('Always fails');
+        }),
+      };
 
       // Should abort due to retry cap
-      await expect(processChunk(chunk, job, governor, mockTranscribe)).rejects.toThrow(
+      await expect(processChunk(chunk, job, governor, mockProvider, 'test-key')).rejects.toThrow(
         /Maximum total retries.*exceeded/
       );
 
@@ -318,12 +324,18 @@ describe('Integration: Rate Limiting', () => {
       const governor = new RateLimitGovernor('balanced');
       const chunk = chunkingResult.chunks[0];
 
-      const mockTranscribe = vi.fn(async () => {
-        throw new Error('Fail');
-      });
+      const mockProvider = {
+        name: 'Mock',
+        summarize: vi.fn(),
+        chat: vi.fn(),
+        validateApiKey: vi.fn(),
+        transcribe: vi.fn(async () => {
+          throw new Error('Fail');
+        }),
+      };
 
       try {
-        await processChunk(chunk, job, governor, mockTranscribe);
+        await processChunk(chunk, job, governor, mockProvider, 'test-key');
       } catch (error) {
         // Should have clear error about safeguard limits
         expect((error as Error).message).toMatch(/Maximum (splits|retries)/);

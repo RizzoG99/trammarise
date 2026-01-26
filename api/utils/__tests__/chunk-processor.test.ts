@@ -23,12 +23,18 @@ describe('Chunk Processor', () => {
       ];
 
       const governor = new RateLimitGovernor('balanced');
-      const transcribeFn = vi.fn(async () => 'Transcription successful');
+      const mockProvider = {
+        name: 'Mock',
+        summarize: vi.fn(),
+        chat: vi.fn(),
+        validateApiKey: vi.fn(),
+        transcribe: vi.fn(async () => 'Transcription successful'),
+      };
 
-      const result = await processChunk(chunk, job, governor, transcribeFn);
+      const result = await processChunk(chunk, job, governor, mockProvider, 'test-key');
 
       expect(result).toBe('Transcription successful');
-      expect(transcribeFn).toHaveBeenCalledTimes(1);
+      expect(mockProvider.transcribe).toHaveBeenCalledTimes(1);
       expect(job.chunkStatuses[0].status).toBe('in_progress');
     });
 
@@ -43,15 +49,21 @@ describe('Chunk Processor', () => {
       const governor = new RateLimitGovernor('balanced');
       let attempts = 0;
 
-      const transcribeFn = vi.fn(async () => {
-        attempts++;
-        if (attempts < 3) {
-          throw new Error('Temporary failure');
-        }
-        return 'Success after retries';
-      });
+      const mockProvider = {
+        name: 'Mock',
+        summarize: vi.fn(),
+        chat: vi.fn(),
+        validateApiKey: vi.fn(),
+        transcribe: vi.fn(async () => {
+          attempts++;
+          if (attempts < 3) {
+            throw new Error('Temporary failure');
+          }
+          return 'Success after retries';
+        }),
+      };
 
-      const result = await processChunk(chunk, job, governor, transcribeFn);
+      const result = await processChunk(chunk, job, governor, mockProvider, 'test-key');
 
       expect(result).toBe('Success after retries');
       expect(attempts).toBe(3);
@@ -68,15 +80,21 @@ describe('Chunk Processor', () => {
       const governor = new RateLimitGovernor('best_quality');
       let attempts = 0;
 
-      const transcribeFn = vi.fn(async () => {
-        attempts++;
-        if (attempts < 2) {
-          throw new Error('Temporary failure');
-        }
-        return 'Success after retries';
-      });
+      const mockProvider = {
+        name: 'Mock',
+        summarize: vi.fn(),
+        chat: vi.fn(),
+        validateApiKey: vi.fn(),
+        transcribe: vi.fn(async () => {
+          attempts++;
+          if (attempts < 2) {
+            throw new Error('Temporary failure');
+          }
+          return 'Success after retries';
+        }),
+      };
 
-      const result = await processChunk(chunk, job, governor, transcribeFn);
+      const result = await processChunk(chunk, job, governor, mockProvider, 'test-key');
 
       expect(result).toBe('Success after retries');
       expect(attempts).toBe(2);
@@ -93,19 +111,25 @@ describe('Chunk Processor', () => {
       const governor = new RateLimitGovernor('balanced');
       let attempts = 0;
 
-      const transcribeFn = vi.fn(async () => {
-        attempts++;
-        // Check status after first failure
-        if (attempts === 2) {
-          expect(job.chunkStatuses[0].status).toBe('retrying');
-        }
-        if (attempts < 2) {
-          throw new Error('Fail');
-        }
-        return 'Success';
-      });
+      const mockProvider = {
+        name: 'Mock',
+        summarize: vi.fn(),
+        chat: vi.fn(),
+        validateApiKey: vi.fn(),
+        transcribe: vi.fn(async () => {
+          attempts++;
+          // Check status after first failure
+          if (attempts === 2) {
+            expect(job.chunkStatuses[0].status).toBe('retrying');
+          }
+          if (attempts < 2) {
+            throw new Error('Fail');
+          }
+          return 'Success';
+        }),
+      };
 
-      await processChunk(chunk, job, governor, transcribeFn);
+      await processChunk(chunk, job, governor, mockProvider, 'test-key');
     });
   });
 
@@ -119,9 +143,15 @@ describe('Chunk Processor', () => {
       ];
 
       const governor = new RateLimitGovernor('balanced');
-      const transcribeFn = vi.fn(async () => 'Should not be called');
+      const mockProvider = {
+        name: 'Mock',
+        summarize: vi.fn(),
+        chat: vi.fn(),
+        validateApiKey: vi.fn(),
+        transcribe: vi.fn(async () => 'Should not be called'),
+      };
 
-      await expect(processChunk(chunk, job, governor, transcribeFn)).rejects.toThrow(
+      await expect(processChunk(chunk, job, governor, mockProvider, 'test-key')).rejects.toThrow(
         'Job was cancelled by user'
       );
     });
@@ -146,11 +176,17 @@ describe('Chunk Processor', () => {
       ];
 
       const governor = new RateLimitGovernor('balanced');
-      const transcribeFn = vi.fn(async () => {
-        throw new Error('Always fail to trigger auto-split');
-      });
+      const mockProvider = {
+        name: 'Mock',
+        summarize: vi.fn(),
+        chat: vi.fn(),
+        validateApiKey: vi.fn(),
+        transcribe: vi.fn(async () => {
+          throw new Error('Always fail to trigger auto-split');
+        }),
+      };
 
-      await expect(processChunk(chunk, job, governor, transcribeFn)).rejects.toThrow(
+      await expect(processChunk(chunk, job, governor, mockProvider, 'test-key')).rejects.toThrow(
         /Maximum splits.*exceeded/
       );
     });
@@ -173,11 +209,17 @@ describe('Chunk Processor', () => {
       ];
 
       const governor = new RateLimitGovernor('balanced');
-      const transcribeFn = vi.fn(async () => {
-        throw new Error('Always fail');
-      });
+      const mockProvider = {
+        name: 'Mock',
+        summarize: vi.fn(),
+        chat: vi.fn(),
+        validateApiKey: vi.fn(),
+        transcribe: vi.fn(async () => {
+          throw new Error('Always fail');
+        }),
+      };
 
-      await expect(processChunk(chunk, job, governor, transcribeFn)).rejects.toThrow(
+      await expect(processChunk(chunk, job, governor, mockProvider, 'test-key')).rejects.toThrow(
         /Maximum total retries.*exceeded/
       );
     });
@@ -209,12 +251,18 @@ describe('Chunk Processor', () => {
 
       const governor = new RateLimitGovernor('balanced');
 
-      const transcribeFn = vi.fn(async () => {
-        throw new Error('Always fail to trigger split');
-      });
+      const mockProvider = {
+        name: 'Mock',
+        summarize: vi.fn(),
+        chat: vi.fn(),
+        validateApiKey: vi.fn(),
+        transcribe: vi.fn(async () => {
+          throw new Error('Always fail to trigger split');
+        }),
+      };
 
       try {
-        await processChunk(chunk, job, governor, transcribeFn);
+        await processChunk(chunk, job, governor, mockProvider, 'test-key');
       } catch {
         // Expected to fail
       }
@@ -235,9 +283,15 @@ describe('Chunk Processor', () => {
       ];
 
       const governor = new RateLimitGovernor('balanced');
-      const transcribeFn = vi.fn(async () => '');
+      const mockProvider = {
+        name: 'Mock',
+        summarize: vi.fn(),
+        chat: vi.fn(),
+        validateApiKey: vi.fn(),
+        transcribe: vi.fn(async () => ''),
+      };
 
-      const result = await processChunk(chunk, job, governor, transcribeFn);
+      const result = await processChunk(chunk, job, governor, mockProvider, 'test-key');
 
       expect(result).toBe('');
     });

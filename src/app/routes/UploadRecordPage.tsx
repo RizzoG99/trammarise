@@ -13,6 +13,8 @@ import { ContextUploadArea } from '../../features/upload/components/ContextUploa
 import { LanguageSelector } from '../../features/configuration/components/LanguageSelector';
 import { ContentTypeSelector } from '../../features/configuration/components/ContentTypeSelector';
 import { ProcessingModeSelector } from '../../features/configuration/components/ProcessingModeSelector';
+import { NoiseProfileSelector } from '../../features/configuration/components/NoiseProfileSelector';
+import type { NoiseProfile } from '../../types/noise-profiles';
 import { ProcessAudioButton } from '../../features/upload/components/ProcessAudioButton';
 import { generateSessionId, saveSession } from '../../utils/session-manager';
 import { buildRoutePath, ROUTES } from '../../types/routing';
@@ -26,11 +28,12 @@ export function UploadRecordPage() {
   const [language, setLanguage] = useState<LanguageCode>('en');
   const [contentType, setContentType] = useState<ContentType>('meeting');
   const [processingMode, setProcessingMode] = useState<ProcessingMode>('balanced');
+  const [noiseProfile, setNoiseProfile] = useState<NoiseProfile>('quiet');
 
   const handleFileUpload = async (file: File) => {
     // Stop any active recording when uploading a file
     recordPanelRef.current?.reset();
-    
+
     // Only update state - DO NOT navigate
     setAudioFile(file);
   };
@@ -71,12 +74,16 @@ export function UploadRecordPage() {
         audioFile: {
           name: audioFile instanceof File ? audioFile.name : 'recording.webm',
           blob: audioFile,
-          file: audioFile instanceof File ? audioFile : new File([audioFile], 'recording.webm', { type: 'audio/webm' }),
+          file:
+            audioFile instanceof File
+              ? audioFile
+              : new File([audioFile], 'recording.webm', { type: 'audio/webm' }),
         },
         contextFiles,
-        language,        // Save user configuration
-        contentType,     // Save user configuration
-        processingMode,  // Save user configuration
+        language, // Save user configuration
+        contentType, // Save user configuration
+        processingMode, // Save user configuration
+        noiseProfile, // Save noise profile
         sessionId,
         createdAt: Date.now(),
         updatedAt: Date.now(),
@@ -93,70 +100,62 @@ export function UploadRecordPage() {
 
   return (
     <PageLayout>
-        {/* Page Title */}
-        <div className="mb-8">
-          <Heading level="h1">{t('home.title')}</Heading>
-          <Text variant="body" color="secondary">
-            {t('home.subtitle')}
-          </Text>
+      {/* Page Title */}
+      <div className="mb-8">
+        <Heading level="h1">{t('home.title')}</Heading>
+        <Text variant="body" color="secondary">
+          {t('home.subtitle')}
+        </Text>
+      </div>
+
+      {/* Upload/Record Split Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <UploadPanel
+          onFileUpload={handleFileUpload}
+          uploadedFile={audioFile}
+          onFileRemove={handleFileRemove}
+        />
+        <RecordPanel
+          ref={recordPanelRef}
+          onRecordingComplete={handleRecordingComplete}
+          onRecordingStart={handleRecordingStart}
+        />
+      </div>
+
+      {/* Configuration Section (3-column grid) */}
+      <GlassCard
+        variant="light"
+        className="p-6 mb-8 border rounded-xl shadow-lg"
+        style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-border)' }}
+      >
+        <div className="flex items-center gap-2 mb-6">
+          <SlidersHorizontal size={20} className="text-gray-500" />
+          <Heading level="h3">{t('nav.configure')}</Heading>
         </div>
 
-        {/* Upload/Record Split Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <UploadPanel 
-            onFileUpload={handleFileUpload}
-            uploadedFile={audioFile}
-            onFileRemove={handleFileRemove}
-          />
-          <RecordPanel 
-            ref={recordPanelRef}
-            onRecordingComplete={handleRecordingComplete}
-            onRecordingStart={handleRecordingStart}
-          />
-        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {/* Column 1: Context Upload */}
+          <ContextUploadArea files={contextFiles} onFilesChange={setContextFiles} />
 
-        {/* Configuration Section (3-column grid) */}
-        <GlassCard variant="light" className="p-6 mb-8 border rounded-xl shadow-lg" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-border)' }}>
-          <div className="flex items-center gap-2 mb-6">
-            <SlidersHorizontal 
-              size={20} 
-              className="text-gray-500" 
-            />
-            <Heading level="h3">{t('nav.configure')}</Heading>
+          {/* Column 2: Language + Content Type */}
+          <div className="space-y-4">
+            <LanguageSelector value={language} onChange={setLanguage} />
+            <ContentTypeSelector value={contentType} onChange={setContentType} />
+            <NoiseProfileSelector value={noiseProfile} onChange={setNoiseProfile} />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Column 1: Context Upload */}
-            <ContextUploadArea
-              files={contextFiles}
-              onFilesChange={setContextFiles}
-            />
-
-            {/* Column 2: Language + Content Type */}
-            <div className="space-y-4">
-              <LanguageSelector
-                value={language}
-                onChange={setLanguage}
-              />
-              <ContentTypeSelector
-                value={contentType}
-                onChange={setContentType}
-              />
-            </div>
-
-            {/* Column 3: Processing Mode */}
+          {/* Column 3: Processing Mode + Noise Profile */}
+          <div className="space-y-4">
             <ProcessingModeSelector
               value={processingMode}
-              onChange={(val) => setProcessingMode(val as ProcessingMode)}
+              onChange={(val) => setProcessingMode(val)}
             />
           </div>
-        </GlassCard>
+        </div>
+      </GlassCard>
 
-        {/* Process Audio Button */}
-        <ProcessAudioButton
-          disabled={!audioFile}
-          onProcess={handleProcessAudio}
-        />
+      {/* Process Audio Button */}
+      <ProcessAudioButton disabled={!audioFile} onProcess={handleProcessAudio} />
     </PageLayout>
   );
 }

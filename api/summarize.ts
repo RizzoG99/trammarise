@@ -7,6 +7,7 @@ import {
   getSummarizationModelForLevel,
   type PerformanceLevel,
 } from '../src/types/performance-levels';
+import { chunkText, shouldUseMapReduce } from './utils/text-chunker';
 
 export const config = {
   api: {
@@ -74,7 +75,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     req.pipe(bb);
     await parsePromise;
 
-    const { transcript, contentType, provider, apiKey, model, language } = fields;
+    const { transcript, contentType, provider, apiKey, model, language, noiseProfile } = fields;
 
     // Validate transcript
     if (!transcript) {
@@ -125,17 +126,67 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       ? getSummarizationModelForLevel(model as PerformanceLevel)
       : undefined;
 
-    const summary = await aiProvider.summarize({
-      transcript,
-      contentType,
-      apiKey,
-      model: actualModel,
-      language,
-      context: {
-        text: contextText,
-        images: contextImages,
-      },
-    });
+    // Cost Optimization: Use MapReduce for long transcripts
+    let summary: string;
+
+    if (shouldUseMapReduce(transcript)) {
+      console.log(`[Summarize] Using MapReduce for long transcript (${transcript.length} chars)`);
+
+      // Split transcript into chunks
+      const chunks = chunkText(transcript, 10000);
+      console.log(`[Summarize] Split into ${chunks.length} chunks`);
+
+      // Map: Summarize each chunk in parallel
+      const partialSummaries = await Promise.all(
+        chunks.map((chunk, index) => {
+          console.log(`[Summarize] Processing chunk ${index + 1}/${chunks.length}`);
+          return aiProvider.summarize({
+            transcript: chunk,
+            contentType: 'other', // Use generic for partial summaries
+            apiKey,
+            model: actualModel,
+            language,
+            context: {
+              text: `This is part ${index + 1} of ${chunks.length} from a larger transcript. Provide a concise summary of the key points in this section.`,
+              images: [],
+            },
+          });
+        })
+      );
+
+      // Reduce: Combine partial summaries into final summary
+      console.log('[Summarize] Combining partial summaries');
+      const combinedPartials = partialSummaries
+        .map((s, i) => `**Part ${i + 1}:**\n${s}`)
+        .join('\n\n');
+
+      summary = await aiProvider.summarize({
+        transcript: combinedPartials,
+        contentType,
+        apiKey,
+        model: actualModel,
+        language,
+        context: {
+          text: contextText,
+          images: contextImages,
+          noiseProfile,
+        },
+      });
+    } else {
+      // Normal summarization for shorter transcripts
+      summary = await aiProvider.summarize({
+        transcript,
+        contentType,
+        apiKey,
+        model: actualModel,
+        language,
+        context: {
+          text: contextText,
+          images: contextImages,
+          noiseProfile,
+        },
+      });
+    }
 
     return res.status(200).json({ summary });
   } catch (error) {

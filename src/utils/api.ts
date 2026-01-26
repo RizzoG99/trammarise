@@ -197,7 +197,8 @@ export async function summarizeTranscript(
   apiKey: string,
   model?: string,
   contextFiles?: File[],
-  language?: string
+  language?: string,
+  noiseProfile?: string
 ): Promise<SummarizationResponse> {
   const formData = new FormData();
   formData.append('transcript', transcript);
@@ -217,6 +218,10 @@ export async function summarizeTranscript(
 
   if (language) {
     formData.append('language', language);
+  }
+
+  if (noiseProfile) {
+    formData.append('noiseProfile', noiseProfile);
   }
 
   const response = await fetchWithTimeout(

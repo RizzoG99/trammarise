@@ -138,7 +138,8 @@ export function useAudioProcessing({ onProgress, onComplete, onError }: UseAudio
           apiKey,
           config.model,
           config.contextFiles,
-          config.language
+          config.language,
+          config.noiseProfile
         );
 
         onProgress('summarizing', 100);

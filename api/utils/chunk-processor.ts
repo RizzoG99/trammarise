@@ -14,15 +14,7 @@ import { JOB_SAFEGUARDS } from '../types/job';
 import { CHUNKING_CONFIGS, AUTO_SPLIT_CONFIG } from '../types/chunking';
 import { RateLimitGovernor } from './rate-limit-governor';
 import { extractChunk, computeChunkHash } from './audio-chunker';
-
-/**
- * Configuration for Whisper API transcription
- */
-interface TranscriptionConfig {
-  model?: string;
-  language?: string;
-  [key: string]: unknown;
-}
+import type { AIProvider } from '../providers/base';
 
 /**
  * Process a single chunk with retry and auto-split logic
@@ -31,7 +23,8 @@ export async function processChunk(
   chunk: ChunkMetadata,
   job: TranscriptionJob,
   governor: RateLimitGovernor,
-  transcribeFunction: (chunkPath: string, config: TranscriptionConfig) => Promise<string>
+  provider: AIProvider,
+  apiKey: string
 ): Promise<string> {
   const config = CHUNKING_CONFIGS[job.config.mode];
   if (!chunk) {
@@ -67,7 +60,15 @@ export async function processChunk(
         `chunk_${job.jobId}_${chunk.index}_${attempt}`,
         job.jobId,
         chunk.index,
-        () => transcribeFunction(chunk.filePath, job.config as unknown as TranscriptionConfig),
+        () =>
+          provider.transcribe({
+            filePath: chunk.filePath,
+            apiKey,
+            model: job.config.model,
+            language: job.config.language,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            ...((job.config as any) || {}),
+          }),
         chunk.index // Priority based on chunk order
       );
 
@@ -103,7 +104,7 @@ export async function processChunk(
   }
 
   // All retries failed, try auto-split
-  return await autoSplitAndProcess(chunk, job, governor, transcribeFunction);
+  return await autoSplitAndProcess(chunk, job, governor, provider, apiKey);
 }
 
 /**
@@ -113,7 +114,8 @@ async function autoSplitAndProcess(
   chunk: ChunkMetadata,
   job: TranscriptionJob,
   governor: RateLimitGovernor,
-  transcribeFunction: (chunkPath: string, config: TranscriptionConfig) => Promise<string>
+  provider: AIProvider,
+  apiKey: string
 ): Promise<string> {
   // Check job-level safeguards
   if (job.chunkingSplits >= JOB_SAFEGUARDS.MAX_SPLITS) {
@@ -199,7 +201,15 @@ async function autoSplitAndProcess(
         `subchunk_${job.jobId}_${chunk.index}_${subChunk.index}`,
         job.jobId,
         chunk.index,
-        () => transcribeFunction(subChunk.filePath, job.config as unknown as TranscriptionConfig),
+        () =>
+          provider.transcribe({
+            filePath: subChunk.filePath,
+            apiKey,
+            model: job.config.model,
+            language: job.config.language,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            ...((job.config as any) || {}),
+          }),
         1000 + chunk.index // Higher priority for sub-chunks
       );
 
@@ -251,53 +261,4 @@ async function cleanupSubChunks(subChunks: ChunkMetadata[]): Promise<void> {
 /**
  * Create a transcription function that calls OpenAI Whisper API
  */
-export function createTranscribeFunction(apiKey: string) {
-  return async (chunkPath: string, config: TranscriptionConfig): Promise<string> => {
-    // TypeScript definitions for form-data reflect CommonJS "export =",
-    // but Node.js ESM interop wraps it in a "default" export.
-    // We cast to match the runtime behavior.
-    const FormData = (
-      (await import('form-data')) as unknown as { default: typeof import('form-data') }
-    ).default;
-    const fetch = (await import('node-fetch')).default;
-
-    const formData = new FormData();
-    const fileBuffer = await fs.readFile(chunkPath);
-
-    formData.append('file', fileBuffer, {
-      filename: 'audio.mp3',
-      contentType: 'audio/mpeg',
-    });
-    formData.append('model', config.model || 'whisper-1');
-
-    if (config.language) {
-      formData.append('language', config.language);
-    }
-
-    if (config.temperature !== undefined && config.temperature !== null) {
-      formData.append('temperature', config.temperature.toString());
-    }
-
-    if (config.prompt) {
-      formData.append('prompt', config.prompt);
-    }
-
-    const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        ...formData.getHeaders(),
-      },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      body: formData as any,
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`OpenAI API error (${response.status}): ${errorText}`);
-    }
-
-    const result = (await response.json()) as { text?: string };
-    return result.text || '';
-  };
-}
+// createTranscribeFunction removed directly via replace_file logic; this chunk targets the removal

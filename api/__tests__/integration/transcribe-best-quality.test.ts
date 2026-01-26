@@ -87,17 +87,23 @@ describe('Integration: Transcribe Best Quality Mode', () => {
       const governor = new RateLimitGovernor('best_quality');
       const tracker = new ConcurrencyTracker();
 
-      const mockTranscribe = vi.fn(async (chunkPath: string) => {
-        tracker.start();
-        await new Promise((resolve) => setTimeout(resolve, 10));
-        tracker.end();
-        return `Transcription for ${chunkPath}`;
-      });
+      const mockProvider = {
+        name: 'Mock',
+        summarize: vi.fn(),
+        chat: vi.fn(),
+        validateApiKey: vi.fn(),
+        transcribe: vi.fn(async (params) => {
+          tracker.start();
+          await new Promise((resolve) => setTimeout(resolve, 10));
+          tracker.end();
+          return `Transcription for ${params.filePath}`;
+        }),
+      };
 
       // Process first 4 chunks to verify sequential processing
       for (let i = 0; i < 4; i++) {
         const chunk = chunkingResult.chunks[i];
-        await processChunk(chunk, job, governor, mockTranscribe);
+        await processChunk(chunk, job, governor, mockProvider, 'test-key');
       }
 
       // Verify concurrency was limited to 1 (sequential)
@@ -198,19 +204,25 @@ describe('Integration: Transcribe Best Quality Mode', () => {
 
       // Mock transcribe to fail 2 times (best_quality max retries)
       let attemptCount = 0;
-      const mockTranscribe = vi.fn(async () => {
-        attemptCount++;
-        retryCounter.increment('chunk_0');
+      const mockProvider = {
+        name: 'Mock',
+        summarize: vi.fn(),
+        chat: vi.fn(),
+        validateApiKey: vi.fn(),
+        transcribe: vi.fn(async () => {
+          attemptCount++;
+          retryCounter.increment('chunk_0');
 
-        if (attemptCount <= 2) {
-          throw new Error('Chunk transcription failed');
-        }
+          if (attemptCount <= 2) {
+            throw new Error('Chunk transcription failed');
+          }
 
-        return 'Success after retries';
-      });
+          return 'Success after retries';
+        }),
+      };
 
       try {
-        await processChunk(chunk, job, governor, mockTranscribe);
+        await processChunk(chunk, job, governor, mockProvider, 'test-key');
       } catch {
         // Expected to fail after retries if auto-split not fully mocked
       }
@@ -255,11 +267,17 @@ describe('Integration: Transcribe Best Quality Mode', () => {
       const chunk = chunkingResult.chunks[0];
 
       // Mock to always fail (simulates sub-chunk failure)
-      const mockTranscribe = vi.fn(async () => {
-        throw new Error('Always fails');
-      });
+      const mockProvider = {
+        name: 'Mock',
+        summarize: vi.fn(),
+        chat: vi.fn(),
+        validateApiKey: vi.fn(),
+        transcribe: vi.fn(async () => {
+          throw new Error('Always fails');
+        }),
+      };
 
-      await expect(processChunk(chunk, job, governor, mockTranscribe)).rejects.toThrow();
+      await expect(processChunk(chunk, job, governor, mockProvider, 'test-key')).rejects.toThrow();
     });
   });
 

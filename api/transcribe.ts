@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import busboy from 'busboy';
 import { API_VALIDATION } from '../src/utils/constants';
-import { getTranscriptionPrompt } from '../src/utils/transcription-prompts';
+import { WHISPER_STYLE_PROMPT } from '../src/utils/transcription-prompts';
 import {
   getTranscriptionModelForLevel,
   type PerformanceLevel,
@@ -9,7 +9,8 @@ import {
 import { JobManager } from './utils/job-manager';
 import { chunkAudio, cleanupChunks } from './utils/audio-chunker';
 import { RateLimitGovernor } from './utils/rate-limit-governor';
-import { processChunk, createTranscribeFunction } from './utils/chunk-processor';
+import { processChunk } from './utils/chunk-processor';
+import { OpenAIProvider } from './providers/openai';
 import { assembleTranscript } from './utils/transcript-assembler';
 import type { ProcessingMode } from './types/chunking';
 import type { JobConfiguration } from './types/job';
@@ -46,7 +47,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     let apiKey: string | null = null;
     let language: string | undefined = undefined;
     let model: string | undefined = undefined;
-    let contentType: string | undefined = undefined;
+
     let performanceLevel: string | undefined = undefined;
     let uploadedFilename: string = 'audio.webm';
     let fileSizeExceeded = false;
@@ -88,8 +89,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           language = value || undefined;
         } else if (fieldname === 'model') {
           model = value || undefined;
-        } else if (fieldname === 'contentType') {
-          contentType = value || undefined;
         } else if (fieldname === 'performanceLevel') {
           performanceLevel = value || undefined;
         }
@@ -126,13 +125,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       ? getTranscriptionModelForLevel(model as PerformanceLevel)
       : 'gpt-4o-mini-transcribe';
 
-    // Create job configuration
+    // Create job configuration with Whisper style prompt
     const jobConfig: JobConfiguration = {
       apiKey,
       mode,
       model: transcriptionModel,
       language,
-      prompt: contentType ? getTranscriptionPrompt(contentType) : undefined,
+      prompt: WHISPER_STYLE_PROMPT, // Use style prompt for clean transcription
     };
 
     // Create job
@@ -217,8 +216,8 @@ async function processJobInBackground(
     // Step 2: Create rate limit governor
     const governor = new RateLimitGovernor(job.config.mode);
 
-    // Step 3: Create transcription function
-    const transcribe = createTranscribeFunction(job.config.apiKey);
+    // Step 3: Create provider
+    const provider = new OpenAIProvider();
 
     // Step 4: Process all chunks
     console.log(`[Job ${jobId}] Processing chunks with rate governor...`);
@@ -233,7 +232,13 @@ async function processJobInBackground(
       }
 
       try {
-        const transcript = await processChunk(chunk, updatedJob, governor, transcribe);
+        const transcript = await processChunk(
+          chunk,
+          updatedJob,
+          governor,
+          provider,
+          job.config.apiKey
+        );
 
         transcripts.push(transcript);
 
