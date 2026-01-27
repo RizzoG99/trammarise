@@ -286,16 +286,18 @@ export async function chatWithAI(
 }
 
 /**
- * Generate PDF from transcript and summary using AI formatting
+ * Generate PDF from transcript and summary using template system
  */
 export async function generatePDF(
   transcript: string,
   summary: string,
   contentType: string,
-  provider: string,
-  apiKey: string,
-  model?: string,
-  language?: string
+  fileName?: string,
+  aiConfig?: {
+    provider: string;
+    model: string;
+    transcriptionModel?: string;
+  }
 ): Promise<Blob> {
   const response = await fetchWithTimeout(
     '/api/generate-pdf',
@@ -306,10 +308,8 @@ export async function generatePDF(
         transcript,
         summary,
         contentType,
-        provider,
-        apiKey,
-        model,
-        language,
+        fileName,
+        aiConfig,
       }),
     },
     60000
