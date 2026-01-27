@@ -6,11 +6,24 @@ import { cleanupOldSessions } from '../utils/session-manager';
 import { LoadingSpinner } from '@/lib';
 
 // Lazy load route pages
-const UploadRecordPage = lazy(() => import('./routes/UploadRecordPage').then(module => ({ default: module.UploadRecordPage })));
-const AudioEditingPage = lazy(() => import('./routes/AudioEditingPage').then(module => ({ default: module.AudioEditingPage })));
-const ProcessingPage = lazy(() => import('./routes/ProcessingPage').then(module => ({ default: module.ProcessingPage })));
-const ResultsPage = lazy(() => import('./routes/ResultsPage').then(module => ({ default: module.ResultsPage })));
-const PreviewPage = lazy(() => import('../pages/PreviewPage').then(module => ({ default: module.PreviewPage })));
+const UploadRecordPage = lazy(() =>
+  import('./routes/UploadRecordPage').then((module) => ({ default: module.UploadRecordPage }))
+);
+const AudioEditingPage = lazy(() =>
+  import('./routes/AudioEditingPage').then((module) => ({ default: module.AudioEditingPage }))
+);
+const ProcessingPage = lazy(() =>
+  import('./routes/ProcessingPage').then((module) => ({ default: module.ProcessingPage }))
+);
+const ResultsPage = lazy(() =>
+  import('./routes/ResultsPage').then((module) => ({ default: module.ResultsPage }))
+);
+const PreviewPage = lazy(() =>
+  import('../pages/PreviewPage').then((module) => ({ default: module.PreviewPage }))
+);
+const ApiKeySetupPage = lazy(() =>
+  import('../pages/ApiKeySetupPage').then((module) => ({ default: module.ApiKeySetupPage }))
+);
 
 // Placeholder for Configuration page (will be enhanced later)
 import { Heading, Text, GlassCard } from '@/lib';
@@ -19,7 +32,9 @@ function ConfigurationPlaceholder() {
   return (
     <div className="w-full max-w-[800px] mx-auto">
       <GlassCard variant="light" className="p-8">
-        <Heading level="h1" className="mb-4">Configuration</Heading>
+        <Heading level="h1" className="mb-4">
+          Configuration
+        </Heading>
         <Text variant="body" color="secondary">
           AI provider selection page - will be enhanced in Phase 3
         </Text>
@@ -46,9 +61,7 @@ function App() {
     <Suspense fallback={<PageLoader />}>
       <Routes>
         {/* Dev preview route */}
-        {import.meta.env.DEV && (
-          <Route path={ROUTES.PREVIEW} element={<PreviewPage />} />
-        )}
+        {import.meta.env.DEV && <Route path={ROUTES.PREVIEW} element={<PreviewPage />} />}
 
         {/* Main app routes with AppLayout wrapper */}
         <Route element={<AppLayout />}>
@@ -66,6 +79,9 @@ function App() {
 
           {/* Results route */}
           <Route path={ROUTES.RESULTS} element={<ResultsPage />} />
+
+          {/* API Key Setup route */}
+          <Route path={ROUTES.SETUP} element={<ApiKeySetupPage />} />
         </Route>
 
         {/* Redirect unknown routes to home */}

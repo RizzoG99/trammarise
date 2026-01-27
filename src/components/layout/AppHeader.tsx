@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { GlassCard, ThemeToggle, Button } from '@/lib';
 import { useTheme } from '../../hooks/useTheme';
 import { LanguageSwitcher } from '../../features/i18n/components/LanguageSwitcher';
+import { useNavigate } from 'react-router-dom';
+import { ROUTES } from '@/types/routing';
 
 /**
  * Props for AppHeader component
@@ -20,6 +22,7 @@ interface AppHeaderProps {
 export function AppHeader({ fileName, onFileNameChange, onExport }: AppHeaderProps = {}) {
   const { t } = useTranslation();
   const { theme, setTheme } = useTheme();
+  const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(fileName || '');
 
@@ -56,9 +59,7 @@ export function AppHeader({ fileName, onFileNameChange, onExport }: AppHeaderPro
               >
                 <span className="text-white font-bold text-2xl">T</span>
               </div>
-              <h1 className="text-xl font-semibold text-text-primary">
-                Trammarise
-              </h1>
+              <h1 className="text-xl font-semibold text-text-primary">Trammarise</h1>
             </div>
 
             {/* File Name (Results Page Only) */}
@@ -120,11 +121,7 @@ export function AppHeader({ fileName, onFileNameChange, onExport }: AppHeaderPro
             <div className="flex items-center gap-3">
               {/* Export Button (Results Page Only) */}
               {onExport && (
-                <Button
-                  variant="outline"
-                  onClick={onExport}
-                  className="flex items-center gap-2"
-                >
+                <Button variant="outline" onClick={onExport} className="flex items-center gap-2">
                   <FileDown className="w-4 h-4" />
                   <span className="hidden sm:inline">{t('header.export')}</span>
                 </Button>
@@ -149,12 +146,16 @@ export function AppHeader({ fileName, onFileNameChange, onExport }: AppHeaderPro
 
               {/* User Avatar */}
               <Button
+                onClick={() => navigate(ROUTES.SETUP)}
                 variant="ghost"
                 aria-label={t('header.userMenu')}
                 icon={
                   <div
                     className="w-8 h-8 rounded-full flex items-center justify-center"
-                    style={{ background: 'linear-gradient(to bottom right, var(--color-primary), var(--color-primary-light))' }}
+                    style={{
+                      background:
+                        'linear-gradient(to bottom right, var(--color-primary), var(--color-primary-light))',
+                    }}
                   >
                     <User className="w-5 h-5 text-white" />
                   </div>
