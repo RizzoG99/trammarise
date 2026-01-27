@@ -37,10 +37,14 @@
     /* Accents (Shared) */
     --color-accent-success: #10b981; /* Emerald 500 */
     --color-accent-success-alpha-10: rgba(16, 185, 129, 0.1);
+    --color-accent-success-alpha-20: rgba(16, 185, 129, 0.2);
     --color-accent-error: #ef4444; /* Red 500 */
     --color-accent-error-hover: #dc2626; /* Red 600 */
     --color-accent-error-alpha-10: rgba(239, 68, 68, 0.1);
+    --color-accent-error-alpha-20: rgba(239, 68, 68, 0.2);
     --color-accent-warning: #f59e0b; /* Amber 500 */
+    --color-accent-warning-alpha-10: rgba(245, 158, 11, 0.1);
+    --color-accent-warning-alpha-20: rgba(245, 158, 11, 0.2);
     --color-accent-info: #3b82f6; /* Blue 500 */
 
     /* Glassmorphism Effects (v2) - Light Mode */

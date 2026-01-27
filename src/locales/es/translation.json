@@ -19,7 +19,12 @@
   "header": {
     "export": "Exportar",
     "notifications": "Notificaciones",
-    "userMenu": "Menú de usuario"
+    "userMenu": "Menú de usuario",
+    "aria": {
+      "saveFile": "Guardar nombre de archivo",
+      "cancelEdit": "Cancelar edición",
+      "editFile": "Editar nombre de archivo"
+    }
   },
   "home": {
     "title": "Nueva Sesión",
