@@ -123,9 +123,7 @@ describe('Summarize API Endpoint', () => {
     expect(mockProvider.summarize).toHaveBeenCalledWith(
       expect.objectContaining({
         context: expect.objectContaining({
-          text: expect.stringMatching(
-            /Extracted PDF Content.*test\.pdf|test\.pdf.*Extracted PDF Content/
-          ),
+          text: expect.stringMatching(/\[Document Context: test\.pdf\]\s*Extracted PDF Content/),
         }),
       })
     );
@@ -166,9 +164,7 @@ describe('Summarize API Endpoint', () => {
     expect(mockProvider.summarize).toHaveBeenCalledWith(
       expect.objectContaining({
         context: expect.objectContaining({
-          text: expect.stringMatching(
-            /Text file content.*notes\.txt|notes\.txt.*Text file content/
-          ),
+          text: expect.stringMatching(/\[Document Context: notes\.txt\]\s*Text file content/),
         }),
       })
     );
