@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import type { ContentType } from '../../../types/content-types';
 import { CONTENT_TYPE_OPTIONS } from '../../../types/content-types';
 import { Text } from '@/lib';
@@ -8,11 +9,13 @@ export interface ContentTypeSelectorProps {
 }
 
 export function ContentTypeSelector({ value, onChange }: ContentTypeSelectorProps) {
+  const { t } = useTranslation();
+
   return (
     <div>
       <label htmlFor="content-type-select" className="block mb-2">
         <Text variant="body" color="primary" className="font-medium">
-          Meeting Type
+          {t('configuration.meetingType.title')}
         </Text>
       </label>
       <select
@@ -29,7 +32,7 @@ export function ContentTypeSelector({ value, onChange }: ContentTypeSelectorProp
       >
         {CONTENT_TYPE_OPTIONS.map((option) => (
           <option key={option.value} value={option.value}>
-            {option.label}
+            {t(`configuration.meetingType.options.${option.value}`)}
           </option>
         ))}
       </select>

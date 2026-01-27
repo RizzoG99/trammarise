@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button, FileSizeWarningModal } from '@/lib';
 import { AttachmentIcon } from '../icons';
 import { getFileSizeStatus } from '../../utils/fileSize';
@@ -42,6 +43,7 @@ export const InitialState: React.FC<InitialStateProps> = ({
   contextFiles,
   onContextFilesChange,
 }) => {
+  const { t } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [showWarningModal, setShowWarningModal] = useState(false);
@@ -53,13 +55,13 @@ export const InitialState: React.FC<InitialStateProps> = ({
   // Cleanup all Object URLs when component unmounts
   useEffect(() => {
     return () => {
-      imagePreviewUrls.forEach(url => URL.revokeObjectURL(url));
+      imagePreviewUrls.forEach((url) => URL.revokeObjectURL(url));
     };
   }, [imagePreviewUrls]);
 
   const handleFileValidation = (file: File) => {
     if (!file.type.startsWith('audio/')) {
-      onError?.('Please select a valid audio file');
+      onError?.(t('initialState.contextFiles.errors.invalidAudio'));
       return;
     }
 
@@ -108,7 +110,7 @@ export const InitialState: React.FC<InitialStateProps> = ({
     );
 
     if (invalidFiles.length > 0) {
-      onError?.('Some files were ignored. Only audio, images, PDF, and TXT files are supported.');
+      onError?.(t('initialState.contextFiles.errors.someIgnored'));
     }
   };
 
@@ -157,7 +159,7 @@ export const InitialState: React.FC<InitialStateProps> = ({
     );
 
     if (invalidFiles.length > 0) {
-      onError?.('Some files were ignored. Only audio, images, PDF, and TXT files are supported.');
+      onError?.(t('initialState.contextFiles.errors.someIgnored'));
     }
   };
 
@@ -203,20 +205,20 @@ export const InitialState: React.FC<InitialStateProps> = ({
         file.type !== 'application/pdf' &&
         file.type !== 'text/plain'
       ) {
-        setContextErrors('Only images, PDF, and TXT files are allowed');
+        setContextErrors(t('initialState.contextFiles.errors.invalidType'));
         return;
       }
 
       // Validate size
       if (totalSize + file.size > MAX_TOTAL_SIZE) {
-        setContextErrors('Total file size cannot exceed 24MB');
+        setContextErrors(t('initialState.contextFiles.errors.sizeLimit'));
         return;
       }
 
       // Generate preview URL for images
       if (file.type.startsWith('image/')) {
         const previewUrl = URL.createObjectURL(file);
-        setImagePreviewUrls(prev => new Map(prev).set(file.name, previewUrl));
+        setImagePreviewUrls((prev) => new Map(prev).set(file.name, previewUrl));
       }
 
       totalSize += file.size;
@@ -235,7 +237,7 @@ export const InitialState: React.FC<InitialStateProps> = ({
       const previewUrl = imagePreviewUrls.get(fileToRemove.name);
       if (previewUrl) {
         URL.revokeObjectURL(previewUrl);
-        setImagePreviewUrls(prev => {
+        setImagePreviewUrls((prev) => {
           const newMap = new Map(prev);
           newMap.delete(fileToRemove.name);
           return newMap;
@@ -250,9 +252,11 @@ export const InitialState: React.FC<InitialStateProps> = ({
     <>
       <div className="w-full max-w-[600px] animate-[fadeIn_0.3s_ease-out]">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-center mb-2 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent sm:text-5xl">Transform Your Audio</h1>
+          <h1 className="text-4xl font-bold text-center mb-2 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent sm:text-5xl">
+            {t('initialState.title')}
+          </h1>
           <p className="text-lg text-text-secondary text-center font-light">
-            Upload an audio file or start recording to transcribe and summarize
+            {t('initialState.subtitle')}
           </p>
         </div>
 
@@ -266,18 +270,23 @@ export const InitialState: React.FC<InitialStateProps> = ({
             style={{ display: 'none' }}
           />
 
-          <Button variant="primary" icon={<UploadIcon />} onClick={handleUploadClick} className="w-full sm:flex-1">
-            Upload Audio
+          <Button
+            variant="primary"
+            icon={<UploadIcon />}
+            onClick={handleUploadClick}
+            className="w-full sm:flex-1"
+          >
+            {t('initialState.uploadButton')}
           </Button>
 
-          <Button 
-            variant="secondary" 
-            icon={<RecordIcon />} 
+          <Button
+            variant="secondary"
+            icon={<RecordIcon />}
             onClick={handleRecordClick}
             disabled={hasMicrophoneAccess === false}
             className="w-full sm:flex-1"
           >
-            Start Recording
+            {t('initialState.recordButton')}
           </Button>
         </div>
 
@@ -295,9 +304,9 @@ export const InitialState: React.FC<InitialStateProps> = ({
           <div className="w-12 h-12 mb-4 opacity-50">
             <DropIcon />
           </div>
-          <p className="text-sm m-0 font-medium">Drop audio and context files here</p>
-          <p className="text-xs mt-2">or click to select files</p>
-          <p className="text-xs mt-1 opacity-75">Audio • Images • PDF • TXT</p>
+          <p className="text-sm m-0 font-medium">{t('initialState.dropZone.main')}</p>
+          <p className="text-xs mt-2">{t('initialState.dropZone.sub')}</p>
+          <p className="text-xs mt-1 opacity-75">{t('initialState.dropZone.formats')}</p>
         </div>
 
         {/* Context Files Display */}
@@ -305,7 +314,7 @@ export const InitialState: React.FC<InitialStateProps> = ({
           <div className="mt-4">
             <p className="text-sm font-semibold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
               <AttachmentIcon className="w-4 h-4" />
-              Context Files ({contextFiles.length})
+              {t('initialState.contextFiles.title')} ({contextFiles.length})
             </p>
             <div className="space-y-2">
               {contextFiles.map((file, index) => {
@@ -335,7 +344,9 @@ export const InitialState: React.FC<InitialStateProps> = ({
                         <span className="text-sm font-medium text-slate-900 dark:text-white truncate">
                           {file.name}
                         </span>
-                        <span className="text-xs text-slate-500">{(file.size / 1024).toFixed(1)} KB</span>
+                        <span className="text-xs text-slate-500">
+                          {(file.size / 1024).toFixed(1)} KB
+                        </span>
                       </div>
                     </div>
 
@@ -345,8 +356,18 @@ export const InitialState: React.FC<InitialStateProps> = ({
                       className="p-1 text-slate-400 hover:text-red-500 transition-colors"
                       aria-label="Remove file"
                     >
-                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M6 18L18 6M6 6l12 12"
+                        />
                       </svg>
                     </button>
                   </div>

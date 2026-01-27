@@ -1,6 +1,7 @@
 import { Search, ChevronUp, ChevronDown, X } from 'lucide-react';
 import { useMemo, useEffect, memo } from 'react';
 import { GlassCard, Heading, Text } from '@/lib';
+import { useTranslation } from 'react-i18next';
 import { useTranscriptSearch } from '../hooks/useTranscriptSearch';
 import { parseTranscriptToSegments } from '../utils/transcriptParser';
 import { TranscriptSegmentBlock } from './TranscriptSegmentBlock';
@@ -18,6 +19,7 @@ export const SearchableTranscript = memo(function SearchableTranscript({
   activeSegmentId,
   onTimestampClick,
 }: SearchableTranscriptProps) {
+  const { t } = useTranslation();
   const {
     searchQuery,
     setSearchQuery,
@@ -50,10 +52,13 @@ export const SearchableTranscript = memo(function SearchableTranscript({
       {/* Search Bar */}
       <div className="mb-4">
         <div className="flex items-center gap-2 mb-2">
-          <Heading level="h3">Transcript</Heading>
+          <Heading level="h3">{t('results.transcript.title')}</Heading>
           {hasMatches && (
             <Text variant="caption" color="tertiary">
-              {currentMatchIndex + 1} of {totalMatches} matches
+              {t('results.transcript.matches', {
+                current: currentMatchIndex + 1,
+                total: totalMatches,
+              })}
             </Text>
           )}
         </div>
@@ -65,7 +70,7 @@ export const SearchableTranscript = memo(function SearchableTranscript({
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search transcript..."
+              placeholder={t('results.transcript.searchPlaceholder')}
               className="
                 w-full pl-10 pr-10 py-2 rounded-lg
                 bg-[var(--color-bg-surface)] border border-border
@@ -117,7 +122,7 @@ export const SearchableTranscript = memo(function SearchableTranscript({
         {/* Fallback: Show notice if no segments */}
         {segments.length === 0 && (
           <Text variant="body" color="secondary" className="text-center py-8">
-            No transcript available
+            {t('results.transcript.noTranscript')}
           </Text>
         )}
       </div>

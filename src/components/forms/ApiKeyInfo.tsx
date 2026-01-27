@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { AIProvider } from '../../types/audio';
 
 interface ApiKeyInfoProps {
@@ -6,13 +7,20 @@ interface ApiKeyInfoProps {
 }
 
 const InfoIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5 flex-shrink-0">
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    className="w-5 h-5 flex-shrink-0"
+  >
     <circle cx="12" cy="12" r="10" />
     <path d="M12 16v-4M12 8h.01" />
   </svg>
 );
 
 export const ApiKeyInfo: React.FC<ApiKeyInfoProps> = ({ provider }) => {
+  const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
 
   interface ProviderDetails {
@@ -37,8 +45,8 @@ export const ApiKeyInfo: React.FC<ApiKeyInfoProps> = ({ provider }) => {
         'Navigate to "Keys" section',
         'Click "Create Key"',
         'Copy your API key (starts with sk-or-...)',
-        'Add credits to your account if needed'
-      ]
+        'Add credits to your account if needed',
+      ],
     },
     openai: {
       name: 'OpenAI (for Whisper transcription)',
@@ -49,9 +57,9 @@ export const ApiKeyInfo: React.FC<ApiKeyInfoProps> = ({ provider }) => {
         'Go to OpenAI Platform',
         'Sign in or create an account',
         'Click "Create new secret key"',
-        'Copy and save your key (it won\'t be shown again)',
-        'Add billing information if needed'
-      ]
+        "Copy and save your key (it won't be shown again)",
+        'Add billing information if needed',
+      ],
     },
   };
 
@@ -65,17 +73,25 @@ export const ApiKeyInfo: React.FC<ApiKeyInfoProps> = ({ provider }) => {
         aria-expanded={isExpanded}
       >
         <InfoIcon />
-        <span className="flex-1 text-left">How to get your {info.name} API key</span>
-        <span className={`text-xs transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}>▼</span>
+        <span className="flex-1 text-left">{t('apiKeyInfo.button', { provider: info.name })}</span>
+        <span
+          className={`text-xs transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+        >
+          ▼
+        </span>
       </button>
 
       {isExpanded && (
         <div className="p-6 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 animate-[slideDown_0.2s_ease-out]">
           <div className="mb-6 last:mb-0">
-            <h4 className="mb-3 text-base font-semibold text-slate-900 dark:text-white">Getting Started</h4>
+            <h4 className="mb-3 text-base font-semibold text-slate-900 dark:text-white">
+              {t('apiKeyInfo.sections.gettingStarted')}
+            </h4>
             <ol className="m-0 pl-6 text-slate-600 dark:text-slate-300 leading-relaxed">
               {info.steps.map((step, index) => (
-                <li key={index} className="mb-2">{step}</li>
+                <li key={index} className="mb-2">
+                  {step}
+                </li>
               ))}
             </ol>
             <a
@@ -84,33 +100,42 @@ export const ApiKeyInfo: React.FC<ApiKeyInfoProps> = ({ provider }) => {
               rel="noopener noreferrer"
               className="inline-block mt-3 text-indigo-600 dark:text-indigo-400 no-underline font-medium transition-colors hover:text-indigo-700 dark:hover:text-indigo-300 hover:underline"
             >
-              Visit {info.name} Platform →
+              {t('apiKeyInfo.visitPlatform', { provider: info.name })}
             </a>
           </div>
 
           <div className="mb-6 last:mb-0">
-            <h4 className="mb-3 text-base font-semibold text-slate-900 dark:text-white">Models Used</h4>
+            <h4 className="mb-3 text-base font-semibold text-slate-900 dark:text-white">
+              {t('apiKeyInfo.sections.modelsUsed')}
+            </h4>
             <p className="m-0 text-slate-600 dark:text-slate-300 leading-relaxed">{info.models}</p>
           </div>
 
           {info.note && (
             <div className="mb-6 last:mb-0 p-4 bg-amber-50 dark:bg-amber-900/20 border-l-4 border-amber-500 rounded text-slate-700 dark:text-slate-200">
-              <strong className="text-amber-600 dark:text-amber-400">Note:</strong> {info.note}
+              <strong className="text-amber-600 dark:text-amber-400">
+                {t('apiKeyInfo.noteLabel')}
+              </strong>{' '}
+              {info.note}
             </div>
           )}
 
           <div className="mb-6 last:mb-0">
-            <h4 className="mb-3 text-base font-semibold text-slate-900 dark:text-white">Pricing</h4>
+            <h4 className="mb-3 text-base font-semibold text-slate-900 dark:text-white">
+              {t('apiKeyInfo.sections.pricing')}
+            </h4>
             <p className="m-0 text-slate-600 dark:text-slate-300 leading-relaxed">{info.pricing}</p>
           </div>
 
           <div className="mb-6 last:mb-0 p-4 bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 rounded">
-            <h4 className="mb-3 text-base font-semibold text-slate-900 dark:text-white">Security Notes</h4>
+            <h4 className="mb-3 text-base font-semibold text-slate-900 dark:text-white">
+              {t('apiKeyInfo.sections.security')}
+            </h4>
             <ul className="m-0 pl-5 text-slate-600 dark:text-slate-300 leading-relaxed">
-              <li className="mb-1 text-sm">Keys are stored only in your browser session</li>
-              <li className="mb-1 text-sm">Never saved to disk or cloud</li>
-              <li className="mb-1 text-sm">Cleared when you close the tab</li>
-              <li className="mb-1 text-sm">We recommend using API keys with spending limits</li>
+              <li className="mb-1 text-sm">{t('apiKeyInfo.securityNotes.browserOnly')}</li>
+              <li className="mb-1 text-sm">{t('apiKeyInfo.securityNotes.neverSaved')}</li>
+              <li className="mb-1 text-sm">{t('apiKeyInfo.securityNotes.clearedOnClose')}</li>
+              <li className="mb-1 text-sm">{t('apiKeyInfo.securityNotes.recommendLimits')}</li>
             </ul>
           </div>
         </div>

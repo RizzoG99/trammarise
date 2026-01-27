@@ -1,5 +1,6 @@
 import { Check, Loader2, Circle } from 'lucide-react';
 import { GlassCard, Heading, Text } from '@/lib';
+import { useTranslation } from 'react-i18next';
 
 export type StepStatus = 'completed' | 'processing' | 'pending';
 
@@ -25,9 +26,12 @@ function StepIcon({ status }: { status: StepStatus }) {
 }
 
 export function StepChecklist({ steps }: StepChecklistProps) {
+  const { t } = useTranslation();
   return (
     <GlassCard variant="light" className="p-6">
-      <Heading level="h3" className="mb-4">Processing Steps</Heading>
+      <Heading level="h3" className="mb-4">
+        {t('stepChecklist.title')}
+      </Heading>
 
       <div className="space-y-3">
         {steps.map((step, index) => (
@@ -57,7 +61,7 @@ export function StepChecklist({ steps }: StepChecklistProps) {
             {/* Status Badge */}
             {step.status === 'processing' && (
               <span className="text-xs text-primary font-medium px-2 py-1 bg-[var(--color-primary-alpha-10)] rounded-full">
-                In Progress
+                {t('stepChecklist.inProgress')}
               </span>
             )}
           </div>

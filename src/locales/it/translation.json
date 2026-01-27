@@ -36,7 +36,10 @@
     "emptyFile": "Il file è vuoto",
     "noAudioFound": "Nessun file audio trovato nei file trascinati",
     "invalidFile": "File non valido",
-    "supportedFormats": "MP3, WAV, M4A fino a 500MB"
+    "supportedFormats": "MP3, WAV, M4A fino a 500MB",
+    "statusReady": "Pronto",
+    "statusRecording": "Registrazione",
+    "statusPaused": "In Pausa"
   },
   "processing": {
     "steps": {
@@ -53,5 +56,340 @@
     "it": "Italiano",
     "es": "Spagnolo",
     "de": "Tedesco"
+  },
+  "initialState": {
+    "title": "Trasforma il Tuo Audio",
+    "subtitle": "Carica un file audio o inizia a registrare per trascrivere e riassumere",
+    "uploadButton": "Carica Audio",
+    "recordButton": "Inizia Registrazione",
+    "dropZone": {
+      "main": "Trascina file audio e di contesto qui",
+      "sub": "o clicca per selezionare i file",
+      "formats": "Audio • Immagini • PDF • TXT"
+    },
+    "contextFiles": {
+      "title": "File di Contesto",
+      "errors": {
+        "invalidType": "Solo immagini, PDF e file TXT sono consentiti",
+        "sizeLimit": "La dimensione totale dei file non può superare i 24MB",
+        "someIgnored": "Alcuni file sono stati ignorati. Solo file audio, immagini, PDF e TXT sono supportati.",
+        "invalidAudio": "Seleziona un file audio valido"
+      }
+    }
+  },
+  "apiKey": {
+    "title": "Configura Chiave API",
+    "metaDescription": "Configura la tua chiave API OpenAI per abilitare la trascrizione e il riassunto basati su IA in Trammarise.",
+    "heading": "Sblocca la Trascrizione IA",
+    "description": "Trammarise utilizza i potenti modelli di OpenAI per trascrivere e riassumere il tuo audio. Segui la guida qui sotto per ottenere la tua chiave API personale.",
+    "guide": {
+      "title": "Come ottenere la tua Chiave API",
+      "step1": {
+        "title": "Accedi alla Piattaforma OpenAI",
+        "text": "Visita platform.openai.com e accedi con il tuo account.",
+        "linkText": "Apri platform.openai.com"
+      },
+      "step2": {
+        "title": "Vai a Chiavi API",
+        "text": "Passa il mouse sulla barra laterale a sinistra e clicca sull'icona \"Chiavi API\"."
+      },
+      "step3": {
+        "title": "Crea nuova chiave segreta",
+        "text": "Clicca \"Crea nuova chiave segreta\". Chiamala 'Trammarise' per identificarla facilmente in seguito."
+      },
+      "step4": {
+        "title": "Copia e incolla",
+        "text": "Copia immediatamente la chiave che inizia con sk-... Non potrai visualizzarla di nuovo."
+      }
+    },
+    "form": {
+      "title": "Connetti OpenAI",
+      "subtitle": "Inserisci la tua chiave qui sotto per abilitare le funzionalità di trascrizione.",
+      "label": "Chiave API OpenAI",
+      "placeholder": "sk-...",
+      "securityNote": "La tua chiave è memorizzata localmente nel tuo browser e non viene mai inviata ai nostri server.",
+      "privacy": {
+        "secure": "Sicuro",
+        "fast": "Veloce",
+        "noCode": "Nessun Codice"
+      },
+      "buttons": {
+        "connecting": "Connessione...",
+        "saved": "Salvato",
+        "connect": "Testa e Salva Connessione"
+      },
+      "errors": {
+        "invalid": "Chiave API non valida. Verifica la tua chiave e riprova.",
+        "connection": "Connessione fallita. Verifica la tua connessione internet."
+      },
+      "success": "Connessione verificata e salvata!",
+      "help": "Hai problemi?",
+      "docsLink": "Consulta la nostra documentazione"
+    }
+  },
+  "actions": {
+    "readAloud": "Leggi ad Alta Voce",
+    "stop": "Ferma",
+    "copy": "Copia",
+    "copied": "Copiato!",
+    "aria": {
+      "stop": "Ferma lettura",
+      "read": "Leggi ad alta voce",
+      "copy": "Copia negli appunti"
+    }
+  },
+  "filePreview": {
+    "uploadSuccess": "File caricato con successo",
+    "recordingSaved": "Registrazione salvata",
+    "replaceFile": "Sostituisci File",
+    "remove": "Rimuovi",
+    "unknownFormat": "Formato sconosciuto"
+  },
+  "configuration": {
+    "context": {
+      "title": "Contesto (Facoltativo)",
+      "subtitle": "Carica Agenda o Slide per migliorare la precisione",
+      "attachFiles": "Allega File",
+      "formats": "PDF, JPG, PNG"
+    },
+    "processingMode": {
+      "title": "Modalità di Elaborazione",
+      "balanced": {
+        "title": "Bilanciato",
+        "description": "Precisione standard, elaborazione più veloce",
+        "credits": "~10 crediti"
+      },
+      "quality": {
+        "title": "Qualità",
+        "description": "Analisi e riassunto migliorati con GPT-4",
+        "credits": "~25 crediti"
+      }
+    },
+    "audioEnvironment": {
+      "title": "Ambiente Audio"
+    },
+    "noiseProfiles": {
+      "quiet": "Ambiente Silenzioso",
+      "meeting_room": "Sala Riunioni",
+      "cafe": "Bar / Ristorante",
+      "outdoor": "All'aperto",
+      "phone": "Telefono / Chiamata Digitale"
+    },
+    "meetingType": {
+      "title": "Tipo di Riunione",
+      "options": {
+        "daily-stand-up": "Daily Stand-up",
+        "focus-group": "Focus Group",
+        "interview": "Intervista",
+        "lecture": "Lezione",
+        "legal": "Legale",
+        "medical-clinical": "Clinico Medico",
+        "meeting": "Note Riunione",
+        "podcast": "Episodio Podcast",
+        "sales-call": "Chiamata Vendite",
+        "voice-memo": "Memo Vocale",
+        "other": "Altro (specifica)"
+      }
+    },
+    "language": {
+      "title": "Lingua",
+      "options": {
+        "en": "Inglese",
+        "it": "Italiano",
+        "es": "Spagnolo",
+        "fr": "Francese",
+        "de": "Tedesco",
+        "pt": "Portoghese",
+        "nl": "Olandese",
+        "ja": "Giapponese",
+        "zh": "Cinese"
+      }
+    }
+  },
+  "audioState": {
+    "title": "Visualizza e ritaglia l'audio qui sotto",
+    "buttons": {
+      "process": "Elabora Audio",
+      "startOver": "Ricomincia"
+    },
+    "messages": {
+      "noRegion": "Seleziona una regione da ritagliare",
+      "invalidRegion": "Regione di ritaglio non valida: l'inizio deve essere prima della fine",
+      "negativeTime": "Regione di ritaglio non valida: valori di tempo negativi",
+      "tooShort": "Regione di ritaglio troppo breve: sono richiesti almeno {{duration}} secondi",
+      "playerNotReady": "Lettore audio non pronto",
+      "audioNotLoaded": "Dati audio non caricati",
+      "trimSuccess": "Audio ritagliato con successo!"
+    }
+  },
+  "recordingState": {
+    "status": "Registrazione in corso...",
+    "stopButton": "Ferma Registrazione"
+  },
+  "configurationState": {
+    "heading": "Configura Elaborazione IA",
+    "description": "Trascrizione completata! Scegli il tuo provider IA e il tipo di contenuto per il riassunto.",
+    "transcriptPreview": "Anteprima Trascrizione",
+    "processingNote": "La trascrizione completa verrà elaborata con il modello IA selezionato"
+  },
+  "audioEditing": {
+    "toolbar": {
+      "undo": "Annulla",
+      "redo": "Ripeti",
+      "reset": "Reimposta"
+    },
+    "actions": {
+      "processSelection": "Elabora Selezione",
+      "processFullAudio": "Elabora Audio Completo"
+    },
+    "timeDisplay": {
+      "start": "Inizio",
+      "end": "Fine",
+      "placeholder": "--:--"
+    }
+  },
+  "fileSizeWarning": {
+    "titles": {
+      "tooLarge": "File Troppo Grande",
+      "large": "File di Grandi Dimensioni Rilevato"
+    },
+    "buttons": {
+      "compress": "Comprimi File",
+      "compressContinue": "Comprimi e Continua",
+      "continueAnyway": "Continua Comunque"
+    },
+    "labels": {
+      "fileSize": "Dimensione File:",
+      "estimatedTime": "Tempo di Elaborazione Stimato:"
+    },
+    "benefits": {
+      "title": "Vantaggi della Compressione:",
+      "faster": "Elaborazione della trascrizione più veloce",
+      "lowerMemory": "Minore utilizzo della memoria durante la riproduzione",
+      "optimized": "Ottimizzato per Whisper AI (frequenza di campionamento 16kHz)",
+      "noImpact": "Nessun impatto sulla qualità della trascrizione"
+    },
+    "note": {
+      "label": "Nota:",
+      "text": "I file più grandi di 50MB devono essere compressi prima dell'elaborazione per garantire prestazioni ottimali ed evitare problemi di memoria."
+    }
+  },
+  "apiKeyInfo": {
+    "button": "Come ottenere la tua chiave API {{provider}}",
+    "sections": {
+      "gettingStarted": "Per Iniziare",
+      "modelsUsed": "Modelli Utilizzati",
+      "pricing": "Prezzi",
+      "security": "Note di Sicurezza"
+    },
+    "visitPlatform": "Visita la Piattaforma {{provider}} →",
+    "noteLabel": "Nota:",
+    "securityNotes": {
+      "browserOnly": "Le chiavi sono memorizzate solo nella sessione del browser",
+      "neverSaved": "Mai salvate su disco o cloud",
+      "clearedOnClose": "Cancellate quando chiudi la scheda",
+      "recommendLimits": "Consigliamo di utilizzare chiavi API con limiti di spesa"
+    }
+  },
+  "chat": {
+    "tryAsking": "Prova a chiedere:",
+    "examplePrompts": {
+      "shorter": "Rendi questo riassunto più breve",
+      "actionItems": "Quali sono i principali punti d'azione?",
+      "translate": "Traduci in spagnolo"
+    },
+    "placeholder": "Chiedi all'IA di perfezionare o spiegare...",
+    "sendButton": "Invia messaggio"
+  },
+  "upload": {
+    "removeFile": "Rimuovi {{filename}}",
+    "aria": {
+      "startRecording": "Avvia registrazione",
+      "pauseRecording": "Metti in pausa la registrazione",
+      "resumeRecording": "Riprendi registrazione"
+    }
+  },
+  "footer": {
+    "copyright": "Trammarise © 2025 - Trascrizione e Riassunto Audio"
+  },
+  "layout": {
+    "loading": "Caricamento sessione...",
+    "sessionNotFound": {
+      "title": "Sessione Non Trovata",
+      "message": "La sessione audio richiesta non è stata trovata."
+    },
+    "instructions": "Seleziona un segmento da riassumere o trascrivi l'intera registrazione.",
+    "keyboardShortcuts": {
+      "space": "SPAZIO",
+      "playPause": "per play/pausa",
+      "arrows": "per cercare"
+    }
+  },
+  "audioStatus": {
+    "clean": "Audio Pulito",
+    "noisy": "Audio Rumoroso",
+    "ready": "Pronto",
+    "total": "Totale"
+  },
+  "playback": {
+    "aria": {
+      "skipBack": "Indietro di 10s",
+      "skipForward": "Avanti di 10s",
+      "play": "Riproduci",
+      "pause": "Pausa",
+      "volumeSlider": "Cursore volume",
+      "speedControl": "Imposta velocità di riproduzione a {{speed}}x"
+    }
+  },
+  "costTransparency": {
+    "title": "Costo Stimato",
+    "balancedMode": "Modalità bilanciata",
+    "qualityMode": "Modalità qualità",
+    "estimate": "~{{credits}} crediti per questo file",
+    "disclaimer": "Il costo finale dipende dalla lunghezza e complessità dell'audio"
+  },
+  "configPanel": {
+    "title": "Configurazione",
+    "customize": "Personalizza le impostazioni di elaborazione",
+    "modeLabel": "Modalità {{mode}} • ~{{credits}} crediti"
+  },
+  "uploadFormats": {
+    "label": "Formati supportati"
+  },
+  "stepChecklist": {
+    "title": "Passaggi di Elaborazione",
+    "inProgress": "In Corso"
+  },
+  "results": {
+    "loading": "Caricamento risultati...",
+    "notFound": {
+      "title": "Nessun Risultato Trovato",
+      "message": "Completa l'elaborazione per visualizzare i risultati."
+    },
+    "transcript": {
+      "title": "Trascrizione",
+      "searchPlaceholder": "Cerca nella trascrizione...",
+      "noTranscript": "Nessuna trascrizione disponibile",
+      "matches": "{{current}} di {{total}} corrispondenze"
+    },
+    "summary": {
+      "title": "Riassunto",
+      "copyAll": "Copia Tutto",
+      "phase4Placeholder": "Riassunti strutturati in arrivo nella Fase 4"
+    }
+  },
+  "chatModal": {
+    "title": "Perfeziona con AI",
+    "emptyState": "Chiedimi qualsiasi cosa sulla tua trascrizione o riassunto",
+    "disclaimer": "L'AI può commettere errori. Verifica le informazioni importanti.",
+    "tokenLimit": "Limite di token raggiunto"
+  },
+  "tokenUsage": {
+    "label": "Utilizzo Token",
+    "warning": "Avvicinamento al limite giornaliero di token"
+  },
+  "configPlaceholder": {
+    "title": "Configurazione",
+    "description": "Pagina di selezione provider AI - sarà migliorata nella Fase 3"
   }
 }

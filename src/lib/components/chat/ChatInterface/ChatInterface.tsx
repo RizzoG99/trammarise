@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Loader2, Send } from 'lucide-react';
 import type { ChatMessage } from '../../../../types/audio';
 
@@ -13,6 +14,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   isLoading,
   chatHistory,
 }) => {
+  const { t } = useTranslation();
   const [message, setMessage] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -24,9 +26,9 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   };
 
   const examplePrompts = [
-    'Make this summary shorter',
-    'What are the main action items?',
-    'Translate to Spanish',
+    t('chat.examplePrompts.shorter'),
+    t('chat.examplePrompts.actionItems'),
+    t('chat.examplePrompts.translate'),
   ];
 
   const handleExampleClick = (prompt: string) => {
@@ -39,7 +41,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     <div className="sticky bottom-0 bg-bg-surface border-t border-border-glass p-6 backdrop-blur-md">
       {chatHistory.length === 0 && (
         <div className="mb-4">
-          <p className="text-sm text-text-secondary mb-3">Try asking:</p>
+          <p className="text-sm text-text-secondary mb-3">{t('chat.tryAsking')}</p>
           {examplePrompts.map((prompt, index) => (
             <button
               key={index}
@@ -58,7 +60,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
           type="text"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          placeholder="Ask AI to refine or explain..."
+          placeholder={t('chat.placeholder')}
           className="flex-1 px-4 py-3 border-2 border-border-glass rounded-xl text-[0.9375rem] bg-black/20 text-text-primary transition-colors focus:outline-none focus:border-primary disabled:bg-white/5 disabled:cursor-not-allowed"
           disabled={isLoading}
         />
@@ -66,13 +68,9 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
           type="submit"
           className="w-11 h-11 flex items-center justify-center bg-primary border-none rounded-xl text-white cursor-pointer transition-all hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={!message.trim() || isLoading}
-          aria-label="Send message"
+          aria-label={t('chat.sendButton')}
         >
-          {isLoading ? (
-            <Loader2 className="w-5 h-5 animate-spin" />
-          ) : (
-            <Send className="w-5 h-5" />
-          )}
+          {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
         </button>
       </form>
     </div>

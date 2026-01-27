@@ -6,7 +6,15 @@ import { FilePreview } from './FilePreview';
 import { useTranslation } from 'react-i18next';
 
 // File validation constants
-const SUPPORTED_AUDIO_TYPES = ['audio/mpeg', 'audio/wav', 'audio/mp4', 'audio/m4a', 'audio/webm', 'audio/ogg', 'audio/flac'];
+const SUPPORTED_AUDIO_TYPES = [
+  'audio/mpeg',
+  'audio/wav',
+  'audio/mp4',
+  'audio/m4a',
+  'audio/webm',
+  'audio/ogg',
+  'audio/flac',
+];
 export const MAX_FILE_SIZE = 500 * 1024 * 1024; // 500MB
 
 interface FileValidationResult {
@@ -35,7 +43,10 @@ export function UploadPanel({ onFileUpload, uploadedFile, onFileRemove }: Upload
     // Check file size
     if (file.size > MAX_FILE_SIZE) {
       const sizeMB = Math.round(file.size / (1024 * 1024));
-      return { valid: false, error: `${t('home.fileTooLarge')} (${sizeMB}MB). ${t('home.maxSize')} 500MB.` };
+      return {
+        valid: false,
+        error: `${t('home.fileTooLarge')} (${sizeMB}MB). ${t('home.maxSize')} 500MB.`,
+      };
     }
 
     // Check for empty file
@@ -61,7 +72,7 @@ export function UploadPanel({ onFileUpload, uploadedFile, onFileRemove }: Upload
     setValidationError(null);
 
     const files = Array.from(e.dataTransfer.files);
-    const audioFile = files.find(file => file.type.startsWith('audio/'));
+    const audioFile = files.find((file) => file.type.startsWith('audio/'));
 
     if (!audioFile) {
       setValidationError(t('home.noAudioFound'));
@@ -93,7 +104,6 @@ export function UploadPanel({ onFileUpload, uploadedFile, onFileRemove }: Upload
       return;
     }
 
-
     onFileUpload(file);
   };
 
@@ -119,13 +129,28 @@ export function UploadPanel({ onFileUpload, uploadedFile, onFileRemove }: Upload
 
   return (
     <GlassCard variant="light" className="p-6">
-      <Heading level="h3" className="mb-4">{t('home.uploadTitle')}</Heading>
+      <Heading level="h3" className="mb-4">
+        {t('home.uploadTitle')}
+      </Heading>
 
       {/* Validation Error Message */}
       {validationError && (
-        <div className="mb-4 p-3 rounded-lg border flex items-start gap-2" style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', borderColor: 'rgba(239, 68, 68, 0.2)' }}>
-          <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: '#ef4444' }} />
-          <Text variant="caption" className="font-medium" style={{ color: '#ef4444' }}>
+        <div
+          className="mb-4 p-3 rounded-lg border flex items-start gap-2"
+          style={{
+            backgroundColor: 'var(--color-accent-error-alpha-10)',
+            borderColor: 'rgba(239, 68, 68, 0.2)',
+          }}
+        >
+          <AlertCircle
+            className="w-5 h-5 flex-shrink-0 mt-0.5"
+            style={{ color: 'var(--color-accent-error)' }}
+          />
+          <Text
+            variant="caption"
+            className="font-medium"
+            style={{ color: 'var(--color-accent-error)' }}
+          >
             {validationError}
           </Text>
         </div>
@@ -133,11 +158,7 @@ export function UploadPanel({ onFileUpload, uploadedFile, onFileRemove }: Upload
 
       {/* Show FilePreview if file is uploaded, otherwise show drop zone */}
       {uploadedFile ? (
-        <FilePreview 
-          file={uploadedFile} 
-          onRemove={handleRemove}
-          onReplace={handleReplace}
-        />
+        <FilePreview file={uploadedFile} onRemove={handleRemove} onReplace={handleReplace} />
       ) : (
         <div
           onDragOver={handleDragOver}
@@ -165,7 +186,7 @@ export function UploadPanel({ onFileUpload, uploadedFile, onFileRemove }: Upload
           </Text>
 
           <Text variant="caption" color="tertiary" className="mb-4">
-            Supported formats
+            {t('uploadFormats.label')}
           </Text>
 
           <div className="inline-flex px-4 py-2 rounded-full bg-[var(--color-bg-surface)] border border-border">

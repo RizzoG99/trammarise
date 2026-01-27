@@ -5,6 +5,7 @@ import { TokenUsageMeter } from './TokenUsageMeter';
 import { SuggestionChips } from './SuggestionChips';
 import { useTokenTracking } from '../hooks/useTokenTracking';
 import type { ChatMessage } from '../../../types/audio';
+import { useTranslation } from 'react-i18next';
 
 export interface ChatModalProps {
   isOpen: boolean;
@@ -14,10 +15,18 @@ export interface ChatModalProps {
   isLoading?: boolean;
 }
 
-export function ChatModal({ isOpen, onClose, onSendMessage, messages, isLoading = false }: ChatModalProps) {
+export function ChatModal({
+  isOpen,
+  onClose,
+  onSendMessage,
+  messages,
+  isLoading = false,
+}: ChatModalProps) {
+  const { t } = useTranslation();
   const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const { tokenUsage, tokenLimit, percentage, isNearLimit, addMessage, isAtLimit } = useTokenTracking();
+  const { tokenUsage, tokenLimit, percentage, isNearLimit, addMessage, isAtLimit } =
+    useTokenTracking();
 
   // Scroll to bottom when new messages arrive
   useEffect(() => {
@@ -54,17 +63,14 @@ export function ChatModal({ isOpen, onClose, onSendMessage, messages, isLoading 
   return (
     <>
       {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
-        onClick={onClose}
-      />
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40" onClick={onClose} />
 
       {/* Modal */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
         <GlassCard variant="light" className="w-full max-w-2xl max-h-[80vh] flex flex-col">
           {/* Header */}
           <div className="p-4 border-b border-border flex items-center justify-between">
-            <Heading level="h3">Refine with AI</Heading>
+            <Heading level="h3">{t('chatModal.title')}</Heading>
             <button
               onClick={onClose}
               className="p-2 hover:bg-[var(--color-bg-surface-hover)] rounded-lg transition-colors"
@@ -83,10 +89,7 @@ export function ChatModal({ isOpen, onClose, onSendMessage, messages, isLoading 
 
           {/* Suggestion Chips */}
           {messages.length === 0 && (
-            <SuggestionChips
-              onSuggestionClick={handleSuggestionClick}
-              disabled={isAtLimit}
-            />
+            <SuggestionChips onSuggestionClick={handleSuggestionClick} disabled={isAtLimit} />
           )}
 
           {/* Messages Area */}
@@ -94,7 +97,7 @@ export function ChatModal({ isOpen, onClose, onSendMessage, messages, isLoading 
             {messages.length === 0 ? (
               <div className="text-center py-8">
                 <Text variant="body" color="tertiary">
-                  Ask me anything about your transcript or summary
+                  {t('chatModal.emptyState')}
                 </Text>
               </div>
             ) : (
@@ -106,13 +109,18 @@ export function ChatModal({ isOpen, onClose, onSendMessage, messages, isLoading 
                   <div
                     className={`
                       max-w-[80%] p-3 rounded-lg
-                      ${msg.role === 'user'
-                        ? 'bg-primary text-white'
-                        : 'bg-[var(--color-bg-surface)] border border-border text-text-primary'
+                      ${
+                        msg.role === 'user'
+                          ? 'bg-primary text-white'
+                          : 'bg-[var(--color-bg-surface)] border border-border text-text-primary'
                       }
                     `}
                   >
-                    <Text variant="body" as="div" className={msg.role === 'user' ? 'text-white' : ''}>
+                    <Text
+                      variant="body"
+                      as="div"
+                      className={msg.role === 'user' ? 'text-white' : ''}
+                    >
                       {msg.content}
                     </Text>
                   </div>
@@ -164,7 +172,7 @@ export function ChatModal({ isOpen, onClose, onSendMessage, messages, isLoading 
             </div>
 
             <Text variant="small" color="tertiary" className="mt-2 text-center">
-              AI can make mistakes. Verify important information.
+              {t('chatModal.disclaimer')}
             </Text>
           </div>
         </GlassCard>

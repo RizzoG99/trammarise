@@ -7,7 +7,7 @@ describe('RecordButton', () => {
   describe('Rendering', () => {
     it('renders with default props', () => {
       render(<RecordButton onClick={() => {}} />);
-      const button = screen.getByRole('button', { name: 'Start recording' });
+      const button = screen.getByRole('button', { name: 'upload.aria.startRecording' });
       expect(button).toBeInTheDocument();
     });
 
@@ -114,7 +114,7 @@ describe('PauseButton', () => {
   describe('Rendering', () => {
     it('renders with default props', () => {
       render(<PauseButton onClick={() => {}} />);
-      const button = screen.getByRole('button', { name: 'Pause recording' });
+      const button = screen.getByRole('button', { name: 'upload.aria.pauseRecording' });
       expect(button).toBeInTheDocument();
     });
 
@@ -137,12 +137,16 @@ describe('PauseButton', () => {
 
     it('uses default aria-label "Pause recording" when not paused', () => {
       render(<PauseButton onClick={() => {}} isPaused={false} />);
-      expect(screen.getByRole('button', { name: 'Pause recording' })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'upload.aria.pauseRecording' })
+      ).toBeInTheDocument();
     });
 
     it('uses default aria-label "Resume recording" when paused', () => {
       render(<PauseButton onClick={() => {}} isPaused={true} />);
-      expect(screen.getByRole('button', { name: 'Resume recording' })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'upload.aria.resumeRecording' })
+      ).toBeInTheDocument();
     });
   });
 
@@ -193,10 +197,14 @@ describe('PauseButton', () => {
   describe('Pause/Resume Toggle', () => {
     it('toggles between pause and resume states', () => {
       const { rerender } = render(<PauseButton onClick={() => {}} isPaused={false} />);
-      expect(screen.getByRole('button', { name: 'Pause recording' })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'upload.aria.pauseRecording' })
+      ).toBeInTheDocument();
 
       rerender(<PauseButton onClick={() => {}} isPaused={true} />);
-      expect(screen.getByRole('button', { name: 'Resume recording' })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'upload.aria.resumeRecording' })
+      ).toBeInTheDocument();
     });
   });
 });
@@ -285,8 +293,8 @@ describe('All Recording Buttons', () => {
       </div>
     );
 
-    expect(screen.getByRole('button', { name: 'Start recording' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Pause recording' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'upload.aria.startRecording' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'upload.aria.pauseRecording' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Stop recording' })).toBeInTheDocument();
   });
 });

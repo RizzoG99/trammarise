@@ -36,7 +36,7 @@ describe('FileSizeWarningModal', () => {
           onCompress={() => {}}
         />
       );
-      expect(screen.getByText('Large File Detected')).toBeInTheDocument();
+      expect(screen.getByText('fileSizeWarning.titles.large')).toBeInTheDocument();
     });
 
     it('does not render when isOpen is false', () => {
@@ -49,7 +49,7 @@ describe('FileSizeWarningModal', () => {
           onCompress={() => {}}
         />
       );
-      expect(screen.queryByText('Large File Detected')).not.toBeInTheDocument();
+      expect(screen.queryByText('fileSizeWarning.titles.large')).not.toBeInTheDocument();
     });
 
     it('displays warning title for non-too-large files', () => {
@@ -62,7 +62,7 @@ describe('FileSizeWarningModal', () => {
           onCompress={() => {}}
         />
       );
-      expect(screen.getByText('Large File Detected')).toBeInTheDocument();
+      expect(screen.getByText('fileSizeWarning.titles.large')).toBeInTheDocument();
     });
 
     it('displays file size', () => {
@@ -101,7 +101,9 @@ describe('FileSizeWarningModal', () => {
           onCompress={() => {}}
         />
       );
-      expect(screen.getByText('We recommend compressing this file for faster processing.')).toBeInTheDocument();
+      expect(
+        screen.getByText('We recommend compressing this file for faster processing.')
+      ).toBeInTheDocument();
     });
 
     it('shows benefits of compression for warning state', () => {
@@ -114,9 +116,9 @@ describe('FileSizeWarningModal', () => {
           onCompress={() => {}}
         />
       );
-      expect(screen.getByText('Benefits of Compression:')).toBeInTheDocument();
-      expect(screen.getByText('Faster transcription processing')).toBeInTheDocument();
-      expect(screen.getByText('Lower memory usage during playback')).toBeInTheDocument();
+      expect(screen.getByText('fileSizeWarning.benefits.title')).toBeInTheDocument();
+      expect(screen.getByText('fileSizeWarning.benefits.faster')).toBeInTheDocument();
+      expect(screen.getByText('fileSizeWarning.benefits.lowerMemory')).toBeInTheDocument();
     });
 
     it('shows warning icon for warning state', () => {
@@ -145,7 +147,7 @@ describe('FileSizeWarningModal', () => {
           onCompress={() => {}}
         />
       );
-      expect(screen.getByText('File Too Large')).toBeInTheDocument();
+      expect(screen.getByText('fileSizeWarning.titles.tooLarge')).toBeInTheDocument();
     });
 
     it('displays file size for error state', () => {
@@ -171,7 +173,7 @@ describe('FileSizeWarningModal', () => {
           onCompress={() => {}}
         />
       );
-      expect(screen.getByText(/Files larger than 50MB must be compressed/)).toBeInTheDocument();
+      expect(screen.getByText('fileSizeWarning.note.text')).toBeInTheDocument();
     });
 
     it('does not show benefits list for error state', () => {
@@ -184,7 +186,7 @@ describe('FileSizeWarningModal', () => {
           onCompress={() => {}}
         />
       );
-      expect(screen.queryByText('Benefits of Compression:')).not.toBeInTheDocument();
+      expect(screen.queryByText('fileSizeWarning.benefits.title')).not.toBeInTheDocument();
     });
 
     it('shows error icon for error state', () => {
@@ -213,9 +215,9 @@ describe('FileSizeWarningModal', () => {
           onCompress={() => {}}
         />
       );
-      expect(screen.getByText('Compress & Continue')).toBeInTheDocument();
-      expect(screen.getByText('Continue Anyway')).toBeInTheDocument();
-      expect(screen.getByText('Cancel')).toBeInTheDocument();
+      expect(screen.getByText('fileSizeWarning.buttons.compressContinue')).toBeInTheDocument();
+      expect(screen.getByText('fileSizeWarning.buttons.continueAnyway')).toBeInTheDocument();
+      expect(screen.getByText('common.cancel')).toBeInTheDocument();
     });
 
     it('calls onCompress when Compress button is clicked', async () => {
@@ -231,7 +233,7 @@ describe('FileSizeWarningModal', () => {
         />
       );
 
-      await user.click(screen.getByText('Compress & Continue'));
+      await user.click(screen.getByText('fileSizeWarning.buttons.compressContinue'));
       expect(handleCompress).toHaveBeenCalledTimes(1);
     });
 
@@ -248,7 +250,7 @@ describe('FileSizeWarningModal', () => {
         />
       );
 
-      await user.click(screen.getByText('Continue Anyway'));
+      await user.click(screen.getByText('fileSizeWarning.buttons.continueAnyway'));
       expect(handleProceed).toHaveBeenCalledTimes(1);
     });
 
@@ -265,7 +267,7 @@ describe('FileSizeWarningModal', () => {
         />
       );
 
-      await user.click(screen.getByText('Cancel'));
+      await user.click(screen.getByText('common.cancel'));
       expect(handleClose).toHaveBeenCalledTimes(1);
     });
   });
@@ -281,9 +283,9 @@ describe('FileSizeWarningModal', () => {
           onCompress={() => {}}
         />
       );
-      expect(screen.getByText('Compress File')).toBeInTheDocument();
-      expect(screen.getByText('Cancel')).toBeInTheDocument();
-      expect(screen.queryByText('Continue Anyway')).not.toBeInTheDocument();
+      expect(screen.getByText('fileSizeWarning.buttons.compress')).toBeInTheDocument();
+      expect(screen.getByText('common.cancel')).toBeInTheDocument();
+      expect(screen.queryByText('fileSizeWarning.buttons.continueAnyway')).not.toBeInTheDocument();
     });
 
     it('calls onCompress when Compress File is clicked', async () => {
@@ -299,7 +301,7 @@ describe('FileSizeWarningModal', () => {
         />
       );
 
-      await user.click(screen.getByText('Compress File'));
+      await user.click(screen.getByText('fileSizeWarning.buttons.compress'));
       expect(handleCompress).toHaveBeenCalledTimes(1);
     });
 
@@ -316,7 +318,7 @@ describe('FileSizeWarningModal', () => {
         />
       );
 
-      await user.click(screen.getByText('Cancel'));
+      await user.click(screen.getByText('common.cancel'));
       expect(handleClose).toHaveBeenCalledTimes(1);
     });
   });
@@ -360,7 +362,9 @@ describe('FileSizeWarningModal', () => {
           onCompress={() => {}}
         />
       );
-      expect(screen.getByText('Custom recommendation message for this specific file.')).toBeInTheDocument();
+      expect(
+        screen.getByText('Custom recommendation message for this specific file.')
+      ).toBeInTheDocument();
     });
   });
 });

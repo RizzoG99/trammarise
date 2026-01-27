@@ -53,7 +53,7 @@ describe('UploadPanel', () => {
       const largeFile = new File([], 'large.mp3', { type: 'audio/mpeg' });
       Object.defineProperty(largeFile, 'size', {
         value: MAX_FILE_SIZE + 1,
-        writable: false
+        writable: false,
       });
 
       const input = screen.getByTestId('file-input');
@@ -130,9 +130,9 @@ describe('UploadPanel', () => {
 
       // Create a mock file >500MB using size property (optimized)
       const largeFile = new File([], 'huge.mp3', { type: 'audio/mpeg' });
-      Object.defineProperty(largeFile, 'size', { 
+      Object.defineProperty(largeFile, 'size', {
         value: MAX_FILE_SIZE + 1,
-        writable: false 
+        writable: false,
       });
       const dropZone = screen.getByText('home.dropText').closest('div')!;
 
@@ -209,14 +209,9 @@ describe('UploadPanel', () => {
     it('handles onFileRemove being undefined', () => {
       const uploadedFile = new File(['audio'], 'test.mp3', { type: 'audio/mpeg' });
 
-      render(
-        <UploadPanel
-          onFileUpload={mockOnFileUpload}
-          uploadedFile={uploadedFile}
-        />
-      );
+      render(<UploadPanel onFileUpload={mockOnFileUpload} uploadedFile={uploadedFile} />);
 
-      const removeButton = screen.getByText('Remove');
+      const removeButton = screen.getByText('filePreview.remove');
 
       // Should not throw error
       expect(() => fireEvent.click(removeButton)).not.toThrow();

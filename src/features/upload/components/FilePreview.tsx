@@ -1,5 +1,6 @@
 import { CheckCircle, Music, Trash2, RefreshCw } from 'lucide-react';
 import { Text } from '@/lib';
+import { useTranslation } from 'react-i18next';
 
 export interface FilePreviewProps {
   file: File | Blob;
@@ -12,6 +13,7 @@ export interface FilePreviewProps {
  * Shows filename, size, duration (if available), and actions
  */
 export function FilePreview({ file, onRemove, onReplace }: FilePreviewProps) {
+  const { t } = useTranslation();
   // Format file size
   const formatFileSize = (bytes: number): string => {
     if (bytes === 0) return '0 Bytes';
@@ -30,8 +32,12 @@ export function FilePreview({ file, onRemove, onReplace }: FilePreviewProps) {
       {/* Success Message */}
       <div className="flex items-center gap-2 p-3 rounded-lg bg-[var(--color-accent-success)]/10 border border-[var(--color-accent-success)]/20">
         <CheckCircle className="w-5 h-5 text-[var(--color-accent-success)] flex-shrink-0" />
-        <Text variant="caption" className="font-medium" style={{ color: 'var(--color-accent-success)' }}>
-          {file instanceof File ? 'File uploaded successfully' : 'Recording saved'}
+        <Text
+          variant="caption"
+          className="font-medium"
+          style={{ color: 'var(--color-accent-success)' }}
+        >
+          {file instanceof File ? t('filePreview.uploadSuccess') : t('filePreview.recordingSaved')}
         </Text>
       </div>
 
@@ -45,9 +51,9 @@ export function FilePreview({ file, onRemove, onReplace }: FilePreviewProps) {
 
           {/* File Details */}
           <div className="flex-1 min-w-0">
-            <Text 
-              variant="body" 
-              color="primary" 
+            <Text
+              variant="body"
+              color="primary"
               className="font-semibold mb-1 truncate"
               title={fileName}
             >
@@ -61,7 +67,7 @@ export function FilePreview({ file, onRemove, onReplace }: FilePreviewProps) {
                 <>
                   <span style={{ color: 'var(--color-text-tertiary)' }}>•</span>
                   <Text variant="caption" color="secondary">
-                    {file.type || 'Unknown format'}
+                    {file.type || t('filePreview.unknownFormat')}
                   </Text>
                 </>
               )}
@@ -76,14 +82,14 @@ export function FilePreview({ file, onRemove, onReplace }: FilePreviewProps) {
           onClick={onReplace}
           aria-label="Replace audio file"
           className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 border-border hover:border-primary hover:bg-[var(--color-primary-alpha-5)] transition-all cursor-pointer"
-          style={{ 
+          style={{
             backgroundColor: 'var(--color-bg-surface)',
-            color: 'var(--color-text-primary)'
+            color: 'var(--color-text-primary)',
           }}
         >
           <RefreshCw className="w-4 h-4" aria-hidden="true" />
           <Text variant="caption" className="font-medium">
-            Replace File
+            {t('filePreview.replaceFile')}
           </Text>
         </button>
 
@@ -91,10 +97,10 @@ export function FilePreview({ file, onRemove, onReplace }: FilePreviewProps) {
           onClick={onRemove}
           aria-label="Remove audio file"
           className="flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all cursor-pointer"
-          style={{ 
+          style={{
             backgroundColor: 'var(--color-bg-surface)',
             borderColor: 'var(--color-accent-error)',
-            color: 'var(--color-accent-error)'
+            color: 'var(--color-accent-error)',
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.backgroundColor = 'var(--color-accent-error-alpha-10)';
@@ -105,7 +111,7 @@ export function FilePreview({ file, onRemove, onReplace }: FilePreviewProps) {
         >
           <Trash2 className="w-4 h-4" aria-hidden="true" />
           <Text variant="caption" className="font-medium">
-            Remove
+            {t('filePreview.remove')}
           </Text>
         </button>
       </div>

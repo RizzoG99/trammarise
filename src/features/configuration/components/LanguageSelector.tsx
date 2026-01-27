@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import type { LanguageCode } from '../../../types/languages';
 import { LANGUAGE_OPTIONS } from '../../../types/languages';
 import { Text } from '@/lib';
@@ -8,11 +9,13 @@ export interface LanguageSelectorProps {
 }
 
 export function LanguageSelector({ value, onChange }: LanguageSelectorProps) {
+  const { t } = useTranslation();
+
   return (
     <div>
       <label htmlFor="language-select" className="block mb-2">
         <Text variant="body" color="primary" className="font-medium">
-          Language
+          {t('configuration.language.title')}
         </Text>
       </label>
       <select
@@ -29,7 +32,7 @@ export function LanguageSelector({ value, onChange }: LanguageSelectorProps) {
       >
         {LANGUAGE_OPTIONS.map((option) => (
           <option key={option.value} value={option.value}>
-            {option.label}
+            {t(`configuration.language.options.${option.value}`)}
           </option>
         ))}
       </select>

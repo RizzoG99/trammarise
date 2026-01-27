@@ -27,16 +27,18 @@ const ApiKeySetupPage = lazy(() =>
 
 // Placeholder for Configuration page (will be enhanced later)
 import { Heading, Text, GlassCard } from '@/lib';
+import { useTranslation } from 'react-i18next';
 
 function ConfigurationPlaceholder() {
+  const { t } = useTranslation();
   return (
     <div className="w-full max-w-[800px] mx-auto">
       <GlassCard variant="light" className="p-8">
         <Heading level="h1" className="mb-4">
-          Configuration
+          {t('configPlaceholder.title')}
         </Heading>
         <Text variant="body" color="secondary">
-          AI provider selection page - will be enhanced in Phase 3
+          {t('configPlaceholder.description')}
         </Text>
       </GlassCard>
     </div>

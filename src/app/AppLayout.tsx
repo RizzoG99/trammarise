@@ -1,7 +1,10 @@
 import { Outlet } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Text } from '@/lib';
 
 export function AppLayout() {
+  const { t } = useTranslation();
+
   return (
     <div className="max-w-[1400px] mx-auto min-h-screen flex flex-col relative">
       {/* Main content area - rendered by routes */}
@@ -12,7 +15,7 @@ export function AppLayout() {
       {/* Footer */}
       <footer className="text-center py-8 text-text-tertiary text-sm border-t border-bg-tertiary mt-auto">
         <Text variant="small" color="tertiary" as="p" className="m-0">
-          Trammarise © 2025 - Audio Transcription & Summarization
+          {t('footer.copyright')}
         </Text>
       </footer>
     </div>

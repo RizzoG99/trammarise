@@ -11,7 +11,7 @@ describe('FilePreview', () => {
 
       render(<FilePreview file={file} onRemove={onRemove} onReplace={onReplace} />);
 
-      expect(screen.getByText('File uploaded successfully')).toBeInTheDocument();
+      expect(screen.getByText('filePreview.uploadSuccess')).toBeInTheDocument();
       expect(screen.getByText('test-audio.mp3')).toBeInTheDocument();
       expect(screen.getByText(/audio\/mpeg/)).toBeInTheDocument();
     });
@@ -55,7 +55,7 @@ describe('FilePreview', () => {
 
       render(<FilePreview file={blob} onRemove={onRemove} onReplace={onReplace} />);
 
-      expect(screen.getByText('Recording saved')).toBeInTheDocument();
+      expect(screen.getByText('filePreview.recordingSaved')).toBeInTheDocument();
       expect(screen.getByText('recording.webm')).toBeInTheDocument();
     });
 
@@ -161,9 +161,9 @@ describe('FilePreview', () => {
       render(<FilePreview file={file} onRemove={onRemove} onReplace={onReplace} />);
 
       // Success message is displayed
-      const successMessage = screen.getByText('File uploaded successfully');
+      const successMessage = screen.getByText('filePreview.uploadSuccess');
       expect(successMessage).toBeInTheDocument();
-      
+
       // Verify success message has appropriate semantic structure
       const successContainer = successMessage.closest('div');
       expect(successContainer).toBeInTheDocument();
@@ -180,7 +180,7 @@ describe('FilePreview', () => {
       const fileNameElement = screen.getByText('test.mp3');
       expect(fileNameElement).toBeInTheDocument();
       expect(fileNameElement).toHaveAttribute('title', 'test.mp3');
-      
+
       // File type and size information are displayed
       expect(screen.getByText(/audio\/mpeg/)).toBeInTheDocument();
     });
@@ -195,13 +195,13 @@ describe('FilePreview', () => {
       // Verify buttons are accessible
       const replaceButton = screen.getByRole('button', { name: /replace audio file/i });
       const removeButton = screen.getByRole('button', { name: /remove audio file/i });
-      
+
       expect(replaceButton).toBeInTheDocument();
       expect(removeButton).toBeInTheDocument();
-      
+
       // Verify button text is also present for visual users
-      expect(screen.getByText('Replace File')).toBeInTheDocument();
-      expect(screen.getByText('Remove')).toBeInTheDocument();
+      expect(screen.getByText('filePreview.replaceFile')).toBeInTheDocument();
+      expect(screen.getByText('filePreview.remove')).toBeInTheDocument();
     });
   });
 
@@ -213,7 +213,7 @@ describe('FilePreview', () => {
 
       render(<FilePreview file={file} onRemove={onRemove} onReplace={onReplace} />);
 
-      expect(screen.getByText('Unknown format')).toBeInTheDocument();
+      expect(screen.getByText('filePreview.unknownFormat')).toBeInTheDocument();
     });
 
     it('handles very large file sizes', () => {
