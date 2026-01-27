@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Trammarise - Results (Liquid Glass)</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#fb923c",
+                        "primary-dark": "#f97316",
+                        "background-dark": "#030712",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "1rem", "2xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        @layer utilities {
+            .liquid-glass {
+                background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+                backdrop-filter: blur(16px);
+                border: 1px solid rgba(255, 255, 255, 0.15);
+                box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+            }
+            .frosted-card {
+                background: linear-gradient(160deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+                backdrop-filter: blur(12px);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            .jewel-button {
+                background: linear-gradient(135deg, #fb923c 0%, #ea580c 50%, #c2410c 100%);
+                box-shadow: 
+                    inset 0 1px 1px rgba(255, 255, 255, 0.4),
+                    inset 0 -2px 4px rgba(0, 0, 0, 0.2),
+                    0 10px 20px -5px rgba(249, 115, 22, 0.4);
+                position: relative;
+                overflow: hidden;
+            }
+            .jewel-button::after {
+                content: '';
+                position: absolute;
+                top: 2px;
+                left: 10%;
+                width: 80%;
+                height: 40%;
+                background: linear-gradient(to bottom, rgba(255, 255, 255, 0.3), transparent);
+                border-radius: 9999px;
+            }
+            .glass-header {
+                background: rgba(3, 7, 18, 0.7);
+                backdrop-filter: blur(20px);
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            .custom-scrollbar::-webkit-scrollbar {
+                width: 4px;
+            }
+            .custom-scrollbar::-webkit-scrollbar-track {
+                background: transparent;
+            }
+            .custom-scrollbar::-webkit-scrollbar-thumb {
+                background: rgba(255, 255, 255, 0.2);
+                border-radius: 20px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-background-dark font-display text-white overflow-x-hidden flex flex-col min-h-screen selection:bg-primary/30">
+<div class="fixed inset-0 overflow-hidden pointer-events-none -z-10">
+<div class="absolute -top-40 -left-40 w-96 h-96 bg-primary/20 rounded-full blur-[120px]"></div>
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[#111827] -z-20"></div>
+<div class="absolute -bottom-40 -right-40 w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-[120px]"></div>
+</div>
+<header class="sticky top-0 z-50 glass-header px-4 py-3 lg:px-10">
+<div class="flex items-center justify-between max-w-7xl mx-auto w-full">
+<div class="flex items-center gap-4">
+<div class="flex items-center justify-center size-9 jewel-button rounded-xl text-white">
+<span class="material-symbols-outlined text-[20px]">graphic_eq</span>
+</div>
+<div class="hidden md:flex flex-col">
+<h2 class="text-white text-lg font-bold leading-tight tracking-tight">Trammarise</h2>
+</div>
+<div class="hidden md:block h-6 w-px bg-white/10 mx-2"></div>
+<div class="flex items-center gap-2 group cursor-pointer">
+<h1 class="text-gray-100 text-base lg:text-lg font-semibold truncate max-w-[200px] lg:max-w-md">Meeting with Product Team - Oct 24</h1>
+<span class="material-symbols-outlined text-gray-400 text-sm group-hover:text-primary transition-colors">edit</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="hidden sm:flex items-center justify-center gap-2 px-4 py-2 frosted-card hover:bg-white/10 rounded-xl transition-all text-sm font-semibold text-white">
+<span class="material-symbols-outlined text-[20px]">download</span>
+<span>Export</span>
+</button>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-9 border border-white/20" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuD0V8K-T-d2lGKvxck8i09hjfZOLGsbK_5HoEcFplupcu_arh9ELbLkbqriEJfsidUk1uPe88_MVhj4t-H55H7L7AtctROVpEEfqP1SITyRyncFPoOMk0Ll6qvbrS46GT_ouBNP0LWWIyvlM6WvxCIlvAv_vYWb-eSxzsFoKgXkA6wsg9vg4VlmzfGEx9PkYCV_MehTFrY0eLikUk4tK1jDEL0_s-2ePMoExTeN68QetvbKDTfEGMfeZFi1svWAVycSaxnh_kbdqecH");'></div>
+</div>
+</div>
+</header>
+<div class="sticky top-[64px] z-40 w-full px-4 py-3">
+<div class="max-w-7xl mx-auto liquid-glass rounded-2xl p-4 flex flex-col md:flex-row items-center gap-4 md:gap-8 border-white/20">
+<div class="flex items-center gap-5 order-2 md:order-1">
+<button class="flex items-center justify-center text-gray-300 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[32px]">skip_previous</span>
+</button>
+<button class="flex items-center justify-center text-gray-300 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[32px]">replay_10</span>
+</button>
+<button class="flex shrink-0 items-center justify-center rounded-full size-12 jewel-button text-white hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[30px] ml-1">play_arrow</span>
+</button>
+<button class="flex items-center justify-center text-gray-300 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[32px]">forward_10</span>
+</button>
+<button class="flex items-center justify-center text-gray-300 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[32px]">skip_next</span>
+</button>
+</div>
+<div class="flex-1 w-full order-1 md:order-2 flex flex-col justify-center gap-1">
+<div class="flex items-center justify-between text-xs font-bold text-gray-300 mb-1">
+<span>12:45</span>
+<span>45:30</span>
+</div>
+<div aria-label="Audio waveform" class="relative h-10 w-full flex items-center gap-[2px] cursor-pointer group">
+<div class="h-3 w-1 bg-primary rounded-full shadow-[0_0_8px_rgba(251,146,60,0.5)]"></div>
+<div class="h-5 w-1 bg-primary rounded-full shadow-[0_0_8px_rgba(251,146,60,0.5)]"></div>
+<div class="h-4 w-1 bg-primary rounded-full shadow-[0_0_8px_rgba(251,146,60,0.5)]"></div>
+<div class="h-8 w-1 bg-primary rounded-full shadow-[0_0_8px_rgba(251,146,60,0.5)]"></div>
+<div class="h-6 w-1 bg-primary rounded-full shadow-[0_0_8px_rgba(251,146,60,0.5)]"></div>
+<div class="h-3 w-1 bg-primary rounded-full shadow-[0_0_8px_rgba(251,146,60,0.5)]"></div>
+<div class="h-7 w-1 bg-primary rounded-full shadow-[0_0_8px_rgba(251,146,60,0.5)]"></div>
+<div class="h-10 w-1 bg-primary rounded-full shadow-[0_0_8px_rgba(251,146,60,0.5)]"></div>
+<div class="h-6 w-1 bg-primary rounded-full shadow-[0_0_8px_rgba(251,146,60,0.5)]"></div>
+<div class="h-4 w-1 bg-white/20 rounded-full hover:bg-white/40"></div>
+<div class="h-6 w-1 bg-white/20 rounded-full hover:bg-white/40"></div>
+<div class="h-3 w-1 bg-white/20 rounded-full hover:bg-white/40"></div>
+<div class="h-5 w-1 bg-white/20 rounded-full hover:bg-white/40"></div>
+<div class="h-8 w-1 bg-white/20 rounded-full hover:bg-white/40"></div>
+<div class="h-4 w-1 bg-white/20 rounded-full hover:bg-white/40"></div>
+<div class="h-7 w-1 bg-white/20 rounded-full hover:bg-white/40"></div>
+<div class="h-5 w-1 bg-white/20 rounded-full hover:bg-white/40"></div>
+<div class="h-3 w-1 bg-white/20 rounded-full hover:bg-white/40"></div>
+<div class="h-6 w-1 bg-white/20 rounded-full hover:bg-white/40"></div>
+<div class="h-9 w-1 bg-white/20 rounded-full hover:bg-white/40"></div>
+<div class="h-4 w-1 bg-white/20 rounded-full hover:bg-white/40"></div>
+<div class="h-7 w-1 bg-white/20 rounded-full hover:bg-white/40"></div>
+<div class="h-1 flex-1 bg-white/10 rounded-full ml-1 relative overflow-hidden">
+<div class="absolute inset-y-0 left-0 w-[40%] bg-primary/40"></div>
+</div>
+</div>
+</div>
+<div class="hidden sm:flex items-center gap-2 order-3">
+<button class="px-3 py-1.5 text-xs font-bold text-white frosted-card rounded-lg hover:bg-white/10 transition-colors border-white/20">1.25x</button>
+</div>
+</div>
+</div>
+<main class="flex-1 w-full max-w-7xl mx-auto px-4 lg:px-8 py-6 lg:py-8">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 h-full">
+<div class="lg:col-span-4 flex flex-col gap-6">
+<div class="flex items-center justify-between">
+<h3 class="text-white text-xl font-bold tracking-tight">Summary</h3>
+<button class="text-xs font-bold text-primary hover:text-primary-dark transition-colors uppercase tracking-widest">Copy All</button>
+</div>
+<div class="frosted-card rounded-2xl p-6 shadow-2xl">
+<h4 class="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-4">Executive Summary</h4>
+<p class="text-gray-100 text-sm leading-relaxed font-medium">
+                        The product team discussed the timeline for the Q4 launch. Key blockers identified include budget approval and finalizing design mockups. The team agreed to prioritize the mobile interface first.
+                    </p>
+</div>
+<div class="flex flex-col gap-4">
+<h4 class="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Key Takeaways</h4>
+<details class="group flex flex-col rounded-2xl frosted-card overflow-hidden open">
+<summary class="flex cursor-pointer items-center justify-between px-5 py-4 select-none hover:bg-white/5 transition-colors">
+<div class="flex items-center gap-4">
+<span class="flex items-center justify-center size-7 rounded-lg jewel-button text-white text-xs font-black">1</span>
+<p class="text-white text-sm font-bold">Budget approval needed by Friday</p>
+</div>
+<span class="material-symbols-outlined text-gray-400 transition-transform group-open:rotate-180">expand_more</span>
+</summary>
+<div class="px-5 pb-5 pl-16">
+<p class="text-gray-300 text-sm leading-normal">
+                                Sarah emphasized that without the budget sign-off from Finance, the marketing campaign cannot be initiated on time.
+                            </p>
+<div class="mt-4">
+<span class="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-black bg-red-500/20 text-red-400 border border-red-500/30 uppercase tracking-tighter">High Priority</span>
+</div>
+</div>
+</details>
+<details class="group flex flex-col rounded-2xl frosted-card overflow-hidden">
+<summary class="flex cursor-pointer items-center justify-between px-5 py-4 select-none hover:bg-white/5 transition-colors">
+<div class="flex items-center gap-4">
+<span class="flex items-center justify-center size-7 rounded-lg jewel-button text-white text-xs font-black">2</span>
+<p class="text-white text-sm font-bold">Design mockups finalized for Q4</p>
+</div>
+<span class="material-symbols-outlined text-gray-400 transition-transform group-open:rotate-180">expand_more</span>
+</summary>
+<div class="px-5 pb-5 pl-16">
+<p class="text-gray-300 text-sm leading-normal">
+                                Mark confirmed the design team is on track. Review meeting set for next Tuesday.
+                            </p>
+</div>
+</details>
+</div>
+</div>
+<div class="lg:col-span-8 flex flex-col h-[calc(100vh-220px)] min-h-[550px] sticky top-32">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+<h3 class="text-white text-xl font-bold tracking-tight">Transcription</h3>
+<div class="relative w-full sm:w-auto min-w-[320px]">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-gray-400 text-[20px]">search</span>
+</div>
+<input class="block w-full pl-11 pr-4 py-2.5 frosted-card rounded-xl leading-5 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 sm:text-sm transition-all shadow-inner" placeholder="Search transcript..." type="text"/>
+<div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+<kbd class="hidden sm:inline-block bg-white/5 border border-white/10 rounded px-1.5 py-0.5 text-[10px] font-bold text-gray-500">⌘K</kbd>
+</div>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto custom-scrollbar frosted-card rounded-2xl shadow-2xl relative">
+<div class="p-8 flex flex-col gap-8">
+<div class="flex gap-6 group p-4 -m-4 rounded-2xl hover:bg-white/5 transition-all">
+<div class="flex-shrink-0 pt-1">
+<button class="text-primary text-[10px] font-black bg-primary/10 px-2.5 py-1 rounded-lg border border-primary/20 hover:bg-primary/20 transition-colors">00:00</button>
+</div>
+<div class="flex-1">
+<p class="text-xs font-black text-primary uppercase tracking-widest mb-2">Sarah</p>
+<p class="text-gray-100 text-base leading-relaxed font-medium">
+                                    Alright, let's get started. Thanks everyone for joining on such short notice. We have a few critical items to cover regarding the Q4 launch.
+                                </p>
+</div>
+</div>
+<div class="flex gap-6 group p-4 -m-4 rounded-2xl hover:bg-white/5 transition-all">
+<div class="flex-shrink-0 pt-1">
+<button class="text-primary text-[10px] font-black bg-primary/10 px-2.5 py-1 rounded-lg border border-primary/20 hover:bg-primary/20 transition-colors">00:15</button>
+</div>
+<div class="flex-1">
+<p class="text-xs font-black text-blue-400 uppercase tracking-widest mb-2">Mark</p>
+<p class="text-gray-100 text-base leading-relaxed font-medium">
+                                    Thanks Sarah. I've prepared the design updates, but I think we're going to hit a snag with the development timeline if we don't simplify the onboarding flow.
+                                </p>
+</div>
+</div>
+<div class="flex gap-6 p-6 -mx-6 bg-white/5 border-l-4 border-primary shadow-lg" id="active-transcript">
+<div class="flex-shrink-0 pt-1">
+<button class="text-white text-[10px] font-black bg-primary px-2.5 py-1 rounded-lg shadow-[0_0_10px_rgba(251,146,60,0.4)]">00:45</button>
+</div>
+<div class="flex-1">
+<p class="text-xs font-black text-primary uppercase tracking-widest mb-2">Sarah</p>
+<p class="text-white text-lg leading-relaxed font-bold">
+<span class="bg-primary/30 px-1.5 py-0.5 rounded">That's a valid concern.</span> Can we look at the metrics from the last user test? I remember users were getting stuck on the second screen.
+                                </p>
+</div>
+</div>
+<div class="flex gap-6 group p-4 -m-4 rounded-2xl hover:bg-white/5 transition-all">
+<div class="flex-shrink-0 pt-1">
+<button class="text-primary text-[10px] font-black bg-primary/10 px-2.5 py-1 rounded-lg border border-primary/20 hover:bg-primary/20 transition-colors">01:12</button>
+</div>
+<div class="flex-1">
+<p class="text-xs font-black text-emerald-400 uppercase tracking-widest mb-2">David</p>
+<p class="text-gray-100 text-base leading-relaxed font-medium">
+                                    I have the data right here. 60% drop-off at the profile photo upload. It's optional, but the UI makes it look mandatory. We should definitely change that.
+                                </p>
+</div>
+</div>
+<div class="h-24"></div>
+</div>
+<div class="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background-dark/80 to-transparent pointer-events-none"></div>
+</div>
+</div>
+</div>
+</main>
+<div class="fixed bottom-10 right-10 z-50">
+<button class="flex items-center gap-3 jewel-button text-white px-8 py-5 rounded-2xl shadow-2xl hover:scale-105 active:scale-95 transition-all group">
+<span class="material-symbols-outlined text-[28px]">spark</span>
+<span class="font-black text-base uppercase tracking-widest">Refine with Chat</span>
+</button>
+</div>
+
+</body></html>

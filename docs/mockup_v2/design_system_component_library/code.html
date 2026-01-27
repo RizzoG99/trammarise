@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Trammarise Design System - Liquid Glass Edition</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#60a5fa",
+                        "primary-hover": "#93c5fd",
+                        "midnight": "#020617",
+                        "glass-white": "rgba(255, 255, 255, 0.03)",
+                        "glass-border": "rgba(255, 255, 255, 0.12)",
+                        "success": "#4ade80",
+                        "warning": "#fbbf24",
+                        "error": "#f87171",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "body": ["Inter", "sans-serif"],
+                    },
+                    boxShadow: {
+                        'liquid': '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
+                        'glow-blue': '0 0 20px rgba(96, 165, 250, 0.4)',
+                        'inner-light': 'inset 0 1px 1px rgba(255, 255, 255, 0.2)',
+                    }
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        @layer components {
+            .liquid-glass {
+                @apply backdrop-blur-[24px] bg-white/5 border border-white/10 shadow-liquid;
+                background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
+            }
+            .liquid-button {
+                @apply relative overflow-hidden transition-all duration-300 active:scale-95 shadow-inner-light;
+                background: linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0) 100%), #3b82f6;
+            }
+            .liquid-button:hover {
+                @apply shadow-glow-blue;
+                background: linear-gradient(180deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0) 100%), #60a5fa;
+            }
+            .glossy-input {
+                @apply bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder:text-slate-500 backdrop-blur-md focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all outline-none shadow-inner-light;
+            }
+            .mesh-bg {
+                background: radial-gradient(at 0% 0%, #1e293b 0px, transparent 50%),
+                            radial-gradient(at 50% 0%, #1e1b4b 0px, transparent 50%),
+                            radial-gradient(at 100% 0%, #0f172a 0px, transparent 50%),
+                            radial-gradient(at 0% 50%, #1e1b4b 0px, transparent 50%),
+                            radial-gradient(at 100% 100%, #1e293b 0px, transparent 50%),
+                            radial-gradient(at 0% 100%, #0f172a 0px, transparent 50%),
+                            #020617;
+            }
+            .reflect {
+                @apply relative after:content-[''] after:absolute after:inset-0 after:bg-gradient-to-t after:from-white/5 after:to-transparent after:pointer-events-none;
+            }
+        }
+        .liquid-blob {
+            position: fixed;
+            z-index: -1;
+            filter: blur(80px);
+            opacity: 0.4;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body class="mesh-bg font-display text-slate-200 min-h-screen antialiased selection:bg-primary selection:text-white">
+<div class="liquid-blob w-[500px] h-[500px] bg-blue-600 top-[-10%] left-[-5%]"></div>
+<div class="liquid-blob w-[400px] h-[400px] bg-indigo-900 bottom-[-10%] right-[-5%]"></div>
+<div class="liquid-blob w-[300px] h-[300px] bg-blue-400 top-[40%] right-[15%]"></div>
+<div class="flex flex-col min-h-screen">
+<header class="sticky top-0 z-50 w-full liquid-glass border-b border-white/10">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex items-center justify-between h-16">
+<div class="flex items-center gap-3">
+<div class="size-8 flex items-center justify-center bg-primary rounded text-white shadow-glow-blue reflect">
+<span class="material-symbols-outlined text-xl">graphic_eq</span>
+</div>
+<h1 class="text-xl font-bold tracking-tight text-white flex items-center">
+                            Trammarise 
+                            <span class="ml-2 px-2 py-0.5 rounded-full bg-primary/20 text-[10px] uppercase tracking-widest text-primary border border-primary/30">Liquid Glass v8.0</span>
+</h1>
+</div>
+<nav class="hidden md:flex gap-8">
+<a class="text-sm font-medium text-slate-300 hover:text-primary transition-colors" href="#foundations">Foundations</a>
+<a class="text-sm font-medium text-slate-300 hover:text-primary transition-colors" href="#components">Components</a>
+<a class="text-sm font-medium text-slate-300 hover:text-primary transition-colors" href="#brand">Patterns</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="liquid-button text-white text-sm font-bold px-5 py-2 rounded-full flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">auto_fix</span>
+                            Style Guide
+                        </button>
+</div>
+</div>
+</div>
+</header>
+<main class="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16">
+<section class="flex flex-col gap-4">
+<h2 class="text-5xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-br from-white via-white to-blue-400/50">Liquid Glass Foundations</h2>
+<p class="text-lg text-slate-400 max-w-3xl leading-relaxed">
+                    A premium, tactile aesthetic built on extreme backdrop blurs, reflective surface highlights, and deep mesh gradients. Designed to convey fluidity and clarity in AI transcription.
+                </p>
+</section>
+<section class="scroll-mt-24" id="foundations">
+<div class="border-b border-white/5 pb-4 mb-8 flex justify-between items-end">
+<h3 class="text-2xl font-bold text-white flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">water_drop</span> Liquid Palette
+                    </h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<div class="space-y-4">
+<h4 class="text-xs font-semibold uppercase tracking-widest text-slate-500">Surface Core</h4>
+<div class="liquid-glass aspect-[3/2] rounded-2xl flex items-end p-6 text-white reflect">
+<div class="w-full">
+<p class="font-bold text-lg">Glass Base</p>
+<p class="text-white/60 text-sm">Blur: 24px • Opacity: 5%</p>
+</div>
+</div>
+</div>
+<div class="space-y-4">
+<h4 class="text-xs font-semibold uppercase tracking-widest text-slate-500">Action High</h4>
+<div class="liquid-button aspect-[3/2] rounded-2xl flex items-end p-6 text-white">
+<div class="w-full">
+<p class="font-bold text-lg">Ocean Gloss</p>
+<p class="text-white/80 text-sm">#3B82F6 • Gradient</p>
+</div>
+</div>
+</div>
+<div class="space-y-4 col-span-1 md:col-span-2">
+<h4 class="text-xs font-semibold uppercase tracking-widest text-slate-500">Semantic Gloss</h4>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+<div class="flex items-center gap-3 p-4 rounded-2xl liquid-glass border-success/30 reflect">
+<div class="size-10 rounded-full bg-success/20 text-success flex items-center justify-center shadow-[0_0_15px_rgba(74,222,128,0.2)]">
+<span class="material-symbols-outlined text-lg">verified</span>
+</div>
+<div>
+<p class="font-bold text-white text-sm">Success</p>
+<p class="text-[10px] text-success font-bold uppercase tracking-tighter">Liquid Green</p>
+</div>
+</div>
+<div class="flex items-center gap-3 p-4 rounded-2xl liquid-glass border-warning/30 reflect">
+<div class="size-10 rounded-full bg-warning/20 text-warning flex items-center justify-center shadow-[0_0_15px_rgba(251,191,36,0.2)]">
+<span class="material-symbols-outlined text-lg">flare</span>
+</div>
+<div>
+<p class="font-bold text-white text-sm">Warning</p>
+<p class="text-[10px] text-warning font-bold uppercase tracking-tighter">Amber Mist</p>
+</div>
+</div>
+<div class="flex items-center gap-3 p-4 rounded-2xl liquid-glass border-error/30 reflect">
+<div class="size-10 rounded-full bg-error/20 text-error flex items-center justify-center shadow-[0_0_15px_rgba(248,113,113,0.2)]">
+<span class="material-symbols-outlined text-lg">dangerous</span>
+</div>
+<div>
+<p class="font-bold text-white text-sm">Critical</p>
+<p class="text-[10px] text-error font-bold uppercase tracking-tighter">Ruby Fluid</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="scroll-mt-24" id="components">
+<div class="border-b border-white/5 pb-4 mb-8">
+<h3 class="text-2xl font-bold text-white flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">blur_on</span> Interactive Components
+                    </h3>
+</div>
+<div class="grid lg:grid-cols-2 gap-8">
+<div class="space-y-6">
+<h4 class="text-xs font-semibold uppercase tracking-widest text-slate-500">Glossy Buttons</h4>
+<div class="liquid-glass p-8 rounded-3xl space-y-8 reflect">
+<div class="flex flex-wrap items-center gap-6">
+<button class="liquid-button h-12 px-8 text-white font-bold rounded-xl">
+                                    Primary Liquid
+                                </button>
+<button class="liquid-glass h-12 px-8 text-white font-semibold rounded-xl hover:bg-white/10 transition-colors">
+                                    Ghost Glass
+                                </button>
+</div>
+<div class="flex flex-wrap items-center gap-6">
+<button class="size-12 rounded-full liquid-button flex items-center justify-center">
+<span class="material-symbols-outlined">mic</span>
+</button>
+<button class="size-12 rounded-full liquid-glass flex items-center justify-center text-primary border-primary/30">
+<span class="material-symbols-outlined">auto_awesome</span>
+</button>
+<button class="px-6 py-2 text-primary font-bold hover:underline decoration-2 underline-offset-4">
+                                    Text Link
+                                </button>
+</div>
+</div>
+</div>
+<div class="space-y-6">
+<h4 class="text-xs font-semibold uppercase tracking-widest text-slate-500">Fluid Inputs</h4>
+<div class="liquid-glass p-8 rounded-3xl space-y-6 reflect">
+<div class="space-y-2">
+<label class="block text-xs font-bold uppercase tracking-widest text-slate-400 ml-1">Session Title</label>
+<input class="glossy-input w-full" placeholder="Enter transcription name..." type="text"/>
+</div>
+<div class="space-y-2">
+<label class="block text-xs font-bold uppercase tracking-widest text-primary ml-1">Processing...</label>
+<div class="relative">
+<input class="glossy-input w-full border-primary/40 ring-1 ring-primary/20" type="text" value="Deep Learning Transcription v4"/>
+<div class="absolute inset-y-0 right-4 flex items-center text-primary">
+<span class="material-symbols-outlined animate-spin text-sm">sync</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="space-y-6">
+<h4 class="text-xs font-semibold uppercase tracking-widest text-slate-500">Liquid Cards</h4>
+<div class="liquid-glass rounded-3xl p-6 border-white/20 hover:border-primary/50 transition-all cursor-pointer group reflect">
+<div class="flex justify-between items-start mb-6">
+<div class="flex items-center gap-4">
+<div class="size-12 rounded-2xl liquid-button flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-2xl">waves</span>
+</div>
+<div>
+<h5 class="font-bold text-white text-lg group-hover:text-primary transition-colors tracking-tight">Strategy Workshop</h5>
+<p class="text-xs text-slate-400 font-medium">Recorded Today • 12:45 PM</p>
+</div>
+</div>
+<div class="px-3 py-1 bg-blue-500/10 border border-blue-500/30 text-blue-400 text-[10px] font-black rounded-full uppercase tracking-widest backdrop-blur-sm">
+                                    Summarizing
+                                </div>
+</div>
+<p class="text-sm text-slate-400 leading-relaxed">
+                                Analysis of quarterly growth targets and AI infrastructure expansion. Identifying bottleneck points in current pipeline...
+                            </p>
+<div class="mt-6 flex gap-2">
+<div class="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-2/3 shadow-glow-blue"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="space-y-6 scroll-mt-24" id="brand">
+<h4 class="text-xs font-semibold uppercase tracking-widest text-slate-500">Live Surface Pattern</h4>
+<div class="relative overflow-hidden rounded-3xl h-full min-h-[220px] bg-gradient-to-br from-blue-900/40 to-indigo-950/60 flex items-center justify-center border border-white/10 reflect">
+<div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&amp;w=2564&amp;auto=format&amp;fit=crop')] bg-cover bg-center opacity-20 mix-blend-overlay"></div>
+<div class="liquid-glass px-10 py-8 rounded-[40px] flex flex-col items-center gap-6 relative z-10 w-5/6 max-w-sm border-white/20 shadow-2xl">
+<div class="flex items-center gap-2">
+<div class="size-2 bg-red-500 rounded-full animate-ping"></div>
+<p class="text-[10px] font-black text-white uppercase tracking-[0.3em]">Direct Liquid Stream</p>
+</div>
+<div class="flex items-end justify-center gap-1.5 h-12">
+<div class="w-1.5 bg-primary rounded-full shadow-glow-blue h-6"></div>
+<div class="w-1.5 bg-primary rounded-full shadow-glow-blue h-10"></div>
+<div class="w-1.5 bg-primary rounded-full shadow-glow-blue h-4"></div>
+<div class="w-1.5 bg-primary rounded-full shadow-glow-blue h-12"></div>
+<div class="w-1.5 bg-primary rounded-full shadow-glow-blue h-8"></div>
+<div class="w-1.5 bg-primary rounded-full shadow-glow-blue h-6"></div>
+<div class="w-1.5 bg-primary rounded-full shadow-glow-blue h-10"></div>
+</div>
+<p class="text-white font-mono text-xl font-bold tracking-widest">00:14:02</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="pb-20">
+<div class="border-b border-white/5 pb-4 mb-8">
+<h3 class="text-2xl font-bold text-white flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">shape_line</span> Liquid Iconography
+                    </h3>
+</div>
+<div class="liquid-glass p-12 rounded-3xl reflect">
+<div class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-12 justify-items-center">
+<div class="flex flex-col items-center gap-3 group cursor-pointer">
+<div class="size-14 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-primary/50 group-hover:bg-primary/10 transition-all shadow-inner-light">
+<span class="material-symbols-outlined text-2xl group-hover:text-primary transition-colors">mic</span>
+</div>
+<span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">mic</span>
+</div>
+<div class="flex flex-col items-center gap-3 group cursor-pointer">
+<div class="size-14 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-primary/50 group-hover:bg-primary/10 transition-all shadow-inner-light">
+<span class="material-symbols-outlined text-2xl group-hover:text-primary transition-colors">analytics</span>
+</div>
+<span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">analys</span>
+</div>
+<div class="flex flex-col items-center gap-3 group cursor-pointer">
+<div class="size-14 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-primary/50 group-hover:bg-primary/10 transition-all shadow-inner-light">
+<span class="material-symbols-outlined text-2xl group-hover:text-primary transition-colors">blur_circular</span>
+</div>
+<span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">liquid</span>
+</div>
+<div class="flex flex-col items-center gap-3 group cursor-pointer">
+<div class="size-14 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-primary/50 group-hover:bg-primary/10 transition-all shadow-inner-light">
+<span class="material-symbols-outlined text-2xl group-hover:text-primary transition-colors">graphic_eq</span>
+</div>
+<span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">wave</span>
+</div>
+<div class="flex flex-col items-center gap-3 group cursor-pointer">
+<div class="size-14 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-primary/50 group-hover:bg-primary/10 transition-all shadow-inner-light">
+<span class="material-symbols-outlined text-2xl group-hover:text-primary transition-colors">auto_awesome</span>
+</div>
+<span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">magic</span>
+</div>
+<div class="flex flex-col items-center gap-3 group cursor-pointer">
+<div class="size-14 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-primary/50 group-hover:bg-primary/10 transition-all shadow-inner-light">
+<span class="material-symbols-outlined text-2xl group-hover:text-primary transition-colors">hub</span>
+</div>
+<span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">node</span>
+</div>
+<div class="flex flex-col items-center gap-3 group cursor-pointer">
+<div class="size-14 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-primary/50 group-hover:bg-primary/10 transition-all shadow-inner-light">
+<span class="material-symbols-outlined text-2xl group-hover:text-primary transition-colors">temp_preferences_custom</span>
+</div>
+<span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">tweak</span>
+</div>
+<div class="flex flex-col items-center gap-3 group cursor-pointer">
+<div class="size-14 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-primary/50 group-hover:bg-primary/10 transition-all shadow-inner-light">
+<span class="material-symbols-outlined text-2xl group-hover:text-primary transition-colors">cloud_sync</span>
+</div>
+<span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">cloud</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<footer class="mt-auto py-10 liquid-glass border-t border-white/10">
+<div class="max-w-7xl mx-auto px-4 text-center">
+<p class="text-slate-500 text-sm font-medium tracking-wide">
+                    © 2024 Trammarise AI. All interfaces rendered in <span class="text-primary font-bold">Liquid Glass Engine</span>.
+                </p>
+</div>
+</footer>
+</div>
+
+</body></html>

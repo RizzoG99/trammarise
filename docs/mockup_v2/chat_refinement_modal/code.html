@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Trammarise Chat Refinement - Liquid Glass</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#3b82f6",
+                        "glass-white": "rgba(255, 255, 255, 0.05)",
+                        "glass-border": "rgba(255, 255, 255, 0.12)",
+                        "accent-blue": "#60a5fa",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "1rem",
+                        "2xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        .chat-scroll::-webkit-scrollbar {
+            width: 5px;
+        }
+        .chat-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .chat-scroll::-webkit-scrollbar-thumb {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+        }
+        .liquid-glass {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.03) 100%);
+            backdrop-filter: blur(40px) saturate(180%);
+            -webkit-backdrop-filter: blur(40px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        .recessed-glass {
+            background: rgba(0, 0, 0, 0.2);
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.3), 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+        .glossy-pill {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glossy-pill:hover {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.1) 100%);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-1px);
+        }
+        .ai-bubble {
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        .user-bubble {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.6) 0%, rgba(37, 99, 235, 0.4) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+        .bg-gradient-mesh {
+            background-color: #0c0f18;
+            background-image: 
+                radial-gradient(at 0% 0%, hsla(210, 100%, 20%, 0.4) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, hsla(240, 100%, 15%, 0.4) 0px, transparent 50%),
+                radial-gradient(at 50% 100%, hsla(215, 80%, 10%, 0.4) 0px, transparent 50%);
+        }
+    </style>
+</head>
+<body class="bg-gradient-mesh font-display h-screen w-full overflow-hidden flex items-center justify-center text-white">
+<div class="absolute inset-0 z-0 p-8 opacity-40 pointer-events-none select-none overflow-hidden">
+<div class="max-w-4xl mx-auto space-y-4">
+<div class="h-8 bg-blue-900/20 rounded w-1/3 blur-sm"></div>
+<div class="h-4 bg-blue-900/10 rounded w-full blur-sm"></div>
+<div class="h-4 bg-blue-900/10 rounded w-full blur-sm"></div>
+<div class="h-4 bg-blue-900/10 rounded w-3/4 blur-sm"></div>
+<div class="flex gap-4 mt-8">
+<div class="h-32 bg-blue-900/10 rounded flex-1 blur-sm"></div>
+<div class="h-32 bg-blue-900/10 rounded flex-1 blur-sm"></div>
+</div>
+</div>
+</div>
+<div class="absolute inset-0 bg-black/40 backdrop-blur-xl z-10"></div>
+<div class="relative z-20 w-full max-w-3xl h-[85vh] flex flex-col liquid-glass rounded-2xl shadow-[0_0_50px_rgba(0,0,0,0.5)] overflow-hidden animate-in fade-in zoom-in duration-500">
+<div class="flex flex-col border-b border-white/10 z-30 shrink-0">
+<div class="flex items-center justify-between px-6 pt-6 pb-3">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/30 to-purple-500/30 flex items-center justify-center border border-white/20">
+<span class="material-symbols-outlined text-blue-400 text-2xl">auto_awesome</span>
+</div>
+<div>
+<h3 class="text-white text-lg font-semibold leading-tight tracking-tight">Refine Summary</h3>
+<p class="text-[11px] uppercase tracking-widest text-blue-400/80 font-bold">Trammarise Intelligence</p>
+</div>
+</div>
+<button class="w-9 h-9 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-all text-white/70">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<div class="px-6 pb-5">
+<div class="flex items-center justify-between mb-2">
+<span class="text-[10px] uppercase tracking-wider font-semibold text-white/50">Daily Capacity</span>
+<span class="text-xs font-mono text-white/90">450 / 500 <span class="text-white/30 text-[10px]">tokens</span></span>
+</div>
+<div class="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+<div class="h-full bg-gradient-to-r from-blue-500 to-blue-300 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.5)]" style="width: 90%;"></div>
+</div>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-6 space-y-8 chat-scroll">
+<div class="flex items-end gap-4">
+<div class="bg-center bg-no-repeat bg-cover rounded-xl w-10 h-10 shrink-0 border border-white/20 shadow-lg ring-4 ring-white/5" data-alt="AI avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDnQIE_k5zj1Ov_kiiLWC4nBKeb-w4JE_uJ6s2A_AKkD7y4FTutBXMxWNOI_fse6iqzEaBaefjbqPfMsufrWoQ2h7vcvp0pq-Ad4nHQ98hmQMhJGjbNZEtof8xMpC_xNlF_QlGA8VoT86G37jMf0aG6vMWs_IrKoPfj57q5VH3CQblkla2-i_2Y0UFhgrW7ZKRVZp5_BaeZjglBEGdv8fYlUOBUXzCIl5RYfk2i7vmRQauO0np0umlyMjj5-OzNMcp13DfuKb4SLjRn");'>
+</div>
+<div class="flex flex-1 flex-col gap-1.5 items-start">
+<div class="flex items-center gap-2 ml-1">
+<span class="text-white/60 text-[11px] font-bold uppercase tracking-tight">Trammarise AI</span>
+<span class="text-[10px] text-white/30 font-medium">10:23 AM</span>
+</div>
+<div class="p-4 ai-bubble text-white/90 rounded-2xl rounded-bl-sm max-w-[85%] shadow-xl">
+<p class="text-[14px] leading-relaxed">
+                        Hello! I've analyzed your audio transcription. How can I help you refine the summary today?
+                    </p>
+</div>
+</div>
+</div>
+<div class="flex gap-2.5 pl-14 flex-wrap">
+<button class="glossy-pill flex h-9 items-center gap-x-2 rounded-full px-4 text-white/80">
+<span class="material-symbols-outlined text-[18px] text-blue-400">list_alt</span>
+<span class="text-[12px] font-medium">Bullet point summary</span>
+</button>
+<button class="glossy-pill flex h-9 items-center gap-x-2 rounded-full px-4 text-white/80">
+<span class="material-symbols-outlined text-[18px] text-blue-400">task_alt</span>
+<span class="text-[12px] font-medium">Extract action items</span>
+</button>
+<button class="glossy-pill flex h-9 items-center gap-x-2 rounded-full px-4 text-white/80">
+<span class="material-symbols-outlined text-[18px] text-blue-400">auto_fix_high</span>
+<span class="text-[12px] font-medium">Fix grammar</span>
+</button>
+</div>
+<div class="flex items-end gap-4 justify-end">
+<div class="flex flex-1 flex-col gap-1.5 items-end">
+<div class="flex items-center gap-2 mr-1">
+<span class="text-[10px] text-white/30 font-medium">10:24 AM</span>
+<span class="text-white/60 text-[11px] font-bold uppercase tracking-tight">You</span>
+</div>
+<div class="p-4 user-bubble text-white rounded-2xl rounded-br-sm max-w-[85%] shadow-lg shadow-blue-500/10">
+<p class="text-[14px] leading-relaxed">
+                        Can you make the summary more professional and focus on the key decisions made regarding the Q3 budget?
+                    </p>
+</div>
+</div>
+<div class="bg-center bg-no-repeat bg-cover rounded-xl w-10 h-10 shrink-0 border border-white/20 shadow-lg ring-4 ring-white/5" data-alt="User avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCgHjlFvV00ZLnOV_TOJsRGLzIqaiL8MOqesIpD1WMZe_L6hM-goxSWILTD3ZCeK5cC_w_M0x4zJ3jHNJwpPZ9epMKCA44F_lGQ8jNlHZ8I4mwT9ZqLQFaydG9zS-6Q94Ywyn5Lh1kz6VxVFpqmTcR9WOvOCARwvx3UIXKM45EADRGflELFScyEFVMFzYWWOeI0AV7pjzMKBSd_t3drA5ZC9BERqvQCLm9ei557sh2SKkD9rVkL__9StFWHoydzat3G3hj5rtliRhrI");'>
+</div>
+</div>
+<div class="flex items-end gap-4">
+<div class="bg-center bg-no-repeat bg-cover rounded-xl w-8 h-8 shrink-0 border border-white/10 opacity-60" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCB0m2se6I6hpHJbzo3FweB_j9Sa8Le5Ugz9TbEn36KCZ7XHhpsx7WUUHTIKdHaKnMp6zDSt0ZytR51d1r-Qll6kSFgYJ9i4WGKSQN1aXgqhnTlhRwlesIEP1A_xHt7p9KtAKTGsIYp6vsbwRoAp2wlfKNVPRbbYIcFX-iBXu-VFm6lb_MbHEgKZVNDbeRbwWm0eFdyFHWW7vZ0Cp3brxaDGUC2vGlQ8e4lMCaplQRkC565sdZlOy1cngoNDncdkz3rVN-HmXUe1bDo");'>
+</div>
+<div class="p-3 ai-bubble rounded-2xl rounded-bl-sm shadow-sm border border-white/5">
+<div class="flex gap-1.5 px-1">
+<div class="w-1 h-1 bg-blue-400/60 rounded-full animate-bounce"></div>
+<div class="w-1 h-1 bg-blue-400/60 rounded-full animate-bounce delay-75"></div>
+<div class="w-1 h-1 bg-blue-400/60 rounded-full animate-bounce delay-150"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="p-6 bg-white/5 border-t border-white/10 shrink-0">
+<div class="relative flex items-center gap-2 recessed-glass p-1.5 rounded-2xl border border-white/10 transition-all group focus-within:ring-1 focus-within:ring-blue-500/50">
+<button class="p-2.5 text-white/40 hover:text-blue-400 transition-colors" title="Add Attachment">
+<span class="material-symbols-outlined text-[22px]">add_circle</span>
+</button>
+<textarea class="w-full max-h-32 bg-transparent border-none text-white placeholder-white/30 text-[14px] resize-none focus:ring-0 py-3 px-1 leading-normal" placeholder="Type a follow-up instruction..." rows="1"></textarea>
+<button class="p-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl shadow-[0_4px_15px_rgba(37,99,235,0.4)] transition-all active:scale-95 flex items-center justify-center h-10 w-10 shrink-0 border border-white/20">
+<span class="material-symbols-outlined text-[20px]">send</span>
+</button>
+</div>
+<div class="text-center mt-3">
+<p class="text-[10px] text-white/30 font-medium tracking-wide">ASSISTANT MAY PROVIDE INACCURATE SUMMARIES. VERIFY CRITICAL INFO.</p>
+</div>
+</div>
+</div>
+
+</body></html>

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Trammarise - API Key Setup</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap"
+        rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#3b82f6",
+                        "glass-white": "rgba(255, 255, 255, 0.05)",
+                        "glass-border": "rgba(255, 255, 255, 0.12)",
+                        "accent-coral": "#ff7e5f",
+                        "accent-amber": "#feb47b",
+                        "deep-navy": "#020617",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "2xl": "1.5rem",
+                        "3xl": "2rem"
+                    }
+                },
+            },
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .glass-panel {
+                @apply bg-white/5 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)];
+            }
+            .glass-card {
+                @apply bg-white/[0.03] backdrop-blur-2xl border border-white/[0.08] shadow-2xl;
+            }
+            .liquid-bg {
+                background: radial-gradient(circle at 0% 0%, #020617 0%, transparent 50%),
+                            radial-gradient(circle at 100% 0%, #1e1b4b 0%, transparent 50%),
+                            radial-gradient(circle at 100% 100%, #450a0a 0%, transparent 50%),
+                            radial-gradient(circle at 0% 100%, #1e3a8a 0%, transparent 50%),
+                            #020617;
+                background-attachment: fixed;
+            }
+            .mesh-accent {
+                background: radial-gradient(circle at 50% 50%, rgba(255, 126, 95, 0.15), transparent 70%);
+            }
+            .glass-button-primary {
+                @apply relative overflow-hidden bg-white/10 border border-white/20 backdrop-blur-md transition-all duration-300 hover:bg-white/20 hover:border-white/30 active:scale-95;
+                box-shadow: inset 0 0 12px rgba(255,255,255,0.05);
+            }
+            .inner-glow {
+                box-shadow: inset 0 0 20px rgba(255,255,255,0.05);
+            }
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+
+<body
+    class="liquid-bg font-display text-slate-200 transition-colors duration-200 antialiased selection:bg-accent-coral/30 selection:text-white min-h-screen">
+    <div class="relative flex min-h-screen w-full flex-col">
+        <div
+            class="fixed top-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-600/20 rounded-full blur-[120px] pointer-events-none">
+        </div>
+        <div class="fixed bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-coral-600/10 rounded-full blur-[120px] pointer-events-none"
+            style="background-color: rgba(255, 126, 95, 0.15);"></div>
+        <div class="fixed top-[20%] right-[10%] w-[30%] h-[30%] bg-amber-500/10 rounded-full blur-[100px] pointer-events-none"
+            style="background-color: rgba(254, 180, 123, 0.1);"></div>
+        <header
+            class="sticky top-0 z-50 flex items-center justify-between glass-panel px-4 py-4 lg:px-10 border-x-0 border-t-0">
+            <div class="flex items-center gap-3">
+                <div
+                    class="flex items-center justify-center size-10 rounded-xl bg-gradient-to-tr from-accent-coral to-accent-amber p-[1px]">
+                    <div class="flex items-center justify-center w-full h-full bg-deep-navy rounded-[11px]">
+                        <span
+                            class="material-symbols-outlined text-[24px] bg-gradient-to-tr from-accent-coral to-accent-amber bg-clip-text text-transparent">graphic_eq</span>
+                    </div>
+                </div>
+                <h2 class="text-white text-xl font-extrabold leading-tight tracking-tight">Trammarise</h2>
+            </div>
+            <div class="hidden lg:flex flex-1 justify-end gap-10">
+                <nav class="flex items-center gap-10">
+                    <a class="text-slate-400 text-sm font-semibold hover:text-white transition-colors" href="#">Home</a>
+                    <a class="text-slate-400 text-sm font-semibold hover:text-white transition-colors"
+                        href="#">Pricing</a>
+                    <a class="text-slate-400 text-sm font-semibold hover:text-white transition-colors"
+                        href="#">Documentation</a>
+                </nav>
+                <button class="glass-button-primary min-w-[100px] rounded-xl h-11 px-6 text-sm font-bold text-white">
+                    Sign In
+                </button>
+            </div>
+            <div class="lg:hidden">
+                <button class="flex items-center justify-center text-white p-2 glass-button-primary rounded-xl">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+            </div>
+        </header>
+        <main class="flex-1 w-full max-w-7xl mx-auto px-4 py-16 lg:px-10 relative z-10">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+                <div class="lg:col-span-7 flex flex-col gap-12">
+                    <div class="flex flex-col gap-6">
+                        <div
+                            class="inline-flex w-fit items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-accent-amber backdrop-blur-md">
+                            <span class="relative flex h-2 w-2">
+                                <span
+                                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-coral opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2 w-2 bg-accent-coral"></span>
+                            </span>
+                            Setup Required
+                        </div>
+                        <h1 class="text-white text-5xl md:text-6xl font-black leading-[1.1] tracking-tight">
+                            Experience the Future of <span
+                                class="bg-clip-text text-transparent bg-gradient-to-r from-accent-coral via-accent-amber to-white">Transcription</span>
+                        </h1>
+                        <p class="text-slate-400 text-xl font-medium leading-relaxed max-w-2xl">
+                            Power your workspace with OpenAI. Transcribe audio and generate AI summaries with
+                            liquid-smooth performance.
+                        </p>
+                    </div>
+                    <div class="glass-card rounded-3xl overflow-hidden inner-glow">
+                        <div class="px-8 py-8 border-b border-white/10 bg-white/[0.02]">
+                            <h3 class="text-2xl font-bold text-white flex items-center gap-3">
+                                <span class="material-symbols-outlined text-accent-coral">auto_awesome</span>
+                                Quick Start Guide
+                            </h3>
+                        </div>
+                        <div class="p-8">
+                            <div class="grid grid-cols-[auto_1fr] gap-x-8">
+                                <div class="flex flex-col items-center">
+                                    <div
+                                        class="flex items-center justify-center size-10 rounded-full glass-button-primary text-white font-bold text-sm shadow-xl z-10">
+                                        1</div>
+                                    <div class="w-px bg-gradient-to-b from-white/20 to-transparent h-full my-2"></div>
+                                </div>
+                                <div class="pb-12 pt-1">
+                                    <h4 class="text-white text-xl font-bold">Log in to OpenAI</h4>
+                                    <p class="text-slate-400 text-base mt-2 mb-4">Access the developer dashboard to
+                                        manage your API integrations.</p>
+                                    <a class="inline-flex items-center gap-2 text-accent-amber text-sm font-bold hover:brightness-110 transition-all group"
+                                        href="#">
+                                        Open Dashboard
+                                        <span
+                                            class="material-symbols-outlined text-base group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                                    </a>
+                                </div>
+                                <div class="flex flex-col items-center">
+                                    <div
+                                        class="flex items-center justify-center size-10 rounded-full glass-card text-slate-400 font-bold text-sm z-10">
+                                        2</div>
+                                    <div class="w-px bg-white/10 h-full my-2"></div>
+                                </div>
+                                <div class="pb-12 pt-1">
+                                    <h4 class="text-white text-xl font-bold">Access API Keys</h4>
+                                    <p class="text-slate-400 text-base mt-2 mb-4">Locate the keys section in the
+                                        navigation sidebar.</p>
+                                    <div
+                                        class="w-full h-48 rounded-2xl overflow-hidden relative border border-white/10 group">
+                                        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
+                                            data-alt="Screenshot of OpenAI dashboard sidebar"
+                                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCGR8dpCJmfwSIxKRh3n29P6mcDAx5hMASQOJYB0IxD8CX4IgUvf1JSGTziFrpkvC3mVEKF5NkKzSiPMVpRbPS9BvbfatDFBXMhbchQnNjzR1GCrWgMQqSviVcqrh70_fRGQct13bKxtD_m9LYPlgIDIXiz8FABr5A2itWlLP1xezbCEJfZPwuj-syLkNsmJImqQbRLEzaptbXwt0hFLagwQJZg-Ejq2eRxJJGlfx9GJCmFJK3n925LJc4WvQmq-3rAjoLUbUv4ybST');">
+                                        </div>
+                                        <div
+                                            class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col items-center">
+                                    <div
+                                        class="flex items-center justify-center size-10 rounded-full glass-card text-slate-400 font-bold text-sm z-10">
+                                        3</div>
+                                    <div class="w-px bg-white/10 h-full my-2"></div>
+                                </div>
+                                <div class="pb-12 pt-1">
+                                    <h4 class="text-white text-xl font-bold">Generate Secret Key</h4>
+                                    <p class="text-slate-400 text-base mt-2 mb-4">Create a dedicated key for Trammarise
+                                        to ensure secure access.</p>
+                                    <div
+                                        class="w-full h-32 rounded-2xl overflow-hidden relative border border-white/10 group">
+                                        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
+                                            data-alt="Secret key modal representation"
+                                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC7XF9eVGsaGqA8sW-3P1JHonMETD4Du1fuOYxpekg7ohKv1rT8fN6XLrCANx8PnpUXlDjly8qdCBhOsXWsSialovaEj5hVHGnGFBQoKM4nj8GK5Fb0ecDaUSmo2Bm2RUaYz-yocCC7s1yejYWpDQIWeJd6a5-khCW867IJ2YuM6LLg_bWDpBsO5LrXRHCFA0XxXcy__8h42oK-LP6jpEhTMNme8ECcpjlHtKo4PUHOxltsY0PTZJ9v8O3P6N3AyoFpyp2l4XGzBeWo');">
+                                        </div>
+                                        <div
+                                            class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col items-center">
+                                    <div
+                                        class="flex items-center justify-center size-10 rounded-full glass-card text-slate-400 font-bold text-sm z-10">
+                                        4</div>
+                                </div>
+                                <div class="pt-1">
+                                    <h4 class="text-white text-xl font-bold">Secure Your Key</h4>
+                                    <p class="text-slate-400 text-base mt-2">Paste your <code
+                                            class="bg-white/10 px-2 py-1 rounded text-accent-amber font-mono text-sm border border-white/5">sk-...</code>
+                                        key into the setup panel.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="lg:col-span-5 lg:sticky lg:top-32">
+                    <div
+                        class="glass-panel rounded-[2.5rem] p-8 md:p-10 flex flex-col gap-8 relative overflow-hidden group">
+                        <div
+                            class="absolute -top-[100%] -left-[100%] w-[300%] h-[300%] bg-gradient-to-br from-white/10 via-transparent to-transparent rotate-12 pointer-events-none group-hover:-translate-y-4 transition-transform duration-1000">
+                        </div>
+                        <div class="relative">
+                            <h3 class="text-3xl font-black text-white mb-3">Connect API</h3>
+                            <p class="text-slate-400 font-medium">Link your OpenAI account to begin.</p>
+                        </div>
+                        <div
+                            class="flex gap-4 bg-white/[0.03] p-5 rounded-2xl border border-white/10 backdrop-blur-sm inner-glow">
+                            <div
+                                class="flex-shrink-0 size-8 rounded-full bg-accent-coral/20 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-accent-coral text-[20px]">shield</span>
+                            </div>
+                            <p class="text-sm text-slate-300 font-medium leading-relaxed">
+                                Your credentials never leave your browser. We prioritize your privacy with local-only
+                                storage.
+                            </p>
+                        </div>
+                        <div class="flex flex-col gap-6 relative z-10">
+                            <div class="flex flex-col gap-3">
+                                <label class="text-sm font-bold text-slate-400 ml-1" for="api-key">OpenAI API
+                                    Key</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                        <span
+                                            class="material-symbols-outlined text-slate-500 text-[22px]">vpn_key</span>
+                                    </div>
+                                    <input
+                                        class="block w-full rounded-2xl border-0 py-4 pl-12 pr-12 text-white bg-white/[0.05] ring-1 ring-inset ring-white/10 placeholder:text-slate-600 focus:ring-2 focus:ring-inset focus:ring-accent-coral transition-all font-mono text-sm backdrop-blur-lg"
+                                        id="api-key" placeholder="sk-...................................."
+                                        type="password" />
+                                    <button
+                                        class="absolute inset-y-0 right-0 pr-4 flex items-center cursor-pointer text-slate-500 hover:text-white transition-colors">
+                                        <span class="material-symbols-outlined text-[20px]">visibility</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <button
+                                class="glass-button-primary group flex w-full items-center justify-center rounded-2xl h-16 px-6 text-white text-lg font-extrabold tracking-wide gap-3 shadow-[0_10px_40px_-10px_rgba(255,126,95,0.3)]">
+                                <span
+                                    class="bg-gradient-to-r from-accent-coral to-accent-amber bg-clip-text text-transparent">Activate
+                                    Connection</span>
+                                <span
+                                    class="material-symbols-outlined text-[24px] text-accent-amber group-hover:rotate-[15deg] transition-transform">bolt</span>
+                            </button>
+                        </div>
+                        <div class="pt-6 border-t border-white/5">
+                            <p class="text-sm text-center text-slate-500 font-medium">
+                                Need assistance? <a
+                                    class="text-white hover:text-accent-amber transition-colors underline underline-offset-4 decoration-white/20"
+                                    href="#">View Docs</a>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="mt-10 flex justify-center gap-8 opacity-40">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-sm">verified_user</span>
+                            <span class="text-[10px] uppercase font-black tracking-widest">Encrypted</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-sm">bolt</span>
+                            <span class="text-[10px] uppercase font-black tracking-widest">Optimized</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-sm">lock_open</span>
+                            <span class="text-[10px] uppercase font-black tracking-widest">Open Standard</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <footer class="mt-auto py-10 border-t border-white/5 bg-black/20 backdrop-blur-lg">
+            <div class="max-w-7xl mx-auto px-4 lg:px-10 flex flex-col md:flex-row justify-between items-center gap-6">
+                <p class="text-slate-500 text-sm font-medium">© 2024 Trammarise AI. All rights reserved.</p>
+                <div class="flex gap-8">
+                    <a class="text-slate-500 hover:text-white text-sm transition-colors" href="#">Privacy</a>
+                    <a class="text-slate-500 hover:text-white text-sm transition-colors" href="#">Terms</a>
+                    <a class="text-slate-500 hover:text-white text-sm transition-colors" href="#">Status</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+</body>
+
+</html>
