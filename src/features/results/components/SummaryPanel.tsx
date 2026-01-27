@@ -1,5 +1,6 @@
 import { GlassCard, Heading, Text } from '../../../lib';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { useTranslation } from 'react-i18next';
 
 /**
@@ -60,8 +61,8 @@ export function SummaryPanel({ summary, structuredSummary }: SummaryPanelProps) 
               </Text>
             </div>
           ) : (
-            // Phase 1: Markdown rendering
-            <ReactMarkdown>{summary}</ReactMarkdown>
+            // Phase 1: Markdown rendering with GitHub Flavored Markdown support
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{summary}</ReactMarkdown>
           )}
         </div>
       </div>

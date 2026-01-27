@@ -40,3 +40,11 @@ export const PDF_METADATA = {
   producer: 'Trammarise Audio Transcription',
   subject: 'Audio Transcription and Summary',
 } as const;
+
+export const PDF_TABLE = {
+  padding: 5,
+  minRowHeight: 25,
+  headerBackground: PDF_COLORS.backgroundLight,
+  borderColor: PDF_COLORS.border,
+  borderWidth: 0.5,
+} as const;

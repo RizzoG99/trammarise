@@ -13,6 +13,8 @@ import {
   extractTopics,
   getTemplateForContentType,
 } from './content-type-handlers';
+import { parseMarkdown } from '../markdown-parser';
+import { renderTable } from './table-renderer';
 
 interface SectionContext {
   doc: typeof PDFDocument.prototype;
@@ -126,7 +128,7 @@ export function generateTableOfContents(ctx: SectionContext): { [section: string
 }
 
 /**
- * Generate summary section
+ * Generate summary section with markdown support
  */
 export function generateSummarySection(ctx: SectionContext): void {
   const { doc, summary } = ctx;
@@ -139,10 +141,65 @@ export function generateSummarySection(ctx: SectionContext): void {
 
   doc.moveDown(1);
 
-  doc.fontSize(PDF_FONTS.body).fillColor(PDF_COLORS.text).font('Helvetica').text(summary, {
-    align: 'left',
-    lineGap: PDF_LAYOUT.lineHeight,
-  });
+  // Parse markdown into blocks
+  const blocks = parseMarkdown(summary);
+
+  for (const block of blocks) {
+    // Check if we need a new page (leave space for content)
+    if (doc.y > PDF_LAYOUT.pageHeight - PDF_LAYOUT.margin.bottom - 100) {
+      doc.addPage();
+    }
+
+    switch (block.type) {
+      case 'table': {
+        const tableWidth = PDF_LAYOUT.pageWidth - PDF_LAYOUT.margin.left - PDF_LAYOUT.margin.right;
+        const newY = renderTable(doc, block, PDF_LAYOUT.margin.left, doc.y, tableWidth);
+        doc.y = newY + 20; // Add spacing after table
+        break;
+      }
+
+      case 'heading': {
+        const fontSize =
+          block.level === 1 ? PDF_FONTS.h2 : block.level === 2 ? PDF_FONTS.h3 : PDF_FONTS.body;
+        doc
+          .fontSize(fontSize)
+          .fillColor(PDF_COLORS.primary)
+          .font('Helvetica-Bold')
+          .text(block.content, { continued: false });
+        doc.moveDown(0.5);
+        break;
+      }
+
+      case 'list': {
+        doc.fontSize(PDF_FONTS.body).fillColor(PDF_COLORS.text).font('Helvetica');
+
+        block.items.forEach((item, index) => {
+          const prefix = block.ordered ? `${index + 1}. ` : '• ';
+          doc.text(prefix + item, {
+            indent: 20,
+            continued: false,
+          });
+          doc.moveDown(0.3);
+        });
+        doc.moveDown(0.5);
+        break;
+      }
+
+      case 'paragraph': {
+        doc
+          .fontSize(PDF_FONTS.body)
+          .fillColor(PDF_COLORS.text)
+          .font('Helvetica')
+          .text(block.content, {
+            align: 'left',
+            lineGap: PDF_LAYOUT.lineHeight,
+            continued: false,
+          });
+        doc.moveDown(1);
+        break;
+      }
+    }
+  }
 
   doc.moveDown(2);
 }
