@@ -19,3 +19,6 @@ export * from './audio';
 
 // Re-export all Chat components
 export * from './chat';
+
+// Re-export all Common components
+export * from './common';

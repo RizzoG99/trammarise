@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { ApiKeyProvider, useApiKey } from './ApiKeyContext';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 // Mock localStorage
 const localStorageMock = (() => {
@@ -77,7 +77,7 @@ describe('ApiKeyContext', () => {
     const { result } = renderHook(() => useApiKey(), { wrapper });
 
     // Mock global fetch
-    global.fetch = vi.fn().mockResolvedValue({
+    globalThis.fetch = vi.fn().mockResolvedValue({
       ok: true,
       status: 200,
     });
@@ -88,7 +88,7 @@ describe('ApiKeyContext', () => {
     });
 
     expect(success).toBe(true);
-    expect(global.fetch).toHaveBeenCalledWith(
+    expect(globalThis.fetch).toHaveBeenCalledWith(
       'https://api.openai.com/v1/models',
       expect.objectContaining({
         headers: expect.objectContaining({
@@ -101,7 +101,7 @@ describe('ApiKeyContext', () => {
   it('should fail testConnection on API error', async () => {
     const { result } = renderHook(() => useApiKey(), { wrapper });
 
-    global.fetch = vi.fn().mockResolvedValue({
+    globalThis.fetch = vi.fn().mockResolvedValue({
       ok: false,
       status: 401,
     });

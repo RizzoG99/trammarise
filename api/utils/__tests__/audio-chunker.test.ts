@@ -241,7 +241,7 @@ describe('Audio Chunker', () => {
       expect(mockFFmpegInstance.setStartTime).toHaveBeenCalledWith(120);
       expect(mockFFmpegInstance.setDuration).toHaveBeenCalledWith(180);
       expect(mockFFmpegInstance.audioCodec).toHaveBeenCalledWith('libmp3lame');
-      expect(mockFFmpegInstance.audioBitrate).toHaveBeenCalledWith('128k');
+      expect(mockFFmpegInstance.audioBitrate).toHaveBeenCalledWith('64k');
       expect(mockFFmpegInstance.audioChannels).toHaveBeenCalledWith(1);
       expect(mockFFmpegInstance.audioFrequency).toHaveBeenCalledWith(16000);
       expect(mockFFmpegInstance.output).toHaveBeenCalledWith('/tmp/output.mp3');
