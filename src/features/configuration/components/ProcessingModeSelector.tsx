@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 export type ProcessingMode = 'balanced' | 'quality';
 
 export interface ProcessingModeSelectorProps {
@@ -7,6 +9,7 @@ export interface ProcessingModeSelectorProps {
 }
 
 export function ProcessingModeSelector({ value, onChange, disabled }: ProcessingModeSelectorProps) {
+  const { t } = useTranslation();
   // Note: Both modes support audio up to ~23 minutes (1400s) per chunk
   // Audio files longer than this will be automatically chunked during processing
 
@@ -16,7 +19,7 @@ export function ProcessingModeSelector({ value, onChange, disabled }: Processing
         className="block text-sm font-semibold mb-1"
         style={{ color: 'var(--color-text-primary)' }}
       >
-        Processing Mode
+        {t('configuration.processingMode.title')}
       </label>
 
       <div className="flex flex-col gap-3">
@@ -51,7 +54,7 @@ export function ProcessingModeSelector({ value, onChange, disabled }: Processing
               <span
                 className={`block text-sm font-medium ${disabled ? 'text-gray-400' : 'text-[var(--color-text-primary)]'}`}
               >
-                Balanced
+                {t('configuration.processingMode.balanced.title')}
               </span>
               <span
                 className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
@@ -60,13 +63,13 @@ export function ProcessingModeSelector({ value, onChange, disabled }: Processing
                   color: 'var(--color-primary)',
                 }}
               >
-                ~10 credits
+                {t('configuration.processingMode.balanced.credits')}
               </span>
             </div>
             <span
               className={`block text-xs ${disabled ? 'text-gray-400' : 'text-[var(--color-text-secondary)]'}`}
             >
-              Standard accuracy, faster processing
+              {t('configuration.processingMode.balanced.description')}
             </span>
           </div>
         </label>
@@ -102,19 +105,19 @@ export function ProcessingModeSelector({ value, onChange, disabled }: Processing
               <span
                 className={`block text-sm font-medium ${disabled ? 'text-gray-400' : 'text-[var(--color-text-primary)]'}`}
               >
-                Quality
+                {t('configuration.processingMode.quality.title')}
               </span>
               <span
                 className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
                 style={{ backgroundColor: 'rgba(168, 85, 247, 0.1)', color: '#a855f7' }}
               >
-                ~25 credits
+                {t('configuration.processingMode.quality.credits')}
               </span>
             </div>
             <span
               className={`block text-xs ${disabled ? 'text-gray-400' : 'text-[var(--color-text-secondary)]'}`}
             >
-              GPT-4 enhanced analysis & summary
+              {t('configuration.processingMode.quality.description')}
             </span>
           </div>
         </label>

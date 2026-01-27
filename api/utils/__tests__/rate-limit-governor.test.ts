@@ -223,6 +223,8 @@ describe('Rate Limit Governor', () => {
       vi.useRealTimers(); // Use real timers for async operations
 
       const governor = new RateLimitGovernor('balanced');
+      // Override backoff to speed up test
+      vi.spyOn(governor, 'calculateBackoff').mockReturnValue(10);
 
       try {
         await governor.enqueue('req-1', 'test-job', 0, async () => {

@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 interface RegionTimeDisplayProps {
   startTime: number | null;
   endTime: number | null;
@@ -8,8 +10,10 @@ interface RegionTimeDisplayProps {
  * Shows "--:--" when no region is selected
  */
 export function RegionTimeDisplay({ startTime, endTime }: RegionTimeDisplayProps) {
+  const { t } = useTranslation();
+
   const formatTimeWithMs = (seconds: number | null): string => {
-    if (seconds === null) return '--:--';
+    if (seconds === null) return t('audioEditing.timeDisplay.placeholder');
 
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
@@ -19,15 +23,25 @@ export function RegionTimeDisplay({ startTime, endTime }: RegionTimeDisplayProps
   };
 
   return (
-    <div className="flex items-center gap-2 p-1 rounded-lg border" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-border)' }}>
-      <div className="flex items-center px-3 gap-2 border-r" style={{ borderColor: 'var(--color-border)' }}>
-        <span className="text-xs text-[var(--color-text-secondary)] font-medium">Start</span>
+    <div
+      className="flex items-center gap-2 p-1 rounded-lg border"
+      style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-border)' }}
+    >
+      <div
+        className="flex items-center px-3 gap-2 border-r"
+        style={{ borderColor: 'var(--color-border)' }}
+      >
+        <span className="text-xs text-[var(--color-text-secondary)] font-medium">
+          {t('audioEditing.timeDisplay.start')}
+        </span>
         <span className="text-sm font-mono font-semibold text-[var(--color-text-primary)]">
           {formatTimeWithMs(startTime)}
         </span>
       </div>
       <div className="flex items-center px-3 gap-2">
-        <span className="text-xs text-[var(--color-text-secondary)] font-medium">End</span>
+        <span className="text-xs text-[var(--color-text-secondary)] font-medium">
+          {t('audioEditing.timeDisplay.end')}
+        </span>
         <span className="text-sm font-mono font-semibold text-[var(--color-text-primary)]">
           {formatTimeWithMs(endTime)}
         </span>

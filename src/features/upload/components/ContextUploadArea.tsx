@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import type { DragEvent } from 'react';
 import { Paperclip, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Text } from '@/lib';
 
 export interface ContextUploadAreaProps {
@@ -9,6 +10,7 @@ export interface ContextUploadAreaProps {
 }
 
 export function ContextUploadArea({ files, onFilesChange }: ContextUploadAreaProps) {
+  const { t } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
 
@@ -26,10 +28,9 @@ export function ContextUploadArea({ files, onFilesChange }: ContextUploadAreaPro
     setIsDragging(false);
 
     const droppedFiles = Array.from(e.dataTransfer.files);
-    const validFiles = droppedFiles.filter(file =>
-      file.type.includes('pdf') ||
-      file.type.startsWith('image/') ||
-      file.type.includes('text')
+    const validFiles = droppedFiles.filter(
+      (file) =>
+        file.type.includes('pdf') || file.type.startsWith('image/') || file.type.includes('text')
     );
 
     onFilesChange([...files, ...validFiles]);
@@ -52,10 +53,10 @@ export function ContextUploadArea({ files, onFilesChange }: ContextUploadAreaPro
   return (
     <div>
       <Text variant="body" color="primary" className="font-medium mb-1">
-        Context (Optional)
+        {t('configuration.context.title')}
       </Text>
       <Text variant="caption" color="tertiary" className="mb-3">
-        Upload Agenda or Slides to improve accuracy
+        {t('configuration.context.subtitle')}
       </Text>
 
       <div
@@ -76,10 +77,10 @@ export function ContextUploadArea({ files, onFilesChange }: ContextUploadAreaPro
       >
         <Paperclip className="w-8 h-8 text-text-tertiary mb-2" />
         <Text variant="caption" color="secondary">
-          Attach Files
+          {t('configuration.context.attachFiles')}
         </Text>
         <Text variant="caption" color="tertiary" className="mt-1">
-          PDF, JPG, PNG
+          {t('configuration.context.formats')}
         </Text>
       </div>
 
@@ -109,7 +110,7 @@ export function ContextUploadArea({ files, onFilesChange }: ContextUploadAreaPro
                   handleRemoveFile(index);
                 }}
                 className="p-1 hover:bg-[var(--color-bg-surface-hover)] rounded transition-colors"
-                aria-label={`Remove ${file.name}`}
+                aria-label={t('upload.removeFile', { filename: file.name })}
               >
                 <X className="w-4 h-4 text-text-tertiary" />
               </button>

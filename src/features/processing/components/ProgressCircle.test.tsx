@@ -27,14 +27,14 @@ describe('ProgressCircle', () => {
 
     it('renders time estimate when provided', () => {
       render(<ProgressCircle progress={50} step="transcribing" timeEstimate="2-3 min" />);
-      expect(screen.getByText('processing.estimatedTime: 2-3 min')).toBeInTheDocument();
+      expect(screen.getByText('Estimated time: 2-3 min')).toBeInTheDocument();
     });
 
     it('does not render time estimate when not provided', () => {
       render(<ProgressCircle progress={50} step="transcribing" />);
-      expect(screen.queryByText(/processing.estimatedTime/)).not.toBeInTheDocument();
+      expect(screen.queryByText(/Estimated time/)).not.toBeInTheDocument();
     });
-// ...
+    // ...
     it('handles very long time estimates', () => {
       render(
         <ProgressCircle
@@ -43,44 +43,45 @@ describe('ProgressCircle', () => {
           timeEstimate="This is a very long time estimate string"
         />
       );
-      expect(screen.getByText('processing.estimatedTime: This is a very long time estimate string')).toBeInTheDocument();
+      expect(
+        screen.getByText('Estimated time: This is a very long time estimate string')
+      ).toBeInTheDocument();
     });
 
     it('handles empty time estimate string', () => {
       render(<ProgressCircle progress={50} step="test" timeEstimate="" />);
       // Empty string is falsy in JavaScript, so nothing is rendered
-      expect(screen.queryByText(/processing.estimatedTime/)).not.toBeInTheDocument();
+      expect(screen.queryByText(/Estimated time/)).not.toBeInTheDocument();
     });
-// ...
+    // ...
 
     it('updates when timeEstimate changes', () => {
       const { rerender } = render(
         <ProgressCircle progress={50} step="test" timeEstimate="5 min" />
       );
-      expect(screen.getByText('processing.estimatedTime: 5 min')).toBeInTheDocument();
+      expect(screen.getByText('Estimated time: 5 min')).toBeInTheDocument();
 
       rerender(<ProgressCircle progress={50} step="test" timeEstimate="2 min" />);
-      expect(screen.getByText('processing.estimatedTime: 2 min')).toBeInTheDocument();
-      expect(screen.queryByText('processing.estimatedTime: 5 min')).not.toBeInTheDocument();
+      expect(screen.getByText('Estimated time: 2 min')).toBeInTheDocument();
+      expect(screen.queryByText('Estimated time: 5 min')).not.toBeInTheDocument();
     });
 
     it('handles timeEstimate being added after initial render', () => {
       const { rerender } = render(<ProgressCircle progress={50} step="test" />);
-      expect(screen.queryByText(/processing.estimatedTime/)).not.toBeInTheDocument();
+      expect(screen.queryByText(/Estimated time/)).not.toBeInTheDocument();
 
       rerender(<ProgressCircle progress={50} step="test" timeEstimate="3 min" />);
-      expect(screen.getByText('processing.estimatedTime: 3 min')).toBeInTheDocument();
+      expect(screen.getByText('Estimated time: 3 min')).toBeInTheDocument();
     });
 
     it('handles timeEstimate being removed', () => {
       const { rerender } = render(
         <ProgressCircle progress={50} step="test" timeEstimate="3 min" />
       );
-      expect(screen.getByText('processing.estimatedTime: 3 min')).toBeInTheDocument();
+      expect(screen.getByText('Estimated time: 3 min')).toBeInTheDocument();
 
       rerender(<ProgressCircle progress={50} step="test" />);
-      expect(screen.queryByText(/processing.estimatedTime/)).not.toBeInTheDocument();
+      expect(screen.queryByText(/Estimated time/)).not.toBeInTheDocument();
     });
-
   });
 });

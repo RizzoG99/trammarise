@@ -1,4 +1,5 @@
 import { Button } from '@/lib';
+import { useTranslation } from 'react-i18next';
 import { Scissors, FileAudio } from 'lucide-react';
 
 export interface DualActionButtonsProps {
@@ -18,6 +19,8 @@ export function DualActionButtons({
   onProcessFull,
   disabled = false,
 }: DualActionButtonsProps) {
+  const { t } = useTranslation();
+
   return (
     <div className="flex flex-col sm:flex-row gap-3 w-full">
       {/* Process Selection Button */}
@@ -29,7 +32,7 @@ export function DualActionButtons({
           className="flex-1 flex items-center justify-center gap-2"
         >
           <Scissors className="w-4 h-4" />
-          <span>Process Selection</span>
+          <span>{t('audioEditing.actions.processSelection')}</span>
           <span className="text-xs text-text-tertiary">({selectionDuration})</span>
         </Button>
       )}
@@ -42,7 +45,7 @@ export function DualActionButtons({
         className="flex-1 flex items-center justify-center gap-2"
       >
         <FileAudio className="w-4 h-4" />
-        <span>Process Full Audio</span>
+        <span>{t('audioEditing.actions.processFullAudio')}</span>
         <span className="text-xs opacity-75">({fullDuration})</span>
       </Button>
     </div>

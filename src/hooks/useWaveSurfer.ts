@@ -38,10 +38,15 @@ export const useWaveSurfer = (
   useEffect(() => {
     if (!containerRef.current || wavesurferRef.current) return;
 
+    // Get colors from CSS variables
+    const style = getComputedStyle(document.documentElement);
+    const primaryColor = style.getPropertyValue('--color-primary').trim();
+    const primaryAlpha20 = style.getPropertyValue('--color-primary-alpha-20').trim();
+
     const defaultConfig: WaveSurferConfig = {
-      waveColor: 'rgba(99, 102, 241, 0.3)',
-      progressColor: 'rgba(99, 102, 241, 0.8)',
-      cursorColor: '#8b5cf6',
+      waveColor: primaryAlpha20 || 'rgba(99, 102, 241, 0.3)',
+      progressColor: primaryColor ? `${primaryColor}cc` : 'rgba(99, 102, 241, 0.8)', // ~80% opacity
+      cursorColor: primaryColor || '#8b5cf6',
       barWidth: 3,
       barRadius: 3,
       cursorWidth: 2,

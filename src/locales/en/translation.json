@@ -19,7 +19,12 @@
   "header": {
     "export": "Export",
     "notifications": "Notifications",
-    "userMenu": "User menu"
+    "userMenu": "User menu",
+    "aria": {
+      "saveFile": "Save file name",
+      "cancelEdit": "Cancel editing",
+      "editFile": "Edit file name"
+    }
   },
   "home": {
     "title": "New Session",
@@ -36,7 +41,10 @@
     "emptyFile": "File is empty",
     "noAudioFound": "No audio file found in the dropped files",
     "invalidFile": "Invalid file",
-    "supportedFormats": "MP3, WAV, M4A up to 500MB"
+    "supportedFormats": "MP3, WAV, M4A up to 500MB",
+    "statusReady": "Ready",
+    "statusRecording": "Recording",
+    "statusPaused": "Paused"
   },
   "processing": {
     "steps": {
@@ -53,5 +61,340 @@
     "it": "Italian",
     "es": "Spanish",
     "de": "German"
+  },
+  "initialState": {
+    "title": "Transform Your Audio",
+    "subtitle": "Upload an audio file or start recording to transcribe and summarize",
+    "uploadButton": "Upload Audio",
+    "recordButton": "Start Recording",
+    "dropZone": {
+      "main": "Drop audio and context files here",
+      "sub": "or click to select files",
+      "formats": "Audio • Images • PDF • TXT"
+    },
+    "contextFiles": {
+      "title": "Context Files",
+      "errors": {
+        "invalidType": "Only images, PDF, and TXT files are allowed",
+        "sizeLimit": "Total file size cannot exceed 24MB",
+        "someIgnored": "Some files were ignored. Only audio, images, PDF, and TXT files are supported.",
+        "invalidAudio": "Please select a valid audio file"
+      }
+    }
+  },
+  "apiKey": {
+    "title": "Setup API Key",
+    "metaDescription": "Configure your OpenAI API key to enable AI-powered transcription and summarization features in Trammarise.",
+    "heading": "Unlock AI Transcription",
+    "description": "Trammarise uses OpenAI's powerful models to transcribe and summarize your audio. Follow the guide below to get your personal API key.",
+    "guide": {
+      "title": "How to get your API Key",
+      "step1": {
+        "title": "Log in to OpenAI Platform",
+        "text": "Visit platform.openai.com and sign in with your account.",
+        "linkText": "Open platform.openai.com"
+      },
+      "step2": {
+        "title": "Navigate to API Keys",
+        "text": "Hover over the sidebar on the left and click on \"API Keys\" icon."
+      },
+      "step3": {
+        "title": "Create new secret key",
+        "text": "Click \"Create new secret key\". Name it 'Trammarise' to easily identify it later."
+      },
+      "step4": {
+        "title": "Copy and paste",
+        "text": "Copy the key starting with sk-... immediately. You won't be able to view it again."
+      }
+    },
+    "form": {
+      "title": "Connect OpenAI",
+      "subtitle": "Enter your key below to enable transcription features.",
+      "label": "OpenAI API Key",
+      "placeholder": "sk-...",
+      "securityNote": "Your key is stored locally in your browser and is never sent to our servers.",
+      "privacy": {
+        "secure": "Secure",
+        "fast": "Fast",
+        "noCode": "No Code"
+      },
+      "buttons": {
+        "connecting": "Connecting...",
+        "saved": "Saved",
+        "connect": "Test & Save Connection"
+      },
+      "errors": {
+        "invalid": "Invalid API Key. Please check your key and try again.",
+        "connection": "Connection failed. Please check your internet connection."
+      },
+      "success": "Connection verified and saved!",
+      "help": "Having trouble?",
+      "docsLink": "Check our documentation"
+    }
+  },
+  "actions": {
+    "readAloud": "Read Aloud",
+    "stop": "Stop",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "aria": {
+      "stop": "Stop reading",
+      "read": "Read aloud",
+      "copy": "Copy to clipboard"
+    }
+  },
+  "filePreview": {
+    "uploadSuccess": "File uploaded successfully",
+    "recordingSaved": "Recording saved",
+    "replaceFile": "Replace File",
+    "remove": "Remove",
+    "unknownFormat": "Unknown format"
+  },
+  "configuration": {
+    "context": {
+      "title": "Context (Optional)",
+      "subtitle": "Upload Agenda or Slides to improve accuracy",
+      "attachFiles": "Attach Files",
+      "formats": "PDF, JPG, PNG"
+    },
+    "processingMode": {
+      "title": "Processing Mode",
+      "balanced": {
+        "title": "Balanced",
+        "description": "Standard accuracy, faster processing",
+        "credits": "~10 credits"
+      },
+      "quality": {
+        "title": "Quality",
+        "description": "GPT-4 enhanced analysis & summary",
+        "credits": "~25 credits"
+      }
+    },
+    "audioEnvironment": {
+      "title": "Audio Environment"
+    },
+    "noiseProfiles": {
+      "quiet": "Quiet Environment",
+      "meeting_room": "Meeting Room",
+      "cafe": "Cafe / Restaurant",
+      "outdoor": "Outdoor",
+      "phone": "Phone / Digital Call"
+    },
+    "meetingType": {
+      "title": "Meeting Type",
+      "options": {
+        "daily-stand-up": "Daily Stand-up",
+        "focus-group": "Focus Group",
+        "interview": "Interview",
+        "lecture": "Lecture/Class",
+        "legal": "Legal",
+        "medical-clinical": "Medical Clinical",
+        "meeting": "Meeting Notes",
+        "podcast": "Podcast Episode",
+        "sales-call": "Sales Call",
+        "voice-memo": "Voice Memo",
+        "other": "Other (specify)"
+      }
+    },
+    "language": {
+      "title": "Language",
+      "options": {
+        "en": "English",
+        "it": "Italian",
+        "es": "Spanish",
+        "fr": "French",
+        "de": "German",
+        "pt": "Portuguese",
+        "nl": "Dutch",
+        "ja": "Japanese",
+        "zh": "Chinese"
+      }
+    }
+  },
+  "audioState": {
+    "title": "Visualize and trim your audio below",
+    "buttons": {
+      "process": "Process Audio",
+      "startOver": "Start Over"
+    },
+    "messages": {
+      "noRegion": "Please select a region to trim",
+      "invalidRegion": "Invalid trim region: start must be before end",
+      "negativeTime": "Invalid trim region: negative time values",
+      "tooShort": "Trim region too short: minimum {{duration}} seconds required",
+      "playerNotReady": "Audio player not ready",
+      "audioNotLoaded": "Audio data not loaded",
+      "trimSuccess": "Audio trimmed successfully!"
+    }
+  },
+  "recordingState": {
+    "status": "Recording...",
+    "stopButton": "Stop Recording"
+  },
+  "configurationState": {
+    "heading": "Configure AI Processing",
+    "description": "Transcription complete! Choose your AI provider and content type for summarization.",
+    "transcriptPreview": "Transcript Preview",
+    "processingNote": "Full transcript will be processed with your selected AI model"
+  },
+  "audioEditing": {
+    "toolbar": {
+      "undo": "Undo",
+      "redo": "Redo",
+      "reset": "Reset"
+    },
+    "actions": {
+      "processSelection": "Process Selection",
+      "processFullAudio": "Process Full Audio"
+    },
+    "timeDisplay": {
+      "start": "Start",
+      "end": "End",
+      "placeholder": "--:--"
+    }
+  },
+  "fileSizeWarning": {
+    "titles": {
+      "tooLarge": "File Too Large",
+      "large": "Large File Detected"
+    },
+    "buttons": {
+      "compress": "Compress File",
+      "compressContinue": "Compress & Continue",
+      "continueAnyway": "Continue Anyway"
+    },
+    "labels": {
+      "fileSize": "File Size:",
+      "estimatedTime": "Estimated Processing Time:"
+    },
+    "benefits": {
+      "title": "Benefits of Compression:",
+      "faster": "Faster transcription processing",
+      "lowerMemory": "Lower memory usage during playback",
+      "optimized": "Optimized for Whisper AI (16kHz sample rate)",
+      "noImpact": "No impact on transcription quality"
+    },
+    "note": {
+      "label": "Note:",
+      "text": "Files larger than 50MB must be compressed before processing to ensure optimal performance and prevent memory issues."
+    }
+  },
+  "apiKeyInfo": {
+    "button": "How to get your {{provider}} API key",
+    "sections": {
+      "gettingStarted": "Getting Started",
+      "modelsUsed": "Models Used",
+      "pricing": "Pricing",
+      "security": "Security Notes"
+    },
+    "visitPlatform": "Visit {{provider}} Platform →",
+    "noteLabel": "Note:",
+    "securityNotes": {
+      "browserOnly": "Keys are stored only in your browser session",
+      "neverSaved": "Never saved to disk or cloud",
+      "clearedOnClose": "Cleared when you close the tab",
+      "recommendLimits": "We recommend using API keys with spending limits"
+    }
+  },
+  "chat": {
+    "tryAsking": "Try asking:",
+    "examplePrompts": {
+      "shorter": "Make this summary shorter",
+      "actionItems": "What are the main action items?",
+      "translate": "Translate to Spanish"
+    },
+    "placeholder": "Ask AI to refine or explain...",
+    "sendButton": "Send message"
+  },
+  "upload": {
+    "removeFile": "Remove {{filename}}",
+    "aria": {
+      "startRecording": "Start recording",
+      "pauseRecording": "Pause recording",
+      "resumeRecording": "Resume recording"
+    }
+  },
+  "footer": {
+    "copyright": "Trammarise © 2025 - Audio Transcription & Summarization"
+  },
+  "layout": {
+    "loading": "Loading session...",
+    "sessionNotFound": {
+      "title": "Session Not Found",
+      "message": "The requested audio session could not be found."
+    },
+    "instructions": "Select a segment to summarize or transcribe the full recording.",
+    "keyboardShortcuts": {
+      "space": "SPACE",
+      "playPause": "to play/pause",
+      "arrows": "to seek"
+    }
+  },
+  "audioStatus": {
+    "clean": "Clean Audio",
+    "noisy": "Noisy Audio",
+    "ready": "Ready",
+    "total": "Total"
+  },
+  "playback": {
+    "aria": {
+      "skipBack": "Skip Back 10s",
+      "skipForward": "Skip Forward 10s",
+      "play": "Play",
+      "pause": "Pause",
+      "volumeSlider": "Volume slider",
+      "speedControl": "Set playback speed to {{speed}}x"
+    }
+  },
+  "costTransparency": {
+    "title": "Estimated Cost",
+    "balancedMode": "Balanced mode",
+    "qualityMode": "Quality mode",
+    "estimate": "~{{credits}} credits for this file",
+    "disclaimer": "Final cost depends on audio length and complexity"
+  },
+  "configPanel": {
+    "title": "Configuration",
+    "customize": "Customize processing settings",
+    "modeLabel": "{{mode}} mode • ~{{credits}} credits"
+  },
+  "uploadFormats": {
+    "label": "Supported formats"
+  },
+  "stepChecklist": {
+    "title": "Processing Steps",
+    "inProgress": "In Progress"
+  },
+  "results": {
+    "loading": "Loading results...",
+    "notFound": {
+      "title": "No Results Found",
+      "message": "Complete processing to view results."
+    },
+    "transcript": {
+      "title": "Transcript",
+      "searchPlaceholder": "Search transcript...",
+      "noTranscript": "No transcript available",
+      "matches": "{{current}} of {{total}} matches"
+    },
+    "summary": {
+      "title": "Summary",
+      "copyAll": "Copy All",
+      "phase4Placeholder": "Structured summaries coming in Phase 4"
+    }
+  },
+  "chatModal": {
+    "title": "Refine with AI",
+    "emptyState": "Ask me anything about your transcript or summary",
+    "disclaimer": "AI can make mistakes. Verify important information.",
+    "tokenLimit": "Token limit reached"
+  },
+  "tokenUsage": {
+    "label": "Token Usage",
+    "warning": "Approaching daily token limit"
+  },
+  "configPlaceholder": {
+    "title": "Configuration",
+    "description": "AI provider selection page - will be enhanced in Phase 3"
   }
 }

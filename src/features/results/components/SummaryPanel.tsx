@@ -1,5 +1,6 @@
 import { GlassCard, Heading, Text } from '../../../lib';
 import ReactMarkdown from 'react-markdown';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Props for SummaryPanel component
@@ -31,20 +32,21 @@ interface SummaryPanelProps {
  * Left panel (40% width) in split layout.
  */
 export function SummaryPanel({ summary, structuredSummary }: SummaryPanelProps) {
+  const { t } = useTranslation();
   return (
     <GlassCard variant="light">
       <div className="p-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <Heading level="h3" className="font-semibold">
-            Summary
+            {t('results.summary.title')}
           </Heading>
           <button
             className="text-sm text-[var(--color-primary)] hover:underline"
             onClick={() => navigator.clipboard.writeText(summary)}
-            aria-label="Copy summary"
+            aria-label={t('results.summary.copyAll')}
           >
-            Copy All
+            {t('results.summary.copyAll')}
           </button>
         </div>
 
@@ -54,7 +56,7 @@ export function SummaryPanel({ summary, structuredSummary }: SummaryPanelProps) 
             // Phase 4: Structured summary (not yet implemented)
             <div>
               <Text variant="body" color="secondary">
-                Structured summaries coming in Phase 4
+                {t('results.summary.phase4Placeholder')}
               </Text>
             </div>
           ) : (

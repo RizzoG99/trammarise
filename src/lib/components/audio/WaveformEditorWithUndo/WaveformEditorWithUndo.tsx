@@ -19,7 +19,10 @@ interface WaveformEditorWithUndoProps {
   onTrimRegionChange?: (start: number, end: number) => void;
 }
 
-export function WaveformEditorWithUndo({ audioFile, onTrimRegionChange }: WaveformEditorWithUndoProps) {
+export function WaveformEditorWithUndo({
+  audioFile,
+  onTrimRegionChange,
+}: WaveformEditorWithUndoProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const wavesurferRef = useRef<WaveSurfer | null>(null);
   const regionsPluginRef = useRef<RegionsPlugin | null>(null);
@@ -29,15 +32,8 @@ export function WaveformEditorWithUndo({ audioFile, onTrimRegionChange }: Wavefo
   const [volume, setVolume] = useState(1);
 
   // Use command history for undo/redo
-  const {
-    execute,
-    undo,
-    redo,
-    canUndo,
-    canRedo,
-    undoDescription,
-    redoDescription,
-  } = useCommandHistory(50);
+  const { execute, undo, redo, canUndo, canRedo, undoDescription, redoDescription } =
+    useCommandHistory(50);
 
   // Initialize WaveSurfer
   useEffect(() => {
@@ -47,12 +43,17 @@ export function WaveformEditorWithUndo({ audioFile, onTrimRegionChange }: Wavefo
     const regions = RegionsPlugin.create();
     regionsPluginRef.current = regions;
 
+    // Get colors from CSS variables
+    const style = getComputedStyle(document.documentElement);
+    const primaryColor = style.getPropertyValue('--color-primary').trim();
+    const primaryAlpha20 = style.getPropertyValue('--color-primary-alpha-20').trim();
+
     // Create WaveSurfer instance
     const wavesurfer = WaveSurfer.create({
       container: containerRef.current,
-      waveColor: '#a78bfa',
-      progressColor: '#7c3aed',
-      cursorColor: '#7c3aed',
+      waveColor: primaryAlpha20 || '#a78bfa',
+      progressColor: primaryColor || '#7c3aed',
+      cursorColor: primaryColor || '#7c3aed',
       barWidth: 2,
       barRadius: 3,
       cursorWidth: 2,
@@ -121,10 +122,7 @@ export function WaveformEditorWithUndo({ audioFile, onTrimRegionChange }: Wavefo
   const handleSpeedChange = async (newSpeed: number) => {
     if (!wavesurferRef.current) return;
 
-    const command = new ChangePlaybackSpeedCommand(
-      wavesurferRef.current,
-      newSpeed
-    );
+    const command = new ChangePlaybackSpeedCommand(wavesurferRef.current, newSpeed);
 
     await execute(command);
     setPlaybackSpeed(newSpeed);
@@ -134,10 +132,7 @@ export function WaveformEditorWithUndo({ audioFile, onTrimRegionChange }: Wavefo
   const handleVolumeChange = async (newVolume: number) => {
     if (!wavesurferRef.current) return;
 
-    const command = new ChangeVolumeCommand(
-      wavesurferRef.current,
-      newVolume
-    );
+    const command = new ChangeVolumeCommand(wavesurferRef.current, newVolume);
 
     await execute(command);
     setVolume(newVolume);
@@ -158,28 +153,18 @@ export function WaveformEditorWithUndo({ audioFile, onTrimRegionChange }: Wavefo
           Play/Pause
         </Button>
 
-        <Button
-          onClick={handleAddTrimRegion}
-          disabled={!isReady}
-          variant="secondary"
-        >
+        <Button onClick={handleAddTrimRegion} disabled={!isReady} variant="secondary">
           Add Trim Region
         </Button>
 
-        <Button
-          onClick={handleRemoveTrimRegion}
-          disabled={!isReady}
-          variant="secondary"
-        >
+        <Button onClick={handleRemoveTrimRegion} disabled={!isReady} variant="secondary">
           Remove Trim Region
         </Button>
       </div>
 
       {/* Playback speed controls */}
       <div className="space-y-2">
-        <label className="text-sm text-text-secondary">
-          Playback Speed: {playbackSpeed}x
-        </label>
+        <label className="text-sm text-text-secondary">Playback Speed: {playbackSpeed}x</label>
         <div className="flex gap-2">
           {[0.5, 0.75, 1, 1.25, 1.5, 2].map((speed) => (
             <Button
@@ -196,9 +181,7 @@ export function WaveformEditorWithUndo({ audioFile, onTrimRegionChange }: Wavefo
 
       {/* Volume controls */}
       <div className="space-y-2">
-        <label className="text-sm text-text-secondary">
-          Volume: {Math.round(volume * 100)}%
-        </label>
+        <label className="text-sm text-text-secondary">Volume: {Math.round(volume * 100)}%</label>
         <input
           type="range"
           min="0"

@@ -15,8 +15,10 @@ import { RegionTimeDisplay } from '../../features/audio-editing/components/Regio
 import { AudioStatusBadges } from '../../features/audio-editing/components/AudioStatusBadges';
 import { TimelineRuler } from '../../features/audio-editing/components/TimelineRuler';
 import { formatTime } from '../../utils/audio';
+import { useTranslation } from 'react-i18next';
 
 export function AudioEditingPage() {
+  const { t } = useTranslation();
   const { sessionId } = useParams();
   const { session, isLoading, updateSession } = useSessionStorage(sessionId || null);
   const { goToProcessing } = useRouteState();
@@ -179,7 +181,7 @@ export function AudioEditingPage() {
     return (
       <PageLayout className="flex items-center justify-center">
         <Text variant="body" color="secondary">
-          Loading session...
+          {t('layout.loading')}
         </Text>
       </PageLayout>
     );
@@ -191,10 +193,10 @@ export function AudioEditingPage() {
       <PageLayout className="flex items-center justify-center">
         <div className="text-center">
           <Heading level="h2" className="mb-2">
-            Session Not Found
+            {t('layout.sessionNotFound.title')}
           </Heading>
           <Text variant="body" color="secondary">
-            The requested audio session could not be found.
+            {t('layout.sessionNotFound.message')}
           </Text>
         </div>
       </PageLayout>
@@ -219,7 +221,7 @@ export function AudioEditingPage() {
         <div className="flex flex-col gap-2">
           <Heading level="h1">{session.audioFile.name}</Heading>
           <Text variant="body" color="secondary">
-            Select a segment to summarize or transcribe the full recording.
+            {t('layout.instructions')}
           </Text>
         </div>
         <AudioStatusBadges totalDuration={duration} />
@@ -338,9 +340,9 @@ export function AudioEditingPage() {
               borderColor: 'var(--color-border)',
             }}
           >
-            SPACE
+            {t('layout.keyboardShortcuts.space')}
           </span>{' '}
-          to play/pause ·{' '}
+          {t('layout.keyboardShortcuts.playPause')} ·{' '}
           <span
             className="font-mono px-1.5 py-0.5 rounded text-[10px] border"
             style={{
@@ -359,7 +361,7 @@ export function AudioEditingPage() {
           >
             →
           </span>{' '}
-          to seek
+          {t('layout.keyboardShortcuts.arrows')}
         </Text>
       </div>
     </PageLayout>

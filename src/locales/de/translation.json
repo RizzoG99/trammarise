@@ -19,7 +19,12 @@
   "header": {
     "export": "Exportieren",
     "notifications": "Benachrichtigungen",
-    "userMenu": "Benutzermenü"
+    "userMenu": "Benutzermenü",
+    "aria": {
+      "saveFile": "Dateinamen speichern",
+      "cancelEdit": "Bearbeitung abbrechen",
+      "editFile": "Dateinamen bearbeiten"
+    }
   },
   "home": {
     "title": "Neue Sitzung",
@@ -36,7 +41,10 @@
     "emptyFile": "Datei ist leer",
     "noAudioFound": "Keine Audiodatei in den gezogenen Dateien gefunden",
     "invalidFile": "Ungültige Datei",
-    "supportedFormats": "MP3, WAV, M4A bis zu 500MB"
+    "supportedFormats": "MP3, WAV, M4A bis zu 500MB",
+    "statusReady": "Bereit",
+    "statusRecording": "Aufnahme",
+    "statusPaused": "Pausiert"
   },
   "processing": {
     "steps": {
@@ -53,5 +61,340 @@
     "it": "Italienisch",
     "es": "Spanisch",
     "de": "Deutsch"
+  },
+  "initialState": {
+    "title": "Transformieren Sie Ihr Audio",
+    "subtitle": "Laden Sie eine Audiodatei hoch oder beginnen Sie mit der Aufnahme zum Transkribieren und Zusammenfassen",
+    "uploadButton": "Audio hochladen",
+    "recordButton": "Aufnahme starten",
+    "dropZone": {
+      "main": "Audio- und Kontextdateien hier ablegen",
+      "sub": "oder klicken Sie, um Dateien auszuwählen",
+      "formats": "Audio • Bilder • PDF • TXT"
+    },
+    "contextFiles": {
+      "title": "Kontextdateien",
+      "errors": {
+        "invalidType": "Nur Bilder, PDF- und TXT-Dateien sind erlaubt",
+        "sizeLimit": "Die Gesamtdateigröße darf 24MB nicht überschreiten",
+        "someIgnored": "Einige Dateien wurden ignoriert. Nur Audio-, Bild-, PDF- und TXT-Dateien werden unterstützt.",
+        "invalidAudio": "Bitte wählen Sie eine gültige Audiodatei"
+      }
+    }
+  },
+  "apiKey": {
+    "title": "API-Schlüssel einrichten",
+    "metaDescription": "Konfigurieren Sie Ihren OpenAI API-Schlüssel, um KI-gestützte Transkriptions- und Zusammenfassungsfunktionen in Trammarise zu aktivieren.",
+    "heading": "KI-Transkription freischalten",
+    "description": "Trammarise nutzt die leistungsstarken Modelle von OpenAI, um Ihr Audio zu transkribieren und zusammenzufassen. Folgen Sie der untenstehenden Anleitung, um Ihren persönlichen API-Schlüssel zu erhalten.",
+    "guide": {
+      "title": "So erhalten Sie Ihren API-Schlüssel",
+      "step1": {
+        "title": "Bei OpenAI Platform anmelden",
+        "text": "Besuchen Sie platform.openai.com und melden Sie sich mit Ihrem Konto an.",
+        "linkText": "platform.openai.com öffnen"
+      },
+      "step2": {
+        "title": "Zu API-Schlüsseln navigieren",
+        "text": "Bewegen Sie den Mauszeiger über die Seitenleiste links und klicken Sie auf das Symbol \"API-Schlüssel\"."
+      },
+      "step3": {
+        "title": "Neuen geheimen Schlüssel erstellen",
+        "text": "Klicken Sie auf \"Neuen geheimen Schlüssel erstellen\". Nennen Sie ihn 'Trammarise', um ihn später leicht zu identifizieren."
+      },
+      "step4": {
+        "title": "Kopieren und einfügen",
+        "text": "Kopieren Sie sofort den Schlüssel, der mit sk-... beginnt. Sie können ihn nicht erneut anzeigen."
+      }
+    },
+    "form": {
+      "title": "OpenAI verbinden",
+      "subtitle": "Geben Sie Ihren Schlüssel unten ein, um die Transkriptionsfunktionen zu aktivieren.",
+      "label": "OpenAI API-Schlüssel",
+      "placeholder": "sk-...",
+      "securityNote": "Ihr Schlüssel wird lokal in Ihrem Browser gespeichert und niemals an unsere Server gesendet.",
+      "privacy": {
+        "secure": "Sicher",
+        "fast": "Schnell",
+        "noCode": "Kein Code"
+      },
+      "buttons": {
+        "connecting": "Verbinden...",
+        "saved": "Gespeichert",
+        "connect": "Verbindung testen & speichern"
+      },
+      "errors": {
+        "invalid": "Ungültiger API-Schlüssel. Bitte überprüfen Sie Ihren Schlüssel und versuchen Sie es erneut.",
+        "connection": "Verbindung fehlgeschlagen. Bitte überprüfen Sie Ihre Internetverbindung."
+      },
+      "success": "Verbindung überprüft und gespeichert!",
+      "help": "Haben Sie Probleme?",
+      "docsLink": "Schauen Sie sich unsere Dokumentation an"
+    }
+  },
+  "actions": {
+    "readAloud": "Vorlesen",
+    "stop": "Stoppen",
+    "copy": "Kopieren",
+    "copied": "Kopiert!",
+    "aria": {
+      "stop": "Vorlesen stoppen",
+      "read": "Vorlesen",
+      "copy": "In Zwischenablage kopieren"
+    }
+  },
+  "filePreview": {
+    "uploadSuccess": "Datei erfolgreich hochgeladen",
+    "recordingSaved": "Aufnahme gespeichert",
+    "replaceFile": "Datei ersetzen",
+    "remove": "Entfernen",
+    "unknownFormat": "Unbekanntes Format"
+  },
+  "configuration": {
+    "context": {
+      "title": "Kontext (Optional)",
+      "subtitle": "Laden Sie Agenda oder Folien hoch, um die Genauigkeit zu verbessern",
+      "attachFiles": "Dateien anhängen",
+      "formats": "PDF, JPG, PNG"
+    },
+    "processingMode": {
+      "title": "Verarbeitungsmodus",
+      "balanced": {
+        "title": "Ausgewogen",
+        "description": "Standardgenauigkeit, schnellere Verarbeitung",
+        "credits": "~10 Credits"
+      },
+      "quality": {
+        "title": "Qualität",
+        "description": "GPT-4 erweiterte Analyse & Zusammenfassung",
+        "credits": "~25 Credits"
+      }
+    },
+    "audioEnvironment": {
+      "title": "Audio-Umgebung"
+    },
+    "noiseProfiles": {
+      "quiet": "Ruhige Umgebung",
+      "meeting_room": "Besprechungsraum",
+      "cafe": "Café / Restaurant",
+      "outdoor": "Draußen",
+      "phone": "Telefon / Digitaler Anruf"
+    },
+    "meetingType": {
+      "title": "Besprechungstyp",
+      "options": {
+        "daily-stand-up": "Daily Stand-up",
+        "focus-group": "Fokusgruppe",
+        "interview": "Interview",
+        "lecture": "Vorlesung/Kurs",
+        "legal": "Rechtlich",
+        "medical-clinical": "Medizinisch Klinisch",
+        "meeting": "Besprechungsnotizen",
+        "podcast": "Podcast-Episode",
+        "sales-call": "Verkaufsgespräch",
+        "voice-memo": "Sprachmemo",
+        "other": "Sonstiges (angeben)"
+      }
+    },
+    "language": {
+      "title": "Sprache",
+      "options": {
+        "en": "Englisch",
+        "it": "Italienisch",
+        "es": "Spanisch",
+        "fr": "Französisch",
+        "de": "Deutsch",
+        "pt": "Portugiesisch",
+        "nl": "Niederländisch",
+        "ja": "Japanisch",
+        "zh": "Chinesisch"
+      }
+    }
+  },
+  "audioState": {
+    "title": "Visualisieren und schneiden Sie Ihr Audio unten",
+    "buttons": {
+      "process": "Audio Verarbeiten",
+      "startOver": "Neu Beginnen"
+    },
+    "messages": {
+      "noRegion": "Bitte wählen Sie einen Bereich zum Zuschneiden aus",
+      "invalidRegion": "Ungültiger Schnittbereich: Start muss vor dem Ende liegen",
+      "negativeTime": "Ungültiger Schnittbereich: negative Zeitwerte",
+      "tooShort": "Schnittbereich zu kurz: mindestens {{duration}} Sekunden erforderlich",
+      "playerNotReady": "Audio-Player nicht bereit",
+      "audioNotLoaded": "Audiodaten nicht geladen",
+      "trimSuccess": "Audio erfolgreich zugeschnitten!"
+    }
+  },
+  "recordingState": {
+    "status": "Aufnahme läuft...",
+    "stopButton": "Aufnahme Stoppen"
+  },
+  "configurationState": {
+    "heading": "KI-Verarbeitung Konfigurieren",
+    "description": "Transkription abgeschlossen! Wählen Sie Ihren KI-Anbieter und Inhaltstyp für die Zusammenfassung.",
+    "transcriptPreview": "Transkript-Vorschau",
+    "processingNote": "Das vollständige Transkript wird mit Ihrem ausgewählten KI-Modell verarbeitet"
+  },
+  "audioEditing": {
+    "toolbar": {
+      "undo": "Rückgängig",
+      "redo": "Wiederholen",
+      "reset": "Zurücksetzen"
+    },
+    "actions": {
+      "processSelection": "Auswahl Verarbeiten",
+      "processFullAudio": "Gesamtes Audio Verarbeiten"
+    },
+    "timeDisplay": {
+      "start": "Start",
+      "end": "Ende",
+      "placeholder": "--:--"
+    }
+  },
+  "fileSizeWarning": {
+    "titles": {
+      "tooLarge": "Datei Zu Groß",
+      "large": "Große Datei Erkannt"
+    },
+    "buttons": {
+      "compress": "Datei Komprimieren",
+      "compressContinue": "Komprimieren & Fortfahren",
+      "continueAnyway": "Trotzdem Fortfahren"
+    },
+    "labels": {
+      "fileSize": "Dateigröße:",
+      "estimatedTime": "Geschätzte Verarbeitungszeit:"
+    },
+    "benefits": {
+      "title": "Vorteile der Komprimierung:",
+      "faster": "Schnellere Transkriptionsverarbeitung",
+      "lowerMemory": "Geringerer Speicherverbrauch während der Wiedergabe",
+      "optimized": "Optimiert für Whisper AI (16kHz Abtastrate)",
+      "noImpact": "Keine Auswirkung auf die Transkriptionsqualität"
+    },
+    "note": {
+      "label": "Hinweis:",
+      "text": "Dateien größer als 50MB müssen vor der Verarbeitung komprimiert werden, um optimale Leistung zu gewährleisten und Speicherprobleme zu vermeiden."
+    }
+  },
+  "apiKeyInfo": {
+    "button": "So erhalten Sie Ihren {{provider}} API-Schlüssel",
+    "sections": {
+      "gettingStarted": "Erste Schritte",
+      "modelsUsed": "Verwendete Modelle",
+      "pricing": "Preise",
+      "security": "Sicherheitshinweise"
+    },
+    "visitPlatform": "{{provider}} Plattform Besuchen →",
+    "noteLabel": "Hinweis:",
+    "securityNotes": {
+      "browserOnly": "Schlüssel werden nur in Ihrer Browser-Sitzung gespeichert",
+      "neverSaved": "Niemals auf Festplatte oder Cloud gespeichert",
+      "clearedOnClose": "Werden gelöscht, wenn Sie die Registerkarte schließen",
+      "recommendLimits": "Wir empfehlen die Verwendung von API-Schlüsseln mit Ausgabenlimits"
+    }
+  },
+  "chat": {
+    "tryAsking": "Versuchen Sie zu fragen:",
+    "examplePrompts": {
+      "shorter": "Machen Sie diese Zusammenfassung kürzer",
+      "actionItems": "Was sind die wichtigsten Handlungspunkte?",
+      "translate": "Ins Spanische übersetzen"
+    },
+    "placeholder": "Fragen Sie die KI, um zu verfeinern oder zu erklären...",
+    "sendButton": "Nachricht senden"
+  },
+  "upload": {
+    "removeFile": "{{filename}} Entfernen",
+    "aria": {
+      "startRecording": "Aufnahme starten",
+      "pauseRecording": "Aufnahme pausieren",
+      "resumeRecording": "Aufnahme fortsetzen"
+    }
+  },
+  "footer": {
+    "copyright": "Trammarise © 2025 - Audio-Transkription und Zusammenfassung"
+  },
+  "layout": {
+    "loading": "Sitzung wird geladen...",
+    "sessionNotFound": {
+      "title": "Sitzung Nicht Gefunden",
+      "message": "Die angeforderte Audiositzung konnte nicht gefunden werden."
+    },
+    "instructions": "Wählen Sie ein Segment zum Zusammenfassen oder transkribieren Sie die gesamte Aufnahme.",
+    "keyboardShortcuts": {
+      "space": "LEERTASTE",
+      "playPause": "zum Abspielen/Pausieren",
+      "arrows": "zum Suchen"
+    }
+  },
+  "audioStatus": {
+    "clean": "Sauberes Audio",
+    "noisy": "Verrauschtes Audio",
+    "ready": "Bereit",
+    "total": "Gesamt"
+  },
+  "playback": {
+    "aria": {
+      "skipBack": "10s zurück",
+      "skipForward": "10s vorwärts",
+      "play": "Abspielen",
+      "pause": "Pause",
+      "volumeSlider": "Lautstärkeregler",
+      "speedControl": "Wiedergabegeschwindigkeit auf {{speed}}x setzen"
+    }
+  },
+  "costTransparency": {
+    "title": "Geschätzte Kosten",
+    "balancedMode": "Ausgewogener Modus",
+    "qualityMode": "Qualitätsmodus",
+    "estimate": "~{{credits}} Credits für diese Datei",
+    "disclaimer": "Die endgültigen Kosten hängen von der Audiolänge und Komplexität ab"
+  },
+  "configPanel": {
+    "title": "Konfiguration",
+    "customize": "Verarbeitungseinstellungen anpassen",
+    "modeLabel": "{{mode}}-Modus • ~{{credits}} Credits"
+  },
+  "uploadFormats": {
+    "label": "Unterstützte Formate"
+  },
+  "stepChecklist": {
+    "title": "Verarbeitungsschritte",
+    "inProgress": "In Bearbeitung"
+  },
+  "results": {
+    "loading": "Ergebnisse werden geladen...",
+    "notFound": {
+      "title": "Keine Ergebnisse Gefunden",
+      "message": "Schließen Sie die Verarbeitung ab, um Ergebnisse anzuzeigen."
+    },
+    "transcript": {
+      "title": "Transkript",
+      "searchPlaceholder": "Transkript durchsuchen...",
+      "noTranscript": "Kein Transkript verfügbar",
+      "matches": "{{current}} von {{total}} Übereinstimmungen"
+    },
+    "summary": {
+      "title": "Zusammenfassung",
+      "copyAll": "Alles Kopieren",
+      "phase4Placeholder": "Strukturierte Zusammenfassungen kommen in Phase 4"
+    }
+  },
+  "chatModal": {
+    "title": "Mit KI Verfeinern",
+    "emptyState": "Fragen Sie mich alles über Ihr Transkript oder Ihre Zusammenfassung",
+    "disclaimer": "KI kann Fehler machen. Überprüfen Sie wichtige Informationen.",
+    "tokenLimit": "Token-Limit erreicht"
+  },
+  "tokenUsage": {
+    "label": "Token-Nutzung",
+    "warning": "Annäherung an das tägliche Token-Limit"
+  },
+  "configPlaceholder": {
+    "title": "Konfiguration",
+    "description": "KI-Anbieter-Auswahlseite - wird in Phase 3 verbessert"
   }
 }

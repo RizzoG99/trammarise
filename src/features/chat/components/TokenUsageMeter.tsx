@@ -1,5 +1,6 @@
 import { Text } from '@/lib';
 import { AlertCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export interface TokenUsageMeterProps {
   tokenUsage: number;
@@ -8,19 +9,23 @@ export interface TokenUsageMeterProps {
   isNearLimit: boolean;
 }
 
-export function TokenUsageMeter({ tokenUsage, tokenLimit, percentage, isNearLimit }: TokenUsageMeterProps) {
+export function TokenUsageMeter({
+  tokenUsage,
+  tokenLimit,
+  percentage,
+  isNearLimit,
+}: TokenUsageMeterProps) {
+  const { t } = useTranslation();
   const barColor = isNearLimit ? 'bg-accent-warning' : 'bg-primary';
 
   return (
     <div className="p-4 border-b border-border">
       <div className="flex items-center justify-between mb-2">
         <Text variant="caption" color="secondary" className="font-medium">
-          Token Usage
+          {t('tokenUsage.label')}
         </Text>
         <div className="flex items-center gap-2">
-          {isNearLimit && (
-            <AlertCircle className="w-4 h-4 text-accent-warning" />
-          )}
+          {isNearLimit && <AlertCircle className="w-4 h-4 text-accent-warning" />}
           <Text variant="caption" color={isNearLimit ? 'primary' : 'secondary'}>
             {tokenUsage}/{tokenLimit}
           </Text>
@@ -37,7 +42,7 @@ export function TokenUsageMeter({ tokenUsage, tokenLimit, percentage, isNearLimi
 
       {isNearLimit && (
         <Text variant="small" color="tertiary" className="mt-2">
-          Approaching daily token limit
+          {t('tokenUsage.warning')}
         </Text>
       )}
     </div>

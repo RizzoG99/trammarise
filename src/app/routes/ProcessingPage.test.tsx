@@ -116,15 +116,15 @@ describe('ProcessingPage', () => {
     it('renders StepChecklist with 4 steps', () => {
       render(<ProcessingPage />);
       expect(screen.getByText('Processing Steps')).toBeInTheDocument();
-      expect(screen.getByText(/processing.steps.uploading/)).toBeInTheDocument();
-      expect(screen.getByText(/processing.steps.transcribing/)).toBeInTheDocument();
-      expect(screen.getByText(/processing.steps.analyzing/)).toBeInTheDocument();
-      expect(screen.getByText(/processing.steps.summarizing/)).toBeInTheDocument();
+      expect(screen.getByText(/Uploading Audio/)).toBeInTheDocument();
+      expect(screen.getByText(/Transcribing Speech/)).toBeInTheDocument();
+      expect(screen.getByText(/Analyzing Context/)).toBeInTheDocument();
+      expect(screen.getByText(/Summarizing Key Points/)).toBeInTheDocument();
     });
 
     it('renders Cancel button', () => {
       render(<ProcessingPage />);
-      expect(screen.getByRole('button', { name: 'common.cancel' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
     });
 
     it('starts processing on mount', () => {
@@ -152,25 +152,25 @@ describe('ProcessingPage', () => {
       const { onProgress } = mockUseAudioProcessing.mock.calls[0][0];
 
       // 0%: uploading
-      expect(screen.getByText(/processing.steps.uploading/)).toBeInTheDocument();
+      expect(screen.getByText(/Uploading Audio/)).toBeInTheDocument();
 
       // 30%: transcribing
       act(() => {
         onProgress('transcribing', 30);
       });
-      expect(screen.getByText(/processing.steps.transcribing/)).toBeInTheDocument();
+      expect(screen.getByText(/Transcribing Speech/)).toBeInTheDocument();
 
       // 70%: analyzing
       act(() => {
         onProgress('analyzing', 70);
       });
-      expect(screen.getByText(/processing.steps.analyzing/)).toBeInTheDocument();
+      expect(screen.getByText(/Analyzing Context/)).toBeInTheDocument();
 
       // 80%: summarizing
       act(() => {
         onProgress('summarizing', 80);
       });
-      expect(screen.getByText(/processing.steps.summarizing/)).toBeInTheDocument();
+      expect(screen.getByText(/Summarizing Key Points/)).toBeInTheDocument();
     });
 
     it('updates time estimate based on progress', () => {
@@ -190,9 +190,7 @@ describe('ProcessingPage', () => {
       act(() => {
         onProgress('analyzing', 75);
       });
-      expect(
-        screen.getByText('processing.estimatedTime: processing.almostDone')
-      ).toBeInTheDocument();
+      expect(screen.getByText('Estimated time: Almost done')).toBeInTheDocument();
     });
   });
 
@@ -217,7 +215,7 @@ describe('ProcessingPage', () => {
   describe('Cancel Button', () => {
     it('calls cancel and navigates to audio when clicked', () => {
       render(<ProcessingPage />);
-      const cancelButton = screen.getByRole('button', { name: 'common.cancel' });
+      const cancelButton = screen.getByRole('button', { name: 'Cancel' });
 
       cancelButton.click();
 
@@ -227,7 +225,7 @@ describe('ProcessingPage', () => {
 
     it('is enabled when progress is less than 100%', () => {
       render(<ProcessingPage />);
-      const cancelButton = screen.getByRole('button', { name: 'common.cancel' });
+      const cancelButton = screen.getByRole('button', { name: 'Cancel' });
 
       expect(cancelButton).not.toBeDisabled();
     });
@@ -240,7 +238,7 @@ describe('ProcessingPage', () => {
         onProgress('summarizing', 100);
       });
 
-      const cancelButton = screen.getByRole('button', { name: 'common.cancel' });
+      const cancelButton = screen.getByRole('button', { name: 'Cancel' });
       expect(cancelButton).toBeDisabled();
     });
   });
@@ -254,7 +252,7 @@ describe('ProcessingPage', () => {
         onError(new Error('Test processing error'));
       });
 
-      expect(screen.getByText('common.error')).toBeInTheDocument();
+      expect(screen.getByText('An error occurred')).toBeInTheDocument();
       expect(screen.getByText('Test processing error')).toBeInTheDocument();
     });
 
@@ -266,7 +264,7 @@ describe('ProcessingPage', () => {
         onError(new Error('Test error'));
       });
 
-      const backButton = screen.getByRole('button', { name: 'common.back' });
+      const backButton = screen.getByRole('button', { name: 'Back' });
       backButton.click();
 
       expect(mockGoToAudio).toHaveBeenCalled();
@@ -283,7 +281,7 @@ describe('ProcessingPage', () => {
       });
 
       render(<ProcessingPage />);
-      expect(screen.getByText('common.loading')).toBeInTheDocument();
+      expect(screen.getByText('Loading...')).toBeInTheDocument();
     });
   });
 
