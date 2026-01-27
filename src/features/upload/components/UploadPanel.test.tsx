@@ -15,15 +15,16 @@ describe('UploadPanel', () => {
     it('renders upload area when no file uploaded', () => {
       render(<UploadPanel onFileUpload={mockOnFileUpload} />);
 
-      expect(screen.getByText('home.uploadTitle')).toBeInTheDocument();
-      expect(screen.getByText('home.dropText')).toBeInTheDocument();
-      expect(screen.getByText('home.supportedFormats')).toBeInTheDocument();
+      expect(screen.getByText('Upload Audio')).toBeInTheDocument();
+      expect(screen.getByText('Drop your audio file here or click to browse')).toBeInTheDocument();
+      // Note: Component uses uploadFormats.label ("Supported formats")
+      expect(screen.getByText('Supported formats')).toBeInTheDocument();
     });
 
     it('renders drop zone that is interactive', () => {
       render(<UploadPanel onFileUpload={mockOnFileUpload} />);
 
-      const dropZone = screen.getByText('home.dropText');
+      const dropZone = screen.getByText('Drop your audio file here or click to browse');
       expect(dropZone).toBeInTheDocument();
 
       // Verify drop zone container exists and is interactive (without checking specific CSS classes)
@@ -53,7 +54,7 @@ describe('UploadPanel', () => {
       const largeFile = new File([], 'large.mp3', { type: 'audio/mpeg' });
       Object.defineProperty(largeFile, 'size', {
         value: MAX_FILE_SIZE + 1,
-        writable: false
+        writable: false,
       });
 
       const input = screen.getByTestId('file-input');
@@ -62,7 +63,7 @@ describe('UploadPanel', () => {
         target: { files: [largeFile] },
       });
 
-      expect(screen.getByText(/home\.fileTooLarge/)).toBeInTheDocument();
+      expect(screen.getByText(/File too large/)).toBeInTheDocument();
       expect(mockOnFileUpload).not.toHaveBeenCalled();
     });
 
@@ -77,7 +78,7 @@ describe('UploadPanel', () => {
       });
 
       // It should now use the translation key
-      expect(screen.getByText('home.audioOnly')).toBeInTheDocument();
+      expect(screen.getByText('Please upload an audio file only')).toBeInTheDocument();
       expect(mockOnFileUpload).not.toHaveBeenCalled();
     });
   });
@@ -86,7 +87,9 @@ describe('UploadPanel', () => {
     it('handles dragOver event', () => {
       render(<UploadPanel onFileUpload={mockOnFileUpload} />);
 
-      const dropZone = screen.getByText('home.dropText').closest('div')!;
+      const dropZone = screen
+        .getByText('Drop your audio file here or click to browse')
+        .closest('div')!;
 
       // Verify drag over doesn't throw error
       expect(() => {
@@ -101,7 +104,9 @@ describe('UploadPanel', () => {
     it('handles dragLeave event', () => {
       render(<UploadPanel onFileUpload={mockOnFileUpload} />);
 
-      const dropZone = screen.getByText('home.dropText').closest('div')!;
+      const dropZone = screen
+        .getByText('Drop your audio file here or click to browse')
+        .closest('div')!;
 
       // Verify drag events don't throw errors
       expect(() => {
@@ -114,7 +119,9 @@ describe('UploadPanel', () => {
       render(<UploadPanel onFileUpload={mockOnFileUpload} />);
 
       const file = new File(['audio'], 'dropped.mp3', { type: 'audio/mpeg' });
-      const dropZone = screen.getByText('home.dropText').closest('div')!;
+      const dropZone = screen
+        .getByText('Drop your audio file here or click to browse')
+        .closest('div')!;
 
       fireEvent.drop(dropZone, {
         dataTransfer: {
@@ -130,11 +137,13 @@ describe('UploadPanel', () => {
 
       // Create a mock file >500MB using size property (optimized)
       const largeFile = new File([], 'huge.mp3', { type: 'audio/mpeg' });
-      Object.defineProperty(largeFile, 'size', { 
+      Object.defineProperty(largeFile, 'size', {
         value: MAX_FILE_SIZE + 1,
-        writable: false 
+        writable: false,
       });
-      const dropZone = screen.getByText('home.dropText').closest('div')!;
+      const dropZone = screen
+        .getByText('Drop your audio file here or click to browse')
+        .closest('div')!;
 
       fireEvent.drop(dropZone, {
         dataTransfer: {
@@ -142,7 +151,7 @@ describe('UploadPanel', () => {
         },
       });
 
-      expect(screen.getByText(/home.fileTooLarge/)).toBeInTheDocument();
+      expect(screen.getByText(/File too large/)).toBeInTheDocument();
       expect(mockOnFileUpload).not.toHaveBeenCalled();
     });
 
@@ -150,7 +159,9 @@ describe('UploadPanel', () => {
       render(<UploadPanel onFileUpload={mockOnFileUpload} />);
 
       const imageFile = new File(['image'], 'test.png', { type: 'image/png' });
-      const dropZone = screen.getByText('home.dropText').closest('div')!;
+      const dropZone = screen
+        .getByText('Drop your audio file here or click to browse')
+        .closest('div')!;
 
       fireEvent.drop(dropZone, {
         dataTransfer: {
@@ -158,7 +169,7 @@ describe('UploadPanel', () => {
         },
       });
 
-      expect(screen.getByText('home.noAudioFound')).toBeInTheDocument();
+      expect(screen.getByText('No audio file found in the dropped files')).toBeInTheDocument();
       expect(mockOnFileUpload).not.toHaveBeenCalled();
     });
   });
@@ -176,7 +187,9 @@ describe('UploadPanel', () => {
       );
 
       expect(screen.getByText('uploaded.mp3')).toBeInTheDocument();
-      expect(screen.queryByText('home.dropText')).not.toBeInTheDocument();
+      expect(
+        screen.queryByText('Drop your audio file here or click to browse')
+      ).not.toBeInTheDocument();
     });
     // ...
   });
@@ -186,7 +199,7 @@ describe('UploadPanel', () => {
       render(<UploadPanel onFileUpload={mockOnFileUpload} />);
 
       // Test that drop zone and file input exist
-      expect(screen.getByText('home.dropText')).toBeInTheDocument();
+      expect(screen.getByText('Drop your audio file here or click to browse')).toBeInTheDocument();
       expect(screen.getByTestId('file-input')).toBeInTheDocument();
     });
   });
@@ -209,12 +222,7 @@ describe('UploadPanel', () => {
     it('handles onFileRemove being undefined', () => {
       const uploadedFile = new File(['audio'], 'test.mp3', { type: 'audio/mpeg' });
 
-      render(
-        <UploadPanel
-          onFileUpload={mockOnFileUpload}
-          uploadedFile={uploadedFile}
-        />
-      );
+      render(<UploadPanel onFileUpload={mockOnFileUpload} uploadedFile={uploadedFile} />);
 
       const removeButton = screen.getByText('Remove');
 

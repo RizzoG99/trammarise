@@ -1,4 +1,5 @@
 import { Undo2, Redo2, RotateCcw } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Button, GlassCard, Text } from '@/lib';
 
 export interface UndoRedoToolbarProps {
@@ -18,6 +19,8 @@ export function UndoRedoToolbar({
   onReset,
   currentAction,
 }: UndoRedoToolbarProps) {
+  const { t } = useTranslation();
+
   return (
     <GlassCard variant="light" className="p-3">
       <div className="flex items-center justify-between">
@@ -29,7 +32,7 @@ export function UndoRedoToolbar({
             className="flex items-center gap-2 px-3 py-1.5"
           >
             <Undo2 className="w-4 h-4" />
-            <span className="hidden sm:inline">Undo</span>
+            <span className="hidden sm:inline">{t('audioEditing.toolbar.undo')}</span>
           </Button>
 
           <Button
@@ -39,7 +42,7 @@ export function UndoRedoToolbar({
             className="flex items-center gap-2 px-3 py-1.5"
           >
             <Redo2 className="w-4 h-4" />
-            <span className="hidden sm:inline">Redo</span>
+            <span className="hidden sm:inline">{t('audioEditing.toolbar.redo')}</span>
           </Button>
 
           {onReset && (
@@ -50,7 +53,7 @@ export function UndoRedoToolbar({
               className="flex items-center gap-2 px-3 py-1.5"
             >
               <RotateCcw className="w-4 h-4" />
-              <span className="hidden sm:inline">Reset</span>
+              <span className="hidden sm:inline">{t('audioEditing.toolbar.reset')}</span>
             </Button>
           )}
         </div>

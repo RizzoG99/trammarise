@@ -1,4 +1,5 @@
 import { useState, lazy, Suspense } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Key,
   ExternalLink,
@@ -20,6 +21,7 @@ const SEO = lazy(() =>
 );
 
 export function ApiKeySetupPage() {
+  const { t } = useTranslation();
   const { apiKey, setApiKey, testConnection } = useApiKey();
   const [inputValue, setInputValue] = useState(apiKey || '');
   const [isVisible, setIsVisible] = useState(false);
@@ -40,12 +42,12 @@ export function ApiKeySetupPage() {
         setStatus('success');
       } else {
         setStatus('error');
-        setErrorMessage('Invalid API Key. Please check your key and try again.');
+        setErrorMessage(t('apiKey.form.errors.invalid'));
       }
     } catch (error) {
       console.error(error);
       setStatus('error');
-      setErrorMessage('Connection failed. Please check your internet connection.');
+      setErrorMessage(t('apiKey.form.errors.connection'));
     }
   };
 
@@ -53,8 +55,8 @@ export function ApiKeySetupPage() {
     <div className="min-h-screen bg-background-light dark:bg-background-dark flex flex-col font-sans text-text-primary">
       <Suspense fallback={null}>
         <SEO
-          title="Setup API Key"
-          description="Configure your OpenAI API key to enable AI-powered transcription and summarization features in Trammarise."
+          title={t('apiKey.title')}
+          description={t('apiKey.metaDescription')}
           canonical="https://trammarise.app/setup"
         />
       </Suspense>
@@ -70,18 +72,17 @@ export function ApiKeySetupPage() {
                 level="h1"
                 className="text-3xl md:text-4xl font-black leading-tight tracking-tight"
               >
-                Unlock AI Transcription
+                {t('apiKey.heading')}
               </Heading>
               <Text variant="body" className="max-w-2xl text-text-secondary text-base md:text-lg">
-                Trammarise uses OpenAI's powerful models to transcribe and summarize your audio.
-                Follow the guide below to get your personal API key.
+                {t('apiKey.description')}
               </Text>
             </div>
 
             <GlassCard variant="light" className="overflow-hidden border border-border p-0">
               <div className="px-6 py-5 border-b border-border bg-surface-secondary/30">
                 <Heading level="h3" className="text-lg font-bold">
-                  How to get your API Key
+                  {t('apiKey.guide.title')}
                 </Heading>
               </div>
 
@@ -90,9 +91,11 @@ export function ApiKeySetupPage() {
                   {/* Step 1 */}
                   <StepIndicator number={1} />
                   <div className="pb-10">
-                    <h4 className="text-base font-semibold mb-1">Log in to OpenAI Platform</h4>
+                    <h4 className="text-base font-semibold mb-1">
+                      {t('apiKey.guide.step1.title')}
+                    </h4>
                     <p className="text-sm text-text-secondary mb-3">
-                      Visit platform.openai.com and sign in with your account.
+                      {t('apiKey.guide.step1.text')}
                     </p>
                     <a
                       href="https://platform.openai.com"
@@ -100,7 +103,7 @@ export function ApiKeySetupPage() {
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-2 text-primary text-sm font-medium hover:underline"
                     >
-                      Open platform.openai.com
+                      {t('apiKey.guide.step1.linkText')}
                       <ExternalLink className="w-4 h-4" />
                     </a>
                   </div>
@@ -108,9 +111,11 @@ export function ApiKeySetupPage() {
                   {/* Step 2 */}
                   <StepIndicator number={2} />
                   <div className="pb-10">
-                    <h4 className="text-base font-semibold mb-1">Navigate to API Keys</h4>
+                    <h4 className="text-base font-semibold mb-1">
+                      {t('apiKey.guide.step2.title')}
+                    </h4>
                     <p className="text-sm text-text-secondary mb-3">
-                      Hover over the sidebar on the left and click on "API Keys" icon.
+                      {t('apiKey.guide.step2.text')}
                     </p>
                     <div className="w-full h-32 md:h-48 rounded-lg overflow-hidden relative bg-surface-secondary border border-border">
                       {/* Placeholder for screenshot */}
@@ -124,10 +129,11 @@ export function ApiKeySetupPage() {
                   {/* Step 3 */}
                   <StepIndicator number={3} />
                   <div className="pb-10">
-                    <h4 className="text-base font-semibold mb-1">Create new secret key</h4>
+                    <h4 className="text-base font-semibold mb-1">
+                      {t('apiKey.guide.step3.title')}
+                    </h4>
                     <p className="text-sm text-text-secondary mb-3">
-                      Click "Create new secret key". Name it 'Trammarise' to easily identify it
-                      later.
+                      {t('apiKey.guide.step3.text')}
                     </p>
                     <div className="w-full h-24 rounded-lg overflow-hidden relative bg-surface-secondary border border-border">
                       {/* Placeholder for screenshot */}
@@ -141,13 +147,11 @@ export function ApiKeySetupPage() {
                   {/* Step 4 */}
                   <StepIndicator number={4} isLast />
                   <div>
-                    <h4 className="text-base font-semibold mb-1">Copy and paste</h4>
+                    <h4 className="text-base font-semibold mb-1">
+                      {t('apiKey.guide.step4.title')}
+                    </h4>
                     <p className="text-sm text-text-secondary mt-1">
-                      Copy the key starting with{' '}
-                      <code className="bg-surface-secondary px-1 py-0.5 rounded text-xs font-mono">
-                        sk-...
-                      </code>{' '}
-                      immediately. You won't be able to view it again.
+                      {t('apiKey.guide.step4.text')}
                     </p>
                   </div>
                 </div>
@@ -163,10 +167,10 @@ export function ApiKeySetupPage() {
             >
               <div>
                 <Heading level="h2" className="text-xl font-bold mb-2">
-                  Connect OpenAI
+                  {t('apiKey.form.title')}
                 </Heading>
                 <Text variant="small" className="text-text-secondary">
-                  Enter your key below to enable transcription features.
+                  {t('apiKey.form.subtitle')}
                 </Text>
               </div>
 
@@ -174,7 +178,7 @@ export function ApiKeySetupPage() {
               <div className="flex gap-3 bg-green-500/10 p-3 rounded-lg border border-green-500/20">
                 <Lock className="w-5 h-5 text-green-600 dark:text-green-400 shrink-0 mt-0.5" />
                 <p className="text-xs text-green-800 dark:text-green-300 font-medium leading-relaxed">
-                  Your key is stored locally in your browser and is never sent to our servers.
+                  {t('apiKey.form.securityNote')}
                 </p>
               </div>
 
@@ -182,7 +186,7 @@ export function ApiKeySetupPage() {
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-2">
                   <label htmlFor="api-key" className="text-sm font-semibold">
-                    OpenAI API Key
+                    {t('apiKey.form.label')}
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -192,7 +196,7 @@ export function ApiKeySetupPage() {
                       id="api-key"
                       type={isVisible ? 'text' : 'password'}
                       className="block w-full rounded-lg border-input py-3 pl-10 pr-10 bg-background text-text-primary shadow-sm focus:ring-2 focus:ring-primary focus:border-primary sm:text-sm font-mono transition-all"
-                      placeholder="sk-..."
+                      placeholder={t('apiKey.form.placeholder')}
                       value={inputValue}
                       onChange={(e) => {
                         setInputValue(e.target.value);
@@ -214,7 +218,7 @@ export function ApiKeySetupPage() {
                   )}
                   {status === 'success' && (
                     <p className="text-xs text-green-500 font-medium animate-in slide-in-from-top-1">
-                      Connection verified and saved!
+                      {t('apiKey.form.success')}
                     </p>
                   )}
                 </div>
@@ -225,14 +229,14 @@ export function ApiKeySetupPage() {
                   className="w-full h-12 text-base font-bold shadow-sm gap-2"
                 >
                   {status === 'loading' ? (
-                    <>Connecting...</>
+                    <>{t('apiKey.form.buttons.connecting')}</>
                   ) : status === 'success' ? (
                     <>
-                      Saved <Check className="w-5 h-5" />
+                      {t('apiKey.form.buttons.saved')} <Check className="w-5 h-5" />
                     </>
                   ) : (
                     <>
-                      Test & Save Connection <Zap className="w-5 h-5" />
+                      {t('apiKey.form.buttons.connect')} <Zap className="w-5 h-5" />
                     </>
                   )}
                 </Button>
@@ -240,9 +244,9 @@ export function ApiKeySetupPage() {
 
               <div className="border-t border-border pt-4 mt-2">
                 <p className="text-xs text-center text-text-secondary">
-                  Having trouble?{' '}
+                  {t('apiKey.form.help')}{' '}
                   <a href="#" className="text-primary font-medium hover:underline">
-                    Check our documentation
+                    {t('apiKey.form.docsLink')}
                   </a>
                   .
                 </p>
@@ -253,15 +257,21 @@ export function ApiKeySetupPage() {
             <div className="mt-6 flex justify-center gap-6 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
               <div className="flex items-center gap-2">
                 <ShieldCheck className="w-5 h-5 text-text-tertiary" />
-                <span className="text-xs font-semibold text-text-secondary">Secure</span>
+                <span className="text-xs font-semibold text-text-secondary">
+                  {t('apiKey.form.privacy.secure')}
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 <Zap className="w-5 h-5 text-text-tertiary" />
-                <span className="text-xs font-semibold text-text-secondary">Fast</span>
+                <span className="text-xs font-semibold text-text-secondary">
+                  {t('apiKey.form.privacy.fast')}
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 <MousePointerClick className="w-5 h-5 text-text-tertiary" />
-                <span className="text-xs font-semibold text-text-secondary">No Code</span>
+                <span className="text-xs font-semibold text-text-secondary">
+                  {t('apiKey.form.privacy.noCode')}
+                </span>
               </div>
             </div>
           </div>

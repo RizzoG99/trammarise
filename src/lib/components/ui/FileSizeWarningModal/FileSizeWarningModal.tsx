@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { AlertTriangle, XCircle } from 'lucide-react';
 import { Modal } from '../Modal';
 import type { FileSizeStatus } from '../../../../utils/fileSize';
@@ -72,24 +73,37 @@ export const FileSizeWarningModal: React.FC<FileSizeWarningModalProps> = ({
   onProceed,
   onCompress,
 }) => {
+  const { t } = useTranslation();
   const { formattedSize, isTooLarge, estimatedTime, recommendation } = fileSizeStatus;
 
   const actions = isTooLarge
     ? [
-        { label: 'Compress File', onClick: onCompress, variant: 'primary' as const },
-        { label: 'Cancel', onClick: onClose, variant: 'outline' as const },
+        {
+          label: t('fileSizeWarning.buttons.compress'),
+          onClick: onCompress,
+          variant: 'primary' as const,
+        },
+        { label: t('common.cancel'), onClick: onClose, variant: 'outline' as const },
       ]
     : [
-        { label: 'Compress & Continue', onClick: onCompress, variant: 'primary' as const },
-        { label: 'Continue Anyway', onClick: onProceed, variant: 'outline' as const },
-        { label: 'Cancel', onClick: onClose, variant: 'outline' as const },
+        {
+          label: t('fileSizeWarning.buttons.compressContinue'),
+          onClick: onCompress,
+          variant: 'primary' as const,
+        },
+        {
+          label: t('fileSizeWarning.buttons.continueAnyway'),
+          onClick: onProceed,
+          variant: 'outline' as const,
+        },
+        { label: t('common.cancel'), onClick: onClose, variant: 'outline' as const },
       ];
 
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isTooLarge ? 'File Too Large' : 'Large File Detected'}
+      title={isTooLarge ? t('fileSizeWarning.titles.tooLarge') : t('fileSizeWarning.titles.large')}
       actions={actions}
     >
       <div className="text-center">
@@ -99,12 +113,20 @@ export const FileSizeWarningModal: React.FC<FileSizeWarningModalProps> = ({
 
         <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 mb-6">
           <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700 last:border-0">
-            <span className="font-medium text-gray-500 dark:text-gray-400 text-sm">File Size:</span>
-            <span className="font-semibold text-gray-900 dark:text-gray-50 text-sm">{formattedSize}</span>
+            <span className="font-medium text-gray-500 dark:text-gray-400 text-sm">
+              {t('fileSizeWarning.labels.fileSize')}
+            </span>
+            <span className="font-semibold text-gray-900 dark:text-gray-50 text-sm">
+              {formattedSize}
+            </span>
           </div>
           <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700 last:border-0">
-            <span className="font-medium text-gray-500 dark:text-gray-400 text-sm">Estimated Processing Time:</span>
-            <span className="font-semibold text-gray-900 dark:text-gray-50 text-sm">{estimatedTime}</span>
+            <span className="font-medium text-gray-500 dark:text-gray-400 text-sm">
+              {t('fileSizeWarning.labels.estimatedTime')}
+            </span>
+            <span className="font-semibold text-gray-900 dark:text-gray-50 text-sm">
+              {estimatedTime}
+            </span>
           </div>
         </div>
 
@@ -114,12 +136,14 @@ export const FileSizeWarningModal: React.FC<FileSizeWarningModalProps> = ({
 
         {!isTooLarge && (
           <div className="text-left bg-green-50 dark:bg-green-900/40 border-l-4 border-emerald-500 rounded p-4 mb-4">
-            <h4 className="m-0 mb-3 text-emerald-800 dark:text-emerald-100 text-base">Benefits of Compression:</h4>
+            <h4 className="m-0 mb-3 text-emerald-800 dark:text-emerald-100 text-base">
+              {t('fileSizeWarning.benefits.title')}
+            </h4>
             <ul className="m-0 pl-6 text-emerald-700 dark:text-emerald-200 list-disc">
-              <li className="my-2 text-sm">Faster transcription processing</li>
-              <li className="my-2 text-sm">Lower memory usage during playback</li>
-              <li className="my-2 text-sm">Optimized for Whisper AI (16kHz sample rate)</li>
-              <li className="my-2 text-sm">No impact on transcription quality</li>
+              <li className="my-2 text-sm">{t('fileSizeWarning.benefits.faster')}</li>
+              <li className="my-2 text-sm">{t('fileSizeWarning.benefits.lowerMemory')}</li>
+              <li className="my-2 text-sm">{t('fileSizeWarning.benefits.optimized')}</li>
+              <li className="my-2 text-sm">{t('fileSizeWarning.benefits.noImpact')}</li>
             </ul>
           </div>
         )}
@@ -127,8 +151,10 @@ export const FileSizeWarningModal: React.FC<FileSizeWarningModalProps> = ({
         {isTooLarge && (
           <div className="text-left bg-red-50 dark:bg-red-900/40 border-l-4 border-red-500 rounded p-4 mb-4">
             <p className="m-0 text-red-800 dark:text-red-200 text-sm">
-              <strong className="text-red-900 dark:text-red-100">Note:</strong> Files larger than 50MB must be compressed before processing
-              to ensure optimal performance and prevent memory issues.
+              <strong className="text-red-900 dark:text-red-100">
+                {t('fileSizeWarning.note.label')}
+              </strong>{' '}
+              {t('fileSizeWarning.note.text')}
             </p>
           </div>
         )}

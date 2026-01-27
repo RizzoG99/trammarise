@@ -163,7 +163,7 @@ describe('FilePreview', () => {
       // Success message is displayed
       const successMessage = screen.getByText('File uploaded successfully');
       expect(successMessage).toBeInTheDocument();
-      
+
       // Verify success message has appropriate semantic structure
       const successContainer = successMessage.closest('div');
       expect(successContainer).toBeInTheDocument();
@@ -180,7 +180,7 @@ describe('FilePreview', () => {
       const fileNameElement = screen.getByText('test.mp3');
       expect(fileNameElement).toBeInTheDocument();
       expect(fileNameElement).toHaveAttribute('title', 'test.mp3');
-      
+
       // File type and size information are displayed
       expect(screen.getByText(/audio\/mpeg/)).toBeInTheDocument();
     });
@@ -195,10 +195,10 @@ describe('FilePreview', () => {
       // Verify buttons are accessible
       const replaceButton = screen.getByRole('button', { name: /replace audio file/i });
       const removeButton = screen.getByRole('button', { name: /remove audio file/i });
-      
+
       expect(replaceButton).toBeInTheDocument();
       expect(removeButton).toBeInTheDocument();
-      
+
       // Verify button text is also present for visual users
       expect(screen.getByText('Replace File')).toBeInTheDocument();
       expect(screen.getByText('Remove')).toBeInTheDocument();

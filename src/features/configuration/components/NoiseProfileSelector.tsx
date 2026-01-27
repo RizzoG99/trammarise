@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import type { NoiseProfile } from '../../../types/noise-profiles';
 import { NOISE_PROFILE_OPTIONS } from '../../../types/noise-profiles';
 import { Text } from '@/lib';
@@ -8,11 +9,13 @@ export interface NoiseProfileSelectorProps {
 }
 
 export function NoiseProfileSelector({ value, onChange }: NoiseProfileSelectorProps) {
+  const { t } = useTranslation();
+
   return (
     <div>
       <label htmlFor="noise-profile-select" className="block mb-2">
         <Text variant="body" color="primary" className="font-medium">
-          Audio Environment
+          {t('configuration.audioEnvironment.title')}
         </Text>
       </label>
       <select
@@ -29,7 +32,7 @@ export function NoiseProfileSelector({ value, onChange }: NoiseProfileSelectorPr
       >
         {NOISE_PROFILE_OPTIONS.map((option) => (
           <option key={option.value} value={option.value}>
-            {option.label}
+            {t(`configuration.noiseProfiles.${option.value}`)}
           </option>
         ))}
       </select>

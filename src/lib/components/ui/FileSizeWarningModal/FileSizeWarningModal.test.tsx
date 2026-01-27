@@ -101,7 +101,9 @@ describe('FileSizeWarningModal', () => {
           onCompress={() => {}}
         />
       );
-      expect(screen.getByText('We recommend compressing this file for faster processing.')).toBeInTheDocument();
+      expect(
+        screen.getByText('We recommend compressing this file for faster processing.')
+      ).toBeInTheDocument();
     });
 
     it('shows benefits of compression for warning state', () => {
@@ -360,7 +362,9 @@ describe('FileSizeWarningModal', () => {
           onCompress={() => {}}
         />
       );
-      expect(screen.getByText('Custom recommendation message for this specific file.')).toBeInTheDocument();
+      expect(
+        screen.getByText('Custom recommendation message for this specific file.')
+      ).toBeInTheDocument();
     });
   });
 });

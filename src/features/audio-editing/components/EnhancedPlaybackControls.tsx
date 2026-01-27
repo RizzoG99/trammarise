@@ -1,4 +1,5 @@
 import { Play, Pause, SkipBack, SkipForward, Volume2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface EnhancedPlaybackControlsProps {
   isPlaying: boolean;
@@ -27,8 +28,12 @@ export function EnhancedPlaybackControls({
   onSkipForward,
   onVolumeChange,
 }: EnhancedPlaybackControlsProps) {
+  const { t } = useTranslation();
   return (
-    <div className="p-4 border-t flex flex-col md:flex-row items-center justify-between gap-4" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-border)' }}>
+    <div
+      className="p-4 border-t flex flex-col md:flex-row items-center justify-between gap-4"
+      style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-border)' }}
+    >
       {/* Speed Control */}
       <div className="hidden md:flex items-center gap-2 w-1/4">
         {PLAYBACK_SPEEDS.map((speed) => (
@@ -40,7 +45,7 @@ export function EnhancedPlaybackControls({
                 ? 'text-[var(--color-text-primary)]'
                 : 'text-[var(--color-text-secondary)]'
             }`}
-            aria-label={`Set playback speed to ${speed}x`}
+            aria-label={t('playback.aria.speedControl', { speed })}
           >
             {speed}x
           </button>
@@ -51,18 +56,15 @@ export function EnhancedPlaybackControls({
       <div className="flex items-center justify-center gap-6 w-full md:w-auto">
         <button
           onClick={onSkipBack}
-          aria-label="Skip Back 10s"
+          aria-label={t('playback.aria.skipBack')}
           className="group p-2 rounded-full hover:bg-gray-100/50 text-[var(--color-text-primary)] transition-colors"
         >
-          <SkipBack
-            size={28}
-            className="group-hover:text-blue-500"
-          />
+          <SkipBack size={28} className="group-hover:text-blue-500" />
         </button>
 
         <button
           onClick={onPlayPause}
-          aria-label={isPlaying ? 'Pause' : 'Play'}
+          aria-label={isPlaying ? t('playback.aria.pause') : t('playback.aria.play')}
           className="size-14 flex items-center justify-center rounded-full bg-blue-500 hover:bg-blue-600 text-white shadow-lg shadow-blue-500/30 transition-all transform active:scale-95"
         >
           {isPlaying ? <Pause size={32} /> : <Play size={32} className="ml-1" />}
@@ -70,25 +72,22 @@ export function EnhancedPlaybackControls({
 
         <button
           onClick={onSkipForward}
-          aria-label="Skip Forward 10s"
+          aria-label={t('playback.aria.skipForward')}
           className="group p-2 rounded-full hover:bg-gray-100/50 text-[var(--color-text-primary)] transition-colors"
         >
-          <SkipForward
-            size={28}
-            className="group-hover:text-blue-500"
-          />
+          <SkipForward size={28} className="group-hover:text-blue-500" />
         </button>
       </div>
 
       {/* Volume Control */}
       <div className="hidden md:flex items-center justify-end gap-2 w-1/4 group">
-        <div
-          className="p-1.5 text-[var(--color-text-secondary)]"
-          aria-hidden="true"
-        >
+        <div className="p-1.5 text-[var(--color-text-secondary)]" aria-hidden="true">
           <Volume2 size={20} />
         </div>
-        <div className="w-24 h-1 rounded-full overflow-hidden cursor-pointer relative" style={{ backgroundColor: 'var(--color-bg-tertiary)' }}>
+        <div
+          className="w-24 h-1 rounded-full overflow-hidden cursor-pointer relative"
+          style={{ backgroundColor: 'var(--color-bg-tertiary)' }}
+        >
           <input
             type="range"
             min="0"
@@ -97,13 +96,13 @@ export function EnhancedPlaybackControls({
             value={volume}
             onChange={(e) => onVolumeChange(parseFloat(e.target.value))}
             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-            aria-label="Volume slider"
+            aria-label={t('playback.aria.volumeSlider')}
           />
           <div
             className="h-full group-hover:bg-blue-500 transition-colors"
-            style={{ 
+            style={{
               backgroundColor: 'var(--color-text-secondary)',
-              width: `${volume * 100}%`
+              width: `${volume * 100}%`,
             }}
           />
         </div>

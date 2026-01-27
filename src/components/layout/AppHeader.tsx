@@ -86,7 +86,7 @@ export function AppHeader({ fileName, onFileNameChange, onExport }: AppHeaderPro
                       variant="secondary"
                       onClick={handleSave}
                       className="p-1"
-                      aria-label="Save file name"
+                      aria-label={t('header.aria.saveFile')}
                     >
                       <Check className="w-4 h-4" />
                     </Button>
@@ -94,7 +94,7 @@ export function AppHeader({ fileName, onFileNameChange, onExport }: AppHeaderPro
                       variant="secondary"
                       onClick={handleCancel}
                       className="p-1"
-                      aria-label="Cancel editing"
+                      aria-label={t('header.aria.cancelEdit')}
                     >
                       <X className="w-4 h-4" />
                     </Button>
@@ -107,7 +107,7 @@ export function AppHeader({ fileName, onFileNameChange, onExport }: AppHeaderPro
                         variant="secondary"
                         onClick={() => setIsEditing(true)}
                         className="p-1"
-                        aria-label="Edit file name"
+                        aria-label={t('header.aria.editFile')}
                       >
                         <Edit2 className="w-4 h-4" />
                       </Button>

@@ -1,5 +1,6 @@
 import { Clock, CheckCircle, AlertCircle } from 'lucide-react';
 import { formatTime } from '../../../utils/audio';
+import { useTranslation } from 'react-i18next';
 
 interface AudioStatusBadgesProps {
   totalDuration: number;
@@ -10,29 +11,34 @@ interface AudioStatusBadgesProps {
  * Displays status badges for audio metadata
  * Shows total duration and optional quality status
  */
-export function AudioStatusBadges({ totalDuration, qualityStatus = 'unknown' }: AudioStatusBadgesProps) {
+export function AudioStatusBadges({
+  totalDuration,
+  qualityStatus = 'unknown',
+}: AudioStatusBadgesProps) {
+  const { t } = useTranslation();
+
   const qualityConfig = {
     clean: {
       icon: CheckCircle,
-      label: 'Clean Audio',
+      label: t('audioStatus.clean'),
       style: {
-        backgroundColor: 'rgba(16, 185, 129, 0.1)',
-        color: '#10b981',
-        borderColor: 'rgba(16, 185, 129, 0.2)',
+        backgroundColor: 'var(--color-accent-success-alpha-10)',
+        color: 'var(--color-accent-success)',
+        borderColor: 'var(--color-accent-success-alpha-20)',
       },
     },
     noisy: {
       icon: AlertCircle,
-      label: 'Noisy Audio',
+      label: t('audioStatus.noisy'),
       style: {
-        backgroundColor: 'rgba(245, 158, 11, 0.1)',
-        color: '#f59e0b',
-        borderColor: 'rgba(245, 158, 11, 0.2)',
+        backgroundColor: 'var(--color-accent-warning-alpha-10)',
+        color: 'var(--color-accent-warning)',
+        borderColor: 'var(--color-accent-warning-alpha-20)',
       },
     },
     unknown: {
       icon: CheckCircle,
-      label: 'Ready',
+      label: t('audioStatus.ready'),
       style: {
         backgroundColor: 'var(--color-bg-tertiary)',
         color: 'var(--color-text-secondary)',
@@ -47,13 +53,23 @@ export function AudioStatusBadges({ totalDuration, qualityStatus = 'unknown' }: 
   return (
     <div className="flex gap-2">
       {/* Duration Badge */}
-      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border" style={{ backgroundColor: 'var(--color-primary-alpha-10)', color: 'var(--color-primary)', borderColor: 'var(--color-primary-alpha-20)' }}>
+      <span
+        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border"
+        style={{
+          backgroundColor: 'var(--color-primary-alpha-10)',
+          color: 'var(--color-primary)',
+          borderColor: 'var(--color-primary-alpha-20)',
+        }}
+      >
         <Clock size={16} />
-        {formatTime(totalDuration)} Total
+        {formatTime(totalDuration)} {t('audioStatus.total')}
       </span>
 
       {/* Quality Badge */}
-      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border" style={quality.style}>
+      <span
+        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border"
+        style={quality.style}
+      >
         <QualityIcon size={16} />
         {quality.label}
       </span>

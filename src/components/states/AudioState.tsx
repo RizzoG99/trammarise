@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button, WaveformPlayer, PlaybackControls } from '@/lib';
 import type { WaveformPlayerRef } from '@/lib';
 import { AUDIO_CONSTANTS } from '../../utils/constants';
@@ -29,6 +30,7 @@ export const AudioState: React.FC<AudioStateProps> = ({
   onReset,
   onProcessingStart,
 }) => {
+  const { t } = useTranslation();
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -69,7 +71,7 @@ export const AudioState: React.FC<AudioStateProps> = ({
     const regions = playerRef.current?.regions?.getRegions();
 
     if (!regions || regions.length === 0) {
-      showMessage('Please select a region to trim', 'info');
+      showMessage(t('audioState.messages.noRegion'), 'info');
       return;
     }
 
@@ -79,31 +81,34 @@ export const AudioState: React.FC<AudioStateProps> = ({
 
     // Validate region bounds
     if (start >= end) {
-      showMessage('Invalid trim region: start must be before end', 'error');
+      showMessage(t('audioState.messages.invalidRegion'), 'error');
       return;
     }
 
     if (start < 0 || end < 0) {
-      showMessage('Invalid trim region: negative time values', 'error');
+      showMessage(t('audioState.messages.negativeTime'), 'error');
       return;
     }
 
     if (end - start < AUDIO_CONSTANTS.MIN_TRIM_DURATION) {
-      showMessage(`Trim region too short: minimum ${AUDIO_CONSTANTS.MIN_TRIM_DURATION} seconds required`, 'error');
+      showMessage(
+        t('audioState.messages.tooShort', { duration: AUDIO_CONSTANTS.MIN_TRIM_DURATION }),
+        'error'
+      );
       return;
     }
 
     try {
       const wavesurfer = playerRef.current?.wavesurfer;
       if (!wavesurfer) {
-        showMessage('Audio player not ready', 'error');
+        showMessage(t('audioState.messages.playerNotReady'), 'error');
         return;
       }
 
       const audioBuffer = wavesurfer.getDecodedData();
 
       if (!audioBuffer) {
-        showMessage('Audio data not loaded', 'error');
+        showMessage(t('audioState.messages.audioNotLoaded'), 'error');
         return;
       }
 
@@ -115,7 +120,7 @@ export const AudioState: React.FC<AudioStateProps> = ({
 
       const { trimAudioBuffer, audioBufferToWav } = await Promise.race([
         importPromise,
-        timeoutPromise
+        timeoutPromise,
       ]);
 
       const trimmedBuffer = await trimAudioBuffer(audioBuffer, start, end);
@@ -124,7 +129,7 @@ export const AudioState: React.FC<AudioStateProps> = ({
       await wavesurfer.loadBlob(blob);
       handleCancelTrim();
 
-      showMessage('Audio trimmed successfully!', 'success');
+      showMessage(t('audioState.messages.trimSuccess'), 'success');
     } catch (error) {
       console.error('Error trimming audio:', error);
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -138,7 +143,8 @@ export const AudioState: React.FC<AudioStateProps> = ({
   };
 
   const getMessageClasses = (type: MessageType) => {
-    const baseClasses = "p-4 rounded-lg mb-4 text-sm animate-[fadeIn_0.3s_ease-out] backdrop-blur-md";
+    const baseClasses =
+      'p-4 rounded-lg mb-4 text-sm animate-[fadeIn_0.3s_ease-out] backdrop-blur-md';
     switch (type) {
       case 'success':
         return `${baseClasses} bg-green-500/10 border border-green-500/30 text-green-400`;
@@ -153,14 +159,10 @@ export const AudioState: React.FC<AudioStateProps> = ({
     <div className="w-full max-w-[800px] animate-[fadeIn_0.3s_ease-out]">
       <div className="text-center mb-8">
         <h2 className="text-2xl font-semibold mb-1">{audioName}</h2>
-        <p className="text-base text-text-secondary">Visualize and trim your audio below</p>
+        <p className="text-base text-text-secondary">{t('audioState.title')}</p>
       </div>
 
-      {message && (
-        <div className={getMessageClasses(message.type)}>
-          {message.text}
-        </div>
-      )}
+      {message && <div className={getMessageClasses(message.type)}>{message.text}</div>}
 
       <WaveformPlayer
         audioFile={audioFile}
@@ -184,11 +186,16 @@ export const AudioState: React.FC<AudioStateProps> = ({
       />
 
       <div className="flex flex-col gap-4 mt-8 sm:flex-row">
-        <Button variant="primary" icon={<ProcessIcon />} onClick={handleProcess} className="w-full sm:flex-[2]">
-          Process Audio
+        <Button
+          variant="primary"
+          icon={<ProcessIcon />}
+          onClick={handleProcess}
+          className="w-full sm:flex-[2]"
+        >
+          {t('audioState.buttons.process')}
         </Button>
         <Button variant="outline" onClick={onReset} className="w-full sm:flex-1">
-          Start Over
+          {t('audioState.buttons.startOver')}
         </Button>
       </div>
     </div>

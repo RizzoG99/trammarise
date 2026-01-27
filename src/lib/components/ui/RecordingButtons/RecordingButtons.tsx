@@ -1,4 +1,5 @@
 import { Mic, Square, Pause, Play } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface RecordingButtonProps {
   onClick: () => void;
@@ -39,8 +40,11 @@ export function RecordButton({
   disabled = false,
   isRecording = false,
   className = '',
-  'aria-label': ariaLabel = 'Start recording'
+  'aria-label': ariaLabel,
 }: RecordButtonProps) {
+  const { t } = useTranslation();
+  const defaultAriaLabel = ariaLabel || t('upload.aria.startRecording');
+
   return (
     <button
       onClick={onClick}
@@ -52,7 +56,7 @@ export function RecordButton({
       } ${className}`}
       style={{
         backgroundColor: disabled || isRecording ? 'transparent' : 'var(--color-primary)',
-        color: disabled || isRecording ? 'var(--color-text-tertiary)' : 'white'
+        color: disabled || isRecording ? 'var(--color-text-tertiary)' : 'white',
       }}
       onMouseEnter={(e) => {
         if (!disabled && !isRecording) {
@@ -64,7 +68,7 @@ export function RecordButton({
           e.currentTarget.style.backgroundColor = 'var(--color-primary)';
         }
       }}
-      aria-label={ariaLabel}
+      aria-label={defaultAriaLabel}
     >
       <Mic className={disabled || isRecording ? 'w-7 h-7' : 'w-8 h-8'} />
 
@@ -110,9 +114,12 @@ export function PauseButton({
   disabled = false,
   isPaused = false,
   className = '',
-  'aria-label': ariaLabel
+  'aria-label': ariaLabel,
 }: PauseButtonProps) {
-  const defaultLabel = isPaused ? 'Resume recording' : 'Pause recording';
+  const { t } = useTranslation();
+  const defaultLabel = isPaused
+    ? t('upload.aria.resumeRecording')
+    : t('upload.aria.pauseRecording');
 
   return (
     <button
@@ -121,7 +128,7 @@ export function PauseButton({
       className={`p-3 rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
       style={{
         backgroundColor: !disabled ? 'var(--color-text-secondary)' : 'transparent',
-        color: !disabled ? 'white' : 'var(--color-text-tertiary)'
+        color: !disabled ? 'white' : 'var(--color-text-tertiary)',
       }}
       onMouseEnter={(e) => {
         if (!disabled) e.currentTarget.style.backgroundColor = 'var(--color-text-primary)';
@@ -158,7 +165,7 @@ export function StopButton({
   onClick,
   disabled = false,
   className = '',
-  'aria-label': ariaLabel = 'Stop recording'
+  'aria-label': ariaLabel = 'Stop recording',
 }: RecordingButtonProps) {
   return (
     <button
@@ -167,10 +174,10 @@ export function StopButton({
       className={`p-3 rounded-full transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
       style={{
         backgroundColor: !disabled ? 'var(--color-accent-error)' : 'transparent',
-        color: !disabled ? 'white' : 'var(--color-text-tertiary)'
+        color: !disabled ? 'white' : 'var(--color-text-tertiary)',
       }}
       onMouseEnter={(e) => {
-        if (!disabled) e.currentTarget.style.backgroundColor = '#dc2626';
+        if (!disabled) e.currentTarget.style.backgroundColor = 'var(--color-accent-error-hover)';
       }}
       onMouseLeave={(e) => {
         if (!disabled) e.currentTarget.style.backgroundColor = 'var(--color-accent-error)';

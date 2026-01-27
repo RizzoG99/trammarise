@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/lib';
 import { formatTime } from '../../utils/audio';
 
@@ -13,21 +14,22 @@ const StopIcon = () => (
   </svg>
 );
 
-export const RecordingState: React.FC<RecordingStateProps> = ({
-  duration,
-  onStopRecording,
-}) => {
+export const RecordingState: React.FC<RecordingStateProps> = ({ duration, onStopRecording }) => {
+  const { t } = useTranslation();
+
   return (
     <div className="w-full max-w-[600px] flex flex-col items-center animate-[fadeIn_0.3s_ease-out]">
       <div className="flex items-center justify-center gap-3 mb-8">
         <div className="w-3 h-3 rounded-full bg-red-500 animate-[pulse_1.5s_ease-in-out_infinite]" />
-        <span className="text-lg font-medium text-red-500">Recording...</span>
+        <span className="text-lg font-medium text-red-500">{t('recordingState.status')}</span>
       </div>
 
-      <div className="text-5xl font-light mb-12 tabular-nums text-white dark:text-slate-900">{formatTime(duration)}</div>
+      <div className="text-5xl font-light mb-12 tabular-nums text-white dark:text-slate-900">
+        {formatTime(duration)}
+      </div>
 
       <Button variant="danger" icon={<StopIcon />} onClick={onStopRecording}>
-        Stop Recording
+        {t('recordingState.stopButton')}
       </Button>
     </div>
   );
