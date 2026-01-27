@@ -52,7 +52,7 @@ export function SummaryPanel({ summary, structuredSummary }: SummaryPanelProps) 
         </div>
 
         {/* Content */}
-        <div className="prose prose-sm dark:prose-invert max-w-none">
+        <div className="prose prose-sm dark:prose-invert max-w-none markdown-tables">
           {structuredSummary ? (
             // Phase 4: Structured summary (not yet implemented)
             <div>
@@ -65,6 +65,35 @@ export function SummaryPanel({ summary, structuredSummary }: SummaryPanelProps) 
             <ReactMarkdown remarkPlugins={[remarkGfm]}>{summary}</ReactMarkdown>
           )}
         </div>
+
+        <style>{`
+          .markdown-tables table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+          }
+
+          .markdown-tables th,
+          .markdown-tables td {
+            border: 1px solid var(--color-border, #e5e7eb);
+            padding: 0.5rem 0.75rem;
+            text-align: left;
+          }
+
+          .markdown-tables th {
+            background-color: var(--color-background-secondary, #f9fafb);
+            font-weight: 600;
+          }
+
+          .dark .markdown-tables th {
+            background-color: var(--color-background-tertiary, #1f2937);
+          }
+
+          .dark .markdown-tables th,
+          .dark .markdown-tables td {
+            border-color: var(--color-border, #374151);
+          }
+        `}</style>
       </div>
     </GlassCard>
   );
