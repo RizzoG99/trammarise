@@ -12,7 +12,7 @@ import {
   Lock,
 } from 'lucide-react';
 import { useApiKey } from '../context/ApiKeyContext';
-import { GlassCard, Button, Heading, Text } from '@/lib';
+import { GlassCard, Button, Heading, Text, SEO } from '@/lib';
 import { AppHeader } from '../components/layout/AppHeader';
 
 export function ApiKeySetupPage() {
@@ -47,6 +47,11 @@ export function ApiKeySetupPage() {
 
   return (
     <div className="min-h-screen bg-background-light dark:bg-background-dark flex flex-col font-sans text-text-primary">
+      <SEO
+        title="Setup API Key"
+        description="Configure your OpenAI API key to enable AI-powered transcription and summarization features in Trammarise."
+        canonical="https://trammarise.app/setup"
+      />
       {/* Reusing AppHeader for consistency */}
       <AppHeader />
 

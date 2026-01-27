@@ -5,7 +5,7 @@ import type { LanguageCode } from '../../types/languages';
 import type { ContentType } from '../../types/content-types';
 import type { ProcessingMode } from '../../features/configuration/components/ProcessingModeSelector';
 import { SlidersHorizontal } from 'lucide-react';
-import { Heading, Text, GlassCard } from '@/lib';
+import { Heading, Text, GlassCard, SEO } from '@/lib';
 import { PageLayout } from '../../components/layout/PageLayout';
 import { UploadPanel } from '../../features/upload/components/UploadPanel';
 import { RecordPanel, type RecordPanelRef } from '../../features/upload/components/RecordPanel';
@@ -100,6 +100,11 @@ export function UploadRecordPage() {
 
   return (
     <PageLayout>
+      <SEO
+        title="Trammarise - AI Audio Transcription & Summarization"
+        description="Transform your audio recordings into accurate transcripts and intelligent summaries. Upload or record audio, get AI-powered transcription with OpenAI Whisper, and generate comprehensive summaries."
+        canonical="https://trammarise.app/"
+      />
       {/* Page Title */}
       <div className="mb-8">
         <Heading level="h1">{t('home.title')}</Heading>
