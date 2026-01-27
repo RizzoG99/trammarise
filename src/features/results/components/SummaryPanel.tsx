@@ -52,7 +52,7 @@ export function SummaryPanel({ summary, structuredSummary }: SummaryPanelProps) 
         </div>
 
         {/* Content */}
-        <div className="prose prose-sm dark:prose-invert max-w-none markdown-tables">
+        <div className="prose prose-sm dark:prose-invert max-w-none">
           {structuredSummary ? (
             // Phase 4: Structured summary (not yet implemented)
             <div>
@@ -62,38 +62,137 @@ export function SummaryPanel({ summary, structuredSummary }: SummaryPanelProps) 
             </div>
           ) : (
             // Phase 1: Markdown rendering with GitHub Flavored Markdown support
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>{summary}</ReactMarkdown>
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              components={{
+                h1: ({ children }) => (
+                  <Heading
+                    level="h1"
+                    className="mt-6 mb-4 border-b border-[var(--color-border)] pb-2 first:mt-0"
+                  >
+                    {children}
+                  </Heading>
+                ),
+                h2: ({ children }) => (
+                  <Heading level="h2" className="mt-5 mb-3">
+                    {children}
+                  </Heading>
+                ),
+                h3: ({ children }) => (
+                  <Heading level="h3" className="mt-4 mb-2">
+                    {children}
+                  </Heading>
+                ),
+                p: ({ children }) => <Text className="mb-4">{children}</Text>,
+                a: (props) => {
+                  return (
+                    <a
+                      href={props.href}
+                      className="text-[var(--color-primary)] hover:underline transition-colors font-medium"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {props.children}
+                    </a>
+                  );
+                },
+                ul: ({ children }) => {
+                  return (
+                    <ul className="list-disc pl-5 mb-4 space-y-1 text-[var(--color-text-primary)]">
+                      {children}
+                    </ul>
+                  );
+                },
+                ol: (props) => {
+                  return (
+                    <ol
+                      className="list-decimal pl-5 mb-4 space-y-1 text-[var(--color-text-primary)]"
+                      {...props}
+                    >
+                      {props.children}
+                    </ol>
+                  );
+                },
+                li: (props) => {
+                  return (
+                    <li className="pl-1" {...props}>
+                      <Text as="span">{props.children}</Text>
+                    </li>
+                  );
+                },
+                blockquote: (props) => {
+                  return (
+                    <blockquote
+                      className="border-l-4 border-[var(--color-primary)] pl-4 py-1 my-4 bg-[var(--color-background-secondary)]/30 rounded-r italic"
+                      {...props}
+                    >
+                      {props.children}
+                    </blockquote>
+                  );
+                },
+                code: (props) => {
+                  const match = /language-(\w+)/.exec(props.className || '');
+                  // Inline code
+                  if (!match) {
+                    return (
+                      <code
+                        className="bg-[var(--color-background-secondary)] px-1.5 py-0.5 rounded text-sm font-mono text-[var(--color-text-primary)] border border-[var(--color-border)]"
+                        {...props}
+                      >
+                        {props.children}
+                      </code>
+                    );
+                  }
+                  // Block code
+                  return (
+                    <code
+                      className={`block bg-[var(--color-background-tertiary)] p-3 rounded-lg overflow-x-auto text-sm font-mono border border-[var(--color-border)] ${props.className}`}
+                      {...props}
+                    >
+                      {props.children}
+                    </code>
+                  );
+                },
+                table: (props) => {
+                  return (
+                    <div className="overflow-x-auto my-4 rounded-lg border border-[var(--color-border)]">
+                      <table
+                        className="w-full border-collapse bg-transparent [&_tr:last-child_td]:border-b-0"
+                        {...props}
+                      >
+                        {props.children}
+                      </table>
+                    </div>
+                  );
+                },
+                th: (props) => {
+                  return (
+                    <th
+                      className="border-b border-[var(--color-border)] bg-[var(--color-background-secondary)] px-4 py-2 text-left font-semibold text-[var(--color-text-primary)]"
+                      {...props}
+                    >
+                      <Text variant="small" className="font-semibold">
+                        {props.children}
+                      </Text>
+                    </th>
+                  );
+                },
+                td: (props) => {
+                  return (
+                    <td
+                      className="border-b border-[var(--color-border)] px-4 py-2 text-[var(--color-text-secondary)]"
+                      {...props}
+                    >
+                      <Text variant="small">{props.children}</Text>
+                    </td>
+                  );
+                },
+              }}
+            >
+              {summary}
+            </ReactMarkdown>
           )}
         </div>
-
-        <style>{`
-          .markdown-tables table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 1rem 0;
-          }
-
-          .markdown-tables th,
-          .markdown-tables td {
-            border: 1px solid var(--color-border, #e5e7eb);
-            padding: 0.5rem 0.75rem;
-            text-align: left;
-          }
-
-          .markdown-tables th {
-            background-color: var(--color-background-secondary, #f9fafb);
-            font-weight: 600;
-          }
-
-          .dark .markdown-tables th {
-            background-color: var(--color-background-tertiary, #1f2937);
-          }
-
-          .dark .markdown-tables th,
-          .dark .markdown-tables td {
-            border-color: var(--color-border, #374151);
-          }
-        `}</style>
       </div>
     </GlassCard>
   );
