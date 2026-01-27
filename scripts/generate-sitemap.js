@@ -30,11 +30,6 @@ const routes = [
     priority: '0.8',
     changefreq: 'monthly',
   },
-  {
-    path: '/audio-editing',
-    priority: '0.7',
-    changefreq: 'monthly',
-  },
 ];
 
 /**

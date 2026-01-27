@@ -1,8 +1,12 @@
 import { useParams } from 'react-router-dom';
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, lazy, Suspense } from 'react';
 import { ArrowRight } from 'lucide-react';
-import { Heading, Text, GlassCard, WaveformPlayer, SEO } from '@/lib';
+import { Heading, Text, GlassCard, WaveformPlayer } from '@/lib';
 import type { WaveformPlayerRef } from '@/lib';
+
+const SEO = lazy(() =>
+  import('@/lib/components/common/SEO').then((module) => ({ default: module.SEO }))
+);
 import { PageLayout } from '../../components/layout/PageLayout';
 import { useSessionStorage } from '../../hooks/useSessionStorage';
 import { useRouteState } from '../../hooks/useRouteState';
@@ -203,11 +207,13 @@ export function AudioEditingPage() {
 
   return (
     <PageLayout>
-      <SEO
-        title="Edit Audio"
-        description="Edit and trim your audio recording before transcription. Select specific segments or process the entire recording."
-        canonical="https://trammarise.app/audio-editing"
-      />
+      <Suspense fallback={null}>
+        <SEO
+          title="Edit Audio"
+          description="Edit and trim your audio recording before transcription. Select specific segments or process the entire recording."
+          canonical="https://trammarise.app/audio-editing"
+        />
+      </Suspense>
       {/* Page Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-6">
         <div className="flex flex-col gap-2">

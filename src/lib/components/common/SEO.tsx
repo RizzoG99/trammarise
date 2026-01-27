@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
 
 interface SEOProps {
@@ -29,19 +30,23 @@ export function SEO({
   const url = canonical || 'https://trammarise.app';
 
   // Structured data for search engines
-  const structuredData = {
-    '@context': 'https://schema.org',
-    '@type': 'WebApplication',
-    name: 'Trammarise',
-    description,
-    url,
-    applicationCategory: 'BusinessApplication',
-    offers: {
-      '@type': 'Offer',
-      price: '0',
-      priceCurrency: 'USD',
-    },
-  };
+  // Structured data for search engines
+  const structuredData = useMemo(
+    () => ({
+      '@context': 'https://schema.org',
+      '@type': 'WebApplication',
+      name: 'Trammarise',
+      description,
+      url,
+      applicationCategory: 'BusinessApplication',
+      offers: {
+        '@type': 'Offer',
+        price: '0',
+        priceCurrency: 'USD',
+      },
+    }),
+    [description, url]
+  );
 
   return (
     <Helmet>
@@ -63,8 +68,12 @@ export function SEO({
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={image} />
 
-      {/* JSON-LD Structured Data */}
-      <script type="application/ld+json">{JSON.stringify(structuredData)}</script>
+      {/* JSON-LD Structured Data - Only on homepage */}
+      {canonical === 'https://trammarise.app/' && (
+        <script type="application/ld+json" id="trammarise-jsonld">
+          {JSON.stringify(structuredData)}
+        </script>
+      )}
     </Helmet>
   );
 }
