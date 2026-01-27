@@ -11,7 +11,7 @@ describe('FilePreview', () => {
 
       render(<FilePreview file={file} onRemove={onRemove} onReplace={onReplace} />);
 
-      expect(screen.getByText('filePreview.uploadSuccess')).toBeInTheDocument();
+      expect(screen.getByText('File uploaded successfully')).toBeInTheDocument();
       expect(screen.getByText('test-audio.mp3')).toBeInTheDocument();
       expect(screen.getByText(/audio\/mpeg/)).toBeInTheDocument();
     });
@@ -55,7 +55,7 @@ describe('FilePreview', () => {
 
       render(<FilePreview file={blob} onRemove={onRemove} onReplace={onReplace} />);
 
-      expect(screen.getByText('filePreview.recordingSaved')).toBeInTheDocument();
+      expect(screen.getByText('Recording saved')).toBeInTheDocument();
       expect(screen.getByText('recording.webm')).toBeInTheDocument();
     });
 
@@ -161,7 +161,7 @@ describe('FilePreview', () => {
       render(<FilePreview file={file} onRemove={onRemove} onReplace={onReplace} />);
 
       // Success message is displayed
-      const successMessage = screen.getByText('filePreview.uploadSuccess');
+      const successMessage = screen.getByText('File uploaded successfully');
       expect(successMessage).toBeInTheDocument();
 
       // Verify success message has appropriate semantic structure
@@ -200,8 +200,8 @@ describe('FilePreview', () => {
       expect(removeButton).toBeInTheDocument();
 
       // Verify button text is also present for visual users
-      expect(screen.getByText('filePreview.replaceFile')).toBeInTheDocument();
-      expect(screen.getByText('filePreview.remove')).toBeInTheDocument();
+      expect(screen.getByText('Replace File')).toBeInTheDocument();
+      expect(screen.getByText('Remove')).toBeInTheDocument();
     });
   });
 
@@ -213,7 +213,7 @@ describe('FilePreview', () => {
 
       render(<FilePreview file={file} onRemove={onRemove} onReplace={onReplace} />);
 
-      expect(screen.getByText('filePreview.unknownFormat')).toBeInTheDocument();
+      expect(screen.getByText('Unknown format')).toBeInTheDocument();
     });
 
     it('handles very large file sizes', () => {

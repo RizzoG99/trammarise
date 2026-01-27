@@ -36,7 +36,7 @@ describe('FileSizeWarningModal', () => {
           onCompress={() => {}}
         />
       );
-      expect(screen.getByText('fileSizeWarning.titles.large')).toBeInTheDocument();
+      expect(screen.getByText('Large File Detected')).toBeInTheDocument();
     });
 
     it('does not render when isOpen is false', () => {
@@ -49,7 +49,7 @@ describe('FileSizeWarningModal', () => {
           onCompress={() => {}}
         />
       );
-      expect(screen.queryByText('fileSizeWarning.titles.large')).not.toBeInTheDocument();
+      expect(screen.queryByText('Large File Detected')).not.toBeInTheDocument();
     });
 
     it('displays warning title for non-too-large files', () => {
@@ -62,7 +62,7 @@ describe('FileSizeWarningModal', () => {
           onCompress={() => {}}
         />
       );
-      expect(screen.getByText('fileSizeWarning.titles.large')).toBeInTheDocument();
+      expect(screen.getByText('Large File Detected')).toBeInTheDocument();
     });
 
     it('displays file size', () => {
@@ -116,9 +116,9 @@ describe('FileSizeWarningModal', () => {
           onCompress={() => {}}
         />
       );
-      expect(screen.getByText('fileSizeWarning.benefits.title')).toBeInTheDocument();
-      expect(screen.getByText('fileSizeWarning.benefits.faster')).toBeInTheDocument();
-      expect(screen.getByText('fileSizeWarning.benefits.lowerMemory')).toBeInTheDocument();
+      expect(screen.getByText('Benefits of Compression:')).toBeInTheDocument();
+      expect(screen.getByText('Faster transcription processing')).toBeInTheDocument();
+      expect(screen.getByText('Lower memory usage during playback')).toBeInTheDocument();
     });
 
     it('shows warning icon for warning state', () => {
@@ -147,7 +147,7 @@ describe('FileSizeWarningModal', () => {
           onCompress={() => {}}
         />
       );
-      expect(screen.getByText('fileSizeWarning.titles.tooLarge')).toBeInTheDocument();
+      expect(screen.getByText('File Too Large')).toBeInTheDocument();
     });
 
     it('displays file size for error state', () => {
@@ -173,7 +173,7 @@ describe('FileSizeWarningModal', () => {
           onCompress={() => {}}
         />
       );
-      expect(screen.getByText('fileSizeWarning.note.text')).toBeInTheDocument();
+      expect(screen.getByText(/Files larger than 50MB must be compressed/)).toBeInTheDocument();
     });
 
     it('does not show benefits list for error state', () => {
@@ -186,7 +186,7 @@ describe('FileSizeWarningModal', () => {
           onCompress={() => {}}
         />
       );
-      expect(screen.queryByText('fileSizeWarning.benefits.title')).not.toBeInTheDocument();
+      expect(screen.queryByText('Benefits of Compression:')).not.toBeInTheDocument();
     });
 
     it('shows error icon for error state', () => {
@@ -215,9 +215,9 @@ describe('FileSizeWarningModal', () => {
           onCompress={() => {}}
         />
       );
-      expect(screen.getByText('fileSizeWarning.buttons.compressContinue')).toBeInTheDocument();
-      expect(screen.getByText('fileSizeWarning.buttons.continueAnyway')).toBeInTheDocument();
-      expect(screen.getByText('common.cancel')).toBeInTheDocument();
+      expect(screen.getByText('Compress & Continue')).toBeInTheDocument();
+      expect(screen.getByText('Continue Anyway')).toBeInTheDocument();
+      expect(screen.getByText('Cancel')).toBeInTheDocument();
     });
 
     it('calls onCompress when Compress button is clicked', async () => {
@@ -233,7 +233,7 @@ describe('FileSizeWarningModal', () => {
         />
       );
 
-      await user.click(screen.getByText('fileSizeWarning.buttons.compressContinue'));
+      await user.click(screen.getByText('Compress & Continue'));
       expect(handleCompress).toHaveBeenCalledTimes(1);
     });
 
@@ -250,7 +250,7 @@ describe('FileSizeWarningModal', () => {
         />
       );
 
-      await user.click(screen.getByText('fileSizeWarning.buttons.continueAnyway'));
+      await user.click(screen.getByText('Continue Anyway'));
       expect(handleProceed).toHaveBeenCalledTimes(1);
     });
 
@@ -267,7 +267,7 @@ describe('FileSizeWarningModal', () => {
         />
       );
 
-      await user.click(screen.getByText('common.cancel'));
+      await user.click(screen.getByText('Cancel'));
       expect(handleClose).toHaveBeenCalledTimes(1);
     });
   });
@@ -283,9 +283,9 @@ describe('FileSizeWarningModal', () => {
           onCompress={() => {}}
         />
       );
-      expect(screen.getByText('fileSizeWarning.buttons.compress')).toBeInTheDocument();
-      expect(screen.getByText('common.cancel')).toBeInTheDocument();
-      expect(screen.queryByText('fileSizeWarning.buttons.continueAnyway')).not.toBeInTheDocument();
+      expect(screen.getByText('Compress File')).toBeInTheDocument();
+      expect(screen.getByText('Cancel')).toBeInTheDocument();
+      expect(screen.queryByText('Continue Anyway')).not.toBeInTheDocument();
     });
 
     it('calls onCompress when Compress File is clicked', async () => {
@@ -301,7 +301,7 @@ describe('FileSizeWarningModal', () => {
         />
       );
 
-      await user.click(screen.getByText('fileSizeWarning.buttons.compress'));
+      await user.click(screen.getByText('Compress File'));
       expect(handleCompress).toHaveBeenCalledTimes(1);
     });
 
@@ -318,7 +318,7 @@ describe('FileSizeWarningModal', () => {
         />
       );
 
-      await user.click(screen.getByText('common.cancel'));
+      await user.click(screen.getByText('Cancel'));
       expect(handleClose).toHaveBeenCalledTimes(1);
     });
   });
