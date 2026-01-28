@@ -50,7 +50,7 @@ export function ProcessingPage() {
 
   // Start processing on mount
   useEffect(() => {
-    if (!session || !session.audioFile || isProcessing || error) return;
+    if (!session || !session.audioFile || isProcessing || error || session.result) return;
 
     let config;
     try {

@@ -4,12 +4,16 @@
  * Tests for adaptive rate limiting with mode-aware concurrency control.
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { RateLimitGovernor } from '../rate-limit-governor';
 import { ConcurrencyTracker, BackoffTracker } from '../__test-helpers__/test-fixtures';
 import { DEGRADED_MODE_CONFIG } from '../../types/rate-limiting';
 
 describe('Rate Limit Governor', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   describe('Balanced Mode', () => {
     let governor: RateLimitGovernor;
 
@@ -157,40 +161,36 @@ describe('Rate Limit Governor', () => {
       governor = new RateLimitGovernor('balanced');
     });
 
-    it(
-      'should enter degraded mode when >30% requests are rate limited',
-      { timeout: 15000 },
-      async () => {
-        vi.useRealTimers(); // Use real timers for async operations
+    it('should enter degraded mode when >30% requests are rate limited', async () => {
+      vi.useFakeTimers();
 
-        // Simulate sustained rate limiting
-        const promises: Promise<void>[] = [];
+      // Simulate sustained rate limiting
+      const promises: Promise<void>[] = [];
 
-        // Fire off requests without awaiting (so retries happen in background)
-        for (let i = 0; i < 20; i++) {
-          const promise = governor
-            .enqueue(`req-${i}`, 'test-job', i, async () => {
-              // Rate limit 40% of requests
-              if (i % 5 < 2) {
-                throw { name: 'RateLimitError', retryAfter: 1 };
-              }
-            })
-            .catch(() => {
-              // Swallow errors - we don't care about individual results
-            });
-          promises.push(promise);
-        }
-
-        // Wait a bit for the governor to detect the pattern
-        await new Promise((resolve) => setTimeout(resolve, 5000));
-
-        // Governor should have detected sustained rate limiting
-        const stats = governor.getStats();
-        expect(stats.degradedModeActivations).toBeGreaterThan(0);
-
-        vi.useFakeTimers(); // Restore fake timers for other tests
+      // Fire off requests without awaiting (so retries happen in background)
+      for (let i = 0; i < 20; i++) {
+        const promise = governor
+          .enqueue(`req-${i}`, 'test-job', i, async () => {
+            // Rate limit 40% of requests
+            if (i % 5 < 2) {
+              throw { name: 'RateLimitError', retryAfter: 1 };
+            }
+          })
+          .catch(() => {
+            // Swallow errors - we don't care about individual results
+          });
+        promises.push(promise);
       }
-    );
+
+      // Run all pending timers to process retries with exponential backoff
+      await vi.runAllTimersAsync();
+
+      // Governor should have detected sustained rate limiting
+      const stats = governor.getStats();
+      expect(stats.degradedModeActivations).toBeGreaterThan(0);
+
+      vi.useRealTimers();
+    });
 
     it('should reduce concurrency in degraded mode', async () => {
       const governor = new RateLimitGovernor('balanced');

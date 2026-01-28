@@ -43,6 +43,21 @@ Open [http://localhost:3000](http://localhost:3000)
 - 🔊 **Text-to-Speech** - Read transcripts and summaries aloud
 - 📋 **Copy to Clipboard** - Easy sharing
 
+### User Flow
+
+```mermaid
+graph LR
+    A[Start] -->|Upload/Record| B[Audio Editor]
+    B -->|Trim/Preview| C[Configuration]
+    C -->|Select AI & Keys| D[Processing]
+    D -->|Transcribe & Summarize| E[Results]
+    E -->|Chat/Export| F[Finish]
+```
+
+## 📋 Requirements & Specifications
+
+For a detailed breakdown of functional requirements, user stories, and technical specifications, please see our [Functional Analysis](docs/functional-analysis/functional-analysis.md).
+
 ## 🚀 Tech Stack
 
 - **React 19** - UI library
@@ -62,16 +77,20 @@ Open [http://localhost:3000](http://localhost:3000)
 ## 💡 Usage
 
 ### 1. Upload or Record Audio
+
 Click "Start Recording" to record directly, or upload an audio file (MP3, WAV, WEBM, etc.)
 
 ### 2. Visualize and Edit
+
 - View your audio as an interactive waveform
 - Trim unwanted sections (click scissors icon, drag to select region)
 
 ### 3. Click "Process Audio"
 
 ### 4. Configure AI Settings
+
 You'll be prompted to:
+
 - Select **content type** (Meeting, Lecture, Interview, Podcast, Voice Memo, or Other)
 - Choose **AI provider** (ChatGPT, Claude, or Deepseek)
 - Enter your **API key(s)**
@@ -80,15 +99,18 @@ You'll be prompted to:
 - Click the help section for instructions on getting API keys
 
 ### 5. Wait for Processing
+
 - **Transcription**: OpenAI Whisper converts speech to text
 - **Summarization**: Your selected AI generates a structured summary
 
 ### 6. View Results
+
 - Full transcript
 - AI-generated summary with markdown formatting
 - Interactive chat interface
 
 ### 7. Interactive Chat Examples
+
 - "Make this summary shorter"
 - "What are the main action items?"
 - "Translate to Spanish"
@@ -188,6 +210,7 @@ api/providers/
 ```
 
 **Key Interface**:
+
 ```typescript
 export interface AIProvider {
   name: string;
@@ -302,17 +325,20 @@ That's it! No configuration required.
 Based on current API pricing (as of 2025):
 
 ### OpenAI (ChatGPT)
+
 - **Whisper**: ~$0.006/minute
 - **GPT-4**: ~$0.01-0.03/summary
 - **Chat**: ~$0.01-0.02/message
 - **Total for 5min audio**: ~$0.04-0.08
 
 ### Claude (Anthropic)
+
 - **Whisper** (OpenAI): ~$0.006/minute
 - **Claude 3.5 Sonnet**: ~$3/$15 per million input/output tokens
 - **Total for 5min audio**: ~$0.03-0.06
 
 ### Deepseek
+
 - **Whisper** (OpenAI): ~$0.006/minute
 - **Deepseek-chat**: Lower cost alternative
 - Check [platform.deepseek.com](https://platform.deepseek.com/) for current rates
@@ -331,14 +357,18 @@ You control your own spending - set API spending limits for safety!
 - ⚠️ **Recommendation**: Set spending limits on your API keys
 
 ### For Users
+
 Your API keys are secure and temporary. They:
+
 - Only exist in your browser session
 - Are cleared when you close the tab
 - Go directly from your browser to the AI provider
 - Are never logged or stored by us
 
 ### For Developers
+
 Security best practices implemented:
+
 - sessionStorage (not localStorage) for session-only storage
 - No API keys in source code or environment variables
 - CORS properly configured
@@ -360,6 +390,7 @@ Security best practices implemented:
 **Problem**: "Transcription failed" error
 
 **Solutions**:
+
 1. Verify your OpenAI API key is correct
 2. Check OpenAI API quota and billing at [platform.openai.com](https://platform.openai.com/)
 3. Ensure audio format is supported (webm, mp3, wav, etc.)
@@ -370,6 +401,7 @@ Security best practices implemented:
 **Problem**: "Summarization failed" after successful transcription
 
 **Solutions**:
+
 1. Verify you entered the correct API key for your chosen provider
 2. Check your API provider account has credits/quota
 3. Try a different AI provider
@@ -379,6 +411,7 @@ Security best practices implemented:
 **Problem**: Chat messages fail to send
 
 **Solutions**:
+
 1. Verify API key is valid
 2. Check API provider account credits
 3. Check browser console for specific errors
@@ -388,6 +421,7 @@ Security best practices implemented:
 **Problem**: "Invalid API key" message
 
 **Solutions**:
+
 1. Double-check you copied the entire key
 2. Ensure no extra spaces before/after the key
 3. Verify key is from the correct provider
@@ -448,15 +482,15 @@ export default defineConfig([
       // other options...
     },
   },
-])
+]);
 ```
 
 You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
 ```js
 // eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+import reactX from 'eslint-plugin-react-x';
+import reactDom from 'eslint-plugin-react-dom';
 
 export default defineConfig([
   globalIgnores(['dist']),
@@ -477,5 +511,5 @@ export default defineConfig([
       // other options...
     },
   },
-])
+]);
 ```

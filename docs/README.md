@@ -4,12 +4,26 @@ Welcome to the Trammarise documentation! This directory contains comprehensive g
 
 ## 📚 Documentation Index
 
+### Architecture & Design
+
+#### [ARCHITECTURE_DIAGRAM.md](./ARCHITECTURE_DIAGRAM.md)
+
+**Visual diagrams of system architecture and patterns**
+Comprehensive Mermaid diagrams showing:
+
+- System Overview
+- Pattern Interactions & Data Flow
+- State Machine Transitions
+- Repository, Builder, Observer, Command, Adapter Flows
+
 ### Design Patterns
 
 #### [DESIGN_PATTERNS.md](./DESIGN_PATTERNS.md)
+
 **Comprehensive guide to all design patterns** (75KB)
 
 Learn about the 6 design patterns implemented in Trammarise:
+
 1. Repository Pattern - API abstraction
 2. Builder Pattern - Configuration construction
 3. Observer Pattern - Event handling
@@ -18,6 +32,7 @@ Learn about the 6 design patterns implemented in Trammarise:
 6. State Machine Pattern - State management
 
 Includes:
+
 - Detailed explanations
 - Code examples
 - Usage patterns
@@ -30,11 +45,13 @@ Includes:
 ---
 
 #### [MIGRATION_GUIDE.md](./MIGRATION_GUIDE.md)
+
 **Step-by-step migration from old to new patterns**
 
 A practical guide for migrating existing code to use the new design patterns.
 
 Covers:
+
 - Before/after code examples
 - Migration phases (3 phases)
 - Gradual migration strategy
@@ -47,9 +64,11 @@ Covers:
 ---
 
 #### [PATTERNS_SUMMARY.md](./PATTERNS_SUMMARY.md)
+
 **Quick reference for all implemented patterns**
 
 High-level overview of all patterns with:
+
 - Quick descriptions
 - File locations
 - Key features
@@ -64,6 +83,7 @@ High-level overview of all patterns with:
 ### Project Documentation
 
 #### [agent-workflow.md](./agent-workflow.md)
+
 Internal development workflow and agent-based development patterns
 
 ---
@@ -138,36 +158,42 @@ src/
 ## 🎯 Pattern Usage at a Glance
 
 ### Repository Pattern
+
 ```typescript
 import { audioRepository } from '@/repositories/AudioRepository';
 const { transcript } = await audioRepository.transcribe({ audioBlob, apiKey });
 ```
 
 ### Builder Pattern
+
 ```typescript
 import { createConfigurationBuilder } from '@/builders/ConfigurationBuilder';
 const config = createConfigurationBuilder().withProvider('openai').build();
 ```
 
 ### Observer Pattern
+
 ```typescript
 import { processingEventEmitter } from '@/patterns/ProcessingEventEmitter';
 processingEventEmitter.on('progress', ({ progress }) => console.log(progress));
 ```
 
 ### Command Pattern
+
 ```typescript
 import { useCommandHistory } from '@/hooks/useCommandHistory';
 const { execute, undo, redo } = useCommandHistory();
 ```
 
 ### Adapter Pattern
+
 ```typescript
 import { audioAdapterRegistry } from '@/adapters/AudioAdapterRegistry';
 const blob = await audioAdapterRegistry.processFile(file);
 ```
 
 ### State Machine Pattern
+
 ```typescript
 import { appStateMachine } from '@/state/AppStateMachine';
 await appStateMachine.transition('processing');
@@ -178,6 +204,7 @@ await appStateMachine.transition('processing');
 ## 🧪 Testing
 
 Each pattern has test examples in `docs/DESIGN_PATTERNS.md`:
+
 - Unit tests for each pattern
 - Integration tests for workflows
 - Mocking strategies
@@ -221,6 +248,7 @@ When contributing code that uses these patterns:
 ## 🐛 Troubleshooting
 
 Common issues and solutions are documented in:
+
 - **[DESIGN_PATTERNS.md](./DESIGN_PATTERNS.md)** - Pattern-specific issues
 - **[MIGRATION_GUIDE.md](./MIGRATION_GUIDE.md#troubleshooting)** - Migration issues
 
@@ -228,14 +256,14 @@ Common issues and solutions are documented in:
 
 ## 📊 Patterns Overview
 
-| Pattern | Purpose | Complexity | Value | Files |
-|---------|---------|------------|-------|-------|
-| Repository | API abstraction | Low | High | 1 |
-| Builder | Config creation | Low | Medium | 1 |
-| Observer | Event handling | Medium | High | 2 |
-| Command | Undo/redo | Medium | Medium | 3 |
-| Adapter | Format handling | Medium | Medium | 3 |
-| State Machine | State management | High | High | 1 |
+| Pattern       | Purpose          | Complexity | Value  | Files |
+| ------------- | ---------------- | ---------- | ------ | ----- |
+| Repository    | API abstraction  | Low        | High   | 1     |
+| Builder       | Config creation  | Low        | Medium | 1     |
+| Observer      | Event handling   | Medium     | High   | 2     |
+| Command       | Undo/redo        | Medium     | Medium | 3     |
+| Adapter       | Format handling  | Medium     | Medium | 3     |
+| State Machine | State management | High       | High   | 1     |
 
 **Total**: 11 core files, ~1,800 LOC
 
@@ -264,6 +292,7 @@ Common issues and solutions are documented in:
 ## 📫 Support
 
 For questions or issues:
+
 1. Check the troubleshooting sections
 2. Review example code
 3. Consult pattern documentation

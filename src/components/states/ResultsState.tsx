@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
-import { Modal, ChatInterface } from '@/lib';
-import { chatWithAI, generatePDF } from '../../utils/api';
+import { Modal, ChatInterface, Snackbar, AILoadingOrb, Text } from '@/lib';
+import { chatWithAI } from '../../utils/api';
+
 import type { ProcessingResult, ChatMessage, AudioFile, AIConfiguration } from '../../types/audio';
 import { ResultsLayout } from '../../features/results/components/ResultsLayout';
 import { AudioPlayerBar } from '../../features/results/components/AudioPlayerBar';
@@ -43,6 +44,9 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
 }) => {
   const [isLoadingChat, setIsLoadingChat] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isPdfGenerating, setIsPdfGenerating] = useState(false);
+  const [pdfError, setPdfError] = useState<string | null>(null);
+  const [pdfSuccess, setPdfSuccess] = useState(false);
   // Initialize fileName without extension
   const [fileName, setFileName] = useState(() => audioName.replace(/\.[^/.]+$/, ''));
 
@@ -125,78 +129,110 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
   };
 
   const handleDownloadPDF = async () => {
-    console.log('📥 Starting AI-powered PDF generation...');
+    console.log('📥 Starting PDF generation...');
+
+    setIsPdfGenerating(true);
+    setPdfError(null);
+    setPdfSuccess(false);
 
     try {
-      const apiKey = getApiKey(result.configuration);
-
-      const pdfBlob = await generatePDF(
-        result.transcript,
-        result.summary,
-        result.configuration.contentType,
-        result.configuration.provider,
-        apiKey,
-        result.configuration.model,
-        result.configuration.language
-      );
-
-      // Create download link
-      const url = URL.createObjectURL(pdfBlob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${fileName}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-
-      // Small timeout to ensure download started before revoking
-      setTimeout(() => URL.revokeObjectURL(url), 100);
+      // Use client-side PDF generation with @react-pdf/renderer
+      // Dynamically import to reduce bundle size (1.6MB+)
+      const { generatePDF } = await import('../../utils/pdf-generator');
+      await generatePDF(result.summary, result.transcript, result.configuration, fileName);
 
       console.log('✅ PDF downloaded successfully');
+      setPdfSuccess(true);
+
+      // Auto-dismiss success message after 3 seconds
+      setTimeout(() => setPdfSuccess(false), 3000);
     } catch (error) {
       console.error('❌ PDF generation error:', error);
-      alert(`Failed to generate PDF: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      setPdfError(`Failed to generate PDF: ${errorMessage}`);
+    } finally {
+      setIsPdfGenerating(false);
     }
   };
 
   return (
-    <ResultsLayout
-      header={
-        <AppHeader
-          fileName={fileName}
-          onFileNameChange={setFileName}
-          onExport={handleDownloadPDF}
-        />
-      }
-      audioPlayer={<AudioPlayerBar audioFile={audioFile} audioPlayer={audioPlayer} />}
-      summaryPanel={<SummaryPanel summary={result.summary} />}
-      transcriptPanel={
-        <SearchableTranscript
-          transcript={result.transcript}
-          activeSegmentId={activeSegmentId}
-          onTimestampClick={handleTimestampClick}
-        />
-      }
-      floatingChatButton={
-        <FloatingChatButton
-          onClick={() => setIsChatOpen(true)}
-          isOpen={isChatOpen}
-          hasNewMessages={false}
-        />
-      }
-      chatModal={
-        isChatOpen && (
-          <Modal isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} title="Refine with Chat">
-            <div className="h-[600px]">
-              <ChatInterface
-                onSendMessage={handleSendMessage}
-                isLoading={isLoadingChat}
-                chatHistory={result.chatHistory}
-              />
-            </div>
-          </Modal>
-        )
-      }
-    />
+    <>
+      <ResultsLayout
+        header={
+          <AppHeader
+            fileName={fileName}
+            onFileNameChange={setFileName}
+            onExport={handleDownloadPDF}
+          />
+        }
+        audioPlayer={<AudioPlayerBar audioFile={audioFile} audioPlayer={audioPlayer} />}
+        summaryPanel={<SummaryPanel summary={result.summary} />}
+        transcriptPanel={
+          <SearchableTranscript
+            transcript={result.transcript}
+            activeSegmentId={activeSegmentId}
+            onTimestampClick={handleTimestampClick}
+          />
+        }
+        floatingChatButton={
+          <FloatingChatButton
+            onClick={() => setIsChatOpen(true)}
+            isOpen={isChatOpen}
+            hasNewMessages={false}
+          />
+        }
+        chatModal={
+          isChatOpen && (
+            <Modal
+              isOpen={isChatOpen}
+              onClose={() => setIsChatOpen(false)}
+              title="Refine with Chat"
+            >
+              <div className="h-[600px]">
+                <ChatInterface
+                  onSendMessage={handleSendMessage}
+                  isLoading={isLoadingChat}
+                  chatHistory={result.chatHistory}
+                />
+              </div>
+            </Modal>
+          )
+        }
+      />
+
+      {/* PDF Generation Loading Modal */}
+      <Modal
+        isOpen={isPdfGenerating}
+        onClose={() => {}}
+        title="Generating PDF"
+        disableBackdropClick={true}
+        role="status"
+        aria-busy="true"
+      >
+        <div className="flex flex-col items-center justify-center py-8 gap-6">
+          <AILoadingOrb size={120} />
+          <Text variant="body" className="text-center text-text-secondary">
+            Creating your professional PDF document...
+          </Text>
+        </div>
+      </Modal>
+
+      {/* Success Snackbar */}
+      <Snackbar
+        isOpen={pdfSuccess}
+        onClose={() => setPdfSuccess(false)}
+        message="PDF downloaded successfully!"
+        variant="success"
+        duration={3000}
+      />
+
+      {/* Error Snackbar */}
+      <Snackbar
+        isOpen={!!pdfError}
+        onClose={() => setPdfError(null)}
+        message={pdfError || ''}
+        variant="error"
+      />
+    </>
   );
 };

@@ -24,6 +24,9 @@ const PreviewPage = lazy(() =>
 const ApiKeySetupPage = lazy(() =>
   import('../pages/ApiKeySetupPage').then((module) => ({ default: module.ApiKeySetupPage }))
 );
+const PdfPreviewPage = lazy(() =>
+  import('../pages/debug/PdfPreviewPage').then((module) => ({ default: module.PdfPreviewPage }))
+);
 
 // Placeholder for Configuration page (will be enhanced later)
 import { Heading, Text, GlassCard } from '@/lib';
@@ -64,6 +67,8 @@ function App() {
       <Routes>
         {/* Dev preview route */}
         {import.meta.env.DEV && <Route path={ROUTES.PREVIEW} element={<PreviewPage />} />}
+        {/* PDF Debug route */}
+        {import.meta.env.DEV && <Route path="/debug/pdf" element={<PdfPreviewPage />} />}
 
         {/* Main app routes with AppLayout wrapper */}
         <Route element={<AppLayout />}>

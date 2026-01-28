@@ -233,16 +233,17 @@
 
 **PDF Generation**
 
-- Professional formatting
+- Professional formatting using `@react-pdf/renderer`
+- **Markdown Rendering Support**:
+  - Full support for Bold, Italic, Lists (ordered/unordered)
+  - Rich Table rendering with headers and borders
+  - Code blocks and inline code styling
 - Sections:
-  - Metadata (date, duration, language, type)
-  - Summary
-  - Full transcription
-  - Optional: context documents summary
+  - Header: Logo, App Name, File Name, Metadata (date, type, model)
+  - Summary Section: Properly formatted markdown content
+  - Transcription Section: Full text
 - Customization options:
-  - Include/exclude sections
-  - Add custom notes
-  - Branding/logo option
+  - Editable filename in App Header
 
 **Additional Formats** (Optional)
 
@@ -252,10 +253,12 @@
 
 **Functional Requirements**:
 
-- Client-side PDF generation (e.g., jsPDF)
+- **Client-side Native PDF generation**: Zero server dependency
+- **Selectable Text**: Generated PDF text must be selectable/copyable (not an image)
+- **Tables Support**: Functional rendering of markdown tables
 - Download triggers browser download
-- Filename with timestamp
-- Preview before download
+- Filename defaulting to timestamp/session name but editable
+- Verification via Debug Preview (`/debug/pdf`)
 
 ---
 
