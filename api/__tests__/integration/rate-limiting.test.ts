@@ -5,7 +5,7 @@
  * Implements test cases TC-RL-01 through TC-RL-05 from functional analysis.
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { RateLimitGovernor } from '../../utils/rate-limit-governor';
 import { JobManager } from '../../utils/job-manager';
 import { processChunk } from '../../utils/chunk-processor';
@@ -19,6 +19,10 @@ import { JOB_SAFEGUARDS } from '../../types/job';
 describe('Integration: Rate Limiting', () => {
   beforeEach(() => {
     JobManager.clearAllJobs();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   describe('TC-RL-01: Burst Upload (Balanced)', () => {
@@ -162,6 +166,8 @@ describe('Integration: Rate Limiting', () => {
 
   describe('TC-RL-04: Sustained Throttling', () => {
     it('should enter degraded mode when >30% requests are rate limited', async () => {
+      vi.useFakeTimers();
+
       const governor = new RateLimitGovernor('balanced');
 
       // Simulate sustained rate limiting (40% of requests)
@@ -198,6 +204,9 @@ describe('Integration: Rate Limiting', () => {
         promises.push(promise);
       }
 
+      // Run all pending timers to process retries with exponential backoff
+      await vi.runAllTimersAsync();
+
       await Promise.all(promises);
 
       const stats = governor.getStats();
@@ -207,7 +216,9 @@ describe('Integration: Rate Limiting', () => {
 
       // May have entered degraded mode (depends on timing)
       // This is validated in the governor itself
-    }, 30000); // Increased timeout for rate limiting delays
+
+      vi.useRealTimers();
+    });
 
     it('should reduce concurrency from 4 to 2 in degraded mode', async () => {
       // Verify degraded mode configuration
