@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Modal, ChatInterface, Snackbar, AILoadingOrb, Text } from '@/lib';
-import { chatWithAI, generatePDF } from '../../utils/api';
+import { chatWithAI } from '../../utils/api';
+import { generatePDF } from '../../utils/pdf-generator';
 import type { ProcessingResult, ChatMessage, AudioFile, AIConfiguration } from '../../types/audio';
 import { ResultsLayout } from '../../features/results/components/ResultsLayout';
 import { AudioPlayerBar } from '../../features/results/components/AudioPlayerBar';
@@ -135,32 +136,8 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
     setPdfSuccess(false);
 
     try {
-      // Prepare AI configuration metadata (optional)
-      const aiConfig = {
-        provider: result.configuration.provider,
-        model: result.configuration.model,
-        transcriptionModel: 'whisper-1',
-      };
-
-      const pdfBlob = await generatePDF(
-        result.transcript,
-        result.summary,
-        result.configuration.contentType,
-        fileName,
-        aiConfig
-      );
-
-      // Create download link
-      const url = URL.createObjectURL(pdfBlob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${fileName}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-
-      // Small timeout to ensure download started before revoking
-      setTimeout(() => URL.revokeObjectURL(url), 100);
+      // Use client-side PDF generation with @react-pdf/renderer
+      await generatePDF(result.summary, result.transcript, result.configuration, fileName);
 
       console.log('✅ PDF downloaded successfully');
       setPdfSuccess(true);
