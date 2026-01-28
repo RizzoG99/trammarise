@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Modal, ChatInterface, Snackbar, AILoadingOrb, Text } from '@/lib';
 import { chatWithAI } from '../../utils/api';
-import { generatePDF } from '../../utils/pdf-generator';
+
 import type { ProcessingResult, ChatMessage, AudioFile, AIConfiguration } from '../../types/audio';
 import { ResultsLayout } from '../../features/results/components/ResultsLayout';
 import { AudioPlayerBar } from '../../features/results/components/AudioPlayerBar';
@@ -137,6 +137,8 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
 
     try {
       // Use client-side PDF generation with @react-pdf/renderer
+      // Dynamically import to reduce bundle size (1.6MB+)
+      const { generatePDF } = await import('../../utils/pdf-generator');
       await generatePDF(result.summary, result.transcript, result.configuration, fileName);
 
       console.log('✅ PDF downloaded successfully');
