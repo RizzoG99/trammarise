@@ -1,4 +1,4 @@
-import { Bell, User, FileDown, Edit2, Check, X } from 'lucide-react';
+import { Bell, User, FileDown } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard, ThemeToggle, Button } from '@/lib';
@@ -23,107 +23,73 @@ export function AppHeader({ fileName, onFileNameChange, onExport }: AppHeaderPro
   const { t } = useTranslation();
   const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
-  const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(fileName || '');
-
-  const handleSave = () => {
-    if (onFileNameChange && editValue.trim()) {
-      onFileNameChange(editValue.trim());
-    }
-    setIsEditing(false);
-  };
-
-  const handleCancel = () => {
-    setEditValue(fileName || '');
-    setIsEditing(false);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleSave();
-    } else if (e.key === 'Escape') {
-      handleCancel();
-    }
-  };
 
   return (
     <header className="sticky top-0 z-50 border-b border-border backdrop-blur-md">
       <GlassCard variant="light" className="rounded-none border-x-0 border-t-0">
         <div className="mx-auto px-6 py-4 max-w-[1400px]">
           <div className="flex items-center justify-between">
-            {/* Logo */}
-            <div className="flex items-center gap-3">
-              <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center shadow-md"
-                style={{ backgroundColor: 'var(--color-primary)' }}
-              >
-                <span className="text-white font-bold text-2xl">T</span>
+            {/* Left Section: Logo + File Name */}
+            <div className="flex items-center gap-6">
+              {/* Logo */}
+              <div className="flex items-center gap-3">
+                <div
+                  className="w-10 h-10 rounded-xl flex items-center justify-center shadow-md"
+                  style={{ backgroundColor: 'var(--color-primary)' }}
+                >
+                  <span className="text-white font-bold text-2xl">T</span>
+                </div>
+                <h1 className="text-xl font-semibold text-text-primary">Trammarise</h1>
               </div>
-              <h1 className="text-xl font-semibold text-text-primary">Trammarise</h1>
-            </div>
 
-            {/* File Name (Results Page Only) */}
-            {fileName && (
-              <div className="flex items-center gap-2 flex-1 min-w-0 mx-6">
-                {isEditing ? (
-                  <>
+              {/* File Name (Results Page Only) */}
+              {fileName && onFileNameChange && (
+                <div className="flex flex-col">
+                  <div className="flex items-center gap-2">
                     <input
                       type="text"
                       value={editValue}
-                      onChange={(e) => setEditValue(e.target.value)}
-                      onKeyDown={handleKeyDown}
-                      onBlur={handleSave}
-                      autoFocus
-                      className="
-                        flex-1 px-3 py-1 rounded-lg
+                      onChange={(e) => {
+                        setEditValue(e.target.value);
+                        if (e.target.value.trim()) {
+                          onFileNameChange(e.target.value.trim());
+                        }
+                      }}
+                      className={`
+                        px-3 py-1 rounded-lg
                         bg-[var(--color-background)]
-                        border border-[var(--color-border)]
+                        border ${!editValue.trim() ? 'border-red-500' : 'border-[var(--color-border)]'}
                         text-[var(--color-text)]
-                        focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]
-                      "
+                        text-sm
+                        focus:outline-none focus:ring-2 ${!editValue.trim() ? 'focus:ring-red-500' : 'focus:ring-[var(--color-primary)]'}
+                      `}
+                      style={{ width: '300px' }}
+                      placeholder="Enter file name..."
                     />
-                    <Button
-                      variant="secondary"
-                      onClick={handleSave}
-                      className="p-1"
-                      aria-label={t('header.aria.saveFile')}
-                    >
-                      <Check className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      variant="secondary"
-                      onClick={handleCancel}
-                      className="p-1"
-                      aria-label={t('header.aria.cancelEdit')}
-                    >
-                      <X className="w-4 h-4" />
-                    </Button>
-                  </>
-                ) : (
-                  <>
-                    <span className="text-sm text-text-secondary truncate">{fileName}</span>
-                    {onFileNameChange && (
-                      <Button
-                        variant="secondary"
-                        onClick={() => setIsEditing(true)}
-                        className="p-1"
-                        aria-label={t('header.aria.editFile')}
-                      >
-                        <Edit2 className="w-4 h-4" />
-                      </Button>
+                    <span className="text-sm text-[var(--color-text-secondary)]">.pdf</span>
+                  </div>
+                  <div className="h-4">
+                    {!editValue.trim() && (
+                      <span className="text-xs text-red-500">File name is required</span>
                     )}
-                  </>
-                )}
-              </div>
-            )}
+                  </div>
+                </div>
+              )}
+            </div>
 
             {/* Right Section */}
             <div className="flex items-center gap-3">
               {/* Export Button (Results Page Only) */}
               {onExport && (
-                <Button variant="outline" onClick={onExport} className="flex items-center gap-2">
-                  <FileDown className="w-4 h-4" />
-                  <span className="hidden sm:inline">{t('header.export')}</span>
+                <Button
+                  variant="outline"
+                  icon={<FileDown className="w-4 h-4" />}
+                  onClick={onExport}
+                  className="flex items-center gap-2"
+                  disabled={!!(fileName && !editValue.trim())}
+                >
+                  {t('header.export')}
                 </Button>
               )}
 
