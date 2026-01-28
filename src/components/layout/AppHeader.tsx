@@ -51,10 +51,9 @@ export function AppHeader({ fileName, onFileNameChange, onExport }: AppHeaderPro
                       type="text"
                       value={editValue}
                       onChange={(e) => {
-                        setEditValue(e.target.value);
-                        if (e.target.value.trim()) {
-                          onFileNameChange(e.target.value.trim());
-                        }
+                        const value = e.target.value;
+                        setEditValue(value);
+                        onFileNameChange(value.trim());
                       }}
                       className={`
                         px-3 py-1 rounded-lg

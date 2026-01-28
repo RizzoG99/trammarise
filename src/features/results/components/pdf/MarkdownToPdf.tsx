@@ -95,26 +95,28 @@ export function MarkdownToPdf({ content }: { content: string }) {
   // Parse markdown to AST
   const ast = unified().use(remarkParse).use(remarkGfm).parse(content);
 
-  return <>{renderNode(ast)}</>;
+  // Use a unique key prefix for this render cycle
+  return <>{renderNode(ast, 'root')}</>;
 }
-
-let nodeKey = 0;
 
 /**
  * Recursively renders AST nodes to PDF components
  */
-function renderNode(node: Root | Content): React.ReactElement | React.ReactElement[] | null {
-  const key = nodeKey++;
+function renderNode(
+  node: Root | Content,
+  keyPrefix: string
+): React.ReactElement | React.ReactElement[] | null {
+  const key = `${keyPrefix}-${node.type}`;
 
   switch (node.type) {
     case 'root':
-      return <>{node.children.map((child) => renderNode(child))}</>;
+      return <>{node.children.map((child, idx) => renderNode(child, `${key}-${idx}`))}</>;
 
     case 'heading': {
       const headingStyle = node.depth === 1 ? styles.h1 : node.depth === 2 ? styles.h2 : styles.h3;
       return (
         <Text key={key} style={headingStyle}>
-          {renderInlineContent(node.children)}
+          {renderInlineContent(node.children, key)}
         </Text>
       );
     }
@@ -122,7 +124,7 @@ function renderNode(node: Root | Content): React.ReactElement | React.ReactEleme
     case 'paragraph':
       return (
         <Text key={key} style={styles.paragraph}>
-          {renderInlineContent(node.children)}
+          {renderInlineContent(node.children, key)}
         </Text>
       );
 
@@ -130,12 +132,15 @@ function renderNode(node: Root | Content): React.ReactElement | React.ReactEleme
       return (
         <View key={key}>
           {node.children.map((item, idx) => {
+            const itemKey = `${key}-item-${idx}`;
             const bullet = node.ordered ? `${idx + 1}.` : '•';
             return (
-              <View key={`${key}-${idx}`} style={styles.listItem}>
+              <View key={itemKey} style={styles.listItem}>
                 <Text style={styles.listBullet}>{bullet}</Text>
                 <View style={styles.listContent}>
-                  {item.children.map((child) => renderNode(child))}
+                  {item.children.map((child, childIdx) =>
+                    renderNode(child, `${itemKey}-${childIdx}`)
+                  )}
                 </View>
               </View>
             );
@@ -162,7 +167,7 @@ function renderNode(node: Root | Content): React.ReactElement | React.ReactEleme
             marginVertical: 8,
           }}
         >
-          {node.children.map((child) => renderNode(child))}
+          {node.children.map((child, idx) => renderNode(child, `${key}-${idx}`))}
         </View>
       );
 
@@ -189,14 +194,15 @@ function renderNode(node: Root | Content): React.ReactElement | React.ReactEleme
 /**
  * Renders a table row
  */
-function renderTableRow(row: TableRow, rowIdx: number, parentKey: number): React.ReactElement {
+function renderTableRow(row: TableRow, rowIdx: number, parentKey: string): React.ReactElement {
   const isHeader = rowIdx === 0;
   const rowStyle = isHeader ? [styles.tableRow, styles.tableHeaderRow] : styles.tableRow;
+  const rowKey = `${parentKey}-row-${rowIdx}`;
 
   return (
-    <View key={`${parentKey}-row-${rowIdx}`} style={rowStyle}>
+    <View key={rowKey} style={rowStyle}>
       {row.children.map((cell, cellIdx) =>
-        renderTableCell(cell, cellIdx, rowIdx, parentKey, cellIdx === row.children.length - 1)
+        renderTableCell(cell, cellIdx, rowIdx, rowKey, cellIdx === row.children.length - 1)
       )}
     </View>
   );
@@ -209,15 +215,16 @@ function renderTableCell(
   cell: TableCell,
   cellIdx: number,
   rowIdx: number,
-  parentKey: number,
+  parentKey: string,
   isLast: boolean
 ): React.ReactElement {
   const cellStyle = isLast ? [styles.tableCell, styles.tableCellLast] : styles.tableCell;
   const textStyle = rowIdx === 0 ? [styles.paragraph, styles.bold] : styles.paragraph;
+  const cellKey = `${parentKey}-cell-${cellIdx}`;
 
   return (
-    <View key={`${parentKey}-cell-${rowIdx}-${cellIdx}`} style={cellStyle}>
-      <Text style={textStyle}>{renderInlineContent(cell.children)}</Text>
+    <View key={cellKey} style={cellStyle}>
+      <Text style={textStyle}>{renderInlineContent(cell.children, cellKey)}</Text>
     </View>
   );
 }
@@ -225,9 +232,9 @@ function renderTableCell(
 /**
  * Renders inline/phrasing content (text, bold, italic, code, links)
  */
-function renderInlineContent(nodes: PhrasingContent[]): React.ReactNode {
+function renderInlineContent(nodes: PhrasingContent[], parentKey: string): React.ReactNode {
   return nodes.map((node, idx) => {
-    const key = `inline-${nodeKey++}-${idx}`;
+    const key = `${parentKey}-inline-${idx}`;
 
     switch (node.type) {
       case 'text':
@@ -236,14 +243,22 @@ function renderInlineContent(nodes: PhrasingContent[]): React.ReactNode {
       case 'strong':
         return (
           <Text key={key} style={styles.bold}>
-            {renderInlineContent(node.children)}
+            {renderInlineContent(node.children, key)}
           </Text>
         );
 
       case 'emphasis':
         return (
           <Text key={key} style={styles.italic}>
-            {renderInlineContent(node.children)}
+            {renderInlineContent(node.children, key)}
+          </Text>
+        );
+
+      // Add strikethrough support
+      case 'delete':
+        return (
+          <Text key={key} style={{ textDecoration: 'line-through' }}>
+            {renderInlineContent(node.children, key)}
           </Text>
         );
 
@@ -257,7 +272,7 @@ function renderInlineContent(nodes: PhrasingContent[]): React.ReactNode {
       case 'link':
         return (
           <Text key={key} style={{ color: '#0066cc', textDecoration: 'underline' }}>
-            {renderInlineContent(node.children)}
+            {renderInlineContent(node.children, key)}
           </Text>
         );
 

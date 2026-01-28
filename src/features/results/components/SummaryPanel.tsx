@@ -157,7 +157,7 @@ export function SummaryPanel({ summary, structuredSummary }: SummaryPanelProps) 
                   return (
                     <div className="overflow-x-auto my-4 rounded-lg border border-[var(--color-border)]">
                       <table
-                        className="w-full border-collapse bg-transparent [&_tr:last-child_td]:border-b-0"
+                        className="w-full border-collapse bg-transparent [&_tr:last-child_td]:border-b-0 [&_tr:nth-child(even)]:bg-[var(--color-background-secondary)]/50"
                         {...props}
                       >
                         {props.children}

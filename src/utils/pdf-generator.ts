@@ -31,9 +31,15 @@ export async function generatePDF(
 
     // Create download link
     const url = URL.createObjectURL(blob);
+
+    // Sanitize filename to prevent directory traversal or invalid characters
+    const sanitizedFileName = (fileName || 'Trammarise-Summary')
+      .replace(/[^a-z0-9\-_\s]/gi, '')
+      .replace(/\s+/g, '-');
+
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${fileName}.pdf`;
+    a.download = `${sanitizedFileName}.pdf`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
