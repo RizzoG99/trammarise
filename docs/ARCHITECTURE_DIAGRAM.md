@@ -4,501 +4,207 @@ Visual representations of the design patterns and system architecture.
 
 ## System Overview
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                           Trammarise App                            │
-├─────────────────────────────────────────────────────────────────────┤
-│                                                                     │
-│  ┌────────────────┐      ┌────────────────┐      ┌──────────────┐ │
-│  │  UI Components │◄─────┤ State Machine  │─────►│ Event System │ │
-│  └────────────────┘      └────────────────┘      └──────────────┘ │
-│         │                        │                       │         │
-│         │                        ▼                       │         │
-│         │              ┌──────────────────┐              │         │
-│         └─────────────►│  Configuration   │◄─────────────┘         │
-│                        │     Builder      │                        │
-│                        └──────────────────┘                        │
-│                                 │                                  │
-│                                 ▼                                  │
-│                        ┌──────────────────┐                        │
-│                        │   Repository     │                        │
-│                        │   (API Layer)    │                        │
-│                        └──────────────────┘                        │
-│                                 │                                  │
-│                                 ▼                                  │
-│                        ┌──────────────────┐                        │
-│                        │  Audio Adapters  │                        │
-│                        │  (File Handlers) │                        │
-│                        └──────────────────┘                        │
-│                                 │                                  │
-│                                 ▼                                  │
-│                        ┌──────────────────┐                        │
-│                        │  Command History │                        │
-│                        │  (Undo/Redo)     │                        │
-│                        └──────────────────┘                        │
-│                                                                     │
-└─────────────────────────────────────────────────────────────────────┘
+```mermaid
+graph TB
+    subgraph App[Trammarise App]
+        style App fill:#f9f9f9,stroke:#333,stroke-width:2px
+
+        UI[UI Components]
+        SM[State Machine]
+        Events[Event System]
+        Config[Configuration Builder]
+        Repo[Repository / API Layer]
+        Adapters[Audio Adapters]
+        Command[Command History]
+
+        UI <--> SM <--> Events
+        SM --> Config
+        Events --> Config
+        Config --> Repo
+        Repo --> Adapters
+        Adapters --> Command
+    end
+
+    classDef component fill:#e1f5fe,stroke:#01579b,stroke-width:2px;
+    class UI,SM,Events,Config,Repo,Adapters,Command component;
 ```
 
 ## Pattern Interactions
 
-```
-┌──────────────┐
-│  User Action │
-└──────┬───────┘
-       │
-       ▼
-┌──────────────────────────────────────────────────────────┐
-│                    State Machine                         │
-│  ┌────────────────────────────────────────────────────┐  │
-│  │ initial → recording → audio → config → results    │  │
-│  └────────────────────────────────────────────────────┘  │
-└──────┬───────────────────────────────────────────────────┘
-       │
-       │ Emits: state-change event
-       ▼
-┌──────────────────────────────────────────────────────────┐
-│                    Event Emitter                         │
-│  ┌────────────────────────────────────────────────────┐  │
-│  │ on('state-change', (data) => updateUI())          │  │
-│  └────────────────────────────────────────────────────┘  │
-└──────┬───────────────────────────────────────────────────┘
-       │
-       │ Updates UI based on state
-       ▼
-┌──────────────────────────────────────────────────────────┐
-│                   UI Components                          │
-│  ┌────────────────────────────────────────────────────┐  │
-│  │ InitialState, RecordingState, AudioState, etc.    │  │
-│  └────────────────────────────────────────────────────┘  │
-└──────┬───────────────────────────────────────────────────┘
-       │
-       │ User configures AI settings
-       ▼
-┌──────────────────────────────────────────────────────────┐
-│                Configuration Builder                      │
-│  ┌────────────────────────────────────────────────────┐  │
-│  │ createConfigurationBuilder()                       │  │
-│  │   .withProvider('openai')                          │  │
-│  │   .withModel('gpt-4')                              │  │
-│  │   .build() → validated config                      │  │
-│  └────────────────────────────────────────────────────┘  │
-└──────┬───────────────────────────────────────────────────┘
-       │
-       │ Uses config for API calls
-       ▼
-┌──────────────────────────────────────────────────────────┐
-│                     Repository                           │
-│  ┌────────────────────────────────────────────────────┐  │
-│  │ audioRepository.transcribe({ ... })                │  │
-│  │ audioRepository.summarize({ ... })                 │  │
-│  │ audioRepository.chat({ ... })                      │  │
-│  └────────────────────────────────────────────────────┘  │
-└──────┬───────────────────────────────────────────────────┘
-       │
-       │ Processes audio file
-       ▼
-┌──────────────────────────────────────────────────────────┐
-│                  Audio Adapter Registry                   │
-│  ┌────────────────────────────────────────────────────┐  │
-│  │ MP3 → MP3Adapter (priority: 100)                   │  │
-│  │ WAV → WAVAdapter (priority: 90)                    │  │
-│  │ WebM → WebMAdapter (priority: 80)                  │  │
-│  │ Detects format → Validates → Converts if needed   │  │
-│  └────────────────────────────────────────────────────┘  │
-└──────┬───────────────────────────────────────────────────┘
-       │
-       │ User edits audio (trim, speed, volume)
-       ▼
-┌──────────────────────────────────────────────────────────┐
-│                   Command Pattern                         │
-│  ┌────────────────────────────────────────────────────┐  │
-│  │ execute(new AddTrimRegionCommand())                │  │
-│  │ undo() → Reverses last command                     │  │
-│  │ redo() → Re-applies undone command                 │  │
-│  │ History: [cmd1, cmd2, cmd3, ...]                   │  │
-│  └────────────────────────────────────────────────────┘  │
-└───────────────────────────────────────────────────────────┘
+```mermaid
+sequenceDiagram
+    participant User
+    participant SM as State Machine
+    participant Events as Event Emitter
+    participant UI as UI Components
+    participant Config as Config Builder
+    participant Repo as Repository
+    participant Adapter as Adapter Registry
+    participant Command as Command Pattern
+
+    User->>SM: Action (Start/Upload)
+    SM->>Events: emit('state-change')
+    Events->>UI: on('state-change') -> updateUI()
+
+    User->>UI: Configure AI Settings
+    UI->>Config: createConfigurationBuilder()
+    Config-->>UI: Validated Config
+
+    UI->>Repo: audioRepository.transcribe()
+    Repo->>Adapter: processFile()
+    Adapter-->>Repo: Processed Blob
+    Repo-->>UI: Result (Transcript/Summary)
+
+    User->>UI: Edit Audio (Trim)
+    UI->>Command: execute(new AddTrimRegionCommand())
+    Command-->>UI: Action Applied (Undo available)
 ```
 
 ## State Machine Transitions
 
-```
-                    ┌─────────────┐
-                    │   initial   │ (File upload or record)
-                    └──────┬──────┘
-                           │
-          ┌────────────────┴────────────────┐
-          │                                 │
-          │ Start Recording                 │ Upload File
-          ▼                                 ▼
-    ┌──────────┐                      ┌─────────┐
-    │recording │──Stop Recording─────►│  audio  │
-    └──────────┘                      └────┬────┘
-          │                                │
-          │ Cancel                         │ Process Audio
-          └────────┐                       ▼
-                   │              ┌─────────────────┐
-                   │              │ configuration   │
-                   │              └────┬────────────┘
-                   │                   │
-                   │                   │ Validate & Continue
-                   │                   ▼
-                   │              ┌──────────┐
-                   │         ┌───┤processing│
-                   │         │   └────┬─────┘
-                   │         │        │
-                   │    Error│        │ Complete
-                   │         │        ▼
-                   │         │   ┌─────────┐
-                   │         └──►│ results │
-                   │             └────┬────┘
-                   │                  │
-                   │                  │ Back to Audio / New Recording
-                   │                  ▼
-                   └──────────────►(initial)
+```mermaid
+stateDiagram-v2
+    [*] --> initial
+
+    initial --> recording: Start Recording
+    initial --> audio: Upload File
+
+    recording --> audio: Stop Recording
+    recording --> initial: Cancel
+
+    audio --> configuration: Process Audio
+    audio --> initial: Reset/Delete
+
+    configuration --> processing: Validate & Continue
+    configuration --> audio: Back
+
+    processing --> results: Complete
+    processing --> configuration: Error
+
+    results --> audio: Back to Audio
+    results --> initial: New Session
 ```
 
 ## Repository Pattern Flow
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                       Component                                 │
-└────────────────────────────┬────────────────────────────────────┘
-                             │
-                             │ Calls repository method
-                             ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                   AudioRepository                               │
-│                                                                 │
-│  transcribe(config) ─┐                                          │
-│  summarize(config)  ─┼─► fetchWithTimeout()                     │
-│  chat(config)       ─┤         │                                │
-│  generatePDF(config)─┤         │ Timeout wrapper                │
-│  validateApiKey()   ─┘         ▼                                │
-│                          fetch('/api/...')                      │
-│                                │                                │
-│                                ▼                                │
-│                         Validate response                       │
-│                                │                                │
-│                                ▼                                │
-│                         Return typed data                       │
-└────────────────────────────┬────────────────────────────────────┘
-                             │
-                             │ Returns validated result
-                             ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                       Component                                 │
-│            { transcript, summary, response }                    │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    Comp[Component] -->|Calls Method| Repo[AudioRepository]
+
+    subgraph RepositoryOps [Repository Operations]
+        direction TB
+        Repo -->|transcribe| Fetch[fetchWithTimeout]
+        Repo -->|summarize| Fetch
+        Repo -->|chat| Fetch
+
+        Fetch --> API[External API \n /api/...]
+        API --> Val[Validate Response]
+        Val --> Type[Return Typed Data]
+    end
+
+    Type -->|Returns Result| Comp
 ```
 
 ## Builder Pattern Flow
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                        Component                                │
-└────────────────────────────┬────────────────────────────────────┘
-                             │
-                             │ Start building
-                             ▼
-┌─────────────────────────────────────────────────────────────────┐
-│              ConfigurationBuilder                               │
-│                                                                 │
-│  createConfigurationBuilder()                                   │
-│    │                                                            │
-│    ▼                                                            │
-│  withProvider('openai') ───► Validate provider                  │
-│    │                                                            │
-│    ▼                                                            │
-│  withModel('gpt-4') ───────► Validate model                     │
-│    │                                                            │
-│    ▼                                                            │
-│  withOpenAIKey('sk-...') ─► Validate key format                 │
-│    │                                                            │
-│    ▼                                                            │
-│  withContentType('meeting')                                     │
-│    │                                                            │
-│    ▼                                                            │
-│  build() ──────────────────► Full validation                    │
-│    │                              │                             │
-│    │                              ▼                             │
-│    │                     ┌────────────────┐                     │
-│    │                     │ Valid config?  │                     │
-│    │                     └────┬───────┬───┘                     │
-│    │                          │       │                         │
-│    │                     Yes  │       │ No                      │
-│    ▼                          ▼       ▼                         │
-│  AIConfiguration    Return config   Throw error                │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    Start([Start Building]) --> Create[createConfigurationBuilder]
+    Create --> Prov[withProvider]
+    Prov -->|Validate| Mod[withModel]
+    Mod -->|Validate| Key[withOpenAIKey]
+    Key -->|Validate| Type[withContentType]
+    Type --> Build{build}
+
+    Build -->|Valid| Success([Return AIConfiguration])
+    Build -->|Invalid| Error([Throw Error])
 ```
 
 ## Observer Pattern Flow
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    Event Emitter                                │
-│                                                                 │
-│  listeners: Map<event, Set<callback>>                           │
-└────────────────────────────┬────────────────────────────────────┘
-                             │
-           ┌─────────────────┼─────────────────┐
-           │                 │                 │
-           │ on()            │ emit()          │ off()
-           ▼                 ▼                 ▼
-    ┌───────────┐     ┌───────────┐     ┌──────────┐
-    │ Subscribe │     │  Notify   │     │Unsubscribe│
-    │           │     │           │     │           │
-    │ listener1 │     │ listener1 │     │ listener1 │
-    │ listener2 │     │ listener2 │     │           │
-    │ listener3 │     │ listener3 │     │           │
-    └───────────┘     └───────────┘     └──────────┘
+```mermaid
+flowchart LR
+    subgraph Emitter [Event Emitter]
+        Listeners[Map: event -> Set/callback]
+    end
 
-┌─────────────────────────────────────────────────────────────────┐
-│              ProcessingEventEmitter Example                      │
-│                                                                 │
-│  Processing Code                     UI Component               │
-│  ──────────────                      ────────────               │
-│                                                                 │
-│  start()                                                        │
-│    │                                                            │
-│    │ emit('progress')               on('progress')             │
-│    ├────────────────────────────────►  setProgress()           │
-│    │                                                            │
-│  changeStep('transcribing')                                     │
-│    │                                                            │
-│    │ emit('step-change')            on('step-change')          │
-│    ├────────────────────────────────►  setStep()               │
-│    │                                                            │
-│  updateProgress(50)                                             │
-│    │                                                            │
-│    │ emit('progress')               on('progress')             │
-│    ├────────────────────────────────►  setProgress(50)         │
-│    │                                                            │
-│  complete()                                                     │
-│    │                                                            │
-│    │ emit('complete')               on('complete')             │
-│    └────────────────────────────────►  showResults()           │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
+    subgraph Components
+        Sub[Subscribe: on]
+        Pub[Publish: emit]
+        Unsub[Unsubscribe: off]
+    end
+
+    Pub -->|Notify| Listeners
+    Listeners -->|Trigger| Sub
 ```
 
-## Command Pattern Flow
+## Command Pattern Flow (Undo/Redo)
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    Command History                              │
-│                                                                 │
-│  history: [cmd1, cmd2, cmd3, cmd4, cmd5]                        │
-│  currentIndex: 4 ────────────────────┘                          │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    User([User Action]) --> Create[Create Command\nnew AddTrimRegionCommand]
+    Create --> Execute[execute]
 
-User Action: Add Trim Region
-    │
-    ▼
-┌─────────────────────────────────────────────────────────────────┐
-│  const cmd = new AddTrimRegionCommand(wavesurfer, 0, 10)        │
-│  execute(cmd)                                                   │
-└────────────────────────────┬────────────────────────────────────┘
-                             │
-                             ▼
-┌─────────────────────────────────────────────────────────────────┐
-│  1. cmd.execute() ─────► Add region to wavesurfer              │
-│  2. Add cmd to history                                          │
-│  3. currentIndex++                                              │
-│                                                                 │
-│  history: [cmd1, cmd2, cmd3, cmd4, cmd5, cmd6]                 │
-│  currentIndex: 5 ────────────────────────────┘                  │
-└─────────────────────────────────────────────────────────────────┘
+    Execute --> Apply[Apply Change]
+    Execute --> Push[Push to History]
 
-User clicks "Undo"
-    │
-    ▼
-┌─────────────────────────────────────────────────────────────────┐
-│  undo()                                                         │
-│    │                                                            │
-│    ▼                                                            │
-│  1. history[currentIndex].undo() ─► Remove region              │
-│  2. currentIndex--                                              │
-│                                                                 │
-│  history: [cmd1, cmd2, cmd3, cmd4, cmd5, cmd6]                 │
-│  currentIndex: 4 ────────────────────────┘                      │
-└─────────────────────────────────────────────────────────────────┘
+    Push --> State{Current State}
 
-User clicks "Redo"
-    │
-    ▼
-┌─────────────────────────────────────────────────────────────────┐
-│  redo()                                                         │
-│    │                                                            │
-│    ▼                                                            │
-│  1. currentIndex++                                              │
-│  2. history[currentIndex].execute() ─► Re-add region           │
-│                                                                 │
-│  history: [cmd1, cmd2, cmd3, cmd4, cmd5, cmd6]                 │
-│  currentIndex: 5 ────────────────────────────┘                  │
-└─────────────────────────────────────────────────────────────────┘
+    Undo([User Undo]) -->|Call undo| Pop[Pop/Move Index Back]
+    Pop --> Reverse[Reverse Change]
+
+    Redo([User Redo]) -->|Call redo| Fwd[Move Index Forward]
+    Fwd --> Reapply[Re-apply Change]
 ```
 
 ## Adapter Pattern Flow
 
-```
-                        File Upload
-                             │
-                             ▼
-┌─────────────────────────────────────────────────────────────────┐
-│              AudioAdapterRegistry.processFile()                  │
-└────────────────────────────┬────────────────────────────────────┘
-                             │
-                             │ Find appropriate adapter
-                             ▼
-┌─────────────────────────────────────────────────────────────────┐
-│  Check adapters by priority:                                    │
-│                                                                 │
-│  Priority 100: MP3Adapter    ─► canHandle(file)?               │
-│                                      │                          │
-│                                      ├─ Yes → Use MP3Adapter    │
-│                                      └─ No  → Next adapter      │
-│                                                                 │
-│  Priority 90:  WAVAdapter    ─► canHandle(file)?               │
-│  Priority 80:  WebMAdapter   ─► canHandle(file)?               │
-│  Priority 70:  M4AAdapter    ─► canHandle(file)?               │
-│  Priority 60:  OGGAdapter    ─► canHandle(file)?               │
-│  Priority 50:  FLACAdapter   ─► canHandle(file)?               │
-│  Priority -1:  GenericAdapter ─► Fallback                       │
-│                                                                 │
-└────────────────────────────┬────────────────────────────────────┘
-                             │
-                             │ Selected adapter
-                             ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                    Selected Adapter                             │
-│                                                                 │
-│  1. validate(file) ─────► Check file integrity                  │
-│       │                                                         │
-│       ▼                                                         │
-│  2. convert(file) ──────► Convert if needed                     │
-│       │                                                         │
-│       ▼                                                         │
-│  3. Return Blob ────────► Standardized audio blob              │
-│                                                                 │
-└────────────────────────────┬────────────────────────────────────┘
-                             │
-                             │ Validated & converted blob
-                             ▼
-                    Ready for processing
+```mermaid
+flowchart TD
+    Upload([File Upload]) --> Registry[AudioAdapterRegistry.processFile]
+
+    Registry --> Check{Check Priority Adapters}
+
+    Check -->|Priority 100| MP3[MP3Adapter]
+    Check -->|Priority 90| WAV[WAVAdapter]
+    Check -->|Priority 80| WebM[WebMAdapter]
+    Check -->|Priority...| Other[Other Adapters]
+
+    MP3 -->|canHandle?| Valid{Valid?}
+    WAV -->|canHandle?| Valid
+
+    Valid -->|Yes| Selected[Selected Adapter]
+    Valid -->|No| Next[Next Adapter]
+
+    Selected --> Process[1. Validate\n2. Convert]
+    Process --> Blob([Return Standardized Blob])
 ```
 
 ## Integration Example
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                      User Workflow                              │
-└─────────────────────────────┬───────────────────────────────────┘
-                              │
-                              ▼
-                     1. Upload audio file
-                              │
-                              ▼
-         ┌────────────────────────────────────────┐
-         │ AudioAdapterRegistry.processFile()     │ ◄── Adapter Pattern
-         └────────────────┬───────────────────────┘
-                          │
-                          ▼
-                  2. Configure AI settings
-                          │
-                          ▼
-         ┌────────────────────────────────────────┐
-         │ ConfigurationBuilder.build()           │ ◄── Builder Pattern
-         └────────────────┬───────────────────────┘
-                          │
-                          ▼
-                  3. Click "Process"
-                          │
-                          ▼
-         ┌────────────────────────────────────────┐
-         │ appStateMachine.transition()           │ ◄── State Machine
-         └────────────────┬───────────────────────┘
-                          │
-                          ▼
-                  4. Processing starts
-                          │
-                          ▼
-         ┌────────────────────────────────────────┐
-         │ processingEventEmitter.emit()          │ ◄── Observer Pattern
-         └────────────────┬───────────────────────┘
-                          │
-                          ▼
-                  5. Transcribe audio
-                          │
-                          ▼
-         ┌────────────────────────────────────────┐
-         │ audioRepository.transcribe()           │ ◄── Repository Pattern
-         └────────────────┬───────────────────────┘
-                          │
-                          ▼
-                  6. Summarize transcript
-                          │
-                          ▼
-         ┌────────────────────────────────────────┐
-         │ audioRepository.summarize()            │ ◄── Repository Pattern
-         └────────────────┬───────────────────────┘
-                          │
-                          ▼
-                  7. Show results
-                          │
-                          ▼
-         ┌────────────────────────────────────────┐
-         │ appStateMachine.transition('results')  │ ◄── State Machine
-         └────────────────┬───────────────────────┘
-                          │
-                          ▼
-                  8. Edit audio (trim)
-                          │
-                          ▼
-         ┌────────────────────────────────────────┐
-         │ execute(AddTrimRegionCommand)          │ ◄── Command Pattern
-         └────────────────┬───────────────────────┘
-                          │
-                          ▼
-                  9. Undo/Redo available
-                          │
-                          ▼
-         ┌────────────────────────────────────────┐
-         │ undo() / redo()                        │ ◄── Command Pattern
-         └────────────────────────────────────────┘
-```
+```mermaid
+job
+    title Data Flow Integration
 
-## Data Flow
+    section User Interaction
+    Upload File: 1
+    Configure AI: 2
+    Click Process: 3
+    Edit Audio: 8
+    Undo/Redo: 9
 
-```
-┌──────────┐
-│ UI Layer │  (React Components)
-└────┬─────┘
-     │
-     │ User interactions
-     ▼
-┌───────────────┐
-│ Pattern Layer │  (State Machine, Commands, Events)
-└────┬──────────┘
-     │
-     │ Validated actions
-     ▼
-┌──────────────┐
-│ Logic Layer  │  (Repository, Builder, Adapters)
-└────┬─────────┘
-     │
-     │ API calls
-     ▼
-┌───────────────┐
-│ API Layer    │  (Vercel Serverless Functions)
-└────┬──────────┘
-     │
-     │ External APIs
-     ▼
-┌───────────────┐
-│ External     │  (OpenAI, OpenRouter, etc.)
-└──────────────┘
+    section Patterns
+    Adapter Pattern: 1
+    Builder Pattern: 2
+    State Machine: 3, 7
+    Observer Pattern: 4
+    Repository Pattern: 5, 6
+    Command Pattern: 8, 9
+
+    section System
+    Transcribe: 5
+    Summarize: 6
+    Show Results: 7
 ```
 
 ## Summary
