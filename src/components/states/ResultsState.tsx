@@ -204,6 +204,8 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
         onClose={() => {}}
         title="Generating PDF"
         disableBackdropClick={true}
+        role="status"
+        aria-busy="true"
       >
         <div className="flex flex-col items-center justify-center py-8 gap-6">
           <AILoadingOrb size={120} />

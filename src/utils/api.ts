@@ -286,46 +286,6 @@ export async function chatWithAI(
 }
 
 /**
- * Generate PDF from transcript and summary using template system
- */
-export async function generatePDF(
-  transcript: string,
-  summary: string,
-  contentType: string,
-  fileName?: string,
-  aiConfig?: {
-    provider: string;
-    model: string;
-    transcriptionModel?: string;
-  }
-): Promise<Blob> {
-  const response = await fetchWithTimeout(
-    '/api/generate-pdf',
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        transcript,
-        summary,
-        contentType,
-        fileName,
-        aiConfig,
-      }),
-    },
-    60000
-  ); // 60 second timeout for PDF generation
-
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'PDF generation failed' }));
-    throw new Error(error.message || 'PDF generation failed');
-  }
-
-  // Return the PDF as a blob with explicit type
-  const blob = await response.blob();
-  return new Blob([blob], { type: 'application/pdf' });
-}
-
-/**
  * Validate API key for a specific provider
  */
 export async function validateApiKey(provider: string, apiKey: string): Promise<boolean> {

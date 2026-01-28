@@ -32,9 +32,11 @@ export async function generatePDF(
     // Create download link
     const url = URL.createObjectURL(blob);
 
-    // Sanitize filename to prevent directory traversal or invalid characters
+    // Sanitize filename to prevent directory traversal or invalid characters (allow unicode)
+    // Remove only characters that are unsafe for filenames on Windows/Linux/Mac: < > : " / \ | ? *
     const sanitizedFileName = (fileName || 'Trammarise-Summary')
-      .replace(/[^a-z0-9\-_\s]/gi, '')
+      .replace(/[<>:"/\\|?*]/g, '-')
+      .trim()
       .replace(/\s+/g, '-');
 
     const a = document.createElement('a');
@@ -44,8 +46,8 @@ export async function generatePDF(
     a.click();
     document.body.removeChild(a);
 
-    // Clean up
-    setTimeout(() => URL.revokeObjectURL(url), 100);
+    // Clean up after a short delay to ensure the download has started
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
 
     console.log('✅ PDF generation completed successfully');
   } catch (error) {
