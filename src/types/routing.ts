@@ -48,6 +48,8 @@ export const ROUTES = {
   PROCESSING: '/processing/:sessionId',
   RESULTS: '/results/:sessionId',
   SETUP: '/setup-api-key',
+  HISTORY: '/history',
+  DOCS: '/docs',
   PREVIEW: '/preview', // Dev only
 } as const;
 
