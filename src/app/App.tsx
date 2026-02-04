@@ -1,8 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { useEffect, lazy, Suspense } from 'react';
+import { lazy, Suspense } from 'react';
 import { AppLayout } from './AppLayout';
 import { ROUTES } from '../types/routing';
-import { cleanupOldSessions } from '../utils/session-manager';
 import { LoadingSpinner } from '@/lib';
 
 // Lazy load route pages
@@ -26,6 +25,9 @@ const ApiKeySetupPage = lazy(() =>
 );
 const PdfPreviewPage = lazy(() =>
   import('../pages/debug/PdfPreviewPage').then((module) => ({ default: module.PdfPreviewPage }))
+);
+const HistoryPage = lazy(() =>
+  import('./routes/HistoryPage').then((module) => ({ default: module.HistoryPage }))
 );
 
 // Placeholder for Configuration page (will be enhanced later)
@@ -57,11 +59,6 @@ function PageLoader() {
 }
 
 function App() {
-  // Cleanup old sessions on app mount
-  useEffect(() => {
-    cleanupOldSessions();
-  }, []);
-
   return (
     <Suspense fallback={<PageLoader />}>
       <Routes>
@@ -89,6 +86,9 @@ function App() {
 
           {/* API Key Setup route */}
           <Route path={ROUTES.SETUP} element={<ApiKeySetupPage />} />
+
+          {/* History route */}
+          <Route path={ROUTES.HISTORY} element={<HistoryPage />} />
         </Route>
 
         {/* Redirect unknown routes to home */}
