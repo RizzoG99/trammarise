@@ -125,19 +125,11 @@ export function HistoryCard({
           <div
             className={`flex flex-wrap gap-2 mb-4 transition-all duration-200 ${selectionMode || selected ? 'pl-8' : 'group-hover:pl-8'}`}
           >
-            <Badge
-              variant="secondary"
-              size="sm"
-              className="bg-gray-100 dark:bg-gray-800 border-transparent"
-            >
+            <Badge variant="default" size="sm">
               <FileText className="w-3 h-3 mr-1.5 opacity-70" />
               {CONTENT_TYPE_LABELS[session.contentType] || session.contentType}
             </Badge>
-            <Badge
-              variant="secondary"
-              size="sm"
-              className="bg-gray-100 dark:bg-gray-800 border-transparent"
-            >
+            <Badge variant="default" size="sm">
               <Globe className="w-3 h-3 mr-1.5 opacity-70" />
               {LANGUAGE_LABELS[session.language] || session.language}
             </Badge>

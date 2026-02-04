@@ -122,14 +122,12 @@
   }
 
   html {
-    overscroll-behavior-y: none;
   }
 
   body {
     margin: 0;
     min-width: 320px;
     min-height: 100vh;
-    overscroll-behavior-y: none;
     background-color: var(--color-bg-primary);
     color: var(--color-text-primary);
     transition:
