@@ -396,5 +396,14 @@
   "configPlaceholder": {
     "title": "Configuración",
     "description": "Página de selección de proveedor de IA - se mejorará en Fase 3"
+  },
+  "history": {
+    "dashboard": {
+      "totalProcessed": "Total Procesado",
+      "topCategory": "Categoría Principal",
+      "activity": "Actividad (Últimos 7 Días)",
+      "sessions": "{{count}} sesión",
+      "sessions_plural": "{{count}} sesiones"
+    }
   }
 }

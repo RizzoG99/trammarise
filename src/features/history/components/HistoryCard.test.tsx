@@ -87,11 +87,12 @@ describe('HistoryCard', () => {
     expect(onDelete).toHaveBeenCalledWith('test-session-123');
   });
 
-  it('should navigate to results page on "View Details" click', async () => {
+  it('should navigate to results page on card click', async () => {
     renderWithRouter(<HistoryCard session={mockSession} onDelete={() => {}} />);
 
-    const viewButton = screen.getByRole('link', { name: /view details/i });
-    expect(viewButton).toHaveAttribute('href', '/results/test-session-123');
+    // The whole card is a link, look for it by its content or href
+    const cardLink = screen.getByRole('link', { name: /team-meeting\.webm/i });
+    expect(cardLink).toHaveAttribute('href', '/results/test-session-123');
   });
 
   it('should have ARIA labels on buttons', () => {
@@ -99,9 +100,6 @@ describe('HistoryCard', () => {
 
     const deleteButton = screen.getByRole('button', { name: /delete recording/i });
     expect(deleteButton).toHaveAccessibleName();
-
-    const viewButton = screen.getByRole('link', { name: /view details/i });
-    expect(viewButton).toHaveAccessibleName();
   });
 
   it('should have touch target size ≥44px', () => {

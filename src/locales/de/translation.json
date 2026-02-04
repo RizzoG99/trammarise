@@ -396,5 +396,14 @@
   "configPlaceholder": {
     "title": "Konfiguration",
     "description": "KI-Anbieter-Auswahlseite - wird in Phase 3 verbessert"
+  },
+  "history": {
+    "dashboard": {
+      "totalProcessed": "Gesamt Verarbeitet",
+      "topCategory": "Top Kategorie",
+      "activity": "Aktivität (Letzte 7 Tage)",
+      "sessions": "{{count}} Sitzung",
+      "sessions_plural": "{{count}} Sitzungen"
+    }
   }
 }
