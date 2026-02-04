@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { Clock, FileAudio, TrendingUp } from 'lucide-react';
 import { GlassCard, Heading, Text } from '@/lib';
+import { useTranslation } from 'react-i18next';
 import type { HistorySession } from '../types/history';
 import { calculateHistoryStats, formatDuration } from '../utils/historyStats';
 
@@ -9,6 +10,7 @@ interface HistoryDashboardProps {
 }
 
 export function HistoryDashboard({ sessions }: HistoryDashboardProps) {
+  const { t } = useTranslation();
   const stats = useMemo(() => calculateHistoryStats(sessions), [sessions]);
 
   if (sessions.length === 0) return null;
@@ -22,7 +24,7 @@ export function HistoryDashboard({ sessions }: HistoryDashboardProps) {
         </div>
         <div>
           <Text variant="small" className="text-text-secondary font-medium">
-            Total Processed
+            {t('history.dashboard.totalProcessed')}
           </Text>
           <Heading level="h3" className="text-xl font-bold">
             {formatDuration(stats.totalDurationSeconds)}
@@ -37,7 +39,7 @@ export function HistoryDashboard({ sessions }: HistoryDashboardProps) {
         </div>
         <div className="min-w-0">
           <Text variant="small" className="text-text-secondary font-medium">
-            Top Category
+            {t('history.dashboard.topCategory')}
           </Text>
           <Heading level="h3" className="text-xl font-bold truncate">
             {stats.topContentType}
@@ -55,7 +57,7 @@ export function HistoryDashboard({ sessions }: HistoryDashboardProps) {
             variant="small"
             className="text-text-secondary font-bold uppercase tracking-wider text-[10px]"
           >
-            Activity (Last 7 Days)
+            {t('history.dashboard.activity')}
           </Text>
         </div>
 
@@ -69,7 +71,7 @@ export function HistoryDashboard({ sessions }: HistoryDashboardProps) {
               <div key={index} className="flex flex-col items-center gap-1 flex-1 group relative">
                 {/* Tooltip */}
                 <div className="absolute -top-8 bg-black text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
-                  {day.count} sessions
+                  {t('history.dashboard.sessions', { count: day.count })}
                 </div>
 
                 {/* Bar */}

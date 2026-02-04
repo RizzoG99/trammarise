@@ -14,7 +14,8 @@
     "home": "Home",
     "upload": "Carica",
     "configure": "Configura",
-    "history": "Cronologia"
+    "history": "Cronologia",
+    "settings": "Impostazioni"
   },
   "header": {
     "export": "Esporta",
@@ -396,5 +397,14 @@
   "configPlaceholder": {
     "title": "Configurazione",
     "description": "Pagina di selezione provider AI - sarà migliorata nella Fase 3"
+  },
+  "history": {
+    "dashboard": {
+      "totalProcessed": "Totale Elaborato",
+      "topCategory": "Categoria Top",
+      "activity": "Attività (Ultimi 7 Giorni)",
+      "sessions": "{{count}} sessione",
+      "sessions_plural": "{{count}} sessioni"
+    }
   }
 }

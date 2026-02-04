@@ -396,5 +396,14 @@
   "configPlaceholder": {
     "title": "Configuration",
     "description": "AI provider selection page - will be enhanced in Phase 3"
+  },
+  "history": {
+    "dashboard": {
+      "totalProcessed": "Total Processed",
+      "topCategory": "Top Category",
+      "activity": "Activity (Last 7 Days)",
+      "sessions": "{{count}} session",
+      "sessions_plural": "{{count}} sessions"
+    }
   }
 }
