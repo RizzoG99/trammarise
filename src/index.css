@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@config "../tailwind.config.js";
 
 @layer base {
   :root {
@@ -120,12 +121,15 @@
     --glass-border: rgba(255, 255, 255, 0.08);
   }
 
+  html {
+    overscroll-behavior-y: none;
+  }
+
   body {
     margin: 0;
-    display: flex;
-    place-items: center;
     min-width: 320px;
     min-height: 100vh;
+    overscroll-behavior-y: none;
     background-color: var(--color-bg-primary);
     color: var(--color-text-primary);
     transition:

@@ -11,7 +11,6 @@ import {
 } from './indexeddb';
 
 const SESSION_KEY_PREFIX = 'trammarise_session_';
-const MAX_SESSION_AGE_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 /**
  * Generate a unique session ID
@@ -28,8 +27,8 @@ function getSessionKey(sessionId: string): string {
 }
 
 /**
- * Save session data to sessionStorage and IndexedDB
- * Files and Blobs are stored in IndexedDB, metadata in sessionStorage
+ * Save session data to localStorage and IndexedDB
+ * Files and Blobs are stored in IndexedDB, metadata in localStorage
  */
 export async function saveSession(sessionId: string, data: Partial<SessionData>): Promise<void> {
   try {
@@ -55,7 +54,7 @@ export async function saveSession(sessionId: string, data: Partial<SessionData>)
       createdAt: existingData?.createdAt || Date.now(),
     };
 
-    sessionStorage.setItem(getSessionKey(sessionId), JSON.stringify(sessionData));
+    localStorage.setItem(getSessionKey(sessionId), JSON.stringify(sessionData));
   } catch (error) {
     console.error('Failed to save session:', error);
     throw new Error('Failed to save session data');
@@ -63,21 +62,15 @@ export async function saveSession(sessionId: string, data: Partial<SessionData>)
 }
 
 /**
- * Load session data from sessionStorage and IndexedDB
+ * Load session data from localStorage and IndexedDB
  * Restores files from IndexedDB
  */
 export async function loadSession(sessionId: string): Promise<SessionData | null> {
   try {
-    const data = sessionStorage.getItem(getSessionKey(sessionId));
+    const data = localStorage.getItem(getSessionKey(sessionId));
     if (!data) return null;
 
     const session = JSON.parse(data);
-
-    // Check if session has expired
-    if (Date.now() - session.createdAt > MAX_SESSION_AGE_MS) {
-      await deleteSession(sessionId);
-      return null;
-    }
 
     // Load files from IndexedDB
     const audioFileRecord = await loadAudioFile(sessionId);
@@ -109,11 +102,11 @@ export async function loadSession(sessionId: string): Promise<SessionData | null
 }
 
 /**
- * Delete a session from sessionStorage and IndexedDB
+ * Delete a session from localStorage and IndexedDB
  */
 export async function deleteSession(sessionId: string): Promise<void> {
   try {
-    sessionStorage.removeItem(getSessionKey(sessionId));
+    localStorage.removeItem(getSessionKey(sessionId));
     await Promise.all([deleteAudioFile(sessionId), deleteContextFiles(sessionId)]);
   } catch (error) {
     console.error('Failed to delete session:', error);
@@ -126,8 +119,8 @@ export async function deleteSession(sessionId: string): Promise<void> {
 export function getAllSessionIds(): string[] {
   const sessionIds: string[] = [];
   try {
-    for (let i = 0; i < sessionStorage.length; i++) {
-      const key = sessionStorage.key(i);
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
       if (key?.startsWith(SESSION_KEY_PREFIX)) {
         sessionIds.push(key.replace(SESSION_KEY_PREFIX, ''));
       }
@@ -139,15 +132,11 @@ export function getAllSessionIds(): string[] {
 }
 
 /**
- * Cleanup old sessions (older than MAX_SESSION_AGE_MS)
+ * Cleanup old sessions (only effectively cleans up orphan files now)
  */
 export async function cleanupOldSessions(): Promise<void> {
-  const sessionIds = getAllSessionIds();
-  await Promise.all(
-    sessionIds.map(async (sessionId) => {
-      await loadSession(sessionId); // Auto-deletes expired sessions
-    })
-  );
+  // No expiration logic for sessions anymore
+  // But we still run file cleanup for any orphaned files
   await cleanupExpiredFiles();
 }
 

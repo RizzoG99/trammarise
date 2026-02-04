@@ -10,7 +10,6 @@ export interface AudioFileRecord {
   audioBlob: Blob;
   audioName: string;
   createdAt: number;
-  expiresAt: number;
 }
 
 /**
@@ -20,7 +19,6 @@ export interface ContextFilesRecord {
   sessionId: string;
   files: File[];
   createdAt: number;
-  expiresAt: number;
 }
 
 /**
@@ -31,7 +29,6 @@ export interface IndexedDBConfig {
   version: number;
   audioStoreName: string;
   contextStoreName: string;
-  maxAgeMs: number;
 }
 
 /**
@@ -41,11 +38,7 @@ export class IndexedDBError extends Error {
   public readonly operation: string;
   public override readonly cause?: Error;
 
-  constructor(
-    message: string,
-    operation: string,
-    cause?: Error
-  ) {
+  constructor(message: string, operation: string, cause?: Error) {
     super(message);
     this.name = 'IndexedDBError';
     this.operation = operation;

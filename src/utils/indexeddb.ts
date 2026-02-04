@@ -2,8 +2,7 @@
  * IndexedDB abstraction layer for persistent audio file storage
  *
  * This module provides a clean API for storing and retrieving audio files
- * and context files using browser IndexedDB. Files are stored with automatic
- * 24-hour expiration.
+ * and context files using browser IndexedDB.
  */
 
 import type { AudioFileRecord, ContextFilesRecord } from './indexeddb-types';
@@ -14,7 +13,6 @@ const DB_NAME = 'trammarise-db';
 const DB_VERSION = 1;
 const AUDIO_STORE = 'audio-files';
 const CONTEXT_STORE = 'context-files';
-const MAX_FILE_AGE_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 // Singleton database instance
 let dbInstance: IDBDatabase | null = null;
@@ -40,21 +38,16 @@ export async function initDatabase(): Promise<IDBDatabase> {
   if (dbInstance) return dbInstance;
 
   if (!isIndexedDBAvailable()) {
-    throw new IndexedDBError(
-      'IndexedDB is not available in this browser',
-      'initDatabase'
-    );
+    throw new IndexedDBError('IndexedDB is not available in this browser', 'initDatabase');
   }
 
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
 
     request.onerror = () => {
-      reject(new IndexedDBError(
-        'Failed to open database',
-        'initDatabase',
-        request.error || undefined
-      ));
+      reject(
+        new IndexedDBError('Failed to open database', 'initDatabase', request.error || undefined)
+      );
     };
 
     request.onsuccess = () => {
@@ -70,7 +63,7 @@ export async function initDatabase(): Promise<IDBDatabase> {
         const audioStore = db.createObjectStore(AUDIO_STORE, {
           keyPath: 'sessionId',
         });
-        audioStore.createIndex('expiresAt', 'expiresAt', { unique: false });
+        audioStore.createIndex('createdAt', 'createdAt', { unique: false });
       }
 
       // Create context-files store if it doesn't exist
@@ -78,7 +71,7 @@ export async function initDatabase(): Promise<IDBDatabase> {
         const contextStore = db.createObjectStore(CONTEXT_STORE, {
           keyPath: 'sessionId',
         });
-        contextStore.createIndex('expiresAt', 'expiresAt', { unique: false });
+        contextStore.createIndex('createdAt', 'createdAt', { unique: false });
       }
     };
   });
@@ -101,8 +94,8 @@ export async function saveAudioFile(
       audioBlob,
       audioName,
       createdAt: now,
-      expiresAt: now + MAX_FILE_AGE_MS,
-    };
+      // Removed expiresAt
+    } as AudioFileRecord;
 
     return new Promise((resolve, reject) => {
       const transaction = db.transaction([AUDIO_STORE], 'readwrite');
@@ -111,11 +104,13 @@ export async function saveAudioFile(
 
       request.onsuccess = () => resolve();
       request.onerror = () => {
-        reject(new IndexedDBError(
-          `Failed to save audio file for session ${sessionId}`,
-          'saveAudioFile',
-          request.error || undefined
-        ));
+        reject(
+          new IndexedDBError(
+            `Failed to save audio file for session ${sessionId}`,
+            'saveAudioFile',
+            request.error || undefined
+          )
+        );
       };
     });
   } catch (error) {
@@ -126,11 +121,9 @@ export async function saveAudioFile(
 
 /**
  * Load an audio file from IndexedDB
- * Returns null if not found or expired
+ * Returns null if not found
  */
-export async function loadAudioFile(
-  sessionId: string
-): Promise<AudioFileRecord | null> {
+export async function loadAudioFile(sessionId: string): Promise<AudioFileRecord | null> {
   try {
     const db = await initDatabase();
 
@@ -141,23 +134,17 @@ export async function loadAudioFile(
 
       request.onsuccess = () => {
         const record = request.result as AudioFileRecord | undefined;
-
-        // Check if record exists and is not expired
-        if (record && Date.now() > record.expiresAt) {
-          // Delete expired file
-          deleteAudioFile(sessionId).catch(console.error);
-          resolve(null);
-        } else {
-          resolve(record || null);
-        }
+        resolve(record || null);
       };
 
       request.onerror = () => {
-        reject(new IndexedDBError(
-          `Failed to load audio file for session ${sessionId}`,
-          'loadAudioFile',
-          request.error || undefined
-        ));
+        reject(
+          new IndexedDBError(
+            `Failed to load audio file for session ${sessionId}`,
+            'loadAudioFile',
+            request.error || undefined
+          )
+        );
       };
     });
   } catch (error) {
@@ -180,11 +167,13 @@ export async function deleteAudioFile(sessionId: string): Promise<void> {
 
       request.onsuccess = () => resolve();
       request.onerror = () => {
-        reject(new IndexedDBError(
-          `Failed to delete audio file for session ${sessionId}`,
-          'deleteAudioFile',
-          request.error || undefined
-        ));
+        reject(
+          new IndexedDBError(
+            `Failed to delete audio file for session ${sessionId}`,
+            'deleteAudioFile',
+            request.error || undefined
+          )
+        );
       };
     });
   } catch (error) {
@@ -196,10 +185,7 @@ export async function deleteAudioFile(sessionId: string): Promise<void> {
 /**
  * Save context files to IndexedDB
  */
-export async function saveContextFiles(
-  sessionId: string,
-  files: File[]
-): Promise<void> {
+export async function saveContextFiles(sessionId: string, files: File[]): Promise<void> {
   try {
     const db = await initDatabase();
     const now = Date.now();
@@ -208,8 +194,8 @@ export async function saveContextFiles(
       sessionId,
       files,
       createdAt: now,
-      expiresAt: now + MAX_FILE_AGE_MS,
-    };
+      // Removed expiresAt
+    } as ContextFilesRecord;
 
     return new Promise((resolve, reject) => {
       const transaction = db.transaction([CONTEXT_STORE], 'readwrite');
@@ -218,11 +204,13 @@ export async function saveContextFiles(
 
       request.onsuccess = () => resolve();
       request.onerror = () => {
-        reject(new IndexedDBError(
-          `Failed to save context files for session ${sessionId}`,
-          'saveContextFiles',
-          request.error || undefined
-        ));
+        reject(
+          new IndexedDBError(
+            `Failed to save context files for session ${sessionId}`,
+            'saveContextFiles',
+            request.error || undefined
+          )
+        );
       };
     });
   } catch (error) {
@@ -233,7 +221,7 @@ export async function saveContextFiles(
 
 /**
  * Load context files from IndexedDB
- * Returns empty array if not found or expired
+ * Returns empty array if not found
  */
 export async function loadContextFiles(sessionId: string): Promise<File[]> {
   try {
@@ -246,23 +234,17 @@ export async function loadContextFiles(sessionId: string): Promise<File[]> {
 
       request.onsuccess = () => {
         const record = request.result as ContextFilesRecord | undefined;
-
-        // Check if record exists and is not expired
-        if (record && Date.now() > record.expiresAt) {
-          // Delete expired files
-          deleteContextFiles(sessionId).catch(console.error);
-          resolve([]);
-        } else {
-          resolve(record?.files || []);
-        }
+        resolve(record?.files || []);
       };
 
       request.onerror = () => {
-        reject(new IndexedDBError(
-          `Failed to load context files for session ${sessionId}`,
-          'loadContextFiles',
-          request.error || undefined
-        ));
+        reject(
+          new IndexedDBError(
+            `Failed to load context files for session ${sessionId}`,
+            'loadContextFiles',
+            request.error || undefined
+          )
+        );
       };
     });
   } catch (error) {
@@ -285,78 +267,27 @@ export async function deleteContextFiles(sessionId: string): Promise<void> {
 
       request.onsuccess = () => resolve();
       request.onerror = () => {
-        reject(new IndexedDBError(
-          `Failed to delete context files for session ${sessionId}`,
-          'deleteContextFiles',
-          request.error || undefined
-        ));
+        reject(
+          new IndexedDBError(
+            `Failed to delete context files for session ${sessionId}`,
+            'deleteContextFiles',
+            request.error || undefined
+          )
+        );
       };
     });
   } catch (error) {
     console.error('Error deleting context files:', error);
-    // Don't throw - deletion failures shouldn't block other operations
   }
 }
 
 /**
- * Clean up all expired files from the database
- * Returns the number of deleted records
+ * Update logic: cleanupExpiredFiles is now a no-op regarding expiration
+ * It returns 0 as nothing is "expired" by time anymore.
  */
 export async function cleanupExpiredFiles(): Promise<number> {
-  try {
-    const db = await initDatabase();
-    const now = Date.now();
-    let deletedCount = 0;
-
-    // Cleanup audio files
-    await new Promise<void>((resolve) => {
-      const audioTx = db.transaction([AUDIO_STORE], 'readwrite');
-      const audioStore = audioTx.objectStore(AUDIO_STORE);
-      const audioIndex = audioStore.index('expiresAt');
-      const audioRange = IDBKeyRange.upperBound(now);
-      const audioCursor = audioIndex.openCursor(audioRange);
-
-      audioCursor.onsuccess = (event) => {
-        const cursor = (event.target as IDBRequest).result as IDBCursorWithValue | null;
-        if (cursor) {
-          cursor.delete();
-          deletedCount++;
-          cursor.continue();
-        } else {
-          resolve();
-        }
-      };
-
-      audioCursor.onerror = () => resolve();
-    });
-
-    // Cleanup context files
-    await new Promise<void>((resolve) => {
-      const contextTx = db.transaction([CONTEXT_STORE], 'readwrite');
-      const contextStore = contextTx.objectStore(CONTEXT_STORE);
-      const contextIndex = contextStore.index('expiresAt');
-      const contextRange = IDBKeyRange.upperBound(now);
-      const contextCursor = contextIndex.openCursor(contextRange);
-
-      contextCursor.onsuccess = (event) => {
-        const cursor = (event.target as IDBRequest).result as IDBCursorWithValue | null;
-        if (cursor) {
-          cursor.delete();
-          deletedCount++;
-          cursor.continue();
-        } else {
-          resolve();
-        }
-      };
-
-      contextCursor.onerror = () => resolve();
-    });
-
-    return deletedCount;
-  } catch (error) {
-    console.error('Error cleaning up expired files:', error);
-    return 0;
-  }
+  // No-op: files persist indefinitely until manually deleted
+  return 0;
 }
 
 /**
