@@ -4,7 +4,7 @@ import type { HistorySession } from '../types/history';
 
 describe('sessionGrouping', () => {
   beforeEach(() => {
-    // Set a fixed time for consistent testing
+    // Set a fixed time for consistent testing: noon on Jan 28, 2026 UTC
     vi.setSystemTime(new Date('2026-01-28T12:00:00Z'));
   });
 
@@ -19,41 +19,43 @@ describe('sessionGrouping', () => {
     updatedAt: createdAt,
   });
 
+  // Calendar-day anchors (all at noon UTC to stay firmly within their day)
+  // "Today" is Jan 28; midnight boundary is 2026-01-28T00:00:00Z
+  const TODAY = new Date('2026-01-28T10:00:00Z').getTime(); // Jan 28, 10 AM
+  const TODAY_EARLY = new Date('2026-01-28T01:00:00Z').getTime(); // Jan 28, 1 AM
+  const YESTERDAY = new Date('2026-01-27T15:00:00Z').getTime(); // Jan 27, 3 PM
+  const YESTERDAY_EARLY = new Date('2026-01-27T02:00:00Z').getTime(); // Jan 27, 2 AM
+  const TWO_DAYS_AGO = new Date('2026-01-26T12:00:00Z').getTime(); // Jan 26
+  const FIVE_DAYS_AGO = new Date('2026-01-23T12:00:00Z').getTime(); // Jan 23
+  const SEVEN_DAYS_AGO = new Date('2026-01-21T12:00:00Z').getTime(); // Jan 21 (>= sevenDaysAgo = Jan 21)
+  const EIGHT_DAYS_AGO = new Date('2026-01-20T12:00:00Z').getTime(); // Jan 20 (lastWeek)
+  const TEN_DAYS_AGO = new Date('2026-01-18T12:00:00Z').getTime(); // Jan 18
+  const FOURTEEN_DAYS_AGO = new Date('2026-01-14T12:00:00Z').getTime(); // Jan 14 (>= fourteenDaysAgo = Jan 14)
+
   describe('groupSessionsByDate', () => {
-    it("should group today's sessions correctly (within 24h)", () => {
-      const now = Date.now();
-      const sessions = [
-        createSession(now),
-        createSession(now - 1000 * 60 * 60), // 1 hour ago
-        createSession(now - 1000 * 60 * 60 * 23), // 23 hours ago
-      ];
+    it("should group today's sessions correctly (same calendar day)", () => {
+      const sessions = [createSession(TODAY), createSession(TODAY_EARLY)];
 
       const result = groupSessionsByDate(sessions);
 
-      expect(result.today).toHaveLength(3);
+      expect(result.today).toHaveLength(2);
       expect(result.yesterday).toHaveLength(0);
     });
 
-    it("should group yesterday's sessions (24-48h ago)", () => {
-      const now = Date.now();
-      const sessions = [
-        createSession(now - 1000 * 60 * 60 * 25), // 25 hours ago
-        createSession(now - 1000 * 60 * 60 * 36), // 36 hours ago
-        createSession(now - 1000 * 60 * 60 * 47), // 47 hours ago
-      ];
+    it("should group yesterday's sessions (previous calendar day)", () => {
+      const sessions = [createSession(YESTERDAY), createSession(YESTERDAY_EARLY)];
 
       const result = groupSessionsByDate(sessions);
 
       expect(result.today).toHaveLength(0);
-      expect(result.yesterday).toHaveLength(3);
+      expect(result.yesterday).toHaveLength(2);
     });
 
-    it("should group this week's sessions (2-7 days)", () => {
-      const now = Date.now();
+    it("should group this week's sessions (2–7 calendar days ago)", () => {
       const sessions = [
-        createSession(now - 1000 * 60 * 60 * 24 * 2), // 2 days ago
-        createSession(now - 1000 * 60 * 60 * 24 * 5), // 5 days ago
-        createSession(now - 1000 * 60 * 60 * 24 * 7), // 7 days ago
+        createSession(TWO_DAYS_AGO),
+        createSession(FIVE_DAYS_AGO),
+        createSession(SEVEN_DAYS_AGO),
       ];
 
       const result = groupSessionsByDate(sessions);
@@ -62,12 +64,11 @@ describe('sessionGrouping', () => {
       expect(result.lastWeek).toHaveLength(0);
     });
 
-    it("should group last week's sessions (8-14 days)", () => {
-      const now = Date.now();
+    it("should group last week's sessions (8–14 calendar days ago)", () => {
       const sessions = [
-        createSession(now - 1000 * 60 * 60 * 24 * 8), // 8 days ago
-        createSession(now - 1000 * 60 * 60 * 24 * 10), // 10 days ago
-        createSession(now - 1000 * 60 * 60 * 24 * 14), // 14 days ago
+        createSession(EIGHT_DAYS_AGO),
+        createSession(TEN_DAYS_AGO),
+        createSession(FOURTEEN_DAYS_AGO),
       ];
 
       const result = groupSessionsByDate(sessions);
@@ -102,9 +103,8 @@ describe('sessionGrouping', () => {
     });
 
     it('should handle sessions with invalid timestamps', () => {
-      const now = Date.now();
       const sessions = [
-        createSession(now),
+        createSession(TODAY),
         createSession(0), // Invalid timestamp
         createSession(-1), // Negative timestamp
         createSession(NaN), // NaN timestamp
@@ -117,11 +117,14 @@ describe('sessionGrouping', () => {
     });
 
     it('should sort within groups by newest first', () => {
-      const now = Date.now();
+      const oldest = new Date('2026-01-28T08:00:00Z').getTime();
+      const middle = new Date('2026-01-28T09:00:00Z').getTime();
+      const newest = new Date('2026-01-28T10:00:00Z').getTime();
+
       const sessions = [
-        createSession(now - 1000 * 60 * 60, 'oldest.webm'),
-        createSession(now - 1000 * 60 * 30, 'middle.webm'),
-        createSession(now - 1000 * 60 * 10, 'newest.webm'),
+        createSession(oldest, 'oldest.webm'),
+        createSession(middle, 'middle.webm'),
+        createSession(newest, 'newest.webm'),
       ];
 
       const result = groupSessionsByDate(sessions);
@@ -131,21 +134,20 @@ describe('sessionGrouping', () => {
       expect(result.today[2].audioName).toBe('oldest.webm');
     });
 
-    it('should handle sessions exactly at group boundaries', () => {
-      const now = Date.now();
-      const exactlyOneDayAgo = now - 1000 * 60 * 60 * 24;
-      const exactlyTwoDaysAgo = now - 1000 * 60 * 60 * 24 * 2;
+    it('should handle sessions exactly at calendar-day boundaries', () => {
+      // Exactly at midnight Jan 27 → that IS Jan 27's calendar day (yesterday)
+      const exactlyYesterdayMidnight = new Date('2026-01-27T00:00:00Z').getTime();
+      // Exactly at midnight Jan 26 → that IS Jan 26's calendar day (thisWeek)
+      const exactlyTwoDaysAgoMidnight = new Date('2026-01-26T00:00:00Z').getTime();
 
       const sessions = [
-        createSession(exactlyOneDayAgo, 'boundary-1.webm'),
-        createSession(exactlyTwoDaysAgo, 'boundary-2.webm'),
+        createSession(exactlyYesterdayMidnight, 'boundary-1.webm'),
+        createSession(exactlyTwoDaysAgoMidnight, 'boundary-2.webm'),
       ];
 
       const result = groupSessionsByDate(sessions);
 
-      // First boundary should be in yesterday
       expect(result.yesterday.find((s) => s.audioName === 'boundary-1.webm')).toBeDefined();
-      // Second boundary should be in thisWeek
       expect(result.thisWeek.find((s) => s.audioName === 'boundary-2.webm')).toBeDefined();
     });
 

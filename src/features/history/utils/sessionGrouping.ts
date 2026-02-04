@@ -1,14 +1,22 @@
 import type { HistorySession, GroupedSessions } from '../types/history';
 
-const MS_PER_DAY = 1000 * 60 * 60 * 24;
-
 /**
- * Groups sessions by date into chronological categories
+ * Groups sessions by date into chronological categories using calendar-day boundaries
  * @param sessions - Array of history sessions
  * @returns Grouped sessions by date category
  */
 export function groupSessionsByDate(sessions: HistorySession[]): GroupedSessions {
-  const now = Date.now();
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+
+  const sevenDaysAgo = new Date(today);
+  sevenDaysAgo.setDate(today.getDate() - 7);
+
+  const fourteenDaysAgo = new Date(today);
+  fourteenDaysAgo.setDate(today.getDate() - 14);
 
   const grouped: GroupedSessions = {
     today: [],
@@ -28,16 +36,17 @@ export function groupSessionsByDate(sessions: HistorySession[]): GroupedSessions
   const sortedSessions = [...validSessions].sort((a, b) => b.createdAt - a.createdAt);
 
   for (const session of sortedSessions) {
-    const ageInMs = now - session.createdAt;
-    const ageInDays = ageInMs / MS_PER_DAY;
+    const sessionDate = new Date(session.createdAt);
+    sessionDate.setHours(0, 0, 0, 0);
+    const sessionTime = sessionDate.getTime();
 
-    if (ageInDays < 1) {
+    if (sessionTime >= today.getTime()) {
       grouped.today.push(session);
-    } else if (ageInDays < 2) {
+    } else if (sessionTime >= yesterday.getTime()) {
       grouped.yesterday.push(session);
-    } else if (ageInDays <= 7) {
+    } else if (sessionTime >= sevenDaysAgo.getTime()) {
       grouped.thisWeek.push(session);
-    } else if (ageInDays <= 14) {
+    } else if (sessionTime >= fourteenDaysAgo.getTime()) {
       grouped.lastWeek.push(session);
     } else {
       // Group by month for older sessions
