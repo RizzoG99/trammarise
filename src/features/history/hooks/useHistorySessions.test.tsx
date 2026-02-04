@@ -105,17 +105,12 @@ describe('useHistorySessions', () => {
     expect(session.createdAt).toBe(createdAt);
   });
 
-  it('should query IndexedDB for file size', async () => {
-    const mockBlob = new Blob(['a'.repeat(1000)], { type: 'audio/webm' });
+  it('should read fileSizeBytes from session metadata', async () => {
+    const expectedSize = 12345;
     vi.mocked(sessionManager.getAllSessionIds).mockReturnValue(['session-1']);
-    vi.mocked(sessionManager.loadSession).mockResolvedValue(
-      mockSessionData('session-1', Date.now())
-    );
-    vi.mocked(indexedDB.loadAudioFile).mockResolvedValue({
-      sessionId: 'session-1',
-      audioBlob: mockBlob,
-      audioName: 'test.webm',
-      createdAt: Date.now(),
+    vi.mocked(sessionManager.loadSession).mockResolvedValue({
+      ...mockSessionData('session-1', Date.now()),
+      fileSizeBytes: expectedSize,
     });
 
     const { result } = renderHook(() => useHistorySessions());
@@ -124,8 +119,7 @@ describe('useHistorySessions', () => {
       expect(result.current.sessions).toHaveLength(1);
     });
 
-    expect(indexedDB.loadAudioFile).toHaveBeenCalledWith('session-1');
-    expect(result.current.sessions[0].fileSizeBytes).toBe(mockBlob.size);
+    expect(result.current.sessions[0].fileSizeBytes).toBe(expectedSize);
   });
 
   it('should persist older sessions >24h', async () => {
@@ -276,8 +270,8 @@ describe('useHistorySessions', () => {
       expect(result.current.sessions).toHaveLength(1);
     });
 
-    // Try to delete
-    await result.current.deleteSession('session-1');
+    // Try to delete — deleteSession re-throws so the caller can surface the error
+    await expect(result.current.deleteSession('session-1')).rejects.toThrow('Delete failed');
 
     // Should revert (session back in list) and show error
     await waitFor(() => {

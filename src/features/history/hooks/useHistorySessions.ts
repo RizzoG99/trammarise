@@ -6,7 +6,6 @@ import {
   loadSession,
   deleteSession as deleteSessionFromStorage,
 } from '@/utils/session-manager';
-import { loadAudioFile } from '@/utils/indexeddb';
 
 interface UseHistorySessionsReturn {
   sessions: HistorySession[];
@@ -14,6 +13,28 @@ interface UseHistorySessionsReturn {
   error: string | null;
   deleteSession: (sessionId: string) => Promise<void>;
   reload: () => Promise<void>;
+}
+
+async function loadOneSession(sessionId: string): Promise<HistorySession | null> {
+  const sessionData = await loadSession(sessionId);
+
+  if (!sessionData) {
+    return null;
+  }
+
+  const fileSizeBytes = sessionData.fileSizeBytes as number | undefined;
+
+  return {
+    sessionId,
+    audioName: sessionData.audioFile.name,
+    contentType: (sessionData.configuration?.contentType || sessionData.contentType) as ContentType,
+    language: sessionData.configuration?.language || sessionData.language,
+    hasTranscript: !!sessionData.result?.transcript,
+    hasSummary: !!sessionData.result?.summary,
+    createdAt: sessionData.createdAt,
+    updatedAt: sessionData.updatedAt,
+    fileSizeBytes,
+  };
 }
 
 /**
@@ -32,44 +53,11 @@ export function useHistorySessions(): UseHistorySessionsReturn {
     try {
       const sessionIds = getAllSessionIds();
 
-      const loadedSessions: HistorySession[] = [];
-
-      for (const sessionId of sessionIds) {
-        try {
-          const sessionData = await loadSession(sessionId);
-
-          if (!sessionData) {
-            continue; // Skip missing sessions
-          }
-
-          // Load file size from IndexedDB (but not the full blob)
-          let fileSizeBytes: number | undefined;
-          try {
-            const audioFile = await loadAudioFile(sessionId);
-            fileSizeBytes = audioFile?.audioBlob.size;
-          } catch {
-            // Continue without file size if IndexedDB fails
-          }
-
-          const historySession: HistorySession = {
-            sessionId,
-            audioName: sessionData.audioFile.name,
-            contentType: (sessionData.configuration?.contentType ||
-              sessionData.contentType) as ContentType,
-            language: sessionData.configuration?.language || sessionData.language,
-            hasTranscript: !!sessionData.result?.transcript,
-            hasSummary: !!sessionData.result?.summary,
-            createdAt: sessionData.createdAt,
-            updatedAt: sessionData.updatedAt,
-            fileSizeBytes,
-          };
-
-          loadedSessions.push(historySession);
-        } catch (err) {
-          // Log but continue loading other sessions
-          console.warn(`Failed to load session ${sessionId}:`, err);
-        }
-      }
+      const results = await Promise.allSettled(sessionIds.map((id) => loadOneSession(id)));
+      const loadedSessions = results
+        .filter((r): r is PromiseFulfilledResult<HistorySession | null> => r.status === 'fulfilled')
+        .map((r) => r.value)
+        .filter((s): s is HistorySession => s !== null);
 
       setSessions(loadedSessions);
     } catch (err) {
@@ -98,6 +86,7 @@ export function useHistorySessions(): UseHistorySessionsReturn {
         setSessions(previousSessions);
         setError('Failed to delete session');
         console.error('Error deleting session:', err);
+        throw err;
       }
     },
     [sessions]

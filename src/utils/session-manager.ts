@@ -110,7 +110,6 @@ export async function deleteSession(sessionId: string): Promise<void> {
     await Promise.all([deleteAudioFile(sessionId), deleteContextFiles(sessionId)]);
   } catch (error) {
     console.error('Failed to delete session:', error);
-    throw error;
   }
 }
 

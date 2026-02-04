@@ -29,6 +29,7 @@ export interface SessionData {
 
   createdAt: number;
   updatedAt: number;
+  fileSizeBytes?: number;
 }
 
 /**
