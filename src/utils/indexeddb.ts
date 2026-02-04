@@ -282,15 +282,6 @@ export async function deleteContextFiles(sessionId: string): Promise<void> {
 }
 
 /**
- * Update logic: cleanupExpiredFiles is now a no-op regarding expiration
- * It returns 0 as nothing is "expired" by time anymore.
- */
-export async function cleanupExpiredFiles(): Promise<number> {
-  // No-op: files persist indefinitely until manually deleted
-  return 0;
-}
-
-/**
  * Delete all files from the database
  */
 export async function deleteAllFiles(): Promise<void> {
