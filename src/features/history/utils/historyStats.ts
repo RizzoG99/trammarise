@@ -5,6 +5,7 @@ export interface HistoryStats {
   totalDurationSeconds: number;
   topContentType: string;
   activityLast7Days: { date: string; count: number }[];
+  isApproximate: boolean;
 }
 
 /**
@@ -17,6 +18,7 @@ export function calculateHistoryStats(sessions: HistorySession[]): HistoryStats 
       totalDurationSeconds: 0,
       topContentType: 'None',
       activityLast7Days: [],
+      isApproximate: false,
     };
   }
 
@@ -26,8 +28,13 @@ export function calculateHistoryStats(sessions: HistorySession[]): HistoryStats 
   // 2. Total Duration (using fileSizeBytes as a proxy for now if duration is missing)
   // Assuming ~1MB = 1 minute for typical audio (very rough approximation)
   // Real implementation would use session.durationSeconds when available
+  let isApproximate = false;
   const totalDurationSeconds = sessions.reduce((acc, session) => {
-    return acc + (session.durationSeconds || ((session.fileSizeBytes || 0) / 1024 / 1024) * 60);
+    if (!session.durationSeconds) {
+      isApproximate = true;
+      return acc + ((session.fileSizeBytes || 0) / 1024 / 1024) * 60;
+    }
+    return acc + session.durationSeconds;
   }, 0);
 
   // 3. Top Content Type
@@ -82,20 +89,6 @@ export function calculateHistoryStats(sessions: HistorySession[]): HistoryStats 
     totalDurationSeconds,
     topContentType,
     activityLast7Days,
+    isApproximate,
   };
-}
-
-/**
- * Formats duration in seconds to a readable string (e.g. "2h 15m")
- */
-export function formatDuration(seconds: number): string {
-  if (seconds < 60) return '< 1m';
-
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-
-  if (hours > 0) {
-    return `${hours}h ${minutes}m`;
-  }
-  return `${minutes}m`;
 }

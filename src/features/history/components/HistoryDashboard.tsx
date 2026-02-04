@@ -3,7 +3,8 @@ import { Clock, FileAudio, TrendingUp } from 'lucide-react';
 import { GlassCard, Heading, Text } from '@/lib';
 import { useTranslation } from 'react-i18next';
 import type { HistorySession } from '../types/history';
-import { calculateHistoryStats, formatDuration } from '../utils/historyStats';
+import { calculateHistoryStats } from '../utils/historyStats';
+import { formatDuration } from '../utils/formatters';
 
 interface HistoryDashboardProps {
   sessions: HistorySession[];
@@ -27,6 +28,7 @@ export function HistoryDashboard({ sessions }: HistoryDashboardProps) {
             {t('history.dashboard.totalProcessed')}
           </Text>
           <Heading level="h3" className="text-xl font-bold">
+            {stats.isApproximate ? '~' : ''}
             {formatDuration(stats.totalDurationSeconds)}
           </Heading>
         </div>
