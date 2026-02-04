@@ -31,9 +31,11 @@ export function HistoryPage() {
   } = useHistoryFilters(sessions);
 
   // Bulk Selection State
-  const { selectedIds, toggleSelection, clearSelection, hasSelection } = useHistorySelection();
+  const { selectedIds, toggleSelection, selectAll, clearSelection, hasSelection } =
+    useHistorySelection();
 
   const [sessionToDelete, setSessionToDelete] = useState<HistorySession | null>(null);
+  const [bulkDeleteCount, setBulkDeleteCount] = useState<number | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [snackbar, setSnackbar] = useState<{
     message: string;
@@ -49,16 +51,14 @@ export function HistoryPage() {
     }
   };
 
-  // Bulk Delete
-  const handleBulkDelete = async () => {
-    if (!window.confirm(`Are you sure you want to delete ${selectedIds.size} recordings?`)) {
-      return;
-    }
+  // Bulk Delete — opens modal instead of window.confirm
+  const handleBulkDelete = () => {
+    setBulkDeleteCount(selectedIds.size);
+  };
 
+  const handleBulkDeleteConfirm = async () => {
     setIsDeleting(true);
     try {
-      // Execute deletions in sequence or parallel depending on backend/storage limits
-      // Using Promise.all for parallel since it's local storage
       await Promise.all(Array.from(selectedIds).map((id) => deleteSession(id)));
 
       setSnackbar({
@@ -70,6 +70,7 @@ export function HistoryPage() {
       setSnackbar({ message: 'Failed to delete some recordings', variant: 'error' });
     } finally {
       setIsDeleting(false);
+      setBulkDeleteCount(null);
     }
   };
 
@@ -94,6 +95,7 @@ export function HistoryPage() {
 
   const handleDeleteCancel = () => {
     setSessionToDelete(null);
+    setBulkDeleteCount(null);
   };
 
   if (isLoading) {
@@ -134,7 +136,7 @@ export function HistoryPage() {
 
   return (
     <PageLayout>
-      <div className="max-w-7xl mx-auto px-4 md:px-8 py-12 relative">
+      <div className="max-w-7xl mx-auto px-4 md:px-8 py-12 relative overscroll-y-none">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Recording History</h1>
@@ -177,6 +179,17 @@ export function HistoryPage() {
             <div className="h-6 w-px bg-gray-200 dark:bg-gray-700 mx-2" />
             <Button
               variant="ghost"
+              onClick={
+                selectedIds.size === filteredSessions.length
+                  ? clearSelection
+                  : () => selectAll(filteredSessions.map((s) => s.sessionId))
+              }
+              className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white rounded-full"
+            >
+              {selectedIds.size === filteredSessions.length ? 'Deselect All' : 'Select All'}
+            </Button>
+            <Button
+              variant="ghost"
               onClick={handleBulkDelete}
               className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full"
             >
@@ -207,11 +220,12 @@ export function HistoryPage() {
       </div>
 
       <DeleteConfirmModal
-        isOpen={!!sessionToDelete}
+        isOpen={!!sessionToDelete || !!bulkDeleteCount}
         onClose={handleDeleteCancel}
-        onConfirm={handleDeleteConfirm}
+        onConfirm={bulkDeleteCount ? handleBulkDeleteConfirm : handleDeleteConfirm}
         session={sessionToDelete}
         isDeleting={isDeleting}
+        count={bulkDeleteCount ?? undefined}
       />
 
       {snackbar && (

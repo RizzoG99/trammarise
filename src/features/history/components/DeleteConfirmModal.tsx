@@ -9,6 +9,7 @@ interface DeleteConfirmModalProps {
   onConfirm: () => void;
   session: HistorySession | null;
   isDeleting?: boolean;
+  count?: number;
 }
 
 export function DeleteConfirmModal({
@@ -17,14 +18,15 @@ export function DeleteConfirmModal({
   onConfirm,
   session,
   isDeleting = false,
+  count,
 }: DeleteConfirmModalProps) {
-  if (!session) return null;
+  if (!session && !count) return null;
 
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Delete Recording?"
+      title={count ? `Delete ${count} Recordings?` : 'Delete Recording?'}
       actions={[
         {
           label: 'Cancel',
@@ -45,25 +47,31 @@ export function DeleteConfirmModal({
           </div>
           <div className="flex-1">
             <p className="text-gray-900 dark:text-white mb-2">
-              Are you sure you want to delete this recording? This action cannot be undone.
+              {count
+                ? `Are you sure you want to delete ${count} recordings? This action cannot be undone.`
+                : 'Are you sure you want to delete this recording? This action cannot be undone.'}
             </p>
           </div>
         </div>
 
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 space-y-2">
-          <div>
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Recording:</span>
-            <p className="text-gray-900 dark:text-white truncate">{session.audioName}</p>
+        {session && (
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 space-y-2">
+            <div>
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Recording:
+              </span>
+              <p className="text-gray-900 dark:text-white truncate">{session.audioName}</p>
+            </div>
+            <div>
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Created:</span>
+              <p className="text-gray-900 dark:text-white">{formatDate(session.createdAt)}</p>
+            </div>
+            <div>
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Type:</span>
+              <p className="text-gray-900 dark:text-white capitalize">{session.contentType}</p>
+            </div>
           </div>
-          <div>
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Created:</span>
-            <p className="text-gray-900 dark:text-white">{formatDate(session.createdAt)}</p>
-          </div>
-          <div>
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Type:</span>
-            <p className="text-gray-900 dark:text-white capitalize">{session.contentType}</p>
-          </div>
-        </div>
+        )}
       </div>
     </Modal>
   );
