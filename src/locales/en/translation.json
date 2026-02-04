@@ -14,7 +14,8 @@
     "home": "Home",
     "upload": "Upload",
     "configure": "Configure",
-    "history": "History"
+    "history": "History",
+    "settings": "Settings"
   },
   "header": {
     "export": "Export",

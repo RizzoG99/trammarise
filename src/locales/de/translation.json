@@ -14,7 +14,8 @@
     "home": "Start",
     "upload": "Hochladen",
     "configure": "Konfigurieren",
-    "history": "Verlauf"
+    "history": "Verlauf",
+    "settings": "Einstellungen"
   },
   "header": {
     "export": "Exportieren",
