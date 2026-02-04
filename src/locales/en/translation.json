@@ -14,7 +14,8 @@
     "home": "Home",
     "upload": "Upload",
     "configure": "Configure",
-    "history": "History"
+    "history": "History",
+    "settings": "Settings"
   },
   "header": {
     "export": "Export",
@@ -396,5 +397,49 @@
   "configPlaceholder": {
     "title": "Configuration",
     "description": "AI provider selection page - will be enhanced in Phase 3"
+  },
+  "docs": {
+    "title": "Documentation & FAQ",
+    "description": "Guides and answers to common questions about Trammarise.",
+    "gettingStarted": {
+      "title": "Getting Started",
+      "step1": {
+        "title": "Upload or Record",
+        "text": "Start by uploading an audio file or recording directly in the browser."
+      },
+      "step2": {
+        "title": "Configure & Process",
+        "text": "Choose your AI provider (ChatGPT, Claude, or Deepseek) and enter your API keys safely."
+      },
+      "step3": {
+        "title": "Interact & Export",
+        "text": "View the transcript, chat with the AI to refine summaries, and export your results."
+      }
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "items": [
+        {
+          "question": "Are my API keys safe?",
+          "answer": "Yes! API keys are stored only in your browser's session storage and are never sent to our servers. They are automatically cleared when you close the tab."
+        },
+        {
+          "question": "What audio formats are supported?",
+          "answer": "We support most common audio formats including MP3, WAV, M4A, and WEBM. The maximum file size is 25MB (or larger if you compress it first)."
+        },
+        {
+          "question": "Why do I need an OpenAI key?",
+          "answer": "An OpenAI API Key is required for the Whisper transcription service, which converts speech to text. This is used regardless of which AI model you choose for summarization."
+        },
+        {
+          "question": "My audio is too large, what can I do?",
+          "answer": "Trammarise has a built-in compression tool that will appear if your file is too large. Alternatively, you can trim the audio using our wave editor before processing."
+        }
+      ]
+    },
+    "troubleshooting": {
+      "title": "Troubleshooting",
+      "transcriptionFailed": "If transcription fails, check that your OpenAI API key is valid and has sufficient credits at platform.openai.com."
+    }
   }
 }

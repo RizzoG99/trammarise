@@ -47,7 +47,9 @@ export const ROUTES = {
   CONFIGURE: '/configure/:sessionId',
   PROCESSING: '/processing/:sessionId',
   RESULTS: '/results/:sessionId',
+  HISTORY: '/history',
   SETUP: '/setup-api-key',
+  DOCS: '/docs',
   PREVIEW: '/preview', // Dev only
 } as const;
 
