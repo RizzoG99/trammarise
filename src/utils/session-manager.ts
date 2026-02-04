@@ -6,7 +6,6 @@ import {
   saveContextFiles,
   loadContextFiles,
   deleteContextFiles,
-  cleanupExpiredFiles,
   deleteAllFiles,
 } from './indexeddb';
 
@@ -52,6 +51,7 @@ export async function saveSession(sessionId: string, data: Partial<SessionData>)
       sessionId,
       updatedAt: Date.now(),
       createdAt: existingData?.createdAt || Date.now(),
+      ...(audioFile ? { fileSizeBytes: audioFile.blob.size } : {}),
     };
 
     localStorage.setItem(getSessionKey(sessionId), JSON.stringify(sessionData));
@@ -129,15 +129,6 @@ export function getAllSessionIds(): string[] {
     console.error('Failed to get session IDs:', error);
   }
   return sessionIds;
-}
-
-/**
- * Cleanup old sessions (only effectively cleans up orphan files now)
- */
-export async function cleanupOldSessions(): Promise<void> {
-  // No expiration logic for sessions anymore
-  // But we still run file cleanup for any orphaned files
-  await cleanupExpiredFiles();
 }
 
 /**
