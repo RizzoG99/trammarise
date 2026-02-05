@@ -398,6 +398,50 @@
     "title": "Configuración",
     "description": "Página de selección de proveedor de IA - se mejorará en Fase 3"
   },
+  "docs": {
+    "title": "Documentación y Preguntas Frecuentes",
+    "description": "Guías y respuestas a preguntas comunes sobre Trammarise.",
+    "gettingStarted": {
+      "title": "Primeros Pasos",
+      "step1": {
+        "title": "Subir o Grabar",
+        "text": "Comienza subiendo un archivo de audio o grabando directamente en el navegador."
+      },
+      "step2": {
+        "title": "Configurar y Procesar",
+        "text": "Elige tu proveedor de IA (ChatGPT, Claude o Deepseek) e ingresa tus claves API de forma segura."
+      },
+      "step3": {
+        "title": "Interactuar y Exportar",
+        "text": "Ve la transcripción, chatea con la IA para refinar resúmenes y exporta tus resultados."
+      }
+    },
+    "faq": {
+      "title": "Preguntas Frecuentes",
+      "items": [
+        {
+          "question": "¿Mis claves API están seguras?",
+          "answer": "¡Sí! Las claves API se almacenan solo en el almacenamiento de sesión de tu navegador y nunca se envían a nuestros servidores. Se borran automáticamente cuando cierras la pestaña."
+        },
+        {
+          "question": "¿Qué formatos de audio son compatibles?",
+          "answer": "Admitimos los formatos de audio más comunes, incluidos MP3, WAV, M4A y WEBM. El tamaño máximo de archivo es de 25MB (o más si lo comprimes primero)."
+        },
+        {
+          "question": "¿Por qué necesito una clave de OpenAI?",
+          "answer": "Se requiere una clave API de OpenAI para el servicio de transcripción Whisper, que convierte el habla en texto. Se utiliza independientemente del modelo de IA que elijas para el resumen."
+        },
+        {
+          "question": "Mi audio es demasiado grande, ¿qué puedo hacer?",
+          "answer": "Trammarise tiene una herramienta de compresión integrada que aparecerá si tu archivo es demasiado grande. Alternativamente, puedes recortar el audio usando nuestro editor de ondas antes del procesamiento."
+        }
+      ]
+    },
+    "troubleshooting": {
+      "title": "Solución de Problemas",
+      "transcriptionFailed": "Si la transcripción falla, verifica que tu clave API de OpenAI sea válida y tenga créditos suficientes en platform.openai.com."
+    }
+  },
   "history": {
     "title": "Historial de Grabaciones",
     "description": "Gestiona tus grabaciones y resúmenes generados",

@@ -398,6 +398,50 @@
     "title": "Konfiguration",
     "description": "KI-Anbieter-Auswahlseite - wird in Phase 3 verbessert"
   },
+  "docs": {
+    "title": "Dokumentation & FAQ",
+    "description": "Anleitungen und Antworten auf häufige Fragen zu Trammarise.",
+    "gettingStarted": {
+      "title": "Erste Schritte",
+      "step1": {
+        "title": "Hochladen oder Aufnehmen",
+        "text": "Beginnen Sie mit dem Hochladen einer Audiodatei oder nehmen Sie direkt im Browser auf."
+      },
+      "step2": {
+        "title": "Konfigurieren & Verarbeiten",
+        "text": "Wählen Sie Ihren KI-Anbieter (ChatGPT, Claude oder Deepseek) und geben Sie Ihre API-Schlüssel sicher ein."
+      },
+      "step3": {
+        "title": "Interagieren & Exportieren",
+        "text": "Sehen Sie sich das Transkript an, chatten Sie mit der KI, um Zusammenfassungen zu verfeinern, und exportieren Sie Ihre Ergebnisse."
+      }
+    },
+    "faq": {
+      "title": "Häufig Gestellte Fragen",
+      "items": [
+        {
+          "question": "Sind meine API-Schlüssel sicher?",
+          "answer": "Ja! API-Schlüssel werden nur im Sitzungsspeicher Ihres Browsers gespeichert und niemals an unsere Server gesendet. Sie werden automatisch gelöscht, wenn Sie die Registerkarte schließen."
+        },
+        {
+          "question": "Welche Audioformate werden unterstützt?",
+          "answer": "Wir unterstützen die gängigsten Audioformate, einschließlich MP3, WAV, M4A und WEBM. Die maximale Dateigröße beträgt 25MB (oder größer, wenn Sie sie zuerst komprimieren)."
+        },
+        {
+          "question": "Warum benötige ich einen OpenAI-Schlüssel?",
+          "answer": "Ein OpenAI API-Schlüssel ist für den Whisper-Transkriptionsdienst erforderlich, der Sprache in Text umwandelt. Dies wird unabhängig davon verwendet, welches KI-Modell Sie für die Zusammenfassung wählen."
+        },
+        {
+          "question": "Mein Audio ist zu groß, was kann ich tun?",
+          "answer": "Trammarise verfügt über ein integriertes Komprimierungstool, das angezeigt wird, wenn Ihre Datei zu groß ist. Alternativ können Sie das Audio mit unserem Wellenform-Editor vor der Verarbeitung zuschneiden."
+        }
+      ]
+    },
+    "troubleshooting": {
+      "title": "Fehlerbehebung",
+      "transcriptionFailed": "Wenn die Transkription fehlschlägt, überprüfen Sie, ob Ihr OpenAI API-Schlüssel gültig ist und über ausreichende Credits auf platform.openai.com verfügt."
+    }
+  },
   "history": {
     "title": "Aufnahmeverlauf",
     "description": "Verwalten Sie Ihre Aufnahmen und generierten Zusammenfassungen",

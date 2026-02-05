@@ -398,6 +398,50 @@
     "title": "Configurazione",
     "description": "Pagina di selezione provider AI - sarà migliorata nella Fase 3"
   },
+  "docs": {
+    "title": "Documentazione e FAQ",
+    "description": "Guide e risposte alle domande più frequenti su Trammarise.",
+    "gettingStarted": {
+      "title": "Per Iniziare",
+      "step1": {
+        "title": "Carica o Registra",
+        "text": "Inizia caricando un file audio o registrando direttamente nel browser."
+      },
+      "step2": {
+        "title": "Configura ed Elabora",
+        "text": "Scegli il tuo provider AI (ChatGPT, Claude o Deepseek) e inserisci le tue chiavi API in sicurezza."
+      },
+      "step3": {
+        "title": "Interagisci ed Esporta",
+        "text": "Visualizza la trascrizione, chatta con l'AI per perfezionare i riassunti ed esporta i risultati."
+      }
+    },
+    "faq": {
+      "title": "Domande Frequenti",
+      "items": [
+        {
+          "question": "Le mie chiavi API sono sicure?",
+          "answer": "Sì! Le chiavi API sono memorizzate solo nella memoria di sessione del tuo browser e non vengono mai inviate ai nostri server. Vengono cancellate automaticamente quando chiudi la scheda."
+        },
+        {
+          "question": "Quali formati audio sono supportati?",
+          "answer": "Supportiamo i formati audio più comuni tra cui MP3, WAV, M4A e WEBM. La dimensione massima del file è 25MB (o maggiore se lo comprimi prima)."
+        },
+        {
+          "question": "Perché ho bisogno di una chiave OpenAI?",
+          "answer": "Una chiave API OpenAI è necessaria per il servizio di trascrizione Whisper, che converte il parlato in testo. Viene utilizzata indipendentemente dal modello AI scelto per il riassunto."
+        },
+        {
+          "question": "Il mio audio è troppo grande, cosa posso fare?",
+          "answer": "Trammarise ha uno strumento di compressione integrato che apparirà se il file è troppo grande. In alternativa, puoi tagliare l'audio usando il nostro editor di forme d'onda prima dell'elaborazione."
+        }
+      ]
+    },
+    "troubleshooting": {
+      "title": "Risoluzione Problemi",
+      "transcriptionFailed": "Se la trascrizione fallisce, verifica che la tua chiave API OpenAI sia valida e abbia crediti sufficienti su platform.openai.com."
+    }
+  },
   "history": {
     "dashboard": {
       "totalProcessed": "Totale Elaborato",
