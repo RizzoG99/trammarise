@@ -29,6 +29,8 @@ export interface SessionData {
 
   createdAt: number;
   updatedAt: number;
+  audioName?: string;
+  fileSizeBytes?: number;
 }
 
 /**
@@ -48,6 +50,7 @@ export const ROUTES = {
   PROCESSING: '/processing/:sessionId',
   RESULTS: '/results/:sessionId',
   SETUP: '/setup-api-key',
+  HISTORY: '/history',
   PREVIEW: '/preview', // Dev only
 } as const;
 

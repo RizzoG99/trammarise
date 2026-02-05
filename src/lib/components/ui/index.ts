@@ -52,3 +52,7 @@ export type { AILoadingOrbProps } from './AILoadingOrb';
 // FileSizeWarningModal
 export { FileSizeWarningModal } from './FileSizeWarningModal';
 export type { FileSizeWarningModalProps } from './FileSizeWarningModal';
+
+// Badge
+export { Badge } from './Badge';
+export type { BadgeProps } from './Badge';

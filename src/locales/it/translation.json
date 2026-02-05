@@ -14,7 +14,8 @@
     "home": "Home",
     "upload": "Carica",
     "configure": "Configura",
-    "history": "Cronologia"
+    "history": "Cronologia",
+    "settings": "Impostazioni"
   },
   "header": {
     "export": "Esporta",
@@ -396,5 +397,49 @@
   "configPlaceholder": {
     "title": "Configurazione",
     "description": "Pagina di selezione provider AI - sarà migliorata nella Fase 3"
+  },
+  "history": {
+    "dashboard": {
+      "totalProcessed": "Totale Elaborato",
+      "topCategory": "Categoria Top",
+      "activity": "Attività (Ultimi 7 Giorni)",
+      "sessions": "{{count}} sessione",
+      "sessions_plural": "{{count}} sessioni"
+    },
+    "title": "Cronologia Registrazioni",
+    "description": "Gestisci le tue registrazioni e i riassunti generati",
+    "stats": {
+      "recordingCount": "{{count}} registrazione",
+      "recordingCount_plural": "{{count}} registrazioni"
+    },
+    "card": {
+      "select": "Seleziona {{name}}",
+      "delete": "Elimina {{name}}",
+      "processed": "Elaborato",
+      "unprocessed": "Non elaborato"
+    },
+    "empty": {
+      "noMatchingTitle": "Nessuna registrazione trovata",
+      "noMatchingDesc": "Nessuna registrazione corrisponde ai filtri. Prova a modificare i criteri di ricerca o filtro.",
+      "clearFilters": "Cancella Filtri",
+      "noRecordingsTitle": "Nessuna Registrazione",
+      "noRecordingsDesc": "Inizia caricando o registrando il tuo primo file audio per trascriverlo e riassumerlo.",
+      "createAction": "Crea Nuova Registrazione"
+    },
+    "messages": {
+      "deleteSuccess": "{{count}} registrazioni eliminate con successo",
+      "deleteFailed": "Impossibile eliminare le registrazioni",
+      "deletePartial": "{{succeeded}} eliminate, {{failed}} fallite",
+      "deleteSelectFail": "Impossibile eliminare {{count}} registrazioni",
+      "deleteGenericError": "Impossibile eliminare alcune registrazioni",
+      "deleteSingleSuccess": "Registrazione eliminata con successo",
+      "deleteSingleError": "Impossibile eliminare la registrazione"
+    },
+    "batch": {
+      "selected": "{{count}} selezionati",
+      "selectAll": "Seleziona Tutto",
+      "deselectAll": "Deseleziona Tutto",
+      "delete": "Elimina Selezione"
+    }
   }
 }

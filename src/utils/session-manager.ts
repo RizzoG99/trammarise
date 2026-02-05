@@ -6,12 +6,10 @@ import {
   saveContextFiles,
   loadContextFiles,
   deleteContextFiles,
-  cleanupExpiredFiles,
   deleteAllFiles,
 } from './indexeddb';
 
 const SESSION_KEY_PREFIX = 'trammarise_session_';
-const MAX_SESSION_AGE_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 /**
  * Generate a unique session ID
@@ -28,8 +26,8 @@ function getSessionKey(sessionId: string): string {
 }
 
 /**
- * Save session data to sessionStorage and IndexedDB
- * Files and Blobs are stored in IndexedDB, metadata in sessionStorage
+ * Save session data to localStorage and IndexedDB
+ * Files and Blobs are stored in IndexedDB, metadata in localStorage
  */
 export async function saveSession(sessionId: string, data: Partial<SessionData>): Promise<void> {
   try {
@@ -53,9 +51,15 @@ export async function saveSession(sessionId: string, data: Partial<SessionData>)
       sessionId,
       updatedAt: Date.now(),
       createdAt: existingData?.createdAt || Date.now(),
+      ...(audioFile
+        ? {
+            fileSizeBytes: audioFile.blob.size,
+            audioName: audioFile.name,
+          }
+        : {}),
     };
 
-    sessionStorage.setItem(getSessionKey(sessionId), JSON.stringify(sessionData));
+    localStorage.setItem(getSessionKey(sessionId), JSON.stringify(sessionData));
   } catch (error) {
     console.error('Failed to save session:', error);
     throw new Error('Failed to save session data');
@@ -63,21 +67,33 @@ export async function saveSession(sessionId: string, data: Partial<SessionData>)
 }
 
 /**
- * Load session data from sessionStorage and IndexedDB
+ * Load session metadata only from localStorage (no IndexedDB access)
+ * This is faster for listing sessions as it doesn't load audio blobs
+ */
+export function loadSessionMetadata(
+  sessionId: string
+): Omit<SessionData, 'audioFile' | 'contextFiles'> | null {
+  try {
+    const data = localStorage.getItem(getSessionKey(sessionId));
+    if (!data) return null;
+
+    return JSON.parse(data);
+  } catch (error) {
+    console.error(`Failed to load session metadata ${sessionId}:`, error);
+    return null;
+  }
+}
+
+/**
+ * Load session data from localStorage and IndexedDB
  * Restores files from IndexedDB
  */
 export async function loadSession(sessionId: string): Promise<SessionData | null> {
   try {
-    const data = sessionStorage.getItem(getSessionKey(sessionId));
+    const data = localStorage.getItem(getSessionKey(sessionId));
     if (!data) return null;
 
     const session = JSON.parse(data);
-
-    // Check if session has expired
-    if (Date.now() - session.createdAt > MAX_SESSION_AGE_MS) {
-      await deleteSession(sessionId);
-      return null;
-    }
 
     // Load files from IndexedDB
     const audioFileRecord = await loadAudioFile(sessionId);
@@ -109,11 +125,11 @@ export async function loadSession(sessionId: string): Promise<SessionData | null
 }
 
 /**
- * Delete a session from sessionStorage and IndexedDB
+ * Delete a session from localStorage and IndexedDB
  */
 export async function deleteSession(sessionId: string): Promise<void> {
   try {
-    sessionStorage.removeItem(getSessionKey(sessionId));
+    localStorage.removeItem(getSessionKey(sessionId));
     await Promise.all([deleteAudioFile(sessionId), deleteContextFiles(sessionId)]);
   } catch (error) {
     console.error('Failed to delete session:', error);
@@ -126,8 +142,8 @@ export async function deleteSession(sessionId: string): Promise<void> {
 export function getAllSessionIds(): string[] {
   const sessionIds: string[] = [];
   try {
-    for (let i = 0; i < sessionStorage.length; i++) {
-      const key = sessionStorage.key(i);
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
       if (key?.startsWith(SESSION_KEY_PREFIX)) {
         sessionIds.push(key.replace(SESSION_KEY_PREFIX, ''));
       }
@@ -139,23 +155,113 @@ export function getAllSessionIds(): string[] {
 }
 
 /**
- * Cleanup old sessions (older than MAX_SESSION_AGE_MS)
- */
-export async function cleanupOldSessions(): Promise<void> {
-  const sessionIds = getAllSessionIds();
-  await Promise.all(
-    sessionIds.map(async (sessionId) => {
-      await loadSession(sessionId); // Auto-deletes expired sessions
-    })
-  );
-  await cleanupExpiredFiles();
-}
-
-/**
  * Clear all sessions (useful for testing/reset)
  */
 export async function clearAllSessions(): Promise<void> {
   const sessionIds = getAllSessionIds();
   await Promise.all(sessionIds.map(deleteSession));
   await deleteAllFiles();
+}
+
+/**
+ * Check if there is enough storage space
+ * Returns true if storage is available, false if quota exceeded
+ */
+export async function checkStorageQuota(): Promise<{
+  quotaExceeded: boolean;
+  usageRatio: number; // 0 to 1
+}> {
+  try {
+    if (navigator.storage && navigator.storage.estimate) {
+      const { usage, quota } = await navigator.storage.estimate();
+      if (usage !== undefined && quota !== undefined) {
+        return {
+          quotaExceeded: usage >= quota * 0.9, // Warn at 90%
+          usageRatio: usage / quota,
+        };
+      }
+    }
+  } catch (error) {
+    console.warn('Unable to estimate storage usage:', error);
+  }
+  return { quotaExceeded: false, usageRatio: 0 };
+}
+
+/**
+ * Migrate sessions from sessionStorage to localStorage
+ * One-time migration for users upgrading from previous version
+ */
+export function migrateFromSessionStorage(): void {
+  try {
+    const keysToRemove: string[] = [];
+
+    // Identify sessions in sessionStorage
+    for (let i = 0; i < sessionStorage.length; i++) {
+      const key = sessionStorage.key(i);
+      if (key?.startsWith(SESSION_KEY_PREFIX)) {
+        const data = sessionStorage.getItem(key);
+        if (data) {
+          // Move to localStorage if not already present
+          if (!localStorage.getItem(key)) {
+            localStorage.setItem(key, data);
+            console.log(`Migrated session ${key} to localStorage`);
+          }
+          keysToRemove.push(key);
+        }
+      }
+    }
+
+    // cleanup migrated sessions
+    keysToRemove.forEach((key) => sessionStorage.removeItem(key));
+  } catch (error) {
+    console.error('Migration failed:', error);
+  }
+}
+/**
+ * Cleanup old sessions based on LRU (Least Recently Used) strategy
+ * Removes oldest sessions until target count is reached
+ * @param targetCount - Maximum number of sessions to keep (default: 10)
+ * @returns Number of sessions deleted
+ */
+export async function cleanupOldSessions(targetCount: number = 10): Promise<number> {
+  try {
+    const allSessions: Array<{ sessionId: string; updatedAt: number }> = [];
+
+    // Collect all sessions with their update times
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key?.startsWith(SESSION_KEY_PREFIX)) {
+        const sessionId = key.replace(SESSION_KEY_PREFIX, '');
+        const metadata = loadSessionMetadata(sessionId);
+        if (metadata) {
+          allSessions.push({
+            sessionId,
+            updatedAt: metadata.updatedAt,
+          });
+        }
+      }
+    }
+
+    // If we're under the target, no cleanup needed
+    if (allSessions.length <= targetCount) {
+      return 0;
+    }
+
+    // Sort by updatedAt (oldest first)
+    allSessions.sort((a, b) => a.updatedAt - b.updatedAt);
+
+    // Calculate how many to delete
+    const deleteCount = allSessions.length - targetCount;
+    const sessionsToDelete = allSessions.slice(0, deleteCount);
+
+    // Delete the oldest sessions
+    for (const { sessionId } of sessionsToDelete) {
+      await deleteSession(sessionId);
+    }
+
+    return deleteCount;
+  } catch (error) {
+    console.error('Failed to cleanup old sessions:', error);
+    throw new Error('Failed to cleanup sessions');
+  }
 }

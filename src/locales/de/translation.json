@@ -14,7 +14,8 @@
     "home": "Start",
     "upload": "Hochladen",
     "configure": "Konfigurieren",
-    "history": "Verlauf"
+    "history": "Verlauf",
+    "settings": "Einstellungen"
   },
   "header": {
     "export": "Exportieren",
@@ -396,5 +397,49 @@
   "configPlaceholder": {
     "title": "Konfiguration",
     "description": "KI-Anbieter-Auswahlseite - wird in Phase 3 verbessert"
+  },
+  "history": {
+    "title": "Aufnahmeverlauf",
+    "description": "Verwalten Sie Ihre Aufnahmen und generierten Zusammenfassungen",
+    "dashboard": {
+      "totalProcessed": "Gesamt Verarbeitet",
+      "topCategory": "Top Kategorie",
+      "activity": "Aktivität (Letzte 7 Tage)",
+      "sessions": "{{count}} Sitzung",
+      "sessions_plural": "{{count}} Sitzungen"
+    },
+    "stats": {
+      "recordingCount": "{{count}} Aufnahme",
+      "recordingCount_plural": "{{count}} Aufnahmen"
+    },
+    "card": {
+      "select": "{{name}} auswählen",
+      "delete": "{{name}} löschen",
+      "processed": "Verarbeitet",
+      "unprocessed": "Unverarbeitet"
+    },
+    "empty": {
+      "noMatchingTitle": "Keine passenden Aufnahmen",
+      "noMatchingDesc": "Keine Aufnahmen entsprechen Ihren aktuellen Filtern. Versuchen Sie, Ihre Such- oder Filterkriterien anzupassen.",
+      "clearFilters": "Filter löschen",
+      "noRecordingsTitle": "Noch keine Aufnahmen",
+      "noRecordingsDesc": "Beginnen Sie mit dem Hochladen oder Aufnehmen Ihrer ersten Audiodatei.",
+      "createAction": "Neue Aufnahme erstellen"
+    },
+    "messages": {
+      "deleteSuccess": "{{count}} Sitzungen erfolgreich gelöscht",
+      "deleteFailed": "Fehler beim Löschen der Sitzungen",
+      "deletePartial": "{{succeeded}} gelöscht, {{failed}} fehlgeschlagen",
+      "deleteSelectFail": "Fehler beim Löschen von {{count}} Aufnahmen",
+      "deleteGenericError": "Fehler beim Löschen einiger Aufnahmen",
+      "deleteSingleSuccess": "Aufnahme erfolgreich gelöscht",
+      "deleteSingleError": "Fehler beim Löschen der Aufnahme"
+    },
+    "batch": {
+      "selected": "{{count}} ausgewählt",
+      "selectAll": "Alle auswählen",
+      "deselectAll": "Alle abwählen",
+      "delete": "Auswahl löschen"
+    }
   }
 }

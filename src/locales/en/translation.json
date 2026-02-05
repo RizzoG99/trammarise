@@ -14,7 +14,8 @@
     "home": "Home",
     "upload": "Upload",
     "configure": "Configure",
-    "history": "History"
+    "history": "History",
+    "settings": "Settings"
   },
   "header": {
     "export": "Export",
@@ -396,5 +397,49 @@
   "configPlaceholder": {
     "title": "Configuration",
     "description": "AI provider selection page - will be enhanced in Phase 3"
+  },
+  "history": {
+    "dashboard": {
+      "totalProcessed": "Total Processed",
+      "topCategory": "Top Category",
+      "activity": "Activity (Last 7 Days)",
+      "sessions": "{{count}} session",
+      "sessions_plural": "{{count}} sessions"
+    },
+    "title": "Recording History",
+    "description": "Manage your recordings and generated summaries",
+    "stats": {
+      "recordingCount": "{{count}} recording",
+      "recordingCount_plural": "{{count}} recordings"
+    },
+    "card": {
+      "select": "Select {{name}}",
+      "delete": "Delete {{name}}",
+      "processed": "Processed",
+      "unprocessed": "Unprocessed"
+    },
+    "empty": {
+      "noMatchingTitle": "No Matching Recordings",
+      "noMatchingDesc": "No recordings match your current filters. Try adjusting your search or filter criteria.",
+      "clearFilters": "Clear Filters",
+      "noRecordingsTitle": "No Recordings Yet",
+      "noRecordingsDesc": "Start by uploading or recording your first audio file to transcribe and summarize.",
+      "createAction": "Create New Recording"
+    },
+    "messages": {
+      "deleteSuccess": "{{count}} recordings deleted successfully",
+      "deleteFailed": "Failed to delete recordings",
+      "deletePartial": "{{succeeded}} deleted, {{failed}} failed",
+      "deleteSelectFail": "Failed to delete {{count}} recordings",
+      "deleteGenericError": "Failed to delete some recordings",
+      "deleteSingleSuccess": "Recording deleted successfully",
+      "deleteSingleError": "Failed to delete recording"
+    },
+    "batch": {
+      "selected": "{{count}} selected",
+      "selectAll": "Select All",
+      "deselectAll": "Deselect All",
+      "delete": "Delete Selection"
+    }
   }
 }

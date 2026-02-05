@@ -14,7 +14,8 @@
     "home": "Inicio",
     "upload": "Subir",
     "configure": "Configurar",
-    "history": "Historial"
+    "history": "Historial",
+    "settings": "Configuración"
   },
   "header": {
     "export": "Exportar",
@@ -396,5 +397,49 @@
   "configPlaceholder": {
     "title": "Configuración",
     "description": "Página de selección de proveedor de IA - se mejorará en Fase 3"
+  },
+  "history": {
+    "title": "Historial de Grabaciones",
+    "description": "Gestiona tus grabaciones y resúmenes generados",
+    "dashboard": {
+      "totalProcessed": "Total Procesado",
+      "topCategory": "Categoría Principal",
+      "activity": "Actividad (Últimos 7 Días)",
+      "sessions": "{{count}} sesión",
+      "sessions_plural": "{{count}} sesiones"
+    },
+    "stats": {
+      "recordingCount": "{{count}} grabación",
+      "recordingCount_plural": "{{count}} grabaciones"
+    },
+    "card": {
+      "select": "Seleccionar {{name}}",
+      "delete": "Eliminar {{name}}",
+      "processed": "Procesado",
+      "unprocessed": "No procesado"
+    },
+    "empty": {
+      "noMatchingTitle": "No se encontraron grabaciones",
+      "noMatchingDesc": "Ninguna grabación coincide con tus filtros actuales. Intenta ajustar tu búsqueda o criterios.",
+      "clearFilters": "Limpiar Filtros",
+      "noRecordingsTitle": "Aún no hay grabaciones",
+      "noRecordingsDesc": "Comienza subiendo o grabando tu primer archivo de audio para transcribir y resumir.",
+      "createAction": "Crear Nueva Grabación"
+    },
+    "messages": {
+      "deleteSuccess": "{{count}} sesiones eliminadas con éxito",
+      "deleteFailed": "Error al eliminar sesiones",
+      "deletePartial": "{{succeeded}} eliminadas, {{failed}} fallidas",
+      "deleteSelectFail": "Error al eliminar {{count}} grabaciones",
+      "deleteGenericError": "Error al eliminar algunas grabaciones",
+      "deleteSingleSuccess": "Grabación eliminada con éxito",
+      "deleteSingleError": "Error al eliminar la grabación"
+    },
+    "batch": {
+      "selected": "{{count}} seleccionados",
+      "selectAll": "Seleccionar Todo",
+      "deselectAll": "Deseleccionar Todo",
+      "delete": "Eliminar Selección"
+    }
   }
 }
