@@ -6,9 +6,9 @@ export function AppLayout() {
   const { t } = useTranslation();
 
   return (
-    <div className="max-w-[1400px] mx-auto min-h-screen flex flex-col relative">
+    <div className="min-h-screen flex flex-col">
       {/* Main content area - rendered by routes */}
-      <main className="flex-1 flex flex-col py-8">
+      <main className="flex-1 flex flex-col">
         <Outlet />
       </main>
 

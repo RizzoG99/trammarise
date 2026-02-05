@@ -29,6 +29,8 @@ export interface SessionData {
 
   createdAt: number;
   updatedAt: number;
+  audioName?: string;
+  fileSizeBytes?: number;
 }
 
 /**
