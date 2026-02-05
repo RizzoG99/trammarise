@@ -31,6 +31,9 @@ const PdfPreviewPage = lazy(() =>
 const HistoryPage = lazy(() =>
   import('./routes/HistoryPage').then((module) => ({ default: module.HistoryPage }))
 );
+const DocsPage = lazy(() =>
+  import('../pages/DocsPage').then((module) => ({ default: module.DocsPage }))
+);
 
 // Placeholder for Configuration page (will be enhanced later)
 import { Heading, Text, GlassCard } from '@/lib';
@@ -126,6 +129,9 @@ function App() {
 
             {/* History route */}
             <Route path={ROUTES.HISTORY} element={<HistoryPage />} />
+
+            {/* Documentation route */}
+            <Route path={ROUTES.DOCS} element={<DocsPage />} />
           </Route>
 
           {/* Redirect unknown routes to home */}

@@ -1,5 +1,7 @@
 import { useState, lazy, Suspense } from 'react';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { ROUTES } from '../types/routing';
 import {
   Key,
   ExternalLink,
@@ -9,7 +11,6 @@ import {
   ShieldCheck,
   Zap,
   MousePointerClick,
-  Monitor,
   Lock,
 } from 'lucide-react';
 import { useApiKey } from '../context/ApiKeyContext';
@@ -117,12 +118,12 @@ export function ApiKeySetupPage() {
                     <p className="text-sm text-text-secondary mb-3">
                       {t('apiKey.guide.step2.text')}
                     </p>
-                    <div className="w-full h-32 md:h-48 rounded-lg overflow-hidden relative bg-surface-secondary border border-border">
-                      {/* Placeholder for screenshot */}
-                      <div className="absolute inset-0 flex items-center justify-center text-text-tertiary">
-                        <Monitor className="w-12 h-12 opacity-20" />
-                        <span className="sr-only">Screenshot of Dashboard</span>
-                      </div>
+                    <div className="w-full rounded-lg overflow-hidden relative border border-border shadow-sm">
+                      <img
+                        src="/images/openai-guide-dashboard.png"
+                        alt="OpenAI Dashboard showing API Keys section"
+                        className="w-full h-auto object-cover transition-transform duration-500 hover:scale-105"
+                      />
                     </div>
                   </div>
 
@@ -135,12 +136,12 @@ export function ApiKeySetupPage() {
                     <p className="text-sm text-text-secondary mb-3">
                       {t('apiKey.guide.step3.text')}
                     </p>
-                    <div className="w-full h-24 rounded-lg overflow-hidden relative bg-surface-secondary border border-border">
-                      {/* Placeholder for screenshot */}
-                      <div className="absolute inset-0 flex items-center justify-center text-text-tertiary">
-                        <Key className="w-10 h-10 opacity-20" />
-                        <span className="sr-only">Screenshot of Modal</span>
-                      </div>
+                    <div className="w-full rounded-lg overflow-hidden relative border border-border shadow-sm">
+                      <img
+                        src="/images/openai-guide-modal.png"
+                        alt="Create new secret key modal"
+                        className="w-full h-auto object-cover transition-transform duration-500 hover:scale-105"
+                      />
                     </div>
                   </div>
 
@@ -175,8 +176,8 @@ export function ApiKeySetupPage() {
               </div>
 
               {/* Privacy Note */}
-              <div className="flex gap-3 bg-green-500/10 p-3 rounded-lg border border-green-500/20">
-                <Lock className="w-5 h-5 text-green-600 dark:text-green-400 shrink-0 mt-0.5" />
+              <div className="flex gap-3 bg-green-100 dark:bg-green-900/20 p-3 rounded-lg border border-green-200 dark:border-green-900/30">
+                <Lock className="w-5 h-5 text-green-700 dark:text-green-400 shrink-0 mt-0.5" />
                 <p className="text-xs text-green-800 dark:text-green-300 font-medium leading-relaxed">
                   {t('apiKey.form.securityNote')}
                 </p>
@@ -195,7 +196,7 @@ export function ApiKeySetupPage() {
                     <input
                       id="api-key"
                       type={isVisible ? 'text' : 'password'}
-                      className="block w-full rounded-lg border-input py-3 pl-10 pr-10 bg-background text-text-primary shadow-sm focus:ring-2 focus:ring-primary focus:border-primary sm:text-sm font-mono transition-all"
+                      className="block w-full rounded-lg border-input py-3 pl-10 pr-10 bg-bg-surface text-text-primary placeholder-text-tertiary shadow-sm focus:ring-2 focus:ring-primary focus:border-primary sm:text-sm font-mono transition-all"
                       placeholder={t('apiKey.form.placeholder')}
                       value={inputValue}
                       onChange={(e) => {
@@ -227,27 +228,33 @@ export function ApiKeySetupPage() {
                   onClick={handleSave}
                   disabled={status === 'loading' || !inputValue}
                   className="w-full h-12 text-base font-bold shadow-sm gap-2"
+                  icon={
+                    status === 'success' ? (
+                      <Check className="w-5 h-5" />
+                    ) : status === 'loading' ? undefined : (
+                      <Zap className="w-5 h-5" />
+                    )
+                  }
                 >
-                  {status === 'loading' ? (
-                    <>{t('apiKey.form.buttons.connecting')}</>
-                  ) : status === 'success' ? (
-                    <>
-                      {t('apiKey.form.buttons.saved')} <Check className="w-5 h-5" />
-                    </>
-                  ) : (
-                    <>
-                      {t('apiKey.form.buttons.connect')} <Zap className="w-5 h-5" />
-                    </>
-                  )}
+                  {status === 'loading'
+                    ? t('apiKey.form.buttons.connecting')
+                    : status === 'success'
+                      ? t('apiKey.form.buttons.saved')
+                      : t('apiKey.form.buttons.connect')}
                 </Button>
               </div>
 
               <div className="border-t border-border pt-4 mt-2">
                 <p className="text-xs text-center text-text-secondary">
                   {t('apiKey.form.help')}{' '}
-                  <a href="#" className="text-primary font-medium hover:underline">
+                  <Link
+                    to={ROUTES.DOCS}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary font-medium hover:underline"
+                  >
                     {t('apiKey.form.docsLink')}
-                  </a>
+                  </Link>
                   .
                 </p>
               </div>
