@@ -16,6 +16,7 @@ describe('useHistorySessions', () => {
     const file = new File([blob], `recording-${sessionId}.webm`, { type: 'audio/webm' });
     return {
       sessionId,
+      audioName: `recording-${sessionId}.webm`,
       audioFile: {
         name: `recording-${sessionId}.webm`,
         blob,

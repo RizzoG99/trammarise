@@ -76,27 +76,24 @@ export function useHistorySessions(): UseHistorySessionsReturn {
     loadSessions();
   }, [loadSessions]);
 
-  const deleteSession = useCallback(async (sessionId: string) => {
-    // Optimistic update: remove immediately and capture the removed session for rollback
-    let removedSession: HistorySession | undefined;
-    setSessions((prev) => {
-      removedSession = prev.find((s) => s.sessionId === sessionId);
-      return prev.filter((s) => s.sessionId !== sessionId);
-    });
-    setError(null);
+  const deleteSession = useCallback(
+    async (sessionId: string) => {
+      // Optimistic update: remove immediately
+      setSessions((prev) => prev.filter((s) => s.sessionId !== sessionId));
+      setError(null);
 
-    try {
-      await deleteSessionFromStorage(sessionId);
-    } catch (err) {
-      // Revert on error: re-add the specific session that failed to delete
-      if (removedSession) {
-        setSessions((prev) => [...prev, removedSession!].sort((a, b) => b.createdAt - a.createdAt));
+      try {
+        await deleteSessionFromStorage(sessionId);
+      } catch (err) {
+        // Revert on error: reload sessions from storage to ensure sync
+        await loadSessions();
+        setError('Failed to delete session');
+        console.error('Error deleting session:', err);
+        throw err;
       }
-      setError('Failed to delete session');
-      console.error('Error deleting session:', err);
-      throw err;
-    }
-  }, []);
+    },
+    [loadSessions]
+  );
 
   return {
     sessions,
