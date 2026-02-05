@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
 import { RecordButton, PauseButton, StopButton } from './RecordingButtons';
 
 const meta: Meta<typeof RecordButton> = {
@@ -8,7 +9,8 @@ const meta: Meta<typeof RecordButton> = {
   parameters: {
     docs: {
       description: {
-        component: 'Audio recording control buttons with states and animations. Includes RecordButton, PauseButton, and StopButton components.',
+        component:
+          'Audio recording control buttons with states and animations. Includes RecordButton, PauseButton, and StopButton components.',
       },
     },
   },
@@ -24,7 +26,7 @@ type Story = StoryObj<typeof RecordButton>;
 export const RecordButtonDefault: Story = {
   name: 'Record Button - Default',
   args: {
-    onClick: () => console.log('Record clicked'),
+    onClick: fn(),
   },
 };
 
@@ -35,7 +37,7 @@ export const RecordButtonDefault: Story = {
 export const RecordButtonRecording: Story = {
   name: 'Record Button - Recording',
   args: {
-    onClick: () => console.log('Record clicked'),
+    onClick: fn(),
     isRecording: true,
   },
 };
@@ -46,7 +48,7 @@ export const RecordButtonRecording: Story = {
 export const RecordButtonDisabled: Story = {
   name: 'Record Button - Disabled',
   args: {
-    onClick: () => console.log('Record clicked'),
+    onClick: fn(),
     disabled: true,
   },
 };
@@ -159,9 +161,7 @@ export const RecordingPanel: Story = {
           <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">
             Audio Recording
           </h3>
-          <p className="text-sm text-slate-600 dark:text-slate-400">
-            Recording: 00:42
-          </p>
+          <p className="text-sm text-slate-600 dark:text-slate-400">Recording: 00:42</p>
         </div>
 
         {/* Waveform Placeholder */}

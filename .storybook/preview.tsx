@@ -43,10 +43,6 @@ const preview: Preview = {
         },
       },
     },
-    // Actions panel configuration
-    actions: {
-      argTypesRegex: '^on[A-Z].*',
-    },
     // Background colors
     backgrounds: {
       default: 'light',
@@ -74,12 +70,14 @@ const preview: Preview = {
     }),
     // Wrapper to ensure proper styling context
     (Story) => (
-      <div style={{
-        minHeight: '100vh',
-        backgroundColor: 'var(--color-bg-primary)',
-        color: 'var(--color-text-primary)',
-        padding: '1rem',
-      }}>
+      <div
+        style={{
+          minHeight: '100vh',
+          backgroundColor: 'var(--color-bg-primary)',
+          color: 'var(--color-text-primary)',
+          padding: '1rem',
+        }}
+      >
         <Story />
       </div>
     ),
