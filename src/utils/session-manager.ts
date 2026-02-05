@@ -217,3 +217,51 @@ export function migrateFromSessionStorage(): void {
     console.error('Migration failed:', error);
   }
 }
+/**
+ * Cleanup old sessions based on LRU (Least Recently Used) strategy
+ * Removes oldest sessions until target count is reached
+ * @param targetCount - Maximum number of sessions to keep (default: 10)
+ * @returns Number of sessions deleted
+ */
+export async function cleanupOldSessions(targetCount: number = 10): Promise<number> {
+  try {
+    const allSessions: Array<{ sessionId: string; updatedAt: number }> = [];
+
+    // Collect all sessions with their update times
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key?.startsWith(SESSION_KEY_PREFIX)) {
+        const sessionId = key.replace(SESSION_KEY_PREFIX, '');
+        const metadata = loadSessionMetadata(sessionId);
+        if (metadata) {
+          allSessions.push({
+            sessionId,
+            updatedAt: metadata.updatedAt,
+          });
+        }
+      }
+    }
+
+    // If we're under the target, no cleanup needed
+    if (allSessions.length <= targetCount) {
+      return 0;
+    }
+
+    // Sort by updatedAt (oldest first)
+    allSessions.sort((a, b) => a.updatedAt - b.updatedAt);
+
+    // Calculate how many to delete
+    const deleteCount = allSessions.length - targetCount;
+    const sessionsToDelete = allSessions.slice(0, deleteCount);
+
+    // Delete the oldest sessions
+    for (const { sessionId } of sessionsToDelete) {
+      await deleteSession(sessionId);
+    }
+
+    return deleteCount;
+  } catch (error) {
+    console.error('Failed to cleanup old sessions:', error);
+    throw new Error('Failed to cleanup sessions');
+  }
+}
