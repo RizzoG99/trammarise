@@ -51,13 +51,36 @@ export async function saveSession(sessionId: string, data: Partial<SessionData>)
       sessionId,
       updatedAt: Date.now(),
       createdAt: existingData?.createdAt || Date.now(),
-      ...(audioFile ? { fileSizeBytes: audioFile.blob.size } : {}),
+      ...(audioFile
+        ? {
+            fileSizeBytes: audioFile.blob.size,
+            audioName: audioFile.name,
+          }
+        : {}),
     };
 
     localStorage.setItem(getSessionKey(sessionId), JSON.stringify(sessionData));
   } catch (error) {
     console.error('Failed to save session:', error);
     throw new Error('Failed to save session data');
+  }
+}
+
+/**
+ * Load session metadata only from localStorage (no IndexedDB access)
+ * This is faster for listing sessions as it doesn't load audio blobs
+ */
+export function loadSessionMetadata(
+  sessionId: string
+): Omit<SessionData, 'audioFile' | 'contextFiles'> | null {
+  try {
+    const data = localStorage.getItem(getSessionKey(sessionId));
+    if (!data) return null;
+
+    return JSON.parse(data);
+  } catch (error) {
+    console.error(`Failed to load session metadata ${sessionId}:`, error);
+    return null;
   }
 }
 
@@ -138,4 +161,59 @@ export async function clearAllSessions(): Promise<void> {
   const sessionIds = getAllSessionIds();
   await Promise.all(sessionIds.map(deleteSession));
   await deleteAllFiles();
+}
+
+/**
+ * Check if there is enough storage space
+ * Returns true if storage is available, false if quota exceeded
+ */
+export async function checkStorageQuota(): Promise<{
+  quotaExceeded: boolean;
+  usageRatio: number; // 0 to 1
+}> {
+  try {
+    if (navigator.storage && navigator.storage.estimate) {
+      const { usage, quota } = await navigator.storage.estimate();
+      if (usage !== undefined && quota !== undefined) {
+        return {
+          quotaExceeded: usage >= quota * 0.9, // Warn at 90%
+          usageRatio: usage / quota,
+        };
+      }
+    }
+  } catch (error) {
+    console.warn('Unable to estimate storage usage:', error);
+  }
+  return { quotaExceeded: false, usageRatio: 0 };
+}
+
+/**
+ * Migrate sessions from sessionStorage to localStorage
+ * One-time migration for users upgrading from previous version
+ */
+export function migrateFromSessionStorage(): void {
+  try {
+    const keysToRemove: string[] = [];
+
+    // Identify sessions in sessionStorage
+    for (let i = 0; i < sessionStorage.length; i++) {
+      const key = sessionStorage.key(i);
+      if (key?.startsWith(SESSION_KEY_PREFIX)) {
+        const data = sessionStorage.getItem(key);
+        if (data) {
+          // Move to localStorage if not already present
+          if (!localStorage.getItem(key)) {
+            localStorage.setItem(key, data);
+            console.log(`Migrated session ${key} to localStorage`);
+          }
+          keysToRemove.push(key);
+        }
+      }
+    }
+
+    // cleanup migrated sessions
+    keysToRemove.forEach((key) => sessionStorage.removeItem(key));
+  } catch (error) {
+    console.error('Migration failed:', error);
+  }
 }

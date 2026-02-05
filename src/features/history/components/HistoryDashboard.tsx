@@ -64,31 +64,34 @@ export function HistoryDashboard({ sessions }: HistoryDashboardProps) {
         </div>
 
         <div className="flex items-end justify-between gap-2 h-16 w-full mt-2">
-          {stats.activityLast7Days.map((day, index) => {
-            // Calculate height percentage relative to max, assume max 10 for scaling visual
+          {(() => {
+            // Calculate max once for all bars
             const max = Math.max(...stats.activityLast7Days.map((d) => d.count), 1);
-            const heightPct = Math.max((day.count / max) * 100, 10); // Min 10% height
 
-            return (
-              <div key={index} className="flex flex-col items-center gap-1 flex-1 group relative">
-                {/* Tooltip */}
-                <div className="absolute -top-8 bg-black text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
-                  {t('history.dashboard.sessions', { count: day.count })}
+            return stats.activityLast7Days.map((day, index) => {
+              const heightPct = Math.max((day.count / max) * 100, 10); // Min 10% height
+
+              return (
+                <div key={index} className="flex flex-col items-center gap-1 flex-1 group relative">
+                  {/* Tooltip */}
+                  <div className="absolute -top-8 bg-black text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                    {t('history.dashboard.sessions', { count: day.count })}
+                  </div>
+
+                  {/* Bar */}
+                  <div
+                    className={`w-full rounded-t-sm transition-all duration-500 ease-out ${
+                      day.count > 0 ? 'bg-primary/80 hover:bg-primary' : 'bg-border/30'
+                    }`}
+                    style={{ height: `${day.count > 0 ? heightPct : 5}%` }}
+                  />
+
+                  {/* Label */}
+                  <span className="text-[10px] text-text-tertiary font-medium">{day.date}</span>
                 </div>
-
-                {/* Bar */}
-                <div
-                  className={`w-full rounded-t-sm transition-all duration-500 ease-out ${
-                    day.count > 0 ? 'bg-primary/80 hover:bg-primary' : 'bg-border/30'
-                  }`}
-                  style={{ height: `${day.count > 0 ? heightPct : 5}%` }}
-                />
-
-                {/* Label */}
-                <span className="text-[10px] text-text-tertiary font-medium">{day.date}</span>
-              </div>
-            );
-          })}
+              );
+            });
+          })()}
         </div>
       </GlassCard>
     </div>

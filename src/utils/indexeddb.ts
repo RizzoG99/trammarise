@@ -10,7 +10,7 @@ import { IndexedDBError } from './indexeddb-types';
 
 // Database configuration
 const DB_NAME = 'trammarise-db';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const AUDIO_STORE = 'audio-files';
 const CONTEXT_STORE = 'context-files';
 
@@ -57,8 +57,39 @@ export async function initDatabase(): Promise<IDBDatabase> {
 
     request.onupgradeneeded = (event) => {
       const db = (event.target as IDBOpenDBRequest).result;
+      const transaction = (event.target as IDBOpenDBRequest).transaction!;
+      const oldVersion = event.oldVersion;
 
-      // Create audio-files store if it doesn't exist
+      // Migration from v1 to v2: Replace expiresAt index with createdAt
+      if (oldVersion < 2) {
+        // Handle audio-files store
+        if (db.objectStoreNames.contains(AUDIO_STORE)) {
+          const audioStore = transaction.objectStore(AUDIO_STORE);
+          // Remove old expiresAt index if it exists
+          if (audioStore.indexNames.contains('expiresAt')) {
+            audioStore.deleteIndex('expiresAt');
+          }
+          // Create createdAt index if it doesn't exist
+          if (!audioStore.indexNames.contains('createdAt')) {
+            audioStore.createIndex('createdAt', 'createdAt', { unique: false });
+          }
+        }
+
+        // Handle context-files store
+        if (db.objectStoreNames.contains(CONTEXT_STORE)) {
+          const contextStore = transaction.objectStore(CONTEXT_STORE);
+          // Remove old expiresAt index if it exists
+          if (contextStore.indexNames.contains('expiresAt')) {
+            contextStore.deleteIndex('expiresAt');
+          }
+          // Create createdAt index if it doesn't exist
+          if (!contextStore.indexNames.contains('createdAt')) {
+            contextStore.createIndex('createdAt', 'createdAt', { unique: false });
+          }
+        }
+      }
+
+      // Create audio-files store if it doesn't exist (for new installations)
       if (!db.objectStoreNames.contains(AUDIO_STORE)) {
         const audioStore = db.createObjectStore(AUDIO_STORE, {
           keyPath: 'sessionId',
@@ -66,7 +97,7 @@ export async function initDatabase(): Promise<IDBDatabase> {
         audioStore.createIndex('createdAt', 'createdAt', { unique: false });
       }
 
-      // Create context-files store if it doesn't exist
+      // Create context-files store if it doesn't exist (for new installations)
       if (!db.objectStoreNames.contains(CONTEXT_STORE)) {
         const contextStore = db.createObjectStore(CONTEXT_STORE, {
           keyPath: 'sessionId',
@@ -94,8 +125,7 @@ export async function saveAudioFile(
       audioBlob,
       audioName,
       createdAt: now,
-      // Removed expiresAt
-    } as AudioFileRecord;
+    };
 
     return new Promise((resolve, reject) => {
       const transaction = db.transaction([AUDIO_STORE], 'readwrite');
@@ -194,8 +224,7 @@ export async function saveContextFiles(sessionId: string, files: File[]): Promis
       sessionId,
       files,
       createdAt: now,
-      // Removed expiresAt
-    } as ContextFilesRecord;
+    };
 
     return new Promise((resolve, reject) => {
       const transaction = db.transaction([CONTEXT_STORE], 'readwrite');

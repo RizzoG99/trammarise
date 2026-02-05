@@ -121,9 +121,6 @@
     --glass-border: rgba(255, 255, 255, 0.08);
   }
 
-  html {
-  }
-
   body {
     margin: 0;
     min-width: 320px;

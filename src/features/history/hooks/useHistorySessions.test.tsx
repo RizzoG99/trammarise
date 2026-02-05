@@ -2,10 +2,8 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { useHistorySessions } from './useHistorySessions';
 import * as sessionManager from '@/utils/session-manager';
-import * as indexedDB from '@/utils/indexeddb';
 
 vi.mock('@/utils/session-manager');
-vi.mock('@/utils/indexeddb');
 
 describe('useHistorySessions', () => {
   beforeEach(() => {
@@ -56,15 +54,9 @@ describe('useHistorySessions', () => {
   it('should load all session IDs on mount', async () => {
     const sessionIds = ['session-1', 'session-2', 'session-3'];
     vi.mocked(sessionManager.getAllSessionIds).mockReturnValue(sessionIds);
-    vi.mocked(sessionManager.loadSession).mockImplementation((id) =>
-      Promise.resolve(mockSessionData(id, Date.now()))
+    vi.mocked(sessionManager.loadSessionMetadata).mockImplementation((id) =>
+      mockSessionData(id, Date.now())
     );
-    vi.mocked(indexedDB.loadAudioFile).mockResolvedValue({
-      sessionId: 'session-1',
-      audioBlob: new Blob(['test'], { type: 'audio/webm' }),
-      audioName: 'test.webm',
-      createdAt: Date.now(),
-    });
 
     const { result } = renderHook(() => useHistorySessions());
 
@@ -79,15 +71,9 @@ describe('useHistorySessions', () => {
   it('should extract metadata from sessionStorage', async () => {
     const createdAt = Date.now();
     vi.mocked(sessionManager.getAllSessionIds).mockReturnValue(['session-1']);
-    vi.mocked(sessionManager.loadSession).mockResolvedValue(
+    vi.mocked(sessionManager.loadSessionMetadata).mockReturnValue(
       mockSessionData('session-1', createdAt)
     );
-    vi.mocked(indexedDB.loadAudioFile).mockResolvedValue({
-      sessionId: 'session-1',
-      audioBlob: new Blob(['test'], { type: 'audio/webm' }),
-      audioName: 'test.webm',
-      createdAt: Date.now(),
-    });
 
     const { result } = renderHook(() => useHistorySessions());
 
@@ -108,7 +94,7 @@ describe('useHistorySessions', () => {
   it('should read fileSizeBytes from session metadata', async () => {
     const expectedSize = 12345;
     vi.mocked(sessionManager.getAllSessionIds).mockReturnValue(['session-1']);
-    vi.mocked(sessionManager.loadSession).mockResolvedValue({
+    vi.mocked(sessionManager.loadSessionMetadata).mockReturnValue({
       ...mockSessionData('session-1', Date.now()),
       fileSizeBytes: expectedSize,
     });
@@ -128,15 +114,9 @@ describe('useHistorySessions', () => {
     const recent = now - 1000 * 60 * 60; // 1 hour ago
 
     vi.mocked(sessionManager.getAllSessionIds).mockReturnValue(['old-session', 'new-session']);
-    vi.mocked(sessionManager.loadSession).mockImplementation((id) => {
+    vi.mocked(sessionManager.loadSessionMetadata).mockImplementation((id) => {
       const createdAt = id === 'old-session' ? older : recent;
-      return Promise.resolve(mockSessionData(id, createdAt));
-    });
-    vi.mocked(indexedDB.loadAudioFile).mockResolvedValue({
-      sessionId: 'test',
-      audioBlob: new Blob(['test'], { type: 'audio/webm' }),
-      audioName: 'test.webm',
-      createdAt: Date.now(),
+      return mockSessionData(id, createdAt);
     });
 
     const { result } = renderHook(() => useHistorySessions());
@@ -153,16 +133,10 @@ describe('useHistorySessions', () => {
 
   it('should handle missing/corrupted session data gracefully', async () => {
     vi.mocked(sessionManager.getAllSessionIds).mockReturnValue(['good', 'bad', 'ugly']);
-    vi.mocked(sessionManager.loadSession).mockImplementation((id) => {
-      if (id === 'bad') return Promise.resolve(null);
-      if (id === 'ugly') return Promise.reject(new Error('Corrupted data'));
-      return Promise.resolve(mockSessionData(id, Date.now()));
-    });
-    vi.mocked(indexedDB.loadAudioFile).mockResolvedValue({
-      sessionId: 'test',
-      audioBlob: new Blob(['test'], { type: 'audio/webm' }),
-      audioName: 'test.webm',
-      createdAt: Date.now(),
+    vi.mocked(sessionManager.loadSessionMetadata).mockImplementation((id) => {
+      if (id === 'bad') return null;
+      if (id === 'ugly') throw new Error('Corrupted data');
+      return mockSessionData(id, Date.now());
     });
 
     const { result } = renderHook(() => useHistorySessions());
@@ -179,10 +153,9 @@ describe('useHistorySessions', () => {
 
   it('should handle IndexedDB read errors', async () => {
     vi.mocked(sessionManager.getAllSessionIds).mockReturnValue(['session-1']);
-    vi.mocked(sessionManager.loadSession).mockResolvedValue(
+    vi.mocked(sessionManager.loadSessionMetadata).mockReturnValue(
       mockSessionData('session-1', Date.now())
     );
-    vi.mocked(indexedDB.loadAudioFile).mockRejectedValue(new Error('IndexedDB error'));
 
     const { result } = renderHook(() => useHistorySessions());
 
@@ -197,15 +170,9 @@ describe('useHistorySessions', () => {
 
   it('should optimistically remove session on delete', async () => {
     vi.mocked(sessionManager.getAllSessionIds).mockReturnValue(['session-1', 'session-2']);
-    vi.mocked(sessionManager.loadSession).mockImplementation((id) =>
-      Promise.resolve(mockSessionData(id, Date.now()))
+    vi.mocked(sessionManager.loadSessionMetadata).mockImplementation((id) =>
+      mockSessionData(id, Date.now())
     );
-    vi.mocked(indexedDB.loadAudioFile).mockResolvedValue({
-      sessionId: 'test',
-      audioBlob: new Blob(['test'], { type: 'audio/webm' }),
-      audioName: 'test.webm',
-      createdAt: Date.now(),
-    });
     vi.mocked(sessionManager.deleteSession).mockResolvedValue(undefined);
 
     const { result } = renderHook(() => useHistorySessions());
@@ -226,15 +193,9 @@ describe('useHistorySessions', () => {
 
   it('should persist deletion on success', async () => {
     vi.mocked(sessionManager.getAllSessionIds).mockReturnValue(['session-1']);
-    vi.mocked(sessionManager.loadSession).mockResolvedValue(
+    vi.mocked(sessionManager.loadSessionMetadata).mockReturnValue(
       mockSessionData('session-1', Date.now())
     );
-    vi.mocked(indexedDB.loadAudioFile).mockResolvedValue({
-      sessionId: 'test',
-      audioBlob: new Blob(['test'], { type: 'audio/webm' }),
-      audioName: 'test.webm',
-      createdAt: Date.now(),
-    });
     vi.mocked(sessionManager.deleteSession).mockResolvedValue(undefined);
 
     const { result } = renderHook(() => useHistorySessions());
@@ -253,15 +214,9 @@ describe('useHistorySessions', () => {
 
   it('should revert UI and show error on delete failure', async () => {
     vi.mocked(sessionManager.getAllSessionIds).mockReturnValue(['session-1']);
-    vi.mocked(sessionManager.loadSession).mockResolvedValue(
+    vi.mocked(sessionManager.loadSessionMetadata).mockReturnValue(
       mockSessionData('session-1', Date.now())
     );
-    vi.mocked(indexedDB.loadAudioFile).mockResolvedValue({
-      sessionId: 'test',
-      audioBlob: new Blob(['test'], { type: 'audio/webm' }),
-      audioName: 'test.webm',
-      createdAt: Date.now(),
-    });
     vi.mocked(sessionManager.deleteSession).mockRejectedValue(new Error('Delete failed'));
 
     const { result } = renderHook(() => useHistorySessions());
@@ -282,15 +237,9 @@ describe('useHistorySessions', () => {
 
   it('should transition loading state correctly', async () => {
     vi.mocked(sessionManager.getAllSessionIds).mockReturnValue(['session-1']);
-    vi.mocked(sessionManager.loadSession).mockResolvedValue(
+    vi.mocked(sessionManager.loadSessionMetadata).mockReturnValue(
       mockSessionData('session-1', Date.now())
     );
-    vi.mocked(indexedDB.loadAudioFile).mockResolvedValue({
-      sessionId: 'test',
-      audioBlob: new Blob(['test'], { type: 'audio/webm' }),
-      audioName: 'test.webm',
-      createdAt: Date.now(),
-    });
 
     const { result } = renderHook(() => useHistorySessions());
 

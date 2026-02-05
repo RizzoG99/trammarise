@@ -3,7 +3,7 @@ import type { HistorySession } from '../types/history';
 import type { ContentType } from '@/types/content-types';
 import {
   getAllSessionIds,
-  loadSession,
+  loadSessionMetadata,
   deleteSession as deleteSessionFromStorage,
 } from '@/utils/session-manager';
 
@@ -15,18 +15,22 @@ interface UseHistorySessionsReturn {
   reload: () => Promise<void>;
 }
 
+/**
+ * Loads session metadata only (not full audio blobs) for performance
+ */
 async function loadOneSession(sessionId: string): Promise<HistorySession | null> {
-  const sessionData = await loadSession(sessionId);
+  const sessionData = loadSessionMetadata(sessionId);
 
   if (!sessionData) {
     return null;
   }
 
   const fileSizeBytes = sessionData.fileSizeBytes as number | undefined;
+  const audioName = sessionData.audioName || 'Unknown';
 
   return {
     sessionId,
-    audioName: sessionData.audioFile.name,
+    audioName,
     contentType: (sessionData.configuration?.contentType || sessionData.contentType) as ContentType,
     language: sessionData.configuration?.language || sessionData.language,
     hasTranscript: !!sessionData.result?.transcript,
@@ -72,25 +76,27 @@ export function useHistorySessions(): UseHistorySessionsReturn {
     loadSessions();
   }, [loadSessions]);
 
-  const deleteSession = useCallback(
-    async (sessionId: string) => {
-      // Optimistic update: remove immediately
-      const previousSessions = sessions;
-      setSessions((prev) => prev.filter((s) => s.sessionId !== sessionId));
-      setError(null);
+  const deleteSession = useCallback(async (sessionId: string) => {
+    // Optimistic update: remove immediately and capture the removed session for rollback
+    let removedSession: HistorySession | undefined;
+    setSessions((prev) => {
+      removedSession = prev.find((s) => s.sessionId === sessionId);
+      return prev.filter((s) => s.sessionId !== sessionId);
+    });
+    setError(null);
 
-      try {
-        await deleteSessionFromStorage(sessionId);
-      } catch (err) {
-        // Revert on error
-        setSessions(previousSessions);
-        setError('Failed to delete session');
-        console.error('Error deleting session:', err);
-        throw err;
+    try {
+      await deleteSessionFromStorage(sessionId);
+    } catch (err) {
+      // Revert on error: re-add the specific session that failed to delete
+      if (removedSession) {
+        setSessions((prev) => [...prev, removedSession!].sort((a, b) => b.createdAt - a.createdAt));
       }
-    },
-    [sessions]
-  );
+      setError('Failed to delete session');
+      console.error('Error deleting session:', err);
+      throw err;
+    }
+  }, []);
 
   return {
     sessions,

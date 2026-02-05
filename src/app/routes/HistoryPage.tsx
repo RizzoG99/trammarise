@@ -15,8 +15,10 @@ import { useHistoryFilters } from '@/features/history/hooks/useHistoryFilters';
 import { useHistorySelection } from '@/features/history/hooks/useHistorySelection';
 import { groupSessionsByDate } from '@/features/history/utils/sessionGrouping';
 import type { HistorySession } from '@/features/history/types/history';
+import { useTranslation } from 'react-i18next';
 
 export function HistoryPage() {
+  const { t } = useTranslation();
   const { sessions, isLoading, error, deleteSession } = useHistorySessions();
   const {
     searchQuery,
@@ -58,16 +60,41 @@ export function HistoryPage() {
 
   const handleBulkDeleteConfirm = async () => {
     setIsDeleting(true);
-    try {
-      await Promise.all(Array.from(selectedIds).map((id) => deleteSession(id)));
+    const idsToDelete = Array.from(selectedIds);
 
-      setSnackbar({
-        message: `${selectedIds.size} recordings deleted successfully`,
-        variant: 'success',
-      });
-      clearSelection();
+    try {
+      const results = await Promise.allSettled(idsToDelete.map((id) => deleteSession(id)));
+
+      const succeeded = results.filter((r) => r.status === 'fulfilled').length;
+      const failed = results.filter((r) => r.status === 'rejected').length;
+
+      if (failed === 0) {
+        setSnackbar({
+          message: t('history.messages.deleteSuccess', { count: succeeded }),
+          variant: 'success',
+        });
+        clearSelection();
+      } else if (succeeded === 0) {
+        setSnackbar({
+          message: t('history.messages.deleteFailed'),
+          variant: 'error',
+        });
+      } else {
+        // Partial success: clear only the successfully deleted IDs
+        const failedIds = new Set(
+          idsToDelete.filter((_, idx) => results[idx].status === 'rejected')
+        );
+        // Update selection to only keep failed IDs
+        clearSelection();
+        failedIds.forEach((id) => toggleSelection(id));
+
+        setSnackbar({
+          message: t('history.messages.deletePartial', { succeeded, failed }),
+          variant: 'error',
+        });
+      }
     } catch {
-      setSnackbar({ message: 'Failed to delete some recordings', variant: 'error' });
+      setSnackbar({ message: t('history.messages.deleteGenericError'), variant: 'error' });
     } finally {
       setIsDeleting(false);
       setBulkDeleteCount(null);
@@ -80,14 +107,14 @@ export function HistoryPage() {
     setIsDeleting(true);
     try {
       await deleteSession(sessionToDelete.sessionId);
-      setSnackbar({ message: 'Recording deleted successfully', variant: 'success' });
+      setSnackbar({ message: t('history.messages.deleteSingleSuccess'), variant: 'success' });
       setSessionToDelete(null);
       // Also remove from selection if present
       if (selectedIds.has(sessionToDelete.sessionId)) {
         toggleSelection(sessionToDelete.sessionId);
       }
     } catch {
-      setSnackbar({ message: 'Failed to delete recording', variant: 'error' });
+      setSnackbar({ message: t('history.messages.deleteSingleError'), variant: 'error' });
     } finally {
       setIsDeleting(false);
     }
@@ -136,18 +163,18 @@ export function HistoryPage() {
 
   return (
     <PageLayout>
-      <div className="max-w-7xl mx-auto px-4 md:px-8 py-12 relative overscroll-y-none">
+      <div className="max-w-7xl mx-auto px-4 md:px-8 py-12 pb-32 relative overscroll-y-none">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Recording History</h1>
-            <p className="text-gray-500 dark:text-gray-400 mt-1">
-              Manage your recordings and generated summaries
-            </p>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+              {t('history.title')}
+            </h1>
+            <p className="text-gray-500 dark:text-gray-400 mt-1">{t('history.description')}</p>
           </div>
 
           {hasAnySessions && (
             <div className="text-sm font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-3 py-1.5 rounded-full self-start md:self-auto">
-              {sessions.length} {sessions.length === 1 ? 'recording' : 'recordings'}
+              {t('history.stats.recordingCount', { count: sessions.length })}
             </div>
           )}
         </div>
@@ -174,7 +201,7 @@ export function HistoryPage() {
         >
           <div className="bg-white dark:bg-gray-800 rounded-full shadow-xl border border-gray-200 dark:border-gray-700 px-6 py-3 flex items-center gap-4">
             <span className="font-semibold text-gray-900 dark:text-white whitespace-nowrap">
-              {selectedIds.size} selected
+              {t('history.batch.selected', { count: selectedIds.size })}
             </span>
             <div className="h-6 w-px bg-gray-200 dark:bg-gray-700 mx-2" />
             <Button
@@ -186,7 +213,9 @@ export function HistoryPage() {
               }
               className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white rounded-full"
             >
-              {selectedIds.size === filteredSessions.length ? 'Deselect All' : 'Select All'}
+              {selectedIds.size === filteredSessions.length
+                ? t('history.batch.deselectAll')
+                : t('history.batch.selectAll')}
             </Button>
             <Button
               variant="ghost"
@@ -194,7 +223,7 @@ export function HistoryPage() {
               className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full"
             >
               <Trash2 className="w-4 h-4 mr-2" />
-              Delete Selection
+              {t('history.batch.delete')}
             </Button>
             <Button
               variant="ghost"

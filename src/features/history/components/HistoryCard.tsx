@@ -4,10 +4,12 @@ import { GlassCard } from '@/lib/components/ui/GlassCard';
 import { Button } from '@/lib/components/ui/Button';
 import { Badge } from '@/lib/components/ui/Badge';
 import { HistoryQuickActions } from './HistoryQuickActions';
+import { useTranslation } from 'react-i18next';
 
 import type { HistorySession } from '../types/history';
 import { formatDate } from '../utils/formatters';
 import { ROUTES } from '@/types/routing';
+import { loadSessionMetadata } from '@/utils/session-manager';
 
 interface HistoryCardProps {
   session: HistorySession;
@@ -17,27 +19,6 @@ interface HistoryCardProps {
   selectionMode?: boolean;
 }
 
-const CONTENT_TYPE_LABELS: Record<string, string> = {
-  meeting: 'Meeting',
-  lecture: 'Lecture',
-  interview: 'Interview',
-  podcast: 'Podcast',
-  'voice-memo': 'Voice Memo',
-  other: 'Other',
-};
-
-const LANGUAGE_LABELS: Record<string, string> = {
-  en: 'English',
-  es: 'Spanish',
-  fr: 'French',
-  de: 'German',
-  it: 'Italian',
-  pt: 'Portuguese',
-  zh: 'Chinese',
-  ja: 'Japanese',
-  ko: 'Korean',
-};
-
 export function HistoryCard({
   session,
   onDelete,
@@ -45,27 +26,33 @@ export function HistoryCard({
   onSelect,
   selectionMode,
 }: HistoryCardProps) {
+  const { t } = useTranslation();
+
   const handleDelete = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     onDelete(session.sessionId);
   };
 
-  const handleSelect = (e: React.MouseEvent) => {
-    e.preventDefault();
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.stopPropagation();
     onSelect?.(session.sessionId);
   };
 
-  // Mock Copy - in real app would fetch summary from storage
   const handleCopySummary = async () => {
-    await navigator.clipboard.writeText(`Summary for ${session.audioName}`);
+    try {
+      const data = loadSessionMetadata(session.sessionId);
+      if (data?.result?.summary) {
+        await navigator.clipboard.writeText(data.result.summary);
+      }
+    } catch (err) {
+      console.error('Failed to copy summary:', err);
+    }
   };
 
-  const handleDownload = () => {
-    // Mock download
-    console.log('Download', session.audioName);
-  };
+  // Download functionality requires loading the full blob which is expensive
+  // Hiding it for now as per review feedback until we have a better strategy
+  // const handleDownload = () => { ... };
 
   return (
     <Link
@@ -81,15 +68,20 @@ export function HistoryCard({
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="flex items-start justify-between gap-3 mb-4">
-            {/* Selection Checkbox (Visible on hover or if selectionMode is active) */}
+            {/* Selection Checkbox */}
             <div
-              onClick={handleSelect}
               className={`absolute top-5 left-5 z-20 transition-opacity duration-200 ${selectionMode || selected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
+              onClick={(e) => e.stopPropagation()}
             >
-              <div
-                className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${selected ? 'bg-primary border-primary' : 'bg-white border-gray-300 dark:border-gray-600'}`}
-              >
-                {selected && <CheckCircle2 className="w-3.5 h-3.5 text-white" />}
+              <div className="relative flex items-center justify-center w-5 h-5">
+                <input
+                  type="checkbox"
+                  checked={selected}
+                  onChange={handleCheckboxChange}
+                  className="peer appearance-none w-5 h-5 rounded border border-gray-300 dark:border-gray-600 checked:bg-primary checked:border-primary transition-colors cursor-pointer"
+                  aria-label={t('history.card.select', { name: session.audioName })}
+                />
+                <CheckCircle2 className="absolute w-3.5 h-3.5 text-white opacity-0 peer-checked:opacity-100 pointer-events-none" />
               </div>
             </div>
 
@@ -110,12 +102,12 @@ export function HistoryCard({
               {session.hasSummary ? (
                 <div className="flex items-center gap-1.5 text-xs font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 px-2 py-1 rounded-full">
                   <CheckCircle2 className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Processed</span>
+                  <span className="hidden sm:inline">{t('history.card.processed')}</span>
                 </div>
               ) : (
                 <div className="flex items-center gap-1.5 text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 px-2 py-1 rounded-full">
                   <Clock className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Unprocessed</span>
+                  <span className="hidden sm:inline">{t('history.card.unprocessed')}</span>
                 </div>
               )}
             </div>
@@ -127,11 +119,11 @@ export function HistoryCard({
           >
             <Badge variant="default" size="sm">
               <FileText className="w-3 h-3 mr-1.5 opacity-70" />
-              {CONTENT_TYPE_LABELS[session.contentType] || session.contentType}
+              {t(`common.contentTypes.${session.contentType}`, session.contentType)}
             </Badge>
             <Badge variant="default" size="sm">
               <Globe className="w-3 h-3 mr-1.5 opacity-70" />
-              {LANGUAGE_LABELS[session.language] || session.language}
+              {t(`common.languages.${session.language}`, session.language)}
             </Badge>
           </div>
 
@@ -142,7 +134,8 @@ export function HistoryCard({
             <div className="-ml-2">
               <HistoryQuickActions
                 onCopySummary={session.hasSummary ? handleCopySummary : undefined}
-                onDownload={handleDownload}
+                // Hiding download for now
+                onDownload={undefined}
               />
             </div>
 
@@ -150,7 +143,7 @@ export function HistoryCard({
               variant="ghost"
               onClick={handleDelete}
               className="w-8 h-8 !p-0 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full transition-colors opacity-0 group-hover:opacity-100"
-              aria-label={`Delete recording: ${session.audioName}`}
+              aria-label={t('history.card.delete', { name: session.audioName })}
             >
               <Trash2 className="w-4 h-4" />
             </Button>

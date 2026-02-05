@@ -1,4 +1,4 @@
-import { Bell, FileDown, AudioWaveform } from 'lucide-react';
+import { FileDown, AudioWaveform } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ThemeToggle, Button } from '@/lib';
@@ -123,16 +123,16 @@ export function AppHeader({ fileName, onFileNameChange, onExport }: AppHeaderPro
               </Button>
             )}
 
-            {/* Notifications */}
+            {/* Notifications - Hidden until implemented
             <div className="relative">
               <Button
                 variant="ghost"
                 icon={<Bell className="w-5 h-5" fill="currentColor" />}
                 aria-label={t('header.notifications')}
               />
-              {/* Notification Badge */}
               <span className="absolute top-1 right-1 w-2 h-2 bg-accent-error rounded-full" />
             </div>
+            */}
 
             {/* Language Switcher */}
             <LanguageSwitcher />

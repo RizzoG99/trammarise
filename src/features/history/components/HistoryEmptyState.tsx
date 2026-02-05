@@ -8,7 +8,11 @@ interface HistoryEmptyStateProps {
   onClearFilters: () => void;
 }
 
+import { useTranslation } from 'react-i18next';
+
 export function HistoryEmptyState({ hasFilters, onClearFilters }: HistoryEmptyStateProps) {
+  const { t } = useTranslation();
+
   return (
     <div className="flex flex-col items-center justify-center py-16 px-4">
       <div className="w-16 h-16 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center mb-6">
@@ -18,25 +22,25 @@ export function HistoryEmptyState({ hasFilters, onClearFilters }: HistoryEmptySt
       {hasFilters ? (
         <>
           <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">
-            No Matching Recordings
+            {t('history.empty.noMatchingTitle')}
           </h2>
           <p className="text-gray-600 dark:text-gray-400 mb-6 text-center max-w-md">
-            No recordings match your current filters. Try adjusting your search or filter criteria.
+            {t('history.empty.noMatchingDesc')}
           </p>
           <Button onClick={onClearFilters} variant="outline">
-            Clear Filters
+            {t('history.empty.clearFilters')}
           </Button>
         </>
       ) : (
         <>
           <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">
-            No Recordings Yet
+            {t('history.empty.noRecordingsTitle')}
           </h2>
           <p className="text-gray-600 dark:text-gray-400 mb-6 text-center max-w-md">
-            Start by uploading or recording your first audio file to transcribe and summarize.
+            {t('history.empty.noRecordingsDesc')}
           </p>
           <Link to={ROUTES.HOME}>
-            <Button>Create New Recording</Button>
+            <Button>{t('history.empty.createAction')}</Button>
           </Link>
         </>
       )}

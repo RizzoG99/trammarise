@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { AppLayout } from './AppLayout';
 import { ROUTES } from '../types/routing';
 import { LoadingSpinner } from '@/lib';
@@ -58,7 +58,14 @@ function PageLoader() {
   );
 }
 
+import { migrateFromSessionStorage } from '@/utils/session-manager';
+
 function App() {
+  // Run migration on mount
+  useEffect(() => {
+    migrateFromSessionStorage();
+  }, []);
+
   return (
     <Suspense fallback={<PageLoader />}>
       <Routes>

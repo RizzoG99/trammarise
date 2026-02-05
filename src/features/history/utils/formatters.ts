@@ -10,8 +10,16 @@ export function formatDate(timestamp: number | null | undefined): string {
 
   const date = new Date(timestamp);
   const now = new Date();
-  const diffMs = now.getTime() - timestamp;
-  const diffDays = diffMs / (1000 * 60 * 60 * 24);
+
+  // Use calendar-day boundaries for consistent grouping
+  const dateDay = new Date(date);
+  dateDay.setHours(0, 0, 0, 0);
+
+  const today = new Date(now);
+  today.setHours(0, 0, 0, 0);
+
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
 
   const timeStr = date.toLocaleString('en-US', {
     hour: 'numeric',
@@ -19,9 +27,9 @@ export function formatDate(timestamp: number | null | undefined): string {
     hour12: true,
   });
 
-  if (diffDays < 1) {
+  if (dateDay.getTime() === today.getTime()) {
     return `Today at ${timeStr}`;
-  } else if (diffDays < 2) {
+  } else if (dateDay.getTime() === yesterday.getTime()) {
     return `Yesterday at ${timeStr}`;
   } else {
     return date.toLocaleString('en-US', {
