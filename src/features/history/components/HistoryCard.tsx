@@ -5,6 +5,7 @@ import { Button } from '@/lib/components/ui/Button';
 import { Badge } from '@/lib/components/ui/Badge';
 import { HistoryQuickActions } from './HistoryQuickActions';
 import { useTranslation } from 'react-i18next';
+import { useBlobDownload } from '../hooks/useBlobDownload';
 
 import type { HistorySession } from '../types/history';
 import { formatDate } from '../utils/formatters';
@@ -27,6 +28,11 @@ export function HistoryCard({
   selectionMode,
 }: HistoryCardProps) {
   const { t } = useTranslation();
+  const { download } = useBlobDownload({
+    onError: (error) => {
+      console.error('Download failed:', error);
+    },
+  });
 
   const handleDelete = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -50,9 +56,13 @@ export function HistoryCard({
     }
   };
 
-  // Download functionality requires loading the full blob which is expensive
-  // Hiding it for now as per review feedback until we have a better strategy
-  // const handleDownload = () => { ... };
+  const handleDownload = async () => {
+    try {
+      await download(session.sessionId, session.audioName);
+    } catch (err) {
+      console.error('Download failed:', err);
+    }
+  };
 
   return (
     <Link
@@ -134,8 +144,7 @@ export function HistoryCard({
             <div className="-ml-2">
               <HistoryQuickActions
                 onCopySummary={session.hasSummary ? handleCopySummary : undefined}
-                // Hiding download for now
-                onDownload={undefined}
+                onDownload={handleDownload}
               />
             </div>
 
