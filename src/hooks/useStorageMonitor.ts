@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 export interface StorageQuota {
   usage: number;
@@ -44,6 +44,14 @@ export function useStorageMonitor(options: UseStorageMonitorOptions = {}): UseSt
     onWarning,
   } = options;
 
+  // Use ref to hold the latest callback to avoid re-triggering effects
+  const onWarningRef = useRef(onWarning);
+
+  // Update ref when callback changes
+  useEffect(() => {
+    onWarningRef.current = onWarning;
+  }, [onWarning]);
+
   const [quota, setQuota] = useState<StorageQuota | null>(null);
   const [warningLevel, setWarningLevel] = useState<StorageWarningLevel>('none');
   const [isChecking, setIsChecking] = useState(false);
@@ -86,8 +94,8 @@ export function useStorageMonitor(options: UseStorageMonitorOptions = {}): UseSt
       const level = getWarningLevel(percentUsed);
       setWarningLevel(level);
 
-      if (level !== 'none' && onWarning) {
-        onWarning(level, quotaInfo);
+      if (level !== 'none' && onWarningRef.current) {
+        onWarningRef.current(level, quotaInfo);
       }
     } catch (err) {
       const storageError = err instanceof Error ? err : new Error('Failed to check storage');
@@ -96,7 +104,7 @@ export function useStorageMonitor(options: UseStorageMonitorOptions = {}): UseSt
     } finally {
       setIsChecking(false);
     }
-  }, [getWarningLevel, onWarning]);
+  }, [getWarningLevel]); // Removed onWarning from dependencies
 
   // Initial check and periodic monitoring
   useEffect(() => {

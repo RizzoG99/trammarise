@@ -1,9 +1,9 @@
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
-import { lazy, Suspense, useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState, useCallback } from 'react';
 import { AppLayout } from './AppLayout';
 import { ROUTES } from '../types/routing';
 import { LoadingSpinner } from '@/lib';
-import { useStorageMonitor } from '@/hooks/useStorageMonitor';
+import { useStorageMonitor, type StorageWarningLevel } from '@/hooks/useStorageMonitor';
 import { StorageWarning } from '@/components/StorageWarning';
 
 // Lazy load route pages
@@ -64,19 +64,22 @@ function PageLoader() {
 }
 
 import { migrateFromSessionStorage } from '@/utils/session-manager';
+import { HeaderProvider } from '@/context/HeaderContext';
 
 function App() {
   const navigate = useNavigate();
   const [showStorageWarning, setShowStorageWarning] = useState(false);
 
+  const handleStorageWarning = useCallback((level: StorageWarningLevel) => {
+    if (level === 'high' || level === 'critical') {
+      setShowStorageWarning(true);
+    }
+  }, []);
+
   // Monitor storage usage
   const { quota, warningLevel } = useStorageMonitor({
-    checkInterval: 60000, // Check every minute
-    onWarning: (level) => {
-      if (level === 'high' || level === 'critical') {
-        setShowStorageWarning(true);
-      }
-    },
+    checkInterval: 60000,
+    onWarning: handleStorageWarning,
   });
 
   // Run migration on mount
@@ -84,7 +87,8 @@ function App() {
     migrateFromSessionStorage();
   }, []);
 
-  const handleCleanup = () => {
+  const handleCleanup = async () => {
+    // Implement cleanup logic
     setShowStorageWarning(false);
     navigate(ROUTES.HISTORY);
   };
@@ -99,45 +103,46 @@ function App() {
           onCleanup={handleCleanup}
         />
       )}
+      <HeaderProvider>
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            {/* Dev preview route */}
+            {import.meta.env.DEV && <Route path={ROUTES.PREVIEW} element={<PreviewPage />} />}
+            {/* PDF Debug route */}
+            {import.meta.env.DEV && <Route path="/debug/pdf" element={<PdfPreviewPage />} />}
 
-      <Suspense fallback={<PageLoader />}>
-        <Routes>
-          {/* Dev preview route */}
-          {import.meta.env.DEV && <Route path={ROUTES.PREVIEW} element={<PreviewPage />} />}
-          {/* PDF Debug route */}
-          {import.meta.env.DEV && <Route path="/debug/pdf" element={<PdfPreviewPage />} />}
+            {/* Main app routes with AppLayout wrapper */}
+            <Route element={<AppLayout />}>
+              {/* Home/Upload page with split-screen */}
+              <Route path={ROUTES.HOME} element={<UploadRecordPage />} />
 
-          {/* Main app routes with AppLayout wrapper */}
-          <Route element={<AppLayout />}>
-            {/* Home/Upload page with split-screen */}
-            <Route path={ROUTES.HOME} element={<UploadRecordPage />} />
+              {/* Audio editing route */}
+              <Route path={ROUTES.AUDIO} element={<AudioEditingPage />} />
 
-            {/* Audio editing route */}
-            <Route path={ROUTES.AUDIO} element={<AudioEditingPage />} />
+              {/* Configuration route */}
+              <Route path={ROUTES.CONFIGURE} element={<ConfigurationPlaceholder />} />
 
-            {/* Configuration route */}
-            <Route path={ROUTES.CONFIGURE} element={<ConfigurationPlaceholder />} />
+              {/* Processing route with step checklist */}
+              <Route path={ROUTES.PROCESSING} element={<ProcessingPage />} />
 
-            {/* Processing route with step checklist */}
-            <Route path={ROUTES.PROCESSING} element={<ProcessingPage />} />
+              {/* Results route */}
+              <Route path={ROUTES.RESULTS} element={<ResultsPage />} />
 
-            {/* Results route */}
-            <Route path={ROUTES.RESULTS} element={<ResultsPage />} />
+              {/* API Key Setup route */}
+              <Route path={ROUTES.SETUP} element={<ApiKeySetupPage />} />
 
-            {/* API Key Setup route */}
-            <Route path={ROUTES.SETUP} element={<ApiKeySetupPage />} />
+              {/* History route */}
+              <Route path={ROUTES.HISTORY} element={<HistoryPage />} />
 
-            {/* History route */}
-            <Route path={ROUTES.HISTORY} element={<HistoryPage />} />
+              {/* Documentation route */}
+              <Route path={ROUTES.DOCS} element={<DocsPage />} />
+            </Route>
 
-            {/* Documentation route */}
-            <Route path={ROUTES.DOCS} element={<DocsPage />} />
-          </Route>
-
-          {/* Redirect unknown routes to home */}
-          <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
-        </Routes>
-      </Suspense>
+            {/* Redirect unknown routes to home */}
+            <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
+          </Routes>
+        </Suspense>
+      </HeaderProvider>
     </>
   );
 }

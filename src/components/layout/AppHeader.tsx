@@ -1,33 +1,34 @@
 import { FileDown, AudioWaveform } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ThemeToggle, Button } from '@/lib';
 import { useTheme } from '../../hooks/useTheme';
 import { LanguageSwitcher } from '../../features/i18n/components/LanguageSwitcher';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import { ROUTES } from '@/types/routing';
+import { useHeader } from '../../hooks/useHeader';
 
-/**
- * Props for AppHeader component
- */
-interface AppHeaderProps {
-  /** Optional: File name for results page (editable) */
-  fileName?: string;
-  /** Optional: Handler when file name is edited */
-  onFileNameChange?: (newName: string) => void;
-  /** Optional: Handler for export button */
-  onExport?: () => void;
-}
-
-export function AppHeader({ fileName, onFileNameChange, onExport }: AppHeaderProps = {}) {
+export function AppHeader() {
   const { t } = useTranslation();
   const { theme, setTheme } = useTheme();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const [editValue, setEditValue] = useState(fileName || '');
+  // Consume global header context
+  const { fileName, setFileName, onExport } = useHeader();
 
-  const isHistoryPage = location.pathname === ROUTES.HISTORY;
-  const isSettingsPage = location.pathname === ROUTES.SETUP;
+  // Local state for input field to avoid jitter, syncs with context on blur/enter or debounce could be used
+  const [editValue, setEditValue] = useState(fileName);
+
+  // Sync local state when context changes (e.g. initial load)
+  useEffect(() => {
+    setEditValue(fileName);
+  }, [fileName]);
+
+  const handleBlur = () => {
+    if (editValue.trim()) {
+      setFileName(editValue.trim());
+    } else {
+      setEditValue(fileName); // Revert if empty
+    }
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full bg-bg-glass backdrop-blur-md border-b border-border">
@@ -36,32 +37,28 @@ export function AppHeader({ fileName, onFileNameChange, onExport }: AppHeaderPro
           {/* Left Section: Logo + File Name */}
           <div className="flex items-center gap-6">
             {/* Logo */}
-            <div className="flex items-center gap-3">
-              <div
-                className="size-8 flex items-center justify-center bg-primary rounded text-white cursor-pointer"
-                onClick={() => navigate(ROUTES.HOME)}
-              >
+            <Link to={ROUTES.HOME} className="flex items-center gap-3 group">
+              <div className="size-8 flex items-center justify-center bg-primary rounded text-white group-hover:bg-primary-hover transition-colors">
                 <AudioWaveform className="w-5 h-5" />
               </div>
-              <h1
-                className="text-xl font-bold tracking-tight text-text-primary cursor-pointer"
-                onClick={() => navigate(ROUTES.HOME)}
-              >
+              <h1 className="text-xl font-bold tracking-tight text-text-primary group-hover:text-primary transition-colors">
                 Trammarise
               </h1>
-            </div>
+            </Link>
 
-            {/* File Name (Results Page Only) */}
-            {fileName && onFileNameChange && (
+            {/* File Name (Results Page Only - presence of onExport implies "Results Mode" or similar context) */}
+            {onExport && (
               <div className="flex flex-col">
                 <div className="flex items-center gap-2">
                   <input
                     type="text"
                     value={editValue}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      setEditValue(value);
-                      onFileNameChange(value.trim());
+                    onChange={(e) => setEditValue(e.target.value)}
+                    onBlur={handleBlur}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.currentTarget.blur();
+                      }
                     }}
                     className={`
                       px-3 py-1 rounded-lg
@@ -88,23 +85,23 @@ export function AppHeader({ fileName, onFileNameChange, onExport }: AppHeaderPro
           {/* Center Section: Navigation */}
           <nav className="hidden md:flex items-center gap-6">
             {[
-              { label: t('nav.history'), path: ROUTES.HISTORY, active: isHistoryPage },
-              { label: t('nav.settings'), path: ROUTES.SETUP, active: isSettingsPage },
+              { label: t('nav.history'), path: ROUTES.HISTORY },
+              { label: t('nav.settings'), path: ROUTES.SETUP },
             ].map((tab) => (
-              <button
+              <NavLink
                 key={tab.path}
-                onClick={() => navigate(tab.path)}
-                className={`
+                to={tab.path}
+                className={({ isActive }) => `
                   px-3 py-1 text-sm font-medium border-b-2 transition-colors duration-200
                   ${
-                    tab.active
+                    isActive
                       ? 'border-primary text-primary'
                       : 'border-transparent text-text-secondary hover:text-text-primary hover:border-border'
                   }
                 `}
               >
                 {tab.label}
-              </button>
+              </NavLink>
             ))}
           </nav>
 
@@ -117,22 +114,11 @@ export function AppHeader({ fileName, onFileNameChange, onExport }: AppHeaderPro
                 icon={<FileDown className="w-4 h-4" />}
                 onClick={onExport}
                 className="flex items-center gap-2"
-                disabled={!!(fileName && !editValue.trim())}
+                disabled={!editValue.trim()}
               >
                 {t('header.export')}
               </Button>
             )}
-
-            {/* Notifications - Hidden until implemented
-            <div className="relative">
-              <Button
-                variant="ghost"
-                icon={<Bell className="w-5 h-5" fill="currentColor" />}
-                aria-label={t('header.notifications')}
-              />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-accent-error rounded-full" />
-            </div>
-            */}
 
             {/* Language Switcher */}
             <LanguageSwitcher />

@@ -10,7 +10,6 @@ import {
   Settings,
   MessageSquare,
 } from 'lucide-react';
-import { AppHeader } from '../components/layout/AppHeader';
 import { GlassCard, Heading, Text } from '@/lib';
 
 const SEO = lazy(() =>
@@ -29,7 +28,6 @@ export function DocsPage() {
           canonical="https://trammarise.app/docs"
         />
       </Suspense>
-      <AppHeader />
 
       <main className="flex-1 w-full max-w-4xl mx-auto px-4 py-8 lg:px-8">
         <div className="flex flex-col gap-8">

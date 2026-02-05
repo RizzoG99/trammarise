@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react';
-import { AppHeader } from './AppHeader';
 
 interface PageLayoutProps {
   children: ReactNode;
@@ -10,25 +9,16 @@ interface PageLayoutProps {
 /**
  * Centralized page layout component
  * Provides consistent structure across all pages with:
- * - AppHeader
  * - Main content area with max-width constraint
  * - Consistent background colors for light/dark mode
  */
-export function PageLayout({ 
-  children, 
-  maxWidth = '1400px',
-  className = '' 
-}: PageLayoutProps) {
-  const maxWidthClass = maxWidth === 'full' 
-    ? 'max-w-full' 
-    : `max-w-[${maxWidth}]`;
+export function PageLayout({ children, maxWidth = '1400px', className = '' }: PageLayoutProps) {
+  const maxWidthClass = maxWidth === 'full' ? 'max-w-full' : `max-w-[${maxWidth}]`;
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--color-bg-primary)' }}>
-      <AppHeader />
-      <main className={`mx-auto px-6 py-6 ${maxWidthClass} ${className}`}>
-        {children}
-      </main>
+      {/* AppHeader is now rendered in AppLayout for persistence */}
+      <main className={`mx-auto px-6 py-6 ${maxWidthClass} ${className}`}>{children}</main>
     </div>
   );
 }

@@ -1,12 +1,15 @@
 import { Outlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Text } from '@/lib';
-
+import { AppHeader } from '@/components/layout/AppHeader';
 export function AppLayout() {
   const { t } = useTranslation();
 
   return (
     <div className="min-h-screen flex flex-col">
+      {/* Persistent Header */}
+      <AppHeader />
+
       {/* Main content area - rendered by routes */}
       <main className="flex-1 flex flex-col">
         <Outlet />

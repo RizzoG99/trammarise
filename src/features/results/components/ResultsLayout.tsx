@@ -4,8 +4,6 @@ import type { ReactNode } from 'react';
  * Props for ResultsLayout component
  */
 interface ResultsLayoutProps {
-  /** Header with title and export functionality */
-  header: ReactNode;
   /** Sticky audio player bar */
   audioPlayer: ReactNode;
   /** Summary panel content (left, 40%) */
@@ -32,7 +30,6 @@ interface ResultsLayoutProps {
  * - Desktop (≥1024px): Side-by-side split
  */
 export function ResultsLayout({
-  header,
   audioPlayer,
   summaryPanel,
   transcriptPanel,
@@ -41,8 +38,7 @@ export function ResultsLayout({
 }: ResultsLayoutProps) {
   return (
     <div className="min-h-screen flex flex-col bg-[var(--color-background)]">
-      {/* Header: Editable title + Export button */}
-      {header}
+      {/* Header is now handled by AppLayout/HeaderContext */}
 
       {/* Audio Player Bar */}
       <div className="z-40">{audioPlayer}</div>

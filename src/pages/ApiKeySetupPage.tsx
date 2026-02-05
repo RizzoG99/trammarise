@@ -15,7 +15,6 @@ import {
 } from 'lucide-react';
 import { useApiKey } from '../context/ApiKeyContext';
 import { GlassCard, Button, Heading, Text } from '@/lib';
-import { AppHeader } from '../components/layout/AppHeader';
 
 const SEO = lazy(() =>
   import('@/lib/components/common/SEO').then((module) => ({ default: module.SEO }))
@@ -61,8 +60,6 @@ export function ApiKeySetupPage() {
           canonical="https://trammarise.app/setup"
         />
       </Suspense>
-      {/* Reusing AppHeader for consistency */}
-      <AppHeader />
 
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 py-8 lg:px-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { Modal, ChatInterface, Snackbar, AILoadingOrb, Text } from '@/lib';
 import { chatWithAI } from '../../utils/api';
 
@@ -8,7 +8,7 @@ import { AudioPlayerBar } from '../../features/results/components/AudioPlayerBar
 import { SummaryPanel } from '../../features/results/components/SummaryPanel';
 import { SearchableTranscript } from '../../features/results/components/SearchableTranscript';
 import { FloatingChatButton } from '../../features/results/components/FloatingChatButton';
-import { AppHeader } from '../layout/AppHeader';
+import { useHeader, useHeaderConfig } from '../../hooks/useHeader';
 import { useAudioPlayer } from '../../features/results/hooks/useAudioPlayer';
 import { parseTranscriptToSegments } from '../../features/results/utils/transcriptParser';
 
@@ -47,8 +47,9 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
   const [isPdfGenerating, setIsPdfGenerating] = useState(false);
   const [pdfError, setPdfError] = useState<string | null>(null);
   const [pdfSuccess, setPdfSuccess] = useState(false);
-  // Initialize fileName without extension
-  const [fileName, setFileName] = useState(() => audioName.replace(/\.[^/.]+$/, ''));
+
+  // Get current filename from global header context
+  const { fileName } = useHeader();
 
   // Audio player state (shared between AudioPlayerBar and SearchableTranscript)
   const audioPlayer = useAudioPlayer(audioFile);
@@ -128,7 +129,7 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
     }
   };
 
-  const handleDownloadPDF = async () => {
+  const handleDownloadPDF = useCallback(async () => {
     console.log('📥 Starting PDF generation...');
 
     setIsPdfGenerating(true);
@@ -153,18 +154,17 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
     } finally {
       setIsPdfGenerating(false);
     }
-  };
+  }, [result.summary, result.transcript, result.configuration, fileName]);
+
+  // Sync header configuration
+  useHeaderConfig({
+    initialFileName: audioName.replace(/\.[^/.]+$/, ''),
+    onExport: handleDownloadPDF,
+  });
 
   return (
     <>
       <ResultsLayout
-        header={
-          <AppHeader
-            fileName={fileName}
-            onFileNameChange={setFileName}
-            onExport={handleDownloadPDF}
-          />
-        }
         audioPlayer={<AudioPlayerBar audioFile={audioFile} audioPlayer={audioPlayer} />}
         summaryPanel={<SummaryPanel summary={result.summary} />}
         transcriptPanel={
