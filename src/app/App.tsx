@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { lazy, Suspense, useEffect, useState, useCallback } from 'react';
+import { ClerkProvider } from '@clerk/clerk-react';
 import { AppLayout } from './AppLayout';
 import { ROUTES } from '../types/routing';
 import { LoadingSpinner } from '@/lib';
@@ -66,6 +67,13 @@ function PageLoader() {
 import { migrateFromSessionStorage } from '@/utils/session-manager';
 import { HeaderProvider } from '@/context/HeaderContext';
 
+// Get Clerk publishable key from environment
+const CLERK_PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || '';
+
+if (!CLERK_PUBLISHABLE_KEY) {
+  console.warn('Missing VITE_CLERK_PUBLISHABLE_KEY. Authentication features will be disabled.');
+}
+
 function App() {
   const navigate = useNavigate();
   const [showStorageWarning, setShowStorageWarning] = useState(false);
@@ -94,7 +102,7 @@ function App() {
   };
 
   return (
-    <>
+    <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY}>
       {showStorageWarning && quota && (
         <StorageWarning
           level={warningLevel}
@@ -143,7 +151,7 @@ function App() {
           </Routes>
         </Suspense>
       </HeaderProvider>
-    </>
+    </ClerkProvider>
   );
 }
 

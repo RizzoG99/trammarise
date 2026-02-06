@@ -27,6 +27,11 @@
       "editFile": "Edit file name"
     }
   },
+  "auth": {
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "signOut": "Sign Out"
+  },
   "home": {
     "title": "New Session",
     "subtitle": "Configure your audio transcription settings",

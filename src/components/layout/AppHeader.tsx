@@ -1,6 +1,7 @@
 import { FileDown, AudioWaveform } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { SignInButton, UserButton, useUser } from '@clerk/clerk-react';
 import { ThemeToggle, Button } from '@/lib';
 import { useTheme } from '../../hooks/useTheme';
 import { LanguageSwitcher } from '../../features/i18n/components/LanguageSwitcher';
@@ -11,6 +12,7 @@ import { useHeader } from '../../hooks/useHeader';
 export function AppHeader() {
   const { t } = useTranslation();
   const { theme, setTheme } = useTheme();
+  const { isSignedIn } = useUser();
   // Consume global header context
   const { fileName, setFileName, onExport } = useHeader();
 
@@ -118,6 +120,23 @@ export function AppHeader() {
               >
                 {t('header.export')}
               </Button>
+            )}
+
+            {/* Authentication */}
+            {isSignedIn ? (
+              <UserButton
+                appearance={{
+                  elements: {
+                    avatarBox: 'w-8 h-8',
+                  },
+                }}
+              />
+            ) : (
+              <SignInButton mode="modal">
+                <Button variant="outline" size="sm">
+                  {t('auth.signIn')}
+                </Button>
+              </SignInButton>
             )}
 
             {/* Language Switcher */}

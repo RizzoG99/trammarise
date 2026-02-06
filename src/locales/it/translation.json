@@ -27,6 +27,11 @@
       "editFile": "Modifica nome file"
     }
   },
+  "auth": {
+    "signIn": "Accedi",
+    "signUp": "Registrati",
+    "signOut": "Esci"
+  },
   "home": {
     "title": "Nuova Sessione",
     "subtitle": "Configura le impostazioni di trascrizione",
