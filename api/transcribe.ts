@@ -11,6 +11,7 @@ import { chunkAudio, cleanupChunks } from './utils/audio-chunker';
 import { RateLimitGovernor } from './utils/rate-limit-governor';
 import { processChunk } from './utils/chunk-processor';
 import { OpenAIProvider } from './providers/openai';
+import { TranscriptionProviderFactory } from './providers/factory';
 import { assembleTranscript } from './utils/transcript-assembler';
 import type { ProcessingMode } from './types/chunking';
 import type { JobConfiguration } from './types/job';
@@ -49,6 +50,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     let model: string | undefined = undefined;
 
     let performanceLevel: string | undefined = undefined;
+    let enableSpeakerDiarization = false;
+    let speakersExpected: number | undefined = undefined;
     let uploadedFilename: string = 'audio.webm';
     let fileSizeExceeded = false;
 
@@ -91,6 +94,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           model = value || undefined;
         } else if (fieldname === 'performanceLevel') {
           performanceLevel = value || undefined;
+        } else if (fieldname === 'enableSpeakerDiarization') {
+          enableSpeakerDiarization = value === 'true';
+        } else if (fieldname === 'speakersExpected') {
+          const parsed = parseInt(value, 10);
+          speakersExpected = !isNaN(parsed) ? parsed : undefined;
         }
       });
 
@@ -132,6 +140,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       model: transcriptionModel,
       language,
       prompt: WHISPER_STYLE_PROMPT, // Use style prompt for clean transcription
+      enableSpeakerDiarization,
+      speakersExpected,
     };
 
     // Create job
@@ -192,6 +202,44 @@ async function processJobInBackground(
   }
 
   try {
+    // Check if speaker diarization is enabled
+    if (job.config.enableSpeakerDiarization) {
+      // Speaker diarization path: Use AssemblyAI with full audio file (no chunking)
+      console.log(`[Job ${jobId}] Starting speaker diarization transcription...`);
+      JobManager.updateJobStatus(jobId, 'transcribing');
+
+      // Create AssemblyAI provider
+      const provider = TranscriptionProviderFactory.create({
+        provider: 'assemblyai',
+        apiKey: job.config.apiKey,
+        enableSpeakerDiarization: true,
+      });
+
+      // Transcribe with speaker diarization
+      const result = await provider.transcribe({
+        audioFile: audioBuffer,
+        language: job.config.language,
+        enableSpeakerDiarization: true,
+        speakersExpected: job.config.speakersExpected,
+      });
+
+      // Set transcript and utterances
+      JobManager.setJobTranscript(jobId, result.text);
+      if (result.utterances) {
+        JobManager.setJobUtterances(jobId, result.utterances);
+      }
+
+      // Mark job as completed
+      JobManager.updateJobStatus(jobId, 'completed');
+
+      console.log(
+        `[Job ${jobId}] ✅ Completed with speaker diarization (${result.text.length} chars, ${result.utterances?.length || 0} utterances)`
+      );
+
+      return;
+    }
+
+    // Standard transcription path: Chunk and process with OpenAI
     // Update status to chunking
     JobManager.updateJobStatus(jobId, 'chunking');
 

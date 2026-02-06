@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { useUser } from '@clerk/clerk-react';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { HistoryFilters } from '@/features/history/components/HistoryFilters';
 import { HistoryList } from '@/features/history/components/HistoryList';
 import { HistoryEmptyState } from '@/features/history/components/HistoryEmptyState';
 import { DeleteConfirmModal } from '@/features/history/components/DeleteConfirmModal';
 import { HistoryDashboard } from '@/features/history/components/HistoryDashboard';
+import { MigrationBanner } from '@/features/history/components/MigrationBanner';
 import { LoadingSpinner } from '@/lib/components/ui/LoadingSpinner';
 import { Snackbar } from '@/lib/components/ui/Snackbar';
 import { Button } from '@/lib/components/ui/Button';
@@ -19,7 +21,8 @@ import { useTranslation } from 'react-i18next';
 
 export function HistoryPage() {
   const { t } = useTranslation();
-  const { sessions, isLoading, error, deleteSession } = useHistorySessions();
+  const { isSignedIn } = useUser();
+  const { sessions, isLoading, error, deleteSession, reload } = useHistorySessions();
   const {
     searchQuery,
     contentTypeFilter,
@@ -178,6 +181,9 @@ export function HistoryPage() {
             </div>
           )}
         </div>
+
+        {/* Migration Banner - Only show for authenticated users */}
+        {isSignedIn && <MigrationBanner onImportComplete={reload} />}
 
         {/* New Insights Dashboard */}
         {hasAnySessions && <HistoryDashboard sessions={sessions} />}

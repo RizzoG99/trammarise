@@ -14,6 +14,7 @@ import { LanguageSelector } from '../../features/configuration/components/Langua
 import { ContentTypeSelector } from '../../features/configuration/components/ContentTypeSelector';
 import { ProcessingModeSelector } from '../../features/configuration/components/ProcessingModeSelector';
 import { NoiseProfileSelector } from '../../features/configuration/components/NoiseProfileSelector';
+import { SpeakerDiarizationToggle } from '../../features/configuration/components/SpeakerDiarizationToggle';
 import type { NoiseProfile } from '../../types/noise-profiles';
 import { ProcessAudioButton } from '../../features/upload/components/ProcessAudioButton';
 import { generateSessionId, saveSession } from '../../utils/session-manager';
@@ -29,6 +30,8 @@ export function UploadRecordPage() {
   const [contentType, setContentType] = useState<ContentType>('meeting');
   const [processingMode, setProcessingMode] = useState<ProcessingMode>('balanced');
   const [noiseProfile, setNoiseProfile] = useState<NoiseProfile>('quiet');
+  const [enableSpeakerDiarization, setEnableSpeakerDiarization] = useState<boolean>(false);
+  const [speakersExpected, setSpeakersExpected] = useState<number | undefined>(undefined);
 
   const handleFileUpload = async (file: File) => {
     // Stop any active recording when uploading a file
@@ -84,6 +87,8 @@ export function UploadRecordPage() {
         contentType, // Save user configuration
         processingMode, // Save user configuration
         noiseProfile, // Save noise profile
+        enableSpeakerDiarization, // Save speaker diarization config
+        speakersExpected, // Save expected speaker count
         sessionId,
         createdAt: Date.now(),
         updatedAt: Date.now(),
@@ -149,11 +154,17 @@ export function UploadRecordPage() {
             <NoiseProfileSelector value={noiseProfile} onChange={setNoiseProfile} />
           </div>
 
-          {/* Column 3: Processing Mode + Noise Profile */}
+          {/* Column 3: Processing Mode + Speaker Diarization */}
           <div className="space-y-4">
             <ProcessingModeSelector
               value={processingMode}
               onChange={(val) => setProcessingMode(val)}
+            />
+            <SpeakerDiarizationToggle
+              enabled={enableSpeakerDiarization}
+              speakersExpected={speakersExpected}
+              onEnabledChange={setEnableSpeakerDiarization}
+              onSpeakersExpectedChange={setSpeakersExpected}
             />
           </div>
         </div>

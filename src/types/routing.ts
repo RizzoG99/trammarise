@@ -17,6 +17,8 @@ export interface SessionData {
   contentType: ContentType;
   processingMode: ProcessingMode;
   noiseProfile?: string; // Audio environment profile
+  enableSpeakerDiarization?: boolean; // Speaker identification
+  speakersExpected?: number; // Expected number of speakers (2-10)
 
   // Audio editing fields (set in AudioEditingPage)
   selectionMode?: 'full' | 'selection';

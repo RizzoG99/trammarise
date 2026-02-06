@@ -5,6 +5,7 @@
  */
 
 import type { ChunkMetadata, ProcessingMode } from './chunking';
+import type { Utterance } from './provider';
 
 /**
  * Job status states
@@ -73,6 +74,12 @@ export interface JobConfiguration {
 
   /** Custom prompt for Whisper */
   prompt?: string;
+
+  /** Enable speaker diarization (requires AssemblyAI) */
+  enableSpeakerDiarization?: boolean;
+
+  /** Expected number of speakers (2-10, optional) */
+  speakersExpected?: number;
 }
 
 /**
@@ -131,6 +138,9 @@ export interface TranscriptionJob {
 
   /** Final assembled transcript (if completed) */
   transcript?: string;
+
+  /** Speaker-labeled utterances (if speaker diarization enabled) */
+  utterances?: Utterance[];
 
   /** Error message (if failed) */
   error?: string;
@@ -197,6 +207,9 @@ export interface JobStatusResponse {
 
   /** Final transcript (if completed) */
   transcript?: string;
+
+  /** Speaker-labeled utterances (if speaker diarization enabled) */
+  utterances?: Utterance[];
 
   /** Error message (if failed) */
   error?: string;

@@ -18,6 +18,7 @@ import type {
   JobStatusResponse,
 } from '../types/job';
 import type { ChunkMetadata } from '../types/chunking';
+import type { Utterance } from '../types/provider';
 import { JOB_SAFEGUARDS } from '../types/job';
 
 /**
@@ -161,6 +162,19 @@ class JobManagerClass {
   }
 
   /**
+   * Set job utterances (for speaker diarization)
+   */
+  setJobUtterances(jobId: string, utterances: Utterance[]): void {
+    const job = this.jobs.get(jobId);
+    if (!job) {
+      throw new Error(`Job ${jobId} not found`);
+    }
+
+    job.utterances = utterances;
+    job.lastUpdated = new Date();
+  }
+
+  /**
    * Delete a job
    */
   deleteJob(jobId: string): void {
@@ -201,6 +215,10 @@ class JobManagerClass {
 
     if (job.transcript) {
       response.transcript = job.transcript;
+    }
+
+    if (job.utterances) {
+      response.utterances = job.utterances;
     }
 
     if (job.error) {

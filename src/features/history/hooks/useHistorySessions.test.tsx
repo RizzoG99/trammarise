@@ -3,7 +3,13 @@ import { renderHook, waitFor } from '@testing-library/react';
 import { useHistorySessions } from './useHistorySessions';
 import * as sessionManager from '@/utils/session-manager';
 
+// Mock Clerk
+vi.mock('@clerk/clerk-react', () => ({
+  useUser: () => ({ isSignedIn: false }), // Default to not signed in for localStorage tests
+}));
+
 vi.mock('@/utils/session-manager');
+vi.mock('@/repositories/SessionRepository');
 
 describe('useHistorySessions', () => {
   beforeEach(() => {

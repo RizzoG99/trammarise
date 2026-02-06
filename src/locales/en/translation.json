@@ -8,7 +8,8 @@
     "cancel": "Cancel",
     "back": "Back",
     "next": "Next",
-    "processing": "Processing"
+    "processing": "Processing",
+    "close": "Close"
   },
   "nav": {
     "home": "Home",
@@ -185,6 +186,13 @@
       "cafe": "Cafe / Restaurant",
       "outdoor": "Outdoor",
       "phone": "Phone / Digital Call"
+    },
+    "speakerDiarization": {
+      "title": "Speaker Identification",
+      "description": "Identify and label different speakers in the transcript",
+      "speakersExpected": "Expected Number of Speakers (Optional)",
+      "speakersPlaceholder": "Auto-detect",
+      "speakersHint": "Specify 2-10 speakers for better accuracy, or leave blank for auto-detection"
     },
     "meetingType": {
       "title": "Meeting Type",
@@ -381,7 +389,11 @@
       "title": "Transcript",
       "searchPlaceholder": "Search transcript...",
       "noTranscript": "No transcript available",
-      "matches": "{{current}} of {{total}} matches"
+      "matches": "{{current}} of {{total}} matches",
+      "utterances": "utterances",
+      "resultsFound": "results found",
+      "noResults": "No results found",
+      "noUtterances": "No utterances available"
     },
     "summary": {
       "title": "Summary",
@@ -489,6 +501,40 @@
       "selectAll": "Select All",
       "deselectAll": "Deselect All",
       "delete": "Delete Selection"
+    },
+    "migration": {
+      "title": "Sync Your Sessions",
+      "successTitle": "Sessions Imported!",
+      "description": "Import your {{count}} local session(s) to sync across devices and never lose your work.",
+      "successMessage": "Your local sessions are now synced across all your devices.",
+      "importButton": "Import Now",
+      "importing": "Importing...",
+      "dismissButton": "Maybe Later"
+    }
+  },
+  "pricing": {
+    "title": "Choose Your Plan",
+    "subtitle": "Start for free with your own API keys, or upgrade for hosted AI and premium features",
+    "monthly": "Monthly",
+    "annual": "Annual",
+    "save2Months": "Save 2 months",
+    "popular": "Most Popular",
+    "loading": "Loading...",
+    "saveAmount": "Save ${{amount}}/year",
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "byok": {
+        "question": "What does BYOK mean?",
+        "answer": "BYOK (Bring Your Own Key) means you provide your own OpenAI API key. This gives you full control and pay-as-you-go pricing directly from OpenAI, with no monthly fees."
+      },
+      "cancel": {
+        "question": "Can I cancel anytime?",
+        "answer": "Yes! You can cancel your subscription at any time. Your access will continue until the end of your billing period, and you can always downgrade to the free BYOK tier."
+      },
+      "minutes": {
+        "question": "What happens if I exceed my minutes?",
+        "answer": "You can purchase additional credits at any time. Unused minutes don't roll over, but you can always use your own API keys for unlimited processing."
+      }
     }
   }
 }

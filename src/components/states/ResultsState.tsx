@@ -7,6 +7,7 @@ import { ResultsLayout } from '../../features/results/components/ResultsLayout';
 import { AudioPlayerBar } from '../../features/results/components/AudioPlayerBar';
 import { SummaryPanel } from '../../features/results/components/SummaryPanel';
 import { SearchableTranscript } from '../../features/results/components/SearchableTranscript';
+import { SpeakerTranscriptView } from '../../features/results/components/SpeakerTranscriptView';
 import { FloatingChatButton } from '../../features/results/components/FloatingChatButton';
 import { useHeader, useHeaderConfig } from '../../hooks/useHeader';
 import { useAudioPlayer } from '../../features/results/hooks/useAudioPlayer';
@@ -168,11 +169,19 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
         audioPlayer={<AudioPlayerBar audioFile={audioFile} audioPlayer={audioPlayer} />}
         summaryPanel={<SummaryPanel summary={result.summary} />}
         transcriptPanel={
-          <SearchableTranscript
-            transcript={result.transcript}
-            activeSegmentId={activeSegmentId}
-            onTimestampClick={handleTimestampClick}
-          />
+          result.utterances && result.utterances.length > 0 ? (
+            <SpeakerTranscriptView
+              utterances={result.utterances}
+              currentTime={audioPlayer.state.currentTime}
+              onTimestampClick={handleTimestampClick}
+            />
+          ) : (
+            <SearchableTranscript
+              transcript={result.transcript}
+              activeSegmentId={activeSegmentId}
+              onTimestampClick={handleTimestampClick}
+            />
+          )
         }
         floatingChatButton={
           <FloatingChatButton

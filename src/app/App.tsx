@@ -35,6 +35,9 @@ const HistoryPage = lazy(() =>
 const DocsPage = lazy(() =>
   import('../pages/DocsPage').then((module) => ({ default: module.DocsPage }))
 );
+const PricingPage = lazy(() =>
+  import('./routes/PricingPage').then((module) => ({ default: module.PricingPage }))
+);
 
 // Placeholder for Configuration page (will be enhanced later)
 import { Heading, Text, GlassCard } from '@/lib';
@@ -66,6 +69,7 @@ function PageLoader() {
 
 import { migrateFromSessionStorage } from '@/utils/session-manager';
 import { HeaderProvider } from '@/context/HeaderContext';
+import { SubscriptionProvider } from '@/context/SubscriptionContext';
 
 // Get Clerk publishable key from environment
 const CLERK_PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || '';
@@ -111,46 +115,51 @@ function App() {
           onCleanup={handleCleanup}
         />
       )}
-      <HeaderProvider>
-        <Suspense fallback={<PageLoader />}>
-          <Routes>
-            {/* Dev preview route */}
-            {import.meta.env.DEV && <Route path={ROUTES.PREVIEW} element={<PreviewPage />} />}
-            {/* PDF Debug route */}
-            {import.meta.env.DEV && <Route path="/debug/pdf" element={<PdfPreviewPage />} />}
+      <SubscriptionProvider>
+        <HeaderProvider>
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              {/* Dev preview route */}
+              {import.meta.env.DEV && <Route path={ROUTES.PREVIEW} element={<PreviewPage />} />}
+              {/* PDF Debug route */}
+              {import.meta.env.DEV && <Route path="/debug/pdf" element={<PdfPreviewPage />} />}
 
-            {/* Main app routes with AppLayout wrapper */}
-            <Route element={<AppLayout />}>
-              {/* Home/Upload page with split-screen */}
-              <Route path={ROUTES.HOME} element={<UploadRecordPage />} />
+              {/* Main app routes with AppLayout wrapper */}
+              <Route element={<AppLayout />}>
+                {/* Home/Upload page with split-screen */}
+                <Route path={ROUTES.HOME} element={<UploadRecordPage />} />
 
-              {/* Audio editing route */}
-              <Route path={ROUTES.AUDIO} element={<AudioEditingPage />} />
+                {/* Audio editing route */}
+                <Route path={ROUTES.AUDIO} element={<AudioEditingPage />} />
 
-              {/* Configuration route */}
-              <Route path={ROUTES.CONFIGURE} element={<ConfigurationPlaceholder />} />
+                {/* Configuration route */}
+                <Route path={ROUTES.CONFIGURE} element={<ConfigurationPlaceholder />} />
 
-              {/* Processing route with step checklist */}
-              <Route path={ROUTES.PROCESSING} element={<ProcessingPage />} />
+                {/* Processing route with step checklist */}
+                <Route path={ROUTES.PROCESSING} element={<ProcessingPage />} />
 
-              {/* Results route */}
-              <Route path={ROUTES.RESULTS} element={<ResultsPage />} />
+                {/* Results route */}
+                <Route path={ROUTES.RESULTS} element={<ResultsPage />} />
 
-              {/* API Key Setup route */}
-              <Route path={ROUTES.SETUP} element={<ApiKeySetupPage />} />
+                {/* API Key Setup route */}
+                <Route path={ROUTES.SETUP} element={<ApiKeySetupPage />} />
 
-              {/* History route */}
-              <Route path={ROUTES.HISTORY} element={<HistoryPage />} />
+                {/* History route */}
+                <Route path={ROUTES.HISTORY} element={<HistoryPage />} />
 
-              {/* Documentation route */}
-              <Route path={ROUTES.DOCS} element={<DocsPage />} />
-            </Route>
+                {/* Documentation route */}
+                <Route path={ROUTES.DOCS} element={<DocsPage />} />
 
-            {/* Redirect unknown routes to home */}
-            <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
-          </Routes>
-        </Suspense>
-      </HeaderProvider>
+                {/* Pricing route */}
+                <Route path="/pricing" element={<PricingPage />} />
+              </Route>
+
+              {/* Redirect unknown routes to home */}
+              <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
+            </Routes>
+          </Suspense>
+        </HeaderProvider>
+      </SubscriptionProvider>
     </ClerkProvider>
   );
 }
