@@ -1,5 +1,5 @@
 import { auth } from '@clerk/nextjs/server';
-import { supabaseAdmin } from '../../src/lib/supabase/admin';
+import { supabaseAdmin } from '../lib/supabase-admin';
 
 export class AuthError extends Error {
   constructor(

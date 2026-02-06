@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { Webhook } from 'svix';
-import { supabaseAdmin } from '../../src/lib/supabase/admin';
+import { supabaseAdmin } from '../lib/supabase-admin';
 
 /**
  * Clerk webhook handler

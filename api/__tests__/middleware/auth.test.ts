@@ -12,7 +12,7 @@ vi.mock('@clerk/nextjs/server', () => ({
   auth: mockAuth,
 }));
 
-vi.mock('../../../src/lib/supabase/admin', () => ({
+vi.mock('../../lib/supabase-admin', () => ({
   supabaseAdmin: {
     from: mockSupabaseFrom,
   },

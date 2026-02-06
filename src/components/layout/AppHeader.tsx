@@ -133,9 +133,7 @@ export function AppHeader() {
               />
             ) : (
               <SignInButton mode="modal">
-                <Button variant="outline" size="sm">
-                  {t('auth.signIn')}
-                </Button>
+                <Button variant="outline">{t('auth.signIn')}</Button>
               </SignInButton>
             )}
 

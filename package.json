@@ -8,7 +8,7 @@
     "dev:api": "tsx api-dev-server.js",
     "dev:vite": "vite",
     "dev:vercel": "vercel dev --yes",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b tsconfig.app.json && vite build",
     "build:sitemap": "node scripts/generate-sitemap.js",
     "lint": "eslint .",
     "preview": "vite preview",

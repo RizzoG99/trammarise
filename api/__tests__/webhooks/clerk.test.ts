@@ -20,7 +20,7 @@ const mockSupabaseUpdate = vi.fn();
 const mockSupabaseDelete = vi.fn();
 const mockSupabaseEq = vi.fn();
 
-vi.mock('../../../src/lib/supabase/admin', () => ({
+vi.mock('../../lib/supabase-admin', () => ({
   supabaseAdmin: {
     from: mockSupabaseFrom,
   },
