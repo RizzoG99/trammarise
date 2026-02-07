@@ -222,7 +222,7 @@ export function CreditPurchaseModal({ isOpen, onClose, onSuccess }: CreditPurcha
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title="Purchase Credits" size="large">
+    <Modal isOpen={isOpen} onClose={handleClose} title="Purchase Credits">
       <div className="space-y-6">
         {!clientSecret ? (
           <>

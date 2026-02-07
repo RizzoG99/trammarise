@@ -3,6 +3,7 @@ import { useUser } from '@clerk/clerk-react';
 import type { HistorySession } from '../types/history';
 import type { ContentType } from '@/types/content-types';
 import type { LanguageCode } from '@/types/languages';
+import { isLanguageCode } from '@/types/languages';
 import {
   getAllSessionIds,
   loadSessionMetadata,
@@ -31,11 +32,15 @@ async function loadOneSession(sessionId: string): Promise<HistorySession | null>
   const fileSizeBytes = sessionData.fileSizeBytes as number | undefined;
   const audioName = sessionData.audioName || 'Unknown';
 
+  const rawLanguage = sessionData.configuration?.language || sessionData.language;
+  const language: LanguageCode =
+    typeof rawLanguage === 'string' && isLanguageCode(rawLanguage) ? rawLanguage : 'en';
+
   return {
     sessionId,
     audioName,
     contentType: (sessionData.configuration?.contentType || sessionData.contentType) as ContentType,
-    language: sessionData.configuration?.language || sessionData.language,
+    language,
     hasTranscript: !!sessionData.result?.transcript,
     hasSummary: !!sessionData.result?.summary,
     createdAt: sessionData.createdAt,

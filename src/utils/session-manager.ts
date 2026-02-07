@@ -99,7 +99,7 @@ export async function saveSession(sessionId: string, data: Partial<SessionData>)
         await sessionRepository.update(sessionId, updateData);
       } else {
         // Create new session - all required fields must be present
-        const createData: Record<string, unknown> = {
+        const createData: import('../repositories/SessionRepository').CreateSessionDTO = {
           sessionId,
           audioName: sessionData.audioName || 'unknown.wav',
           fileSizeBytes: sessionData.fileSizeBytes || 0,
@@ -124,9 +124,7 @@ export async function saveSession(sessionId: string, data: Partial<SessionData>)
             createData.aiConfig = sessionData.result.configuration;
         }
 
-        await sessionRepository.create(
-          createData as import('../repositories/SessionRepository').CreateSessionDTO
-        );
+        await sessionRepository.create(createData);
       }
     } catch (apiError) {
       // Silently fail - user might not be authenticated or API might be unavailable
