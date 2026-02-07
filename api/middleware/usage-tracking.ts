@@ -34,11 +34,13 @@ const TIER_MINUTES: Record<string, number> = {
  * @param userId - User UUID
  * @param operationType - Type of operation (transcription, summarization, chat)
  * @param durationSeconds - Duration in seconds (for transcription)
+ * @param mode - Tracking mode: 'with_quota_deduction' (paid users with platform key) or 'analytics_only' (user's own key)
  */
 export async function trackUsage(
   userId: string,
   operationType: 'transcription' | 'summarization' | 'chat',
-  durationSeconds: number
+  durationSeconds: number,
+  mode: 'with_quota_deduction' | 'analytics_only' = 'with_quota_deduction'
 ): Promise<void> {
   try {
     // Fetch user subscription
@@ -60,7 +62,7 @@ export async function trackUsage(
     // Calculate minutes (round up)
     const minutesUsed = Math.ceil(durationSeconds / 60);
 
-    // Insert usage event
+    // Insert usage event (always track for analytics)
     const { error: insertError } = await supabaseAdmin.from('usage_events').insert({
       user_id: userId,
       operation_type: operationType,
@@ -74,14 +76,20 @@ export async function trackUsage(
       return; // Don't throw - usage tracking failures shouldn't block operations
     }
 
-    // Increment subscription minutes_used via RPC
-    const { error: rpcError } = await supabaseAdmin.rpc('increment_minutes_used', {
-      sub_id: subscription.id,
-      minutes: minutesUsed,
-    });
+    // Only deduct from quota if mode is 'with_quota_deduction'
+    if (mode === 'with_quota_deduction') {
+      const { error: rpcError } = await supabaseAdmin.rpc('increment_minutes_used', {
+        sub_id: subscription.id,
+        minutes: minutesUsed,
+      });
 
-    if (rpcError) {
-      console.error('Failed to increment minutes_used:', rpcError);
+      if (rpcError) {
+        console.error('Failed to increment minutes_used:', rpcError);
+      }
+    } else {
+      console.log(
+        `[Usage Tracking] Analytics-only mode: tracked ${minutesUsed} minutes for user ${userId} (no quota deduction)`
+      );
     }
   } catch (error) {
     console.error('Error tracking usage:', error);
@@ -184,16 +192,30 @@ export async function checkQuota(
 }
 
 /**
- * Middleware wrapper to track usage after successful handler execution
+ * DEPRECATED: withUsageTracking middleware
  *
- * @param handler - API route handler
- * @param operationType - Type of operation to track
- * @returns Wrapped handler with usage tracking
+ * This middleware wrapper is flawed because:
+ * 1. req.body is not populated by auth middleware (it's from form data)
+ * 2. It tries to extract userId from request body instead of auth result
+ * 3. It doesn't support the new dual-mode tracking (with/without quota deduction)
+ *
+ * Instead, track usage directly in handlers after successful operations:
+ *
+ * @example
+ * const { userId } = await requireAuth();
+ * // ... perform operation ...
+ * await trackUsage(userId, 'transcription', duration, mode);
+ *
+ * DO NOT USE THIS FUNCTION - it exists only for reference and will be removed.
  */
 export function withUsageTracking(
   handler: (req: VercelRequest, res: VercelResponse) => Promise<void>,
   operationType: 'transcription' | 'summarization' | 'chat'
 ) {
+  console.warn(
+    '[DEPRECATED] withUsageTracking is deprecated and should not be used. Track usage directly in handlers.'
+  );
+
   return async (req: VercelRequest, res: VercelResponse): Promise<void> => {
     // Execute handler first
     await handler(req, res);

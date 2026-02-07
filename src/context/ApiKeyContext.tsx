@@ -13,23 +13,32 @@ interface ApiKeyContextType {
 const ApiKeyContext = createContext<ApiKeyContextType | undefined>(undefined);
 
 const STORAGE_KEY = 'trammarise_openai_api_key';
+const OLD_STORAGE_KEY = 'trammarise_openai_api_key'; // For migration from localStorage
 
 export function ApiKeyProvider({ children }: { children: ReactNode }) {
   // Initialize from storage directly in useState
   const [apiKey, setApiKeyState] = useState<string | null>(() => {
-    const storedKey = window.localStorage.getItem(STORAGE_KEY);
+    // One-time migration from localStorage to sessionStorage
+    const oldKey = window.localStorage.getItem(OLD_STORAGE_KEY);
+    if (oldKey) {
+      window.sessionStorage.setItem(STORAGE_KEY, oldKey);
+      window.localStorage.removeItem(OLD_STORAGE_KEY);
+      return oldKey;
+    }
+
+    const storedKey = window.sessionStorage.getItem(STORAGE_KEY);
     return storedKey || null;
   });
 
   const setApiKey = useCallback((key: string) => {
     const trimmedKey = key.trim();
     setApiKeyState(trimmedKey);
-    window.localStorage.setItem(STORAGE_KEY, trimmedKey);
+    window.sessionStorage.setItem(STORAGE_KEY, trimmedKey);
   }, []);
 
   const clearApiKey = useCallback(() => {
     setApiKeyState(null);
-    window.localStorage.removeItem(STORAGE_KEY);
+    window.sessionStorage.removeItem(STORAGE_KEY);
   }, []);
 
   const testConnection = useCallback(async (keyToTest: string): Promise<boolean> => {

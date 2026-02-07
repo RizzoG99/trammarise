@@ -80,6 +80,12 @@ export interface JobConfiguration {
 
   /** Expected number of speakers (2-10, optional) */
   speakersExpected?: number;
+
+  /** User ID who created this job (for ownership validation) */
+  userId?: string;
+
+  /** Whether to track usage with quota deduction (false = analytics only) */
+  shouldTrackQuota?: boolean;
 }
 
 /**
@@ -153,6 +159,9 @@ export interface TranscriptionJob {
 
   /** Last update timestamp */
   lastUpdated: Date;
+
+  /** User ID who owns this job (for authorization) */
+  userId?: string;
 }
 
 /**

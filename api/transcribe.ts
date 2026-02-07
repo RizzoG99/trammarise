@@ -15,6 +15,11 @@ import { TranscriptionProviderFactory } from './providers/factory';
 import { assembleTranscript } from './utils/transcript-assembler';
 import type { ProcessingMode } from './types/chunking';
 import type { JobConfiguration } from './types/job';
+import { requireAuth, AuthError } from './middleware/auth';
+import { rateLimit, RateLimitError, RATE_LIMITS } from './middleware/rate-limit';
+import { checkQuota, trackUsage } from './middleware/usage-tracking';
+import { validateAudioFile } from './utils/file-validator';
+import { supabaseAdmin } from './lib/supabase-admin';
 
 export const config = {
   api: {
@@ -33,6 +38,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
+    // 1. AUTHENTICATION - All users must authenticate
+    const { userId } = await requireAuth();
+
+    // 2. RATE LIMITING - Prevent abuse
+    await rateLimit(req, {
+      ...RATE_LIMITS.TRANSCRIBE,
+      keyGenerator: () => `user:${userId}`,
+    });
+
     // Parse multipart form data with busboy
     const bb = busboy({
       headers: req.headers,
@@ -60,7 +74,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const { filename, mimeType } = info;
         uploadedFilename = filename || 'audio.webm';
 
-        // Validate file type
+        // Basic MIME type check
         if (!mimeType.startsWith('audio/')) {
           file.resume();
           reject(new Error('Invalid file type. Audio files only.'));
@@ -118,12 +132,67 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ error: 'No audio file found in request' });
     }
 
-    if (!apiKey) {
-      return res.status(400).json({ error: 'API key is required' });
-    }
-
     // Narrow audioData type to Buffer (TypeScript needs explicit assertion in async callbacks)
     const audioBuffer: Buffer = audioData;
+
+    // 3. FILE VALIDATION - Magic bytes and duration check
+    // Note: We'll do a quick validation here, full validation happens during chunking
+    const mimeType = req.headers['content-type']?.split(';')[0] || 'audio/webm';
+    const validation = await validateAudioFile(audioBuffer, mimeType, 7200);
+
+    if (!validation.valid) {
+      return res.status(400).json({
+        error: 'File validation failed',
+        message: validation.error,
+      });
+    }
+
+    // 4. API KEY LOGIC - Tier-based enforcement
+    const userProvidedKey = apiKey; // From form data
+    let finalApiKey: string;
+    let shouldTrackQuota = false;
+
+    if (userProvidedKey) {
+      // User provided their own API key - use it (any tier allowed)
+      finalApiKey = userProvidedKey;
+      shouldTrackQuota = false; // Analytics only, no quota deduction
+      console.log(`[Transcribe] User ${userId} using own API key`);
+    } else {
+      // No user key provided - check tier
+      const { data: subscription, error: subError } = await supabaseAdmin
+        .from('subscriptions')
+        .select('tier')
+        .eq('user_id', userId)
+        .single();
+
+      if (subError || !subscription || subscription.tier === 'free') {
+        return res.status(403).json({
+          error: 'API key required',
+          message:
+            'Free tier users must provide their own API key. Upgrade to Pro or Team to use platform infrastructure.',
+          upgradeUrl: '/pricing',
+        });
+      }
+
+      // Pro/Team user without own key - use platform key with quota check
+      const estimatedMinutes = Math.ceil((validation.duration || 0) / 60);
+      const quotaCheck = await checkQuota(userId, estimatedMinutes);
+
+      if (!quotaCheck.allowed) {
+        return res.status(429).json({
+          error: 'Quota exceeded',
+          minutesRemaining: quotaCheck.minutesRemaining,
+          minutesRequired: quotaCheck.minutesRequired,
+          message: 'Insufficient quota. Please upgrade your plan or purchase additional credits.',
+        });
+      }
+
+      finalApiKey = process.env.OPENAI_API_KEY!;
+      shouldTrackQuota = true; // Track + deduct from quota
+      console.log(
+        `[Transcribe] User ${userId} (${subscription.tier}) using platform key with quota`
+      );
+    }
 
     // Determine processing mode from performance level
     const mode: ProcessingMode = performanceLevel === 'best_quality' ? 'best_quality' : 'balanced';
@@ -138,20 +207,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // Create job configuration with Whisper style prompt
     const jobConfig: JobConfiguration = {
-      apiKey,
+      apiKey: finalApiKey,
       mode,
       model: transcriptionModel,
       language: transcriptionLanguage,
       prompt: WHISPER_STYLE_PROMPT, // Use style prompt for clean transcription
       enableSpeakerDiarization,
       speakersExpected,
+      userId, // Store userId for ownership validation
+      shouldTrackQuota, // Track mode (with/without quota deduction)
     };
 
     // Create job
     const job = JobManager.createJob(jobConfig, {
       filename: uploadedFilename,
       fileSize: audioBuffer.length,
-      duration: 0, // Will be updated after chunking
+      duration: validation.duration || 0, // Use validated duration
       totalChunks: 0,
     });
 
@@ -173,6 +244,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       JobManager.updateJobStatus(job.jobId, 'failed', error.message);
     });
   } catch (error) {
+    if (error instanceof AuthError) {
+      return res.status(error.statusCode).json({ error: error.message });
+    }
+
+    if (error instanceof RateLimitError) {
+      res.setHeader('Retry-After', error.retryAfter.toString());
+      return res.status(429).json({
+        error: 'Rate limit exceeded',
+        retryAfter: error.retryAfter,
+      });
+    }
+
     const err = error as { message?: string };
     console.error('[Transcribe API] Error:', error);
 
@@ -180,8 +263,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       ? 413
       : err.message?.includes('Invalid file type')
         ? 415
-        : err.message?.includes('API key')
-          ? 401
+        : err.message?.includes('validation')
+          ? 400
           : 500;
 
     return res.status(status).json({
@@ -238,6 +321,13 @@ async function processJobInBackground(
       console.log(
         `[Job ${jobId}] ✅ Completed with speaker diarization (${result.text.length} chars, ${result.utterances?.length || 0} utterances)`
       );
+
+      // Track usage (after successful completion)
+      if (job.config.userId) {
+        const durationSeconds = job.metadata.duration || 0;
+        const mode = job.config.shouldTrackQuota ? 'with_quota_deduction' : 'analytics_only';
+        await trackUsage(job.config.userId, 'transcription', durationSeconds, mode);
+      }
 
       return;
     }
@@ -348,6 +438,13 @@ async function processJobInBackground(
       degradedModeActivations: stats.degradedModeActivations,
       peakConcurrency: stats.peakConcurrency,
     });
+
+    // Step 8: Track usage (after successful completion)
+    if (job.config.userId) {
+      const durationSeconds = updatedJob.metadata.duration || 0;
+      const mode = job.config.shouldTrackQuota ? 'with_quota_deduction' : 'analytics_only';
+      await trackUsage(job.config.userId, 'transcription', durationSeconds, mode);
+    }
   } catch (error) {
     const err = error as { message?: string };
     console.error(`[Job ${jobId}] ❌ Failed:`, error);
