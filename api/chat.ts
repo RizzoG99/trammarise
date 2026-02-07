@@ -1,20 +1,26 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { ProviderFactory, type ProviderType } from './providers/factory';
 import { API_VALIDATION } from '../src/utils/constants';
-import { getSummarizationModelForLevel, type PerformanceLevel } from '../src/types/performance-levels';
+import {
+  getSummarizationModelForLevel,
+  type PerformanceLevel,
+} from '../src/types/performance-levels';
 
-const { MAX_MESSAGE_LENGTH, MAX_HISTORY_ITEMS, MAX_TEXT_LENGTH, MIN_API_KEY_LENGTH, MAX_API_KEY_LENGTH } = API_VALIDATION;
+const {
+  MAX_MESSAGE_LENGTH,
+  MAX_HISTORY_ITEMS,
+  MAX_TEXT_LENGTH,
+  MIN_API_KEY_LENGTH,
+  MAX_API_KEY_LENGTH,
+} = API_VALIDATION;
 
-export default async function handler(
-  req: VercelRequest,
-  res: VercelResponse
-) {
+export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
-    const { transcript, summary, message, history, provider, apiKey, model } = req.body;
+    const { transcript, summary, message, history, provider, apiKey, model, language } = req.body;
 
     // Validate required fields with type checking
     if (!transcript || typeof transcript !== 'string') {
@@ -22,7 +28,9 @@ export default async function handler(
     }
 
     if (transcript.length > MAX_TEXT_LENGTH) {
-      return res.status(400).json({ error: `Transcript too long. Maximum ${MAX_TEXT_LENGTH} characters allowed` });
+      return res
+        .status(400)
+        .json({ error: `Transcript too long. Maximum ${MAX_TEXT_LENGTH} characters allowed` });
     }
 
     if (!summary || typeof summary !== 'string') {
@@ -30,7 +38,9 @@ export default async function handler(
     }
 
     if (summary.length > MAX_TEXT_LENGTH) {
-      return res.status(400).json({ error: `Summary too long. Maximum ${MAX_TEXT_LENGTH} characters allowed` });
+      return res
+        .status(400)
+        .json({ error: `Summary too long. Maximum ${MAX_TEXT_LENGTH} characters allowed` });
     }
 
     if (!message || typeof message !== 'string') {
@@ -42,7 +52,9 @@ export default async function handler(
     }
 
     if (message.length > MAX_MESSAGE_LENGTH) {
-      return res.status(400).json({ error: `Message too long. Maximum ${MAX_MESSAGE_LENGTH} characters allowed` });
+      return res
+        .status(400)
+        .json({ error: `Message too long. Maximum ${MAX_MESSAGE_LENGTH} characters allowed` });
     }
 
     // Validate history
@@ -51,7 +63,9 @@ export default async function handler(
     }
 
     if (history && history.length > MAX_HISTORY_ITEMS) {
-      return res.status(400).json({ error: `History too long. Maximum ${MAX_HISTORY_ITEMS} items allowed` });
+      return res
+        .status(400)
+        .json({ error: `History too long. Maximum ${MAX_HISTORY_ITEMS} items allowed` });
     }
 
     // Validate provider and API key
@@ -69,7 +83,9 @@ export default async function handler(
 
     // Validate OpenRouter-specific requirements
     if (provider === 'openrouter' && (!model || typeof model !== 'string')) {
-      return res.status(400).json({ error: 'Model is required for OpenRouter and must be a string' });
+      return res
+        .status(400)
+        .json({ error: 'Model is required for OpenRouter and must be a string' });
     }
 
     const aiProvider = ProviderFactory.getProvider(provider as ProviderType);
@@ -86,6 +102,7 @@ export default async function handler(
       history: Array.isArray(history) ? history : [],
       apiKey,
       model: actualModel, // Optional: only required for OpenRouter
+      language, // Optional: for language-specific chat prompts
     });
 
     return res.status(200).json({ response });
@@ -94,7 +111,7 @@ export default async function handler(
     console.error('Chat error:', error);
     return res.status(500).json({
       error: 'Chat failed',
-      message: err.message
+      message: err.message,
     });
   }
 }

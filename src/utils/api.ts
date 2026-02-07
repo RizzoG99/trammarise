@@ -258,14 +258,24 @@ export async function chatWithAI(
   history: ChatMessage[],
   provider: string,
   apiKey: string,
-  model?: string
+  model?: string,
+  language?: string
 ): Promise<ChatResponse> {
   const response = await fetchWithTimeout(
     '/api/chat',
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ transcript, summary, message, history, provider, apiKey, model }),
+      body: JSON.stringify({
+        transcript,
+        summary,
+        message,
+        history,
+        provider,
+        apiKey,
+        model,
+        language,
+      }),
     },
     API_DEFAULT_TIMEOUT
   );

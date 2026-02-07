@@ -1,7 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import type { LanguageCode } from '../../types/languages';
 import type { ContentType } from '../../types/content-types';
 import type { ProcessingMode } from '../../features/configuration/components/ProcessingModeSelector';
 import { SlidersHorizontal } from 'lucide-react';
@@ -10,7 +9,7 @@ import { PageLayout } from '../../components/layout/PageLayout';
 import { UploadPanel } from '../../features/upload/components/UploadPanel';
 import { RecordPanel, type RecordPanelRef } from '../../features/upload/components/RecordPanel';
 import { ContextUploadArea } from '../../features/upload/components/ContextUploadArea';
-import { LanguageSelector } from '../../features/configuration/components/LanguageSelector';
+import { EnhancedLanguageSelector } from '../../features/configuration/components/EnhancedLanguageSelector';
 import { ContentTypeSelector } from '../../features/configuration/components/ContentTypeSelector';
 import { ProcessingModeSelector } from '../../features/configuration/components/ProcessingModeSelector';
 import { NoiseProfileSelector } from '../../features/configuration/components/NoiseProfileSelector';
@@ -26,7 +25,7 @@ export function UploadRecordPage() {
   const recordPanelRef = useRef<RecordPanelRef>(null);
   const [audioFile, setAudioFile] = useState<File | Blob | null>(null);
   const [contextFiles, setContextFiles] = useState<File[]>([]);
-  const [language, setLanguage] = useState<LanguageCode>('en');
+  const [language, setLanguage] = useState<string>('auto');
   const [contentType, setContentType] = useState<ContentType>('meeting');
   const [processingMode, setProcessingMode] = useState<ProcessingMode>('balanced');
   const [noiseProfile, setNoiseProfile] = useState<NoiseProfile>('quiet');
@@ -149,7 +148,7 @@ export function UploadRecordPage() {
 
           {/* Column 2: Language + Content Type */}
           <div className="space-y-4">
-            <LanguageSelector value={language} onChange={setLanguage} />
+            <EnhancedLanguageSelector value={language} onChange={setLanguage} />
             <ContentTypeSelector value={contentType} onChange={setContentType} />
             <NoiseProfileSelector value={noiseProfile} onChange={setNoiseProfile} />
           </div>

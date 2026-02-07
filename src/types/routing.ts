@@ -1,5 +1,4 @@
 import type { AudioFile, AIConfiguration, ProcessingResult } from './audio';
-import type { LanguageCode } from './languages';
 import type { ContentType } from './content-types';
 import type { ProcessingMode } from '../features/configuration/components/ProcessingModeSelector';
 
@@ -13,7 +12,7 @@ export interface SessionData {
   contextFiles: File[];
 
   // Configuration fields captured during upload/record flow
-  language: LanguageCode;
+  language: string; // Language code (e.g., 'en', 'es', 'auto') - supports 50+ languages
   contentType: ContentType;
   processingMode: ProcessingMode;
   noiseProfile?: string; // Audio environment profile

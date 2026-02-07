@@ -133,12 +133,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       ? getTranscriptionModelForLevel(model as PerformanceLevel)
       : 'gpt-4o-mini-transcribe';
 
+    // Handle auto-detection: Convert 'auto' to undefined for Whisper API
+    const transcriptionLanguage = language === 'auto' ? undefined : language;
+
     // Create job configuration with Whisper style prompt
     const jobConfig: JobConfiguration = {
       apiKey,
       mode,
       model: transcriptionModel,
-      language,
+      language: transcriptionLanguage,
       prompt: WHISPER_STYLE_PROMPT, // Use style prompt for clean transcription
       enableSpeakerDiarization,
       speakersExpected,
