@@ -64,7 +64,8 @@ export const SpeakerTranscriptView = memo(function SpeakerTranscriptView({
   const [searchQuery, setSearchQuery] = useState('');
 
   // Create speaker-to-index map for consistent coloring
-  const speakerMap = useMemo(() => new Map<string, number>(), []);
+  // Reset when utterances change (e.g., switching sessions)
+  const speakerMap = useMemo(() => new Map<string, number>(), [utterances]);
 
   // Filter utterances by search query
   const filteredUtterances = useMemo(() => {

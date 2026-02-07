@@ -152,6 +152,33 @@ export interface Database {
         };
         Update: Partial<Database['public']['Tables']['usage_events']['Insert']>;
       };
+      credit_transactions: {
+        Row: {
+          id: string;
+          user_id: string;
+          transaction_type: 'purchase' | 'deduction' | 'refund' | 'bonus';
+          credits_amount: number;
+          balance_after: number;
+          stripe_payment_intent_id: string | null;
+          amount_paid_cents: number | null;
+          usage_event_id: string | null;
+          description: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          transaction_type: 'purchase' | 'deduction' | 'refund' | 'bonus';
+          credits_amount: number;
+          balance_after: number;
+          stripe_payment_intent_id?: string | null;
+          amount_paid_cents?: number | null;
+          usage_event_id?: string | null;
+          description?: string | null;
+          created_at?: string;
+        };
+        Update: Partial<Database['public']['Tables']['credit_transactions']['Insert']>;
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
