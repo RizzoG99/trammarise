@@ -33,6 +33,7 @@ interface ResultsStateProps {
   audioName: string;
   audioFile: AudioFile;
   result: ProcessingResult;
+  language?: string; // Language code for multi-language support
   onBack: () => void;
   onUpdateResult: (result: ProcessingResult) => void;
 }
@@ -41,6 +42,7 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
   audioName,
   audioFile,
   result,
+  language,
   onUpdateResult,
 }) => {
   const [isLoadingChat, setIsLoadingChat] = useState(false);
@@ -103,7 +105,8 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
         result.chatHistory,
         result.configuration.provider,
         apiKey,
-        result.configuration.model
+        result.configuration.model,
+        language
       );
       // Add assistant response to chat history
       const assistantMessage: ChatMessage = { role: 'assistant', content: response };
