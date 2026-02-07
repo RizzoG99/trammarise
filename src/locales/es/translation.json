@@ -8,7 +8,8 @@
     "cancel": "Cancelar",
     "back": "Atrás",
     "next": "Siguiente",
-    "processing": "Procesando"
+    "processing": "Procesando",
+    "close": "Cerrar"
   },
   "nav": {
     "home": "Inicio",
@@ -26,6 +27,11 @@
       "cancelEdit": "Cancelar edición",
       "editFile": "Editar nombre de archivo"
     }
+  },
+  "auth": {
+    "signIn": "Iniciar Sesión",
+    "signUp": "Registrarse",
+    "signOut": "Cerrar Sesión"
   },
   "home": {
     "title": "Nueva Sesión",
@@ -180,6 +186,13 @@
       "cafe": "Cafetería / Restaurante",
       "outdoor": "Exterior",
       "phone": "Teléfono / Llamada Digital"
+    },
+    "speakerDiarization": {
+      "title": "Identificación de Oradores",
+      "description": "Identifica y etiqueta diferentes oradores en la transcripción",
+      "speakersExpected": "Número de Oradores Esperados (Opcional)",
+      "speakersPlaceholder": "Auto-detectar",
+      "speakersHint": "Especifica 2-10 oradores para mayor precisión, o deja en blanco para detección automática"
     },
     "meetingType": {
       "title": "Tipo de Reunión",
@@ -376,7 +389,11 @@
       "title": "Transcripción",
       "searchPlaceholder": "Buscar en transcripción...",
       "noTranscript": "No hay transcripción disponible",
-      "matches": "{{current}} de {{total}} coincidencias"
+      "matches": "{{current}} de {{total}} coincidencias",
+      "utterances": "intervenciones",
+      "resultsFound": "resultados encontrados",
+      "noResults": "No se encontraron resultados",
+      "noUtterances": "No hay intervenciones disponibles"
     },
     "summary": {
       "title": "Resumen",
@@ -484,6 +501,40 @@
       "selectAll": "Seleccionar Todo",
       "deselectAll": "Deseleccionar Todo",
       "delete": "Eliminar Selección"
+    },
+    "migration": {
+      "title": "Sincroniza tus sesiones",
+      "successTitle": "¡Sesiones importadas!",
+      "description": "Importa tus {{count}} sesiones locales para sincronizarlas entre dispositivos y no perder nunca tu trabajo.",
+      "successMessage": "Tus sesiones locales ahora están sincronizadas en todos tus dispositivos.",
+      "importButton": "Importar ahora",
+      "importing": "Importando...",
+      "dismissButton": "Tal vez más tarde"
+    }
+  },
+  "pricing": {
+    "title": "Elige tu plan",
+    "subtitle": "Comienza gratis con tus propias claves API, o actualiza para IA alojada y funciones premium",
+    "monthly": "Mensual",
+    "annual": "Anual",
+    "save2Months": "Ahorra 2 meses",
+    "popular": "Más popular",
+    "loading": "Cargando...",
+    "saveAmount": "Ahorra ${{amount}}/año",
+    "faq": {
+      "title": "Preguntas frecuentes",
+      "byok": {
+        "question": "¿Qué significa BYOK?",
+        "answer": "BYOK (Bring Your Own Key) significa que proporcionas tu propia clave API de OpenAI. Esto te da control total y precios de pago por uso directamente desde OpenAI, sin tarifas mensuales."
+      },
+      "cancel": {
+        "question": "¿Puedo cancelar en cualquier momento?",
+        "answer": "¡Sí! Puedes cancelar tu suscripción en cualquier momento. Tu acceso continuará hasta el final de tu período de facturación, y siempre puedes volver al plan BYOK gratuito."
+      },
+      "minutes": {
+        "question": "¿Qué pasa si supero mis minutos?",
+        "answer": "Puedes comprar créditos adicionales en cualquier momento. Los minutos no utilizados no se transfieren, pero siempre puedes usar tus propias claves API para procesamiento ilimitado."
+      }
     }
   }
 }

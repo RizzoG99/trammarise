@@ -8,7 +8,8 @@
     "cancel": "Annulla",
     "back": "Indietro",
     "next": "Avanti",
-    "processing": "Elaborazione"
+    "processing": "Elaborazione",
+    "close": "Chiudi"
   },
   "nav": {
     "home": "Home",
@@ -185,6 +186,13 @@
       "cafe": "Bar / Ristorante",
       "outdoor": "All'aperto",
       "phone": "Telefono / Chiamata Digitale"
+    },
+    "speakerDiarization": {
+      "title": "Identificazione Relatori",
+      "description": "Identifica ed etichetta i diversi relatori nella trascrizione",
+      "speakersExpected": "Numero di Relatori Previsti (Opzionale)",
+      "speakersPlaceholder": "Rilevamento automatico",
+      "speakersHint": "Specifica 2-10 relatori per una maggiore precisione, oppure lascia vuoto per il rilevamento automatico"
     },
     "meetingType": {
       "title": "Tipo di Riunione",
@@ -381,7 +389,11 @@
       "title": "Trascrizione",
       "searchPlaceholder": "Cerca nella trascrizione...",
       "noTranscript": "Nessuna trascrizione disponibile",
-      "matches": "{{current}} di {{total}} corrispondenze"
+      "matches": "{{current}} di {{total}} corrispondenze",
+      "utterances": "interventi",
+      "resultsFound": "risultati trovati",
+      "noResults": "Nessun risultato trovato",
+      "noUtterances": "Nessun intervento disponibile"
     },
     "summary": {
       "title": "Riassunto",
@@ -489,6 +501,40 @@
       "selectAll": "Seleziona Tutto",
       "deselectAll": "Deseleziona Tutto",
       "delete": "Elimina Selezione"
+    },
+    "migration": {
+      "title": "Sincronizza le tue sessioni",
+      "successTitle": "Sessioni importate!",
+      "description": "Importa le tue {{count}} sessioni locali per sincronizzarle tra i dispositivi e non perdere mai il tuo lavoro.",
+      "successMessage": "Le tue sessioni locali sono ora sincronizzate su tutti i tuoi dispositivi.",
+      "importButton": "Importa ora",
+      "importing": "Importazione...",
+      "dismissButton": "Forse più tardi"
+    }
+  },
+  "pricing": {
+    "title": "Scegli il tuo piano",
+    "subtitle": "Inizia gratis con le tue chiavi API, oppure passa a un piano premium per AI ospitato e funzionalità avanzate",
+    "monthly": "Mensile",
+    "annual": "Annuale",
+    "save2Months": "Risparmia 2 mesi",
+    "popular": "Più popolare",
+    "loading": "Caricamento...",
+    "saveAmount": "Risparmia ${{amount}}/anno",
+    "faq": {
+      "title": "Domande frequenti",
+      "byok": {
+        "question": "Cosa significa BYOK?",
+        "answer": "BYOK (Bring Your Own Key) significa che fornisci la tua chiave API OpenAI. Questo ti dà il pieno controllo e prezzi pay-as-you-go direttamente da OpenAI, senza costi mensili."
+      },
+      "cancel": {
+        "question": "Posso cancellare in qualsiasi momento?",
+        "answer": "Sì! Puoi cancellare il tuo abbonamento in qualsiasi momento. Il tuo accesso continuerà fino alla fine del periodo di fatturazione e potrai sempre passare al piano BYOK gratuito."
+      },
+      "minutes": {
+        "question": "Cosa succede se supero i miei minuti?",
+        "answer": "Puoi acquistare crediti aggiuntivi in qualsiasi momento. I minuti inutilizzati non vengono trasferiti, ma puoi sempre usare le tue chiavi API per elaborazioni illimitate."
+      }
     }
   }
 }

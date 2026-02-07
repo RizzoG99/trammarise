@@ -8,7 +8,8 @@
     "cancel": "Abbrechen",
     "back": "Zurück",
     "next": "Weiter",
-    "processing": "Verarbeitung"
+    "processing": "Verarbeitung",
+    "close": "Schließen"
   },
   "nav": {
     "home": "Start",
@@ -26,6 +27,11 @@
       "cancelEdit": "Bearbeitung abbrechen",
       "editFile": "Dateinamen bearbeiten"
     }
+  },
+  "auth": {
+    "signIn": "Anmelden",
+    "signUp": "Registrieren",
+    "signOut": "Abmelden"
   },
   "home": {
     "title": "Neue Sitzung",
@@ -180,6 +186,13 @@
       "cafe": "Café / Restaurant",
       "outdoor": "Draußen",
       "phone": "Telefon / Digitaler Anruf"
+    },
+    "speakerDiarization": {
+      "title": "Sprechererkennung",
+      "description": "Identifizieren und kennzeichnen Sie verschiedene Sprecher im Transkript",
+      "speakersExpected": "Erwartete Anzahl von Sprechern (Optional)",
+      "speakersPlaceholder": "Automatische Erkennung",
+      "speakersHint": "Geben Sie 2-10 Sprecher für bessere Genauigkeit an oder lassen Sie das Feld leer für automatische Erkennung"
     },
     "meetingType": {
       "title": "Besprechungstyp",
@@ -376,7 +389,11 @@
       "title": "Transkript",
       "searchPlaceholder": "Transkript durchsuchen...",
       "noTranscript": "Kein Transkript verfügbar",
-      "matches": "{{current}} von {{total}} Übereinstimmungen"
+      "matches": "{{current}} von {{total}} Übereinstimmungen",
+      "utterances": "Äußerungen",
+      "resultsFound": "Ergebnisse gefunden",
+      "noResults": "Keine Ergebnisse gefunden",
+      "noUtterances": "Keine Äußerungen verfügbar"
     },
     "summary": {
       "title": "Zusammenfassung",
@@ -484,6 +501,40 @@
       "selectAll": "Alle auswählen",
       "deselectAll": "Alle abwählen",
       "delete": "Auswahl löschen"
+    },
+    "migration": {
+      "title": "Synchronisieren Sie Ihre Sitzungen",
+      "successTitle": "Sitzungen importiert!",
+      "description": "Importieren Sie Ihre {{count}} lokalen Sitzungen, um sie geräteübergreifend zu synchronisieren und Ihre Arbeit nie zu verlieren.",
+      "successMessage": "Ihre lokalen Sitzungen sind jetzt auf allen Ihren Geräten synchronisiert.",
+      "importButton": "Jetzt importieren",
+      "importing": "Importiere...",
+      "dismissButton": "Vielleicht später"
+    }
+  },
+  "pricing": {
+    "title": "Wählen Sie Ihren Plan",
+    "subtitle": "Starten Sie kostenlos mit Ihren eigenen API-Schlüsseln oder upgraden Sie für gehostete KI und Premium-Funktionen",
+    "monthly": "Monatlich",
+    "annual": "Jährlich",
+    "save2Months": "Sparen Sie 2 Monate",
+    "popular": "Am beliebtesten",
+    "loading": "Laden...",
+    "saveAmount": "Sparen Sie ${{amount}}/Jahr",
+    "faq": {
+      "title": "Häufig gestellte Fragen",
+      "byok": {
+        "question": "Was bedeutet BYOK?",
+        "answer": "BYOK (Bring Your Own Key) bedeutet, dass Sie Ihren eigenen OpenAI API-Schlüssel bereitstellen. Dies gibt Ihnen volle Kontrolle und Pay-as-you-go-Preise direkt von OpenAI, ohne monatliche Gebühren."
+      },
+      "cancel": {
+        "question": "Kann ich jederzeit kündigen?",
+        "answer": "Ja! Sie können Ihr Abonnement jederzeit kündigen. Ihr Zugang bleibt bis zum Ende Ihres Abrechnungszeitraums bestehen, und Sie können jederzeit zum kostenlosen BYOK-Tarif wechseln."
+      },
+      "minutes": {
+        "question": "Was passiert, wenn ich meine Minuten überschreite?",
+        "answer": "Sie können jederzeit zusätzliche Credits kaufen. Nicht genutzte Minuten werden nicht übertragen, aber Sie können immer Ihre eigenen API-Schlüssel für unbegrenzte Verarbeitung verwenden."
+      }
     }
   }
 }
