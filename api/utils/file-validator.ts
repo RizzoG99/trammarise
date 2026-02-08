@@ -1,4 +1,4 @@
-import { promises as fs } from 'fs';
+import * as fs from 'fs/promises';
 import ffmpeg from 'fluent-ffmpeg';
 import { setupFFmpeg } from './ffmpeg-setup';
 

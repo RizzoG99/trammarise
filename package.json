@@ -119,6 +119,7 @@
     "husky": "^9.1.7",
     "jsdom": "^27.3.0",
     "lint-staged": "^16.2.7",
+    "node-mocks-http": "^1.17.2",
     "playwright": "^1.57.0",
     "postcss": "^8.5.6",
     "prettier": "^3.7.4",

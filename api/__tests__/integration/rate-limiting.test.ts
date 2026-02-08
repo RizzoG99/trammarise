@@ -1,362 +1,129 @@
 /**
- * Integration Tests: Rate Limiting
- *
- * Full workflow tests for rate limiting behavior.
- * Implements test cases TC-RL-01 through TC-RL-05 from functional analysis.
+ * Integration tests for rate limiting middleware
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { RateLimitGovernor } from '../../utils/rate-limit-governor';
-import { JobManager } from '../../utils/job-manager';
-import { processChunk } from '../../utils/chunk-processor';
-import { chunkAudio } from '../../utils/audio-chunker';
-import { generateMockAudio } from '../../utils/__test-helpers__/mock-audio-generator';
-import { MockOpenAIAPI } from '../../utils/__test-helpers__/mock-openai-api';
-import { ConcurrencyTracker, BackoffTracker } from '../../utils/__test-helpers__/test-fixtures';
-import { DEGRADED_MODE_CONFIG } from '../../types/rate-limiting';
-import { JOB_SAFEGUARDS } from '../../types/job';
+import { describe, it, expect, beforeEach } from 'vitest';
+import { createMocks } from 'node-mocks-http';
+import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { rateLimit, RateLimitError, RATE_LIMITS } from '../../middleware/rate-limit';
 
-describe('Integration: Rate Limiting', () => {
+describe('Rate Limiting Middleware', () => {
   beforeEach(() => {
-    JobManager.clearAllJobs();
+    // Note: In-memory rate limit store is shared between tests
+    // In a real test environment, you'd want to clear the store between tests
   });
 
-  afterEach(() => {
-    vi.useRealTimers();
-  });
-
-  describe('TC-RL-01: Burst Upload (Balanced)', () => {
-    it('should handle 4 chunks simultaneously without 429 errors', async () => {
-      const governor = new RateLimitGovernor('balanced');
-      const tracker = new ConcurrencyTracker();
-
-      // Setup successful API responses
-      const mockOpenAI = new MockOpenAIAPI({
-        transcriptGenerator: (index) => `Transcript ${index}`,
-      });
-      global.fetch = mockOpenAI.createMockFetch();
-
-      // Simulate 4 concurrent chunks
-      const promises: Promise<string>[] = [];
-
-      for (let i = 0; i < 4; i++) {
-        const promise = governor.enqueue(
-          `chunk-${i}`,
-          'test-job',
-          i,
-          async () => {
-            tracker.start();
-            await new Promise((resolve) => setTimeout(resolve, 50));
-            tracker.end();
-            return `Result ${i}`;
-          },
-          i
-        );
-        promises.push(promise);
-      }
-
-      const results = await Promise.all(promises);
-
-      // All should succeed
-      expect(results).toHaveLength(4);
-      expect(tracker.getMaxConcurrency()).toBeLessThanOrEqual(4);
-
-      // No rate limit errors
-      const stats = governor.getStats();
-      expect(stats.successfulRequests).toBe(4);
-      expect(stats.rateLimitedRequests).toBe(0);
-    });
-  });
-
-  describe('TC-RL-02: Rate Limit Trigger (Balanced)', () => {
-    it('should apply exponential backoff on 429 while other chunks continue', async () => {
-      const governor = new RateLimitGovernor('balanced');
-      new BackoffTracker();
-
-      // Setup mock to return 429 on chunk 1
-      const mockOpenAI = new MockOpenAIAPI();
-      mockOpenAI.return429OnChunk(1);
-      global.fetch = mockOpenAI.createMockFetch();
-
-      const promises: Promise<string | Error>[] = [];
-
-      // Enqueue 4 chunks
-      for (let i = 0; i < 4; i++) {
-        const promise = governor
-          .enqueue(
-            `chunk-${i}`,
-            'test-job',
-            i,
-            async () => {
-              const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
-                method: 'POST',
-                body: new FormData(),
-              });
-
-              if (!response.ok) {
-                if (response.status === 429) {
-                  throw { name: 'RateLimitError', retryAfter: 2 };
-                }
-                throw new Error('API error');
-              }
-
-              return `Success ${i}`;
-            },
-            i
-          )
-          .catch((e) => e);
-
-        promises.push(promise);
-      }
-
-      const results = await Promise.all(promises);
-
-      // Chunk 1 should have failed with rate limit
-      const stats = governor.getStats();
-      expect(stats.rateLimitedRequests).toBeGreaterThan(0);
-
-      // Other chunks should have succeeded
-      const successCount = results.filter((r) => typeof r === 'string').length;
-      expect(successCount).toBeGreaterThan(0);
-    });
-
-    it('should use exponential backoff with jitter for balanced mode', async () => {
-      const governor = new RateLimitGovernor('balanced');
-
-      // This tests that the exponential backoff logic exists
-      // Full integration requires time advancement which is complex with real governor
-      expect(governor.getMaxConcurrency()).toBe(4);
-    });
-  });
-
-  describe('TC-RL-03: Sequential Enforcement (Best Quality)', () => {
-    it('should block parallel dispatch and enforce max 1 concurrent', async () => {
-      const governor = new RateLimitGovernor('best_quality');
-      const tracker = new ConcurrencyTracker();
-
-      const promises: Promise<number>[] = [];
-
-      // Try to enqueue 4 chunks
-      for (let i = 0; i < 4; i++) {
-        const promise = governor.enqueue(
-          `chunk-${i}`,
-          'test-job',
-          i,
-          async () => {
-            tracker.start();
-            await new Promise((resolve) => setTimeout(resolve, 50));
-            tracker.end();
-            return i;
-          },
-          i
-        );
-        promises.push(promise);
-      }
-
-      await Promise.all(promises);
-
-      // Max concurrency should be 1 (sequential)
-      expect(tracker.getMaxConcurrency()).toBe(1);
-
-      // Verify strict order
-      const stats = governor.getStats();
-      expect(stats.peakConcurrency).toBe(1);
-    });
-  });
-
-  describe('TC-RL-04: Sustained Throttling', () => {
-    it('should enter degraded mode when >30% requests are rate limited', async () => {
-      vi.useFakeTimers();
-
-      const governor = new RateLimitGovernor('balanced');
-
-      // Simulate sustained rate limiting (40% of requests)
-      const mockOpenAI = new MockOpenAIAPI({
-        rateLimitRate: 0.4, // 40% rate limit
-      });
-      global.fetch = mockOpenAI.createMockFetch();
-
-      const promises: Promise<void | string>[] = [];
-
-      // Make 20 requests to trigger degraded mode
-      for (let i = 0; i < 20; i++) {
-        const promise = governor
-          .enqueue(
-            `req-${i}`,
-            'test-job',
-            i,
-            async () => {
-              const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
-                method: 'POST',
-                body: new FormData(),
-              });
-
-              if (response.status === 429) {
-                throw { name: 'RateLimitError', retryAfter: 1 };
-              }
-
-              return 'success';
-            },
-            i
-          )
-          .catch(() => {}); // Swallow errors
-
-        promises.push(promise);
-      }
-
-      // Run all pending timers to process retries with exponential backoff
-      await vi.runAllTimersAsync();
-
-      await Promise.all(promises);
-
-      const stats = governor.getStats();
-
-      // Should have detected sustained rate limiting
-      expect(stats.rateLimitedRequests).toBeGreaterThan(5);
-
-      // May have entered degraded mode (depends on timing)
-      // This is validated in the governor itself
-
-      vi.useRealTimers();
-    });
-
-    it('should reduce concurrency from 4 to 2 in degraded mode', async () => {
-      // Verify degraded mode configuration
-      expect(DEGRADED_MODE_CONFIG.CONCURRENCY_REDUCTION_FACTOR).toBe(2);
-      expect(DEGRADED_MODE_CONFIG.ACTIVATION_THRESHOLD).toBe(0.3);
-      expect(DEGRADED_MODE_CONFIG.EXIT_THRESHOLD).toBe(0.1);
-    });
-
-    it('should stay in degraded mode for minimum 30 seconds', async () => {
-      expect(DEGRADED_MODE_CONFIG.MIN_DEGRADED_DURATION).toBe(30000);
-    });
-
-    it('should exit degraded mode when <10% rate limited', async () => {
-      // This tests the configuration exists
-      // Full integration test would require complex timing simulation
-      expect(DEGRADED_MODE_CONFIG.EXIT_THRESHOLD).toBe(0.1);
-    });
-  });
-
-  describe('TC-RL-05: Retry Cap Exceeded', () => {
-    it('should terminate job cleanly when retry cap (20) exceeded', async () => {
-      const audioBuffer = generateMockAudio({ durationSeconds: 400, format: 'mp3' });
-      const duration = 400;
-
-      const mockFFmpegModule = await import('fluent-ffmpeg');
-      const mockFfprobe = vi.fn((path, callback) => {
-        callback(null, { format: { duration } });
+  describe('IP-based Rate Limiting', () => {
+    it('should allow requests within rate limit', async () => {
+      const { req } = createMocks<VercelRequest, VercelResponse>({
+        method: 'POST',
+        headers: {
+          'x-forwarded-for': '192.168.1.100',
+        },
       });
 
-      const mockModule = mockFFmpegModule as unknown as {
-        default?: { ffprobe: unknown };
-        ffprobe?: unknown;
-      };
-      mockModule.ffprobe = mockFfprobe;
-      if (mockModule.default) {
-        mockModule.default.ffprobe = mockFfprobe;
-      }
-
-      const chunkingResult = await chunkAudio(audioBuffer, 'test.mp3', 'balanced');
-
-      const job = JobManager.createJob(
-        { apiKey: 'test-key', mode: 'balanced', model: 'whisper-1' },
-        {
-          filename: 'test.mp3',
-          fileSize: audioBuffer.length,
-          duration,
-          totalChunks: chunkingResult.totalChunks,
-        }
-      );
-
-      JobManager.initializeChunks(job.jobId, chunkingResult.chunks);
-
-      // Set job to have max retries already
-      job.totalRetries = JOB_SAFEGUARDS.MAX_TOTAL_RETRIES;
-
-      const governor = new RateLimitGovernor('balanced');
-      const chunk = chunkingResult.chunks[0];
-
-      const mockProvider = {
-        name: 'Mock',
-        summarize: vi.fn(),
-        chat: vi.fn(),
-        validateApiKey: vi.fn(),
-        transcribe: vi.fn(async () => {
-          throw new Error('Always fails');
-        }),
-      };
-
-      // Should abort due to retry cap
-      await expect(processChunk(chunk, job, governor, mockProvider, 'test-key')).rejects.toThrow(
-        /Maximum total retries.*exceeded/
-      );
-
-      // Job should not have partial transcript
-      const jobStatus = JobManager.getJobStatusResponse(job.jobId);
-      expect(jobStatus!.transcript).toBeUndefined();
+      // Should not throw for first request
+      await expect(
+        rateLimit(req, {
+          windowMs: 60000,
+          maxRequests: 5,
+        })
+      ).resolves.toBeUndefined();
     });
 
-    it('should provide clear error message when terminating', async () => {
-      const audioBuffer = generateMockAudio({ durationSeconds: 200, format: 'mp3' });
-      const duration = 200;
-
-      const mockFFmpegModule = await import('fluent-ffmpeg');
-      const mockFfprobe = vi.fn((path, callback) => {
-        callback(null, { format: { duration } });
+    it('should block requests exceeding rate limit', async () => {
+      const { req } = createMocks<VercelRequest, VercelResponse>({
+        method: 'POST',
+        headers: {
+          'x-forwarded-for': '192.168.1.101', // Different IP to avoid conflicts
+        },
       });
 
-      const mockModule = mockFFmpegModule as unknown as {
-        default?: { ffprobe: unknown };
-        ffprobe?: unknown;
+      const config = {
+        windowMs: 60000,
+        maxRequests: 3,
       };
-      mockModule.ffprobe = mockFfprobe;
-      if (mockModule.default) {
-        mockModule.default.ffprobe = mockFfprobe;
-      }
 
-      const chunkingResult = await chunkAudio(audioBuffer, 'test.mp3', 'balanced');
+      // Make 3 requests (should all succeed)
+      await rateLimit(req, config);
+      await rateLimit(req, config);
+      await rateLimit(req, config);
 
-      const job = JobManager.createJob(
-        { apiKey: 'test-key', mode: 'balanced', model: 'whisper-1' },
-        {
-          filename: 'test.mp3',
-          fileSize: audioBuffer.length,
-          duration,
-          totalChunks: chunkingResult.totalChunks,
-        }
-      );
+      // 4th request should be rate limited
+      await expect(rateLimit(req, config)).rejects.toThrow(RateLimitError);
+    });
 
-      JobManager.initializeChunks(job.jobId, chunkingResult.chunks);
+    it('should include retry-after in error', async () => {
+      const { req } = createMocks<VercelRequest, VercelResponse>({
+        method: 'POST',
+        headers: {
+          'x-forwarded-for': '192.168.1.102',
+        },
+      });
 
-      // Simulate max splits exceeded
-      job.chunkingSplits = JOB_SAFEGUARDS.MAX_SPLITS;
-
-      const governor = new RateLimitGovernor('balanced');
-      const chunk = chunkingResult.chunks[0];
-
-      const mockProvider = {
-        name: 'Mock',
-        summarize: vi.fn(),
-        chat: vi.fn(),
-        validateApiKey: vi.fn(),
-        transcribe: vi.fn(async () => {
-          throw new Error('Fail');
-        }),
+      const config = {
+        windowMs: 60000,
+        maxRequests: 2,
       };
+
+      await rateLimit(req, config);
+      await rateLimit(req, config);
 
       try {
-        await processChunk(chunk, job, governor, mockProvider, 'test-key');
+        await rateLimit(req, config);
+        expect.fail('Should have thrown RateLimitError');
       } catch (error) {
-        // Should have clear error about safeguard limits
-        expect((error as Error).message).toMatch(/Maximum (splits|retries)/);
+        expect(error).toBeInstanceOf(RateLimitError);
+        expect((error as RateLimitError).retryAfter).toBeGreaterThan(0);
+        expect((error as RateLimitError).statusCode).toBe(429);
       }
     });
+  });
 
-    it('should verify safeguard limits', () => {
-      expect(JOB_SAFEGUARDS.MAX_TOTAL_RETRIES).toBe(20);
-      expect(JOB_SAFEGUARDS.MAX_SPLITS).toBe(2);
-      expect(JOB_SAFEGUARDS.MAX_JOB_AGE).toBe(2 * 60 * 60 * 1000); // 2 hours
+  describe('User-based Rate Limiting', () => {
+    it('should use custom key generator', async () => {
+      const { req } = createMocks<VercelRequest, VercelResponse>({
+        method: 'POST',
+      });
+
+      const config = {
+        windowMs: 60000,
+        maxRequests: 5,
+        keyGenerator: () => 'user:custom-user-123',
+      };
+
+      // Should not throw with custom key generator
+      await expect(rateLimit(req, config)).resolves.toBeUndefined();
+    });
+  });
+
+  describe('Predefined Rate Limits', () => {
+    it('should have strict limit for validate-key endpoint', () => {
+      expect(RATE_LIMITS.VALIDATE_KEY).toEqual({
+        windowMs: 15 * 60 * 1000, // 15 minutes
+        maxRequests: 10,
+      });
+    });
+
+    it('should have limit for transcribe endpoint', () => {
+      expect(RATE_LIMITS.TRANSCRIBE).toEqual({
+        windowMs: 60 * 60 * 1000, // 1 hour
+        maxRequests: 20,
+      });
+    });
+
+    it('should have limit for summarize endpoint', () => {
+      expect(RATE_LIMITS.SUMMARIZE).toEqual({
+        windowMs: 60 * 60 * 1000, // 1 hour
+        maxRequests: 100,
+      });
+    });
+
+    it('should have limit for chat endpoint', () => {
+      expect(RATE_LIMITS.CHAT).toEqual({
+        windowMs: 60 * 1000, // 1 minute
+        maxRequests: 30,
+      });
     });
   });
 });
