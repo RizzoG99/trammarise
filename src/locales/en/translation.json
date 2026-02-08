@@ -15,8 +15,56 @@
     "home": "Home",
     "upload": "Upload",
     "configure": "Configure",
-    "history": "History",
-    "settings": "Settings"
+    "history": "History"
+  },
+  "userMenu": {
+    "ariaLabel": "User menu",
+    "profile": "Profile Settings",
+    "apiKeys": "API Keys",
+    "billing": "Usage & Billing",
+    "usage": "Usage",
+    "upgrade": "Upgrade to Pro",
+    "signOut": "Sign Out",
+    "manageAccount": "Manage Account",
+    "tabs": {
+      "profile": "Profile",
+      "apiKeys": "API Keys",
+      "usage": "Usage & Billing"
+    },
+    "profile": {
+      "name": "Full Name",
+      "email": "Email Address",
+      "memberSince": "Member Since",
+      "managedByClerk": "Profile managed by Clerk authentication"
+    },
+    "apiKeys": {
+      "openAiKey": "OpenAI API Key",
+      "optionalForPaid": "Optional: Use your own API key",
+      "optionalExplanation": "As a paid subscriber, you can optionally provide your own OpenAI API key to save on costs. Your subscription minutes will still be tracked.",
+      "showKey": "Show API key",
+      "hideKey": "Hide API key",
+      "testConnection": "Test Connection",
+      "testing": "Testing...",
+      "connectionSuccess": "✓ Connection successful!",
+      "connectionError": "✗ Connection failed. Please check your API key.",
+      "clear": "Clear",
+      "securityNotice": "Your API key is stored securely in your browser and never sent to our servers."
+    },
+    "usage": {
+      "freeTier": "Free Tier",
+      "freeTierDescription": "You're using the free tier with BYOK (Bring Your Own Key). Upgrade to unlock hosted API and advanced features.",
+      "upgradeTitle": "Unlock with Pro:",
+      "benefit1": "No API key required - we handle it for you",
+      "benefit2": "500 minutes of transcription per month",
+      "benefit3": "Priority processing queue",
+      "benefit4": "Advanced features: speaker diarization, chat",
+      "upgradeToPro": "Upgrade to Pro",
+      "currentPlan": "Current Plan",
+      "minutesUsed": "Minutes Used",
+      "minutesRemaining": "minutes remaining this period",
+      "renewsOn": "Renews on",
+      "manageSubscription": "Manage Subscription"
+    }
   },
   "header": {
     "export": "Export",

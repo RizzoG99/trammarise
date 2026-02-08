@@ -53,6 +53,7 @@ export const ROUTES = {
   HISTORY: '/history',
   SETUP: '/setup-api-key',
   DOCS: '/docs',
+  PRICING: '/pricing',
   PREVIEW: '/preview', // Dev only
 } as const;
 

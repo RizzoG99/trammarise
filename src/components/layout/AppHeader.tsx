@@ -1,10 +1,11 @@
 import { FileDown, AudioWaveform } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { SignInButton, UserButton, useUser } from '@clerk/clerk-react';
-import { ThemeToggle, Button } from '@/lib';
+import { SignInButton, useUser } from '@clerk/clerk-react';
+import { ThemeToggle, Button, Input } from '@/lib';
 import { useTheme } from '../../hooks/useTheme';
 import { LanguageSwitcher } from '../../features/i18n/components/LanguageSwitcher';
+import { CustomUserMenu } from '../../features/user-menu';
 import { Link, NavLink } from 'react-router-dom';
 import { ROUTES } from '@/types/routing';
 import { useHeader } from '../../hooks/useHeader';
@@ -52,8 +53,7 @@ export function AppHeader() {
             {onExport && (
               <div className="flex flex-col">
                 <div className="flex items-center gap-2">
-                  <input
-                    type="text"
+                  <Input
                     value={editValue}
                     onChange={(e) => setEditValue(e.target.value)}
                     onBlur={handleBlur}
@@ -62,16 +62,9 @@ export function AppHeader() {
                         e.currentTarget.blur();
                       }
                     }}
-                    className={`
-                      px-3 py-1 rounded-lg
-                      bg-bg-primary
-                      border ${!editValue.trim() ? 'border-accent-error' : 'border-border'}
-                      text-text-primary
-                      text-sm
-                      focus:outline-none focus:ring-2 ${!editValue.trim() ? 'focus:ring-accent-error' : 'focus:ring-primary'}
-                    `}
-                    style={{ width: '300px' }}
                     placeholder="Enter file name..."
+                    className="w-[300px]"
+                    error={!editValue.trim() ? 'File name is required' : undefined}
                   />
                   <span className="text-sm text-text-secondary">.pdf</span>
                 </div>
@@ -86,25 +79,19 @@ export function AppHeader() {
 
           {/* Center Section: Navigation */}
           <nav className="hidden md:flex items-center gap-6">
-            {[
-              { label: t('nav.history'), path: ROUTES.HISTORY },
-              { label: t('nav.settings'), path: ROUTES.SETUP },
-            ].map((tab) => (
-              <NavLink
-                key={tab.path}
-                to={tab.path}
-                className={({ isActive }) => `
-                  px-3 py-1 text-sm font-medium border-b-2 transition-colors duration-200
-                  ${
-                    isActive
-                      ? 'border-primary text-primary'
-                      : 'border-transparent text-text-secondary hover:text-text-primary hover:border-border'
-                  }
-                `}
-              >
-                {tab.label}
-              </NavLink>
-            ))}
+            <NavLink
+              to={ROUTES.HISTORY}
+              className={({ isActive }) => `
+                px-3 py-1 text-sm font-medium border-b-2 transition-colors duration-200
+                ${
+                  isActive
+                    ? 'border-primary text-primary'
+                    : 'border-transparent text-text-secondary hover:text-text-primary hover:border-border'
+                }
+              `}
+            >
+              {t('nav.history')}
+            </NavLink>
           </nav>
 
           {/* Right Section */}
@@ -122,26 +109,20 @@ export function AppHeader() {
               </Button>
             )}
 
-            {/* Authentication */}
-            {isSignedIn ? (
-              <UserButton
-                appearance={{
-                  elements: {
-                    avatarBox: 'w-8 h-8',
-                  },
-                }}
-              />
-            ) : (
-              <SignInButton mode="modal">
-                <Button variant="outline">{t('auth.signIn')}</Button>
-              </SignInButton>
-            )}
-
             {/* Language Switcher */}
             <LanguageSwitcher />
 
             {/* Theme Toggle */}
             <ThemeToggle theme={theme} onThemeChange={setTheme} />
+
+            {/* Authentication - MOVED TO LAST */}
+            {isSignedIn ? (
+              <CustomUserMenu />
+            ) : (
+              <SignInButton mode="modal">
+                <Button variant="outline">{t('auth.signIn')}</Button>
+              </SignInButton>
+            )}
           </div>
         </div>
       </div>
