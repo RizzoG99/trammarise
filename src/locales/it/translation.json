@@ -18,6 +18,57 @@
     "history": "Cronologia",
     "settings": "Impostazioni"
   },
+  "userMenu": {
+    "ariaLabel": "Menu utente",
+    "menuItems": {
+      "profile": "Impostazioni Profilo",
+      "apiKeys": "Chiavi API",
+      "usage": "Utilizzo",
+      "billing": "Utilizzo e Fatturazione",
+      "upgrade": "Aggiorna a Pro",
+      "signOut": "Esci"
+    },
+    "manageAccount": "Gestisci Account",
+    "tabs": {
+      "profile": "Profilo",
+      "apiKeys": "Chiavi API",
+      "usage": "Utilizzo e Fatturazione"
+    },
+    "profile": {
+      "name": "Nome Completo",
+      "email": "Indirizzo Email",
+      "memberSince": "Membro da",
+      "managedByClerk": "Profilo gestito dall'autenticazione Clerk"
+    },
+    "apiKeys": {
+      "openAiKey": "Chiave API OpenAI",
+      "optionalForPaid": "Facoltativo: Usa la tua chiave API",
+      "optionalExplanation": "Come abbonato a pagamento, puoi fornire la tua chiave API OpenAI per risparmiare sui costi. I tuoi minuti di abbonamento saranno comunque tracciati.",
+      "showKey": "Mostra chiave API",
+      "hideKey": "Nascondi chiave API",
+      "testConnection": "Testa Connessione",
+      "testing": "Test in corso...",
+      "connectionSuccess": "✓ Connessione riuscita!",
+      "connectionError": "✗ Connessione fallita. Controlla la tua chiave API.",
+      "clear": "Cancella",
+      "securityNotice": "La tua chiave API è memorizzata in modo sicuro nel tuo browser e non viene mai inviata ai nostri server."
+    },
+    "usage": {
+      "freeTier": "Piano Gratuito",
+      "freeTierDescription": "Stai usando il piano gratuito con BYOK (Porta la tua chiave). Aggiorna per sbloccare API ospitate e funzionalità avanzate.",
+      "upgradeTitle": "Sblocca con Pro:",
+      "benefit1": "Nessuna chiave API richiesta - ce ne occupiamo noi",
+      "benefit2": "500 minuti di trascrizione al mese",
+      "benefit3": "Coda di elaborazione prioritaria",
+      "benefit4": "Funzionalità avanzate: diarizzazione speaker, chat",
+      "upgradeToPro": "Aggiorna a Pro",
+      "currentPlan": "Piano Attuale",
+      "minutesUsed": "Minuti Utilizzati",
+      "minutesRemaining": "minuti rimanenti in questo periodo",
+      "renewsOn": "Si rinnova il",
+      "manageSubscription": "Gestisci Abbonamento"
+    }
+  },
   "header": {
     "export": "Esporta",
     "notifications": "Notifiche",

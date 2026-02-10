@@ -1,8 +1,10 @@
-import { Search, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { useMemo, useEffect, memo, useState } from 'react';
-import { GlassCard, Heading, Text } from '@/lib';
+import { GlassCard, Heading, Text, Input, Badge } from '@/lib';
+import { EmptyState } from '@/lib/components/ui/EmptyState/EmptyState';
 import { useTranslation } from 'react-i18next';
-import type { Utterance } from '../../../types/audio';
+import type { Utterance } from '@/types/audio';
+import { SPEAKER_COLORS } from '@/constants/ui-constants';
 
 export interface SpeakerTranscriptViewProps {
   utterances: Utterance[];
@@ -11,22 +13,6 @@ export interface SpeakerTranscriptViewProps {
   /** Optional: Handler when timestamp is clicked */
   onTimestampClick?: (timestampSeconds: number) => void;
 }
-
-/**
- * Speaker colors for visual distinction (up to 10 speakers)
- */
-const SPEAKER_COLORS = [
-  'from-blue-500/20 to-blue-600/10',
-  'from-green-500/20 to-green-600/10',
-  'from-purple-500/20 to-purple-600/10',
-  'from-orange-500/20 to-orange-600/10',
-  'from-pink-500/20 to-pink-600/10',
-  'from-cyan-500/20 to-cyan-600/10',
-  'from-yellow-500/20 to-yellow-600/10',
-  'from-indigo-500/20 to-indigo-600/10',
-  'from-red-500/20 to-red-600/10',
-  'from-teal-500/20 to-teal-600/10',
-];
 
 /**
  * Format timestamp in milliseconds to MM:SS format
@@ -65,6 +51,7 @@ export const SpeakerTranscriptView = memo(function SpeakerTranscriptView({
 
   // Create speaker-to-index map for consistent coloring
   // Reset when utterances change (e.g., switching sessions)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const speakerMap = useMemo(() => new Map<string, number>(), [utterances]);
 
   // Filter utterances by search query
@@ -106,25 +93,19 @@ export const SpeakerTranscriptView = memo(function SpeakerTranscriptView({
       <div className="mb-4">
         <div className="flex items-center gap-2 mb-2">
           <Heading level="h3">{t('results.transcript.title')}</Heading>
-          <span className="text-xs text-text-tertiary bg-bg-surface px-2 py-1 rounded">
+          <Badge variant="secondary" size="md">
             {utterances.length} {t('results.transcript.utterances')}
-          </span>
+          </Badge>
         </div>
 
         {/* Search Bar */}
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-tertiary" />
-          <input
-            type="text"
+          <Input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={t('results.transcript.searchPlaceholder')}
-            className="
-              w-full pl-10 pr-10 py-2 rounded-lg
-              bg-[var(--color-bg-surface)] border border-border
-              text-text-primary placeholder:text-text-tertiary
-              focus:outline-none focus:border-primary
-            "
+            className="mb-0"
+            fullWidth
           />
           {searchQuery && (
             <button
@@ -148,13 +129,12 @@ export const SpeakerTranscriptView = memo(function SpeakerTranscriptView({
       {/* Utterances List */}
       <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2">
         {filteredUtterances.length === 0 ? (
-          <div className="text-center py-8">
-            <Text variant="body" color="secondary">
-              {searchQuery
-                ? t('results.transcript.noResults')
-                : t('results.transcript.noUtterances')}
-            </Text>
-          </div>
+          <EmptyState
+            title={
+              searchQuery ? t('results.transcript.noResults') : t('results.transcript.noUtterances')
+            }
+            className="py-8 bg-transparent border-none"
+          />
         ) : (
           filteredUtterances.map((utterance) => {
             const utteranceId = `utterance-${utterances.indexOf(utterance)}`;

@@ -77,22 +77,24 @@ export function AppHeader() {
             )}
           </div>
 
-          {/* Center Section: Navigation */}
-          <nav className="hidden md:flex items-center gap-6">
-            <NavLink
-              to={ROUTES.HISTORY}
-              className={({ isActive }) => `
-                px-3 py-1 text-sm font-medium border-b-2 transition-colors duration-200
-                ${
-                  isActive
-                    ? 'border-primary text-primary'
-                    : 'border-transparent text-text-secondary hover:text-text-primary hover:border-border'
-                }
-              `}
-            >
-              {t('nav.history')}
-            </NavLink>
-          </nav>
+          {/* Center Section: Navigation - Only show when authenticated */}
+          {isSignedIn && (
+            <nav className="hidden md:flex items-center gap-6">
+              <NavLink
+                to={ROUTES.HISTORY}
+                className={({ isActive }) => `
+                  px-3 py-1 text-sm font-medium border-b-2 transition-colors duration-200
+                  ${
+                    isActive
+                      ? 'border-primary text-primary'
+                      : 'border-transparent text-text-secondary hover:text-text-primary hover:border-border'
+                  }
+                `}
+              >
+                {t('nav.history')}
+              </NavLink>
+            </nav>
+          )}
 
           {/* Right Section */}
           <div className="flex items-center gap-3">
@@ -120,7 +122,13 @@ export function AppHeader() {
               <CustomUserMenu />
             ) : (
               <SignInButton mode="modal">
-                <Button variant="outline">{t('auth.signIn')}</Button>
+                <Button
+                  variant="ghost"
+                  className="flex items-center gap-2 px-3"
+                  aria-label="Select language"
+                >
+                  <span className="text-sm font-medium">{t('auth.signIn')}</span>
+                </Button>
               </SignInButton>
             )}
           </div>

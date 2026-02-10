@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Modal } from '../../lib/components/ui/Modal/Modal';
 import { Button } from '../../lib/components/ui/Button/Button';
+import { Badge } from '@/lib/components/ui/Badge';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 
@@ -66,8 +67,10 @@ function CreditPackageCard({
       }`}
     >
       {popular && (
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-indigo-500 text-white px-3 py-1 rounded-full text-xs font-medium">
-          Most Popular
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+          <Badge variant="secondary" className="bg-indigo-500 text-white">
+            Most Popular
+          </Badge>
         </div>
       )}
       <div className="text-center">
@@ -77,8 +80,8 @@ function CreditPackageCard({
           ${price.toFixed(2)}
         </p>
         {savings && (
-          <div className="mt-2 inline-block bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 px-2 py-1 rounded text-xs font-medium">
-            Save {savings}
+          <div className="mt-2">
+            <Badge variant="success">Save {savings}</Badge>
           </div>
         )}
       </div>

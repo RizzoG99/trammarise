@@ -7,7 +7,7 @@ import { HistoryEmptyState } from '@/features/history/components/HistoryEmptySta
 import { DeleteConfirmModal } from '@/features/history/components/DeleteConfirmModal';
 import { HistoryDashboard } from '@/features/history/components/HistoryDashboard';
 import { MigrationBanner } from '@/features/history/components/MigrationBanner';
-import { LoadingSpinner } from '@/lib/components/ui/LoadingSpinner';
+import { PageLoader } from '@/lib/components/ui/PageLoader/PageLoader';
 import { Snackbar } from '@/lib/components/ui/Snackbar';
 import { Button } from '@/lib/components/ui/Button';
 import { Trash2, X } from 'lucide-react';
@@ -131,9 +131,7 @@ export function HistoryPage() {
   if (isLoading) {
     return (
       <PageLayout>
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <LoadingSpinner size="lg" />
-        </div>
+        <PageLoader fullHeight />
       </PageLayout>
     );
   }

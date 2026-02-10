@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Button } from '../Button';
 import type { ButtonVariant } from '../Button';
 
@@ -87,7 +88,7 @@ export const Modal: React.FC<ModalProps> = ({
     }
   };
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 bg-black/70 flex items-center justify-center z-[1000] animate-[fadeIn_0.2s_ease-out]"
       onClick={handleBackdropClick}
@@ -97,7 +98,7 @@ export const Modal: React.FC<ModalProps> = ({
       {...rest}
     >
       <div
-        className={`bg-white dark:bg-[#1e1e1e] rounded-xl max-w-[500px] w-[90%] max-h-[80vh] overflow-y-auto shadow-2xl animate-[slideUp_0.3s_ease-out] ${className}`}
+        className={`bg-white dark:bg-[#1e1e1e] rounded-xl w-[90%] max-h-[80vh] overflow-y-auto shadow-2xl animate-[slideUp_0.3s_ease-out] ${className}`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -129,6 +130,7 @@ export const Modal: React.FC<ModalProps> = ({
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

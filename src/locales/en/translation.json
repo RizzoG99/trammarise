@@ -19,12 +19,14 @@
   },
   "userMenu": {
     "ariaLabel": "User menu",
-    "profile": "Profile Settings",
-    "apiKeys": "API Keys",
-    "billing": "Usage & Billing",
-    "usage": "Usage",
-    "upgrade": "Upgrade to Pro",
-    "signOut": "Sign Out",
+    "menuItems": {
+      "profile": "Profile Settings",
+      "apiKeys": "API Keys",
+      "usage": "Usage",
+      "billing": "Usage & Billing",
+      "upgrade": "Upgrade to Pro",
+      "signOut": "Sign Out"
+    },
     "manageAccount": "Manage Account",
     "tabs": {
       "profile": "Profile",

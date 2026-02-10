@@ -23,11 +23,21 @@ export function UserMenuDropdown({
   };
 
   const menuItems = [
-    { icon: User, label: t('userMenu.profile'), action: () => onNavigateToModal('profile') },
-    { icon: Key, label: t('userMenu.apiKeys'), action: () => onNavigateToModal('apiKeys') },
+    {
+      icon: User,
+      label: t('userMenu.menuItems.profile', 'Profile Settings'),
+      action: () => onNavigateToModal('profile'),
+    },
+    {
+      icon: Key,
+      label: t('userMenu.menuItems.apiKeys', 'API Keys'),
+      action: () => onNavigateToModal('apiKeys'),
+    },
     {
       icon: CreditCard,
-      label: isSubscribed ? t('userMenu.billing') : t('userMenu.usage'),
+      label: isSubscribed
+        ? t('userMenu.menuItems.billing', 'Usage & Billing')
+        : t('userMenu.menuItems.usage', 'Usage'),
       action: () => onNavigateToModal('usage'),
     },
   ];
@@ -36,7 +46,7 @@ export function UserMenuDropdown({
   if (!isSubscribed) {
     menuItems.push({
       icon: Sparkles,
-      label: t('userMenu.upgrade'),
+      label: t('userMenu.menuItems.upgrade', 'Upgrade to Pro'),
       action: () => onNavigateToModal('usage'), // Opens usage tab with upgrade CTA
     });
   }
@@ -74,7 +84,7 @@ export function UserMenuDropdown({
         onClick={handleSignOut}
       >
         <LogOut className="w-4 h-4" />
-        <span>{t('userMenu.signOut')}</span>
+        <span>{t('userMenu.menuItems.signOut', 'Sign Out')}</span>
       </button>
     </div>
   );

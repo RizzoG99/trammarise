@@ -21,7 +21,7 @@ export function TierBadge({ tier, className = '' }: TierBadgeProps) {
   return (
     <span
       className={`
-        absolute -top-1 -right-1 px-1.5 py-0.5 text-[10px] font-bold
+        absolute -bottom-0.5 -right-0.5 px-1 py-0.5 text-[8px] font-bold
         rounded-full border border-current
         ${TIER_STYLES[tier]} ${className}
       `}

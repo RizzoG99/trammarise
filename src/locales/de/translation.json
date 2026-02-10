@@ -18,6 +18,57 @@
     "history": "Verlauf",
     "settings": "Einstellungen"
   },
+  "userMenu": {
+    "ariaLabel": "Benutzermenü",
+    "menuItems": {
+      "profile": "Profileinstellungen",
+      "apiKeys": "API-Schlüssel",
+      "usage": "Nutzung",
+      "billing": "Nutzung & Abrechnung",
+      "upgrade": "Auf Pro upgraden",
+      "signOut": "Abmelden"
+    },
+    "manageAccount": "Konto verwalten",
+    "tabs": {
+      "profile": "Profil",
+      "apiKeys": "API-Schlüssel",
+      "usage": "Nutzung & Abrechnung"
+    },
+    "profile": {
+      "name": "Vollständiger Name",
+      "email": "E-Mail-Adresse",
+      "memberSince": "Mitglied seit",
+      "managedByClerk": "Profil wird von Clerk-Authentifizierung verwaltet"
+    },
+    "apiKeys": {
+      "openAiKey": "OpenAI API-Schlüssel",
+      "optionalForPaid": "Optional: Verwenden Sie Ihren eigenen API-Schlüssel",
+      "optionalExplanation": "Als zahlender Abonnent können Sie optional Ihren eigenen OpenAI API-Schlüssel bereitstellen, um Kosten zu sparen. Ihre Abonnementminuten werden weiterhin verfolgt.",
+      "showKey": "API-Schlüssel anzeigen",
+      "hideKey": "API-Schlüssel ausblenden",
+      "testConnection": "Verbindung testen",
+      "testing": "Teste...",
+      "connectionSuccess": "✓ Verbindung erfolgreich!",
+      "connectionError": "✗ Verbindung fehlgeschlagen. Bitte überprüfen Sie Ihren API-Schlüssel.",
+      "clear": "Löschen",
+      "securityNotice": "Ihr API-Schlüssel wird sicher in Ihrem Browser gespeichert und niemals an unsere Server gesendet."
+    },
+    "usage": {
+      "freeTier": "Kostenloser Plan",
+      "freeTierDescription": "Sie verwenden den kostenlosen Plan mit BYOK (Bring Your Own Key). Upgraden Sie, um gehostete API und erweiterte Funktionen freizuschalten.",
+      "upgradeTitle": "Mit Pro freischalten:",
+      "benefit1": "Kein API-Schlüssel erforderlich - wir kümmern uns darum",
+      "benefit2": "500 Minuten Transkription pro Monat",
+      "benefit3": "Prioritäts-Verarbeitungswarteschlange",
+      "benefit4": "Erweiterte Funktionen: Sprecher-Diarisierung, Chat",
+      "upgradeToPro": "Auf Pro upgraden",
+      "currentPlan": "Aktueller Plan",
+      "minutesUsed": "Verwendete Minuten",
+      "minutesRemaining": "Minuten verbleiben in diesem Zeitraum",
+      "renewsOn": "Erneuert sich am",
+      "manageSubscription": "Abonnement verwalten"
+    }
+  },
   "header": {
     "export": "Exportieren",
     "notifications": "Benachrichtigungen",

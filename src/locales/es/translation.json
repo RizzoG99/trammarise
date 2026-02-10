@@ -18,6 +18,57 @@
     "history": "Historial",
     "settings": "Configuración"
   },
+  "userMenu": {
+    "ariaLabel": "Menú de usuario",
+    "menuItems": {
+      "profile": "Configuración del Perfil",
+      "apiKeys": "Claves API",
+      "usage": "Uso",
+      "billing": "Uso y Facturación",
+      "upgrade": "Actualizar a Pro",
+      "signOut": "Cerrar Sesión"
+    },
+    "manageAccount": "Administrar Cuenta",
+    "tabs": {
+      "profile": "Perfil",
+      "apiKeys": "Claves API",
+      "usage": "Uso y Facturación"
+    },
+    "profile": {
+      "name": "Nombre Completo",
+      "email": "Correo Electrónico",
+      "memberSince": "Miembro desde",
+      "managedByClerk": "Perfil administrado por autenticación Clerk"
+    },
+    "apiKeys": {
+      "openAiKey": "Clave API de OpenAI",
+      "optionalForPaid": "Opcional: Usa tu propia clave API",
+      "optionalExplanation": "Como suscriptor de pago, puedes proporcionar tu propia clave API de OpenAI para ahorrar costos. Tus minutos de suscripción seguirán siendo rastreados.",
+      "showKey": "Mostrar clave API",
+      "hideKey": "Ocultar clave API",
+      "testConnection": "Probar Conexión",
+      "testing": "Probando...",
+      "connectionSuccess": "✓ ¡Conexión exitosa!",
+      "connectionError": "✗ Conexión fallida. Por favor verifica tu clave API.",
+      "clear": "Limpiar",
+      "securityNotice": "Tu clave API se almacena de forma segura en tu navegador y nunca se envía a nuestros servidores."
+    },
+    "usage": {
+      "freeTier": "Plan Gratuito",
+      "freeTierDescription": "Estás usando el plan gratuito con BYOK (Trae tu propia clave). Actualiza para desbloquear API alojada y funciones avanzadas.",
+      "upgradeTitle": "Desbloquea con Pro:",
+      "benefit1": "No se requiere clave API - nos encargamos nosotros",
+      "benefit2": "500 minutos de transcripción al mes",
+      "benefit3": "Cola de procesamiento prioritaria",
+      "benefit4": "Funciones avanzadas: diarización de hablantes, chat",
+      "upgradeToPro": "Actualizar a Pro",
+      "currentPlan": "Plan Actual",
+      "minutesUsed": "Minutos Usados",
+      "minutesRemaining": "minutos restantes en este período",
+      "renewsOn": "Se renueva el",
+      "manageSubscription": "Administrar Suscripción"
+    }
+  },
   "header": {
     "export": "Exportar",
     "notifications": "Notificaciones",

@@ -31,7 +31,7 @@ export function ManageAccountModal({
       isOpen={isOpen}
       onClose={onClose}
       title={t('userMenu.manageAccount')}
-      className="max-w-2xl"
+      className="max-w-2xl w-full"
     >
       {/* Tab Navigation */}
       <div className="flex border-b border-border mb-6">

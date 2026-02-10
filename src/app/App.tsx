@@ -3,7 +3,7 @@ import { lazy, Suspense, useEffect, useState, useCallback } from 'react';
 import { ClerkProvider } from '@clerk/clerk-react';
 import { AppLayout } from './AppLayout';
 import { ROUTES } from '../types/routing';
-import { LoadingSpinner } from '@/lib';
+
 import { useStorageMonitor, type StorageWarningLevel } from '@/hooks/useStorageMonitor';
 import { StorageWarning } from '@/components/StorageWarning';
 
@@ -59,13 +59,7 @@ function ConfigurationPlaceholder() {
   );
 }
 
-function PageLoader() {
-  return (
-    <div className="flex h-[calc(100vh-200px)] w-full items-center justify-center">
-      <LoadingSpinner size="lg" />
-    </div>
-  );
-}
+import { PageLoader } from '@/lib/components/ui/PageLoader/PageLoader';
 
 import { migrateFromSessionStorage } from '@/utils/session-manager';
 import { HeaderProvider } from '@/context/HeaderContext';

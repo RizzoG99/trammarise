@@ -3,73 +3,13 @@ import { useSubscription } from '../../context/SubscriptionContext';
 import { GlassCard } from '../../lib/components/ui/GlassCard/GlassCard';
 import { Button } from '../../lib/components/ui/Button/Button';
 import { useNavigate } from 'react-router-dom';
+import { ProgressBar } from '@/lib/components/ui/ProgressBar/ProgressBar';
+import { Alert } from '@/lib/components/ui/Alert/Alert';
 
 interface UsageStats {
   totalMinutes: number;
   eventCount: number;
   billingPeriod: string;
-}
-
-/**
- * Progress bar component for usage visualization
- */
-function ProgressBar({
-  value,
-  max,
-  warning = false,
-}: {
-  value: number;
-  max: number;
-  warning?: boolean;
-}) {
-  const percentage = Math.min(100, (value / max) * 100);
-  const isOverLimit = value >= max;
-
-  return (
-    <div className="w-full">
-      <div className="flex justify-between text-sm mb-2">
-        <span className="text-gray-700 dark:text-gray-300">
-          {value.toFixed(1)} / {max} minutes
-        </span>
-        <span
-          className={`font-medium ${isOverLimit ? 'text-red-600 dark:text-red-400' : warning ? 'text-yellow-600 dark:text-yellow-400' : 'text-indigo-600 dark:text-indigo-400'}`}
-        >
-          {percentage.toFixed(0)}%
-        </span>
-      </div>
-      <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-        <div
-          className={`h-full transition-all duration-500 ease-out ${isOverLimit ? 'bg-red-500' : warning ? 'bg-yellow-500' : 'bg-indigo-500'}`}
-          style={{ width: `${percentage}%` }}
-          role="progressbar"
-          aria-valuenow={value}
-          aria-valuemin={0}
-          aria-valuemax={max}
-        />
-      </div>
-    </div>
-  );
-}
-
-/**
- * Alert component for warnings and notifications
- */
-function Alert({
-  children,
-  variant = 'info',
-}: {
-  children: React.ReactNode;
-  variant?: 'info' | 'warning' | 'error';
-}) {
-  const styles = {
-    info: 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-200',
-    warning:
-      'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800 text-yellow-800 dark:text-yellow-200',
-    error:
-      'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-800 dark:text-red-200',
-  };
-
-  return <div className={`p-4 rounded-lg border ${styles[variant]}`}>{children}</div>;
 }
 
 /**
