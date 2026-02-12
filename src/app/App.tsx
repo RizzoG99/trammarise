@@ -1,8 +1,9 @@
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { lazy, Suspense, useEffect, useState, useCallback } from 'react';
-import { ClerkProvider } from '@clerk/clerk-react';
+import { ClerkProvider, useUser } from '@clerk/clerk-react';
 import { AppLayout } from './AppLayout';
 import { ROUTES } from '../types/routing';
+import { WelcomePage } from '../pages/WelcomePage';
 
 import { useStorageMonitor, type StorageWarningLevel } from '@/hooks/useStorageMonitor';
 import { StorageWarning } from '@/components/StorageWarning';
@@ -72,7 +73,8 @@ if (!CLERK_PUBLISHABLE_KEY) {
   console.warn('Missing VITE_CLERK_PUBLISHABLE_KEY. Authentication features will be disabled.');
 }
 
-function App() {
+function AppRoutes() {
+  const { isSignedIn, isLoaded } = useUser();
   const navigate = useNavigate();
   const [showStorageWarning, setShowStorageWarning] = useState(false);
 
@@ -99,8 +101,12 @@ function App() {
     navigate(ROUTES.HISTORY);
   };
 
+  if (!isLoaded) {
+    return <PageLoader />;
+  }
+
   return (
-    <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY}>
+    <>
       {showStorageWarning && quota && (
         <StorageWarning
           level={warningLevel}
@@ -109,15 +115,16 @@ function App() {
           onCleanup={handleCleanup}
         />
       )}
-      <SubscriptionProvider>
-        <HeaderProvider>
-          <Suspense fallback={<PageLoader />}>
-            <Routes>
-              {/* Dev preview route */}
-              {import.meta.env.DEV && <Route path={ROUTES.PREVIEW} element={<PreviewPage />} />}
-              {/* PDF Debug route */}
-              {import.meta.env.DEV && <Route path="/debug/pdf" element={<PdfPreviewPage />} />}
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
+          {/* Dev preview route */}
+          {import.meta.env.DEV && <Route path={ROUTES.PREVIEW} element={<PreviewPage />} />}
+          {/* PDF Debug route */}
+          {import.meta.env.DEV && <Route path="/debug/pdf" element={<PdfPreviewPage />} />}
 
+          {/* Authenticated Routes */}
+          {isSignedIn ? (
+            <>
               {/* Main app routes with AppLayout wrapper */}
               <Route element={<AppLayout />}>
                 {/* Home/Upload page with split-screen */}
@@ -150,8 +157,28 @@ function App() {
 
               {/* Redirect unknown routes to home */}
               <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
-            </Routes>
-          </Suspense>
+            </>
+          ) : (
+            <>
+              {/* Unauthenticated Routes */}
+              <Route path="/" element={<WelcomePage />} />
+              
+              {/* Redirect any other access to Welcome Page */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </>
+          )}
+        </Routes>
+      </Suspense>
+    </>
+  );
+}
+
+function App() {
+  return (
+    <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY}>
+      <SubscriptionProvider>
+        <HeaderProvider>
+          <AppRoutes />
         </HeaderProvider>
       </SubscriptionProvider>
     </ClerkProvider>
