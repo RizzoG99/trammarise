@@ -12,6 +12,7 @@ interface ResultPdfDocumentProps {
   transcript: string;
   config: AIConfiguration;
   fileName: string;
+  tier?: 'free' | 'pro' | 'team';
 }
 
 /**
@@ -23,6 +24,7 @@ export function ResultPdfDocument({
   transcript,
   config,
   fileName,
+  tier = 'free',
 }: ResultPdfDocumentProps) {
   const props: PdfTemplateProps = { summary, transcript, config, fileName };
 

@@ -21,8 +21,8 @@ interface SubscriptionContextValue {
 const SubscriptionContext = createContext<SubscriptionContextValue | null>(null);
 
 // Minutes included per tier
-const TIER_MINUTES: Record<SubscriptionTier, number> = {
-  free: 0,
+export const TIER_MINUTES: Record<SubscriptionTier, number> = {
+  free: 60,
   pro: 500,
   team: 2000,
 };

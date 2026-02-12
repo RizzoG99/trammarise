@@ -45,6 +45,7 @@ export interface RouteParams {
  * Route paths as constants for type-safe navigation
  */
 export const ROUTES = {
+  WELCOME: '/welcome',
   HOME: '/',
   AUDIO: '/audio/:sessionId',
   CONFIGURE: '/configure/:sessionId',

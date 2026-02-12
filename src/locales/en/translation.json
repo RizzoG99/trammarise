@@ -562,6 +562,79 @@
       "dismissButton": "Maybe Later"
     }
   },
+  "welcome": {
+    "hero": {
+      "title": "Transform Audio into Actionable Insights",
+      "subtitle": "AI-powered transcription and summarization that turns your recordings into clear, structured notes in minutes.",
+      "cta": {
+        "getStarted": "Get Started Free",
+        "signIn": "Sign In"
+      },
+      "badge": "No credit card required"
+    },
+    "features": {
+      "title": "Everything You Need",
+      "subtitle": "Powerful tools to make your audio work for you",
+      "items": {
+        "transcription": {
+          "title": "Accurate Transcription",
+          "description": "Powered by OpenAI Whisper with support for 50+ languages and automatic speaker detection."
+        },
+        "summarization": {
+          "title": "Smart Summarization",
+          "description": "AI-generated summaries tailored to your content type — meetings, lectures, interviews, and more."
+        },
+        "editing": {
+          "title": "Audio Editing",
+          "description": "Trim and select audio regions with our waveform editor before processing."
+        },
+        "chat": {
+          "title": "Chat with Transcripts",
+          "description": "Ask questions, request refinements, or translate your transcripts with AI chat."
+        },
+        "export": {
+          "title": "PDF Export",
+          "description": "Export polished transcripts and summaries as professional PDF documents."
+        },
+        "privacy": {
+          "title": "Privacy First",
+          "description": "Your API keys stay in your browser. Audio is processed securely and never stored on our servers."
+        }
+      }
+    },
+    "howItWorks": {
+      "title": "How It Works",
+      "subtitle": "Three simple steps to transform your audio",
+      "steps": {
+        "upload": {
+          "title": "Upload or Record",
+          "description": "Drop an audio file or record directly in your browser. Supports MP3, WAV, M4A and more."
+        },
+        "process": {
+          "title": "AI Processing",
+          "description": "Whisper transcribes your audio while GPT-4 generates structured summaries tailored to your content."
+        },
+        "results": {
+          "title": "Review & Export",
+          "description": "Browse your transcript, refine with AI chat, and export as a polished PDF."
+        }
+      }
+    },
+    "pricing": {
+      "title": "Simple, Transparent Pricing",
+      "subtitle": "Start free with your own API keys, or upgrade for a fully hosted experience.",
+      "cta": "View All Plans"
+    },
+    "footer": {
+      "tagline": "AI-powered audio transcription and summarization",
+      "links": {
+        "docs": "Documentation",
+        "pricing": "Pricing",
+        "privacy": "Privacy"
+      },
+      "copyright": "© 2025 Trammarise. All rights reserved."
+    }
+  },
   "pricing": {
     "title": "Choose Your Plan",
     "subtitle": "Start for free with your own API keys, or upgrade for hosted AI and premium features",

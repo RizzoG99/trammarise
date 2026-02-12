@@ -20,15 +20,19 @@ import {
   validateEnvironmentConfiguration,
 } from '../../utils/config-helper';
 
+import { UpgradeModal, type UpgradeTrigger } from '@/components/marketing/UpgradeModal';
+
 export function ProcessingPage() {
   const { t } = useTranslation();
   const { sessionId } = useParams();
   const { session, isLoading, updateSession } = useSessionStorage(sessionId || null);
-  const { goToResults, goToAudio } = useRouteState();
+  const { goToResults, goToAudio, goToHome } = useRouteState();
 
   const [progress, setProgress] = useState(0);
   const [currentStep, setCurrentStep] = useState<AudioStep>('uploading');
   const [error, setError] = useState<string | null>(null);
+  const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
+  const [upgradeTrigger, setUpgradeTrigger] = useState<UpgradeTrigger>('limit_reached');
 
   // Real audio processing hook
   const { startProcessing, cancel, isProcessing } = useAudioProcessing({
@@ -44,13 +48,19 @@ export function ProcessingPage() {
     },
     onError: (err) => {
       console.error('Processing error:', err);
-      setError(err.message);
+      if (err.message.includes('Usage limit')) {
+        setUpgradeTrigger('limit_reached');
+        setIsUpgradeModalOpen(true);
+        // Do not display generic error UI, just show modal
+      } else {
+        setError(err.message);
+      }
     },
   });
 
   // Start processing on mount
   useEffect(() => {
-    if (!session || !session.audioFile || isProcessing || error || session.result) return;
+    if (!session || !session.audioFile || isProcessing || error || session.result || isUpgradeModalOpen) return;
 
     let config;
     try {
@@ -69,14 +79,23 @@ export function ProcessingPage() {
 
     // Start real processing
     startProcessing(session, config);
-  }, [session, isProcessing, error, startProcessing]);
+  }, [session, isProcessing, error, startProcessing, isUpgradeModalOpen]);
+
+  // Handle modal close - redirect to home/dashboard if they can't proceed
+  const handleUpgradeModalClose = () => {
+    setIsUpgradeModalOpen(false);
+    // If they closed the modal without upgrading, we should probably go back
+    // But checking if they upgraded is hard synchronously.
+    // Let's just go back to home for now to avoid loop/stuck state.
+    goToHome();
+  };
 
   const handleCancel = () => {
     cancel();
     goToAudio();
   };
 
-  // Derive steps from progress for UI (memoized to prevent unnecessary re-renders)
+  // ... (Steps memoization) ...
   const steps: ProcessingStep[] = useMemo(
     () => [
       {
@@ -167,6 +186,12 @@ export function ProcessingPage() {
           {t('common.cancel')}
         </Button>
       </div>
+      
+      <UpgradeModal
+        isOpen={isUpgradeModalOpen}
+        onClose={handleUpgradeModalClose}
+        trigger={upgradeTrigger}
+      />
     </PageLayout>
   );
 }

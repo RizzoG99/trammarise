@@ -165,11 +165,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         .eq('user_id', userId)
         .single();
 
-      if (subError || !subscription || subscription.tier === 'free') {
+      if (subError || !subscription) {
         return res.status(403).json({
-          error: 'API key required',
+          error: 'Subscription required',
           message:
-            'Free tier users must provide their own API key. Upgrade to Pro or Team to use platform infrastructure.',
+            'Please check your subscription status.',
           upgradeUrl: '/pricing',
         });
       }

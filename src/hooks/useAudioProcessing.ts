@@ -40,10 +40,15 @@ interface UseAudioProcessingOptions {
  * @param options - Callbacks for progress, completion, and errors
  * @returns Processing control functions
  */
+import { useSubscription, TIER_MINUTES } from '../context/SubscriptionContext';
+
+// ... existing imports ...
+
 export function useAudioProcessing({ onProgress, onComplete, onError }: UseAudioProcessingOptions) {
   const [isProcessing, setIsProcessing] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
   const currentJobIdRef = useRef<string | null>(null);
+  const { subscription } = useSubscription();
 
   /**
    * Start the audio processing workflow (server-side chunking)
@@ -54,6 +59,25 @@ export function useAudioProcessing({ onProgress, onComplete, onError }: UseAudio
         console.warn('Processing already in progress');
         return;
       }
+
+      // Check usage limits before starting
+      // We check if they have ANY minutes left. Strict duration check happens on backend.
+      if (subscription) {
+        const minutesRemaining =
+          (TIER_MINUTES[subscription.tier] || 0) - (subscription.minutes_used || 0);
+
+        if (minutesRemaining <= 0 && subscription.tier !== 'pro' && subscription.tier !== 'team') {
+          // Technically Pro/Team should have high limits, but if they hit it, they hit it.
+          // However, strictly blocking Free users.
+          const error = new Error('Usage limit exceeded. Please upgrade to continue.');
+          onError(error);
+          return;
+        }
+      }
+
+      // ... unfortunately TIER_MINUTES is not exported from context.
+      // I should expose `isOverLimit` or `minutesRemaining` from Context.
+      // Let's check SubscriptionContext again.
 
       setIsProcessing(true);
       const abortController = new AbortController();
@@ -206,7 +230,7 @@ function handleError(errorMsg: string, _session: SessionData, onError: (error: E
     onError(
       new Error(
         'Transcription job failed or timed out. This may happen with very long audio files. ' +
-          'Please try again or split your audio into shorter segments.'
+        'Please try again or split your audio into shorter segments.'
       )
     );
     return;
@@ -217,9 +241,9 @@ function handleError(errorMsg: string, _session: SessionData, onError: (error: E
     onError(
       new Error(
         'Processing timed out. Your audio may be too long or complex. Try:\n' +
-          '1. Trimming the audio to a shorter segment\n' +
-          '2. Using a faster model\n' +
-          '3. Splitting into smaller files'
+        '1. Trimming the audio to a shorter segment\n' +
+        '2. Using a faster model\n' +
+        '3. Splitting into smaller files'
       )
     );
     return;
@@ -230,8 +254,8 @@ function handleError(errorMsg: string, _session: SessionData, onError: (error: E
     onError(
       new Error(
         'Invalid API credentials. Please check your API keys in .env.local:\n' +
-          'VITE_OPENAI_API_KEY=sk-...\n\n' +
-          'Get your key at: https://platform.openai.com/api-keys'
+        'VITE_OPENAI_API_KEY=sk-...\n\n' +
+        'Get your key at: https://platform.openai.com/api-keys'
       )
     );
     return;

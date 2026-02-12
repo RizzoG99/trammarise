@@ -2,15 +2,26 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { requireAuth } from '../middleware/auth';
 import { supabaseAdmin } from '../lib/supabase-admin';
 
+// Define limits in minutes
+const TIER_LIMITS = {
+  free: 60,
+  pro: 500,
+  team: 2000,
+};
+
 /**
  * Get current month usage for authenticated user
  *
- * Returns total minutes consumed and event count for the current billing period
+ * Returns total minutes consumed, event count, and limit status
  *
  * @returns {
  *   totalMinutes: number,
  *   eventCount: number,
- *   billingPeriod: string (ISO date)
+ *   billingPeriod: string (ISO date),
+ *   tier: 'free' | 'pro' | 'team',
+ *   limit: number,
+ *   remainingMinutes: number,
+ *   isOverLimit: boolean
  * }
  */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -27,7 +38,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const month = String(now.getMonth() + 1).padStart(2, '0'); // Month is 0-indexed
     const billingPeriod = `${year}-${month}-01`;
 
-    // Query usage events for current billing period
+    // 1. Get User's Subscription Tier
+    const { data: subscription } = await supabaseAdmin
+      .from('subscriptions')
+      .select('tier, status')
+      .eq('user_id', userId)
+      .in('status', ['active', 'trialing'])
+      .single();
+
+    const tier = (subscription?.tier as 'free' | 'pro' | 'team') || 'free';
+    const limit = TIER_LIMITS[tier] || TIER_LIMITS.free;
+
+    // 2. Query usage events for current billing period
     const { data: events, error } = await supabaseAdmin
       .from('usage_events')
       .select('minutes_consumed')
@@ -39,15 +61,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(500).json({ error: 'Failed to fetch usage data' });
     }
 
-    // Calculate totals
+    // 3. Calculate totals & Limits
     const totalMinutes =
       events?.reduce((sum, event) => sum + (event.minutes_consumed || 0), 0) || 0;
     const eventCount = events?.length || 0;
+    const remainingMinutes = Math.max(0, limit - totalMinutes);
+    const isOverLimit = totalMinutes >= limit;
 
     return res.status(200).json({
       totalMinutes,
       eventCount,
       billingPeriod: `${billingPeriod}T00:00:00.000Z`,
+      tier,
+      limit,
+      remainingMinutes,
+      isOverLimit,
     });
   } catch (error) {
     console.error('Error in usage/current:', error);

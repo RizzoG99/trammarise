@@ -23,7 +23,7 @@ interface CheckQuotaOptions {
 }
 
 const TIER_MINUTES: Record<string, number> = {
-  free: 0,
+  free: 60,
   pro: 500,
   team: 2000,
 };

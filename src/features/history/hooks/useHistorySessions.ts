@@ -10,6 +10,7 @@ import {
   deleteSession as deleteSessionFromStorage,
 } from '@/utils/session-manager';
 import { sessionRepository } from '@/repositories/SessionRepository';
+import { useSubscription } from '@/context/SubscriptionContext';
 
 interface UseHistorySessionsReturn {
   sessions: HistorySession[];
@@ -17,69 +18,28 @@ interface UseHistorySessionsReturn {
   error: string | null;
   deleteSession: (sessionId: string) => Promise<void>;
   reload: () => Promise<void>;
+  totalCount: number;
 }
 
-/**
- * Loads session metadata only (not full audio blobs) for performance
- */
-async function loadOneSession(sessionId: string): Promise<HistorySession | null> {
-  const sessionData = loadSessionMetadata(sessionId);
+// ... existing code ...
 
-  if (!sessionData) {
-    return null;
-  }
-
-  const fileSizeBytes = sessionData.fileSizeBytes as number | undefined;
-  const audioName = sessionData.audioName || 'Unknown';
-
-  const rawLanguage = sessionData.configuration?.language || sessionData.language;
-  const language: LanguageCode =
-    typeof rawLanguage === 'string' && isLanguageCode(rawLanguage) ? rawLanguage : 'en';
-
-  return {
-    sessionId,
-    audioName,
-    contentType: (sessionData.configuration?.contentType || sessionData.contentType) as ContentType,
-    language,
-    hasTranscript: !!sessionData.result?.transcript,
-    hasSummary: !!sessionData.result?.summary,
-    createdAt: sessionData.createdAt,
-    updatedAt: sessionData.updatedAt,
-    fileSizeBytes,
-  };
-}
-
-/**
- * Load sessions from localStorage
- */
-async function loadSessionsFromLocal(): Promise<HistorySession[]> {
-  const sessionIds = getAllSessionIds();
-
-  const results = await Promise.allSettled(sessionIds.map((id) => loadOneSession(id)));
-  const loadedSessions = results
-    .filter((r): r is PromiseFulfilledResult<HistorySession | null> => r.status === 'fulfilled')
-    .map((r) => r.value)
-    .filter((s): s is HistorySession => s !== null);
-
-  return loadedSessions;
-}
-
-/**
- * Hook to manage loading and deleting history sessions
- * Loads metadata only (not full audio blobs) for performance
- * Fetches from API when authenticated, localStorage otherwise
- */
 export function useHistorySessions(): UseHistorySessionsReturn {
   const [sessions, setSessions] = useState<HistorySession[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { isSignedIn } = useUser();
+  const { subscription } = useSubscription();
+  const userTier = subscription?.tier || 'free';
 
   const loadSessions = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
     try {
+      let loadedSessions: HistorySession[] = [];
+
+      // ... (fetching logic remains same) ...
       // If authenticated, fetch from API
       if (isSignedIn) {
         try {
@@ -95,43 +55,50 @@ export function useHistorySessions(): UseHistorySessionsReturn {
             updatedAt: new Date(session.updatedAt).getTime(),
             fileSizeBytes: session.fileSizeBytes,
           }));
-          setSessions(apiSessions);
+          loadedSessions = apiSessions;
         } catch (apiError) {
           // Fall back to localStorage if API fails
           console.warn('API fetch failed, falling back to localStorage:', apiError);
-          const localSessions = await loadSessionsFromLocal();
-          setSessions(localSessions);
+          loadedSessions = await loadSessionsFromLocal();
         }
       } else {
         // Not authenticated, use localStorage
-        const localSessions = await loadSessionsFromLocal();
-        setSessions(localSessions);
+        loadedSessions = await loadSessionsFromLocal();
       }
+
+      setTotalCount(loadedSessions.length);
+
+      // Apply Tier Limits (Free: Max 5 items)
+      if (userTier === 'free') {
+        // Enforce 5 item limit for Free tier
+        const limitedSessions = loadedSessions.slice(0, 5);
+        setSessions(limitedSessions);
+      } else {
+        setSessions(loadedSessions);
+      }
+
     } catch (err) {
       setError('Failed to load sessions');
       console.error('Error loading sessions:', err);
     } finally {
       setIsLoading(false);
     }
-  }, [isSignedIn]);
+  }, [isSignedIn, userTier]);
 
-  useEffect(() => {
-    loadSessions();
-  }, [loadSessions]);
-
+  // ... (deleteSession logic) ...
   const deleteSession = useCallback(
     async (sessionId: string) => {
-      // Optimistic update: remove immediately
+      // Optimistic update
       setSessions((prev) => prev.filter((s) => s.sessionId !== sessionId));
+      setTotalCount((prev) => Math.max(0, prev - 1));
       setError(null);
 
       try {
         await deleteSessionFromStorage(sessionId);
       } catch (err) {
-        // Revert on error: reload sessions from storage to ensure sync
+        // Revert on error
         await loadSessions();
         setError('Failed to delete session');
-        console.error('Error deleting session:', err);
         throw err;
       }
     },
@@ -144,5 +111,6 @@ export function useHistorySessions(): UseHistorySessionsReturn {
     error,
     deleteSession,
     reload: loadSessions,
+    totalCount,
   };
 }

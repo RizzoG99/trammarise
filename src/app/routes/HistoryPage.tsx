@@ -10,7 +10,15 @@ import { MigrationBanner } from '@/features/history/components/MigrationBanner';
 import { PageLoader } from '@/lib/components/ui/PageLoader/PageLoader';
 import { Snackbar } from '@/lib/components/ui/Snackbar';
 import { Button } from '@/lib/components/ui/Button';
-import { Trash2, X } from 'lucide-react';
+import { Trash2, X, Search, Filter, Lock, FileAudio } from 'lucide-react';
+
+import { useSubscription } from '@/context/SubscriptionContext';
+import { UpgradeModal } from '@/components/marketing/UpgradeModal';
+
+import { Input } from '@/lib/components/ui/Input';
+import { Select } from '@/lib/components/ui/Select';
+import { GlassCard } from '@/lib/components/ui/GlassCard';
+import { EmptyState } from '@/lib/components/ui/EmptyState';
 
 import { useHistorySessions } from '@/features/history/hooks/useHistorySessions';
 import { useHistoryFilters } from '@/features/history/hooks/useHistoryFilters';
@@ -22,7 +30,9 @@ import { useTranslation } from 'react-i18next';
 export function HistoryPage() {
   const { t } = useTranslation();
   const { isSignedIn } = useUser();
-  const { sessions, isLoading, error, deleteSession, reload } = useHistorySessions();
+  const { subscription } = useSubscription();
+  const userTier = subscription?.tier || 'free';
+  const { sessions, isLoading, error, deleteSession, reload, totalCount } = useHistorySessions();
   const {
     searchQuery,
     contentTypeFilter,
@@ -42,6 +52,7 @@ export function HistoryPage() {
   const [sessionToDelete, setSessionToDelete] = useState<HistorySession | null>(null);
   const [bulkDeleteCount, setBulkDeleteCount] = useState<number | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
   const [snackbar, setSnackbar] = useState<{
     message: string;
     variant: 'success' | 'error';
@@ -161,96 +172,123 @@ export function HistoryPage() {
 
   const hasAnySessions = sessions.length > 0;
   const hasFilteredResults = filteredSessions.length > 0;
+  
+  // Check if we need to show the locked history banner
+  const showLockedHistoryBanner = userTier === 'free' && totalCount > 5;
+  const lockedCount = Math.max(0, totalCount - 5);
 
   return (
     <PageLayout>
-      <div className="max-w-7xl mx-auto px-4 md:px-8 py-12 pb-32 relative overscroll-y-none">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+      <div className="min-h-screen bg-bg-primary text-text-primary p-4 md:p-8">
+      <div className="max-w-7xl mx-auto space-y-8">
+        
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400 mb-2">
               {t('history.title')}
             </h1>
-            <p className="text-gray-500 dark:text-gray-400 mt-1">{t('history.description')}</p>
+            <p className="text-slate-400">
+              {t('history.subtitle', { count: totalCount })}
+            </p>
           </div>
-
-          {hasAnySessions && (
-            <div className="text-sm font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-3 py-1.5 rounded-full self-start md:self-auto">
-              {t('history.stats.recordingCount', { count: sessions.length })}
-            </div>
-          )}
+          
+          <div className="flex items-center gap-3">
+             {/* Batch Actions will go here */}
+          </div>
         </div>
 
-        {/* Migration Banner - Only show for authenticated users */}
-        {isSignedIn && <MigrationBanner onImportComplete={reload} />}
+        {/* Filters & Search */}
+        <GlassCard variant="glow" className="p-4 flex flex-col md:flex-row gap-4 items-center justify-between sticky top-4 z-30">
+          <div className="relative w-full md:w-96">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={t('history.searchPlaceholder')}
+              className="pl-10 bg-slate-900/50 border-white/10 text-white placeholder:text-slate-500 focus:ring-primary/50"
+            />
+          </div>
+          
+          <div className="flex items-center gap-3 w-full md:w-auto">
+             <Select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as any)}
+                className="bg-slate-900/50 border-white/10 text-slate-300"
+             >
+                <option value="date-desc">{t('history.sort.newest')}</option>
+                <option value="date-asc">{t('history.sort.oldest')}</option>
+                <option value="name-asc">{t('history.sort.nameAsc')}</option>
+                <option value="name-desc">{t('history.sort.nameDesc')}</option>
+             </Select>
+             {/* Additional Filters can be added here */}
+          </div>
+        </GlassCard>
 
-        {/* New Insights Dashboard */}
-        {hasAnySessions && <HistoryDashboard sessions={sessions} />}
-
-        {hasAnySessions && (
-          <HistoryFilters
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            contentTypeFilter={contentTypeFilter}
-            onContentTypeChange={setContentTypeFilter}
-            sortBy={sortBy}
-            onSortChange={setSortBy}
-            hasActiveFilters={hasActiveFilters}
-            onClearFilters={clearFilters}
-          />
+        {/* Selection Bar */}
+        {hasSelection && (
+           <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-40 w-[90%] max-w-2xl animate-in slide-in-from-bottom-4 fade-in duration-300">
+              <GlassCard variant="primary" className="p-4 flex items-center justify-between shadow-2xl shadow-blue-900/40 border-blue-500/20 backdrop-blur-xl">
+                 <div className="flex items-center gap-4">
+                    <span className="text-blue-100 font-medium px-3 py-1 bg-blue-500/20 rounded-full text-sm">
+                       {selectedIds.size} selected
+                    </span>
+                    <Button variant="ghost" size="sm" onClick={selectAll} className="text-blue-200 hover:text-white hover:bg-blue-500/20">
+                       Select All
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={clearSelection} className="text-blue-200 hover:text-white hover:bg-blue-500/20">
+                       Clear
+                    </Button>
+                 </div>
+                 <div className="flex items-center gap-2">
+                    <Button 
+                       variant="destructive" 
+                       onClick={handleBulkDelete}
+                       className="bg-red-500/20 text-red-200 hover:bg-red-500/30 border border-red-500/30"
+                    >
+                       <Trash2 className="w-4 h-4 mr-2" />
+                       Delete
+                    </Button>
+                 </div>
+              </GlassCard>
+           </div>
         )}
 
-        {/* Batch Action Floating Bar */}
-        <div
-          className={`fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50 transition-all duration-300 ${hasSelection ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0 pointer-events-none'}`}
-        >
-          <div className="bg-white dark:bg-gray-800 rounded-full shadow-xl border border-gray-200 dark:border-gray-700 px-6 py-3 flex items-center gap-4">
-            <span className="font-semibold text-gray-900 dark:text-white whitespace-nowrap">
-              {t('history.batch.selected', { count: selectedIds.size })}
-            </span>
-            <div className="h-6 w-px bg-gray-200 dark:bg-gray-700 mx-2" />
-            <Button
-              variant="ghost"
-              onClick={
-                selectedIds.size === filteredSessions.length
-                  ? clearSelection
-                  : () => selectAll(filteredSessions.map((s) => s.sessionId))
-              }
-              className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white rounded-full"
-            >
-              {selectedIds.size === filteredSessions.length
-                ? t('history.batch.deselectAll')
-                : t('history.batch.selectAll')}
-            </Button>
-            <Button
-              variant="ghost"
-              onClick={handleBulkDelete}
-              className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full"
-            >
-              <Trash2 className="w-4 h-4 mr-2" />
-              {t('history.batch.delete')}
-            </Button>
-            <Button
-              variant="ghost"
-              onClick={clearSelection}
-              className="ml-2 !p-2 rounded-full text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
-            >
-              <X className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
+        {/* Pro Banner */}
+        {showLockedHistoryBanner && (
+          <GlassCard variant="primary" className="p-6 border-amber-500/20 bg-amber-500/5">
+             <div className="flex items-center gap-4">
+                <div className="p-3 bg-amber-500/20 rounded-full text-amber-400">
+                   <Lock className="w-6 h-6" />
+                </div>
+                <div>
+                   <h3 className="text-lg font-bold text-amber-100">Unlock Full History</h3>
+                   <p className="text-amber-200/70">Upgrade to Pro to access all your past recordings forever.</p>
+                </div>
+                <Button className="ml-auto bg-amber-500 text-black hover:bg-amber-400 border-0" onClick={() => setIsUpgradeModalOpen(true)}>
+                   Upgrade Now
+                </Button>
+             </div>
+          </GlassCard>
+        )}
 
-        {hasFilteredResults ? (
-          <HistoryList
-            groupedSessions={groupedSessions}
-            onDelete={handleDeleteClick}
-            selectedIds={selectedIds}
-            onToggleSelection={toggleSelection}
-            selectionMode={hasSelection}
-          />
+        {/* Grid Content */}
+        {filteredSessions.length > 0 ? (
+           <HistoryList
+              groupedSessions={groupedSessions}
+              onDelete={handleDeleteClick}
+              selectedIds={selectedIds}
+              onToggleSelection={toggleSelection}
+              selectionMode={hasSelection}
+           />
         ) : (
-          <HistoryEmptyState hasFilters={hasActiveFilters} onClearFilters={clearFilters} />
+           <HistoryEmptyState 
+              hasFilters={hasActiveFilters} 
+              onClearFilters={clearFilters} 
+           />
         )}
       </div>
+    </div>
 
       <DeleteConfirmModal
         isOpen={!!sessionToDelete || !!bulkDeleteCount}
@@ -269,6 +307,13 @@ export function HistoryPage() {
           onClose={() => setSnackbar(null)}
         />
       )}
+      
+      <UpgradeModal
+        isOpen={isUpgradeModalOpen}
+        onClose={() => setIsUpgradeModalOpen(false)}
+        trigger="history_limit"
+      />
     </PageLayout>
   );
 }
+```

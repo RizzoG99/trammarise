@@ -38,6 +38,9 @@ interface ResultsStateProps {
   onUpdateResult: (result: ProcessingResult) => void;
 }
 
+import { useSubscription } from '../../context/SubscriptionContext';
+import { UpgradeModal, type UpgradeTrigger } from '../../components/marketing/UpgradeModal';
+
 export const ResultsState: React.FC<ResultsStateProps> = ({
   audioName,
   audioFile,
@@ -50,6 +53,13 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
   const [isPdfGenerating, setIsPdfGenerating] = useState(false);
   const [pdfError, setPdfError] = useState<string | null>(null);
   const [pdfSuccess, setPdfSuccess] = useState(false);
+  
+  // Upgrade Modal State
+  const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
+  const [upgradeTrigger, setUpgradeTrigger] = useState<UpgradeTrigger>('generic');
+
+  const { subscription } = useSubscription();
+  const userTier = subscription?.tier || 'free';
 
   // Get current filename from global header context
   const { fileName } = useHeader();
@@ -82,7 +92,23 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
     }
   };
 
+  const handleChatOpen = () => {
+    if (userTier === 'free') {
+      setUpgradeTrigger('chat_gate');
+      setIsUpgradeModalOpen(true);
+      return;
+    }
+    setIsChatOpen(true);
+  };
+
   const handleSendMessage = async (message: string) => {
+    // Double check gating although UI should prevent it
+    if (userTier === 'free') {
+       setUpgradeTrigger('chat_gate');
+       setIsUpgradeModalOpen(true);
+       return;
+    }
+
     setIsLoadingChat(true);
 
     // Add user message to chat history
@@ -144,7 +170,13 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
       // Use client-side PDF generation with @react-pdf/renderer
       // Dynamically import to reduce bundle size (1.6MB+)
       const { generatePDF } = await import('../../utils/pdf-generator');
-      await generatePDF(result.summary, result.transcript, result.configuration, fileName);
+      await generatePDF(
+        result.summary, 
+        result.transcript, 
+        result.configuration, 
+        fileName,
+        userTier
+      );
 
       console.log('✅ PDF downloaded successfully');
       setPdfSuccess(true);
@@ -158,7 +190,7 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
     } finally {
       setIsPdfGenerating(false);
     }
-  }, [result.summary, result.transcript, result.configuration, fileName]);
+  }, [result.summary, result.transcript, result.configuration, fileName, userTier]);
 
   // Sync header configuration
   useHeaderConfig({
@@ -188,7 +220,7 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
         }
         floatingChatButton={
           <FloatingChatButton
-            onClick={() => setIsChatOpen(true)}
+            onClick={handleChatOpen}
             isOpen={isChatOpen}
             hasNewMessages={false}
           />
@@ -210,6 +242,13 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
             </Modal>
           )
         }
+      />
+
+      {/* Upgrade Modal */}
+      <UpgradeModal
+        isOpen={isUpgradeModalOpen}
+        onClose={() => setIsUpgradeModalOpen(false)}
+        trigger={upgradeTrigger}
       />
 
       {/* PDF Generation Loading Modal */}
