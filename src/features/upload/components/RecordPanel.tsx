@@ -68,7 +68,7 @@ export const RecordPanel = forwardRef<RecordPanelRef, RecordPanelProps>(
     };
 
     return (
-      <GlassCard variant="light" className="p-6">
+      <GlassCard variant="dark" className="p-6 h-full flex flex-col justify-between">
         {/* Header with Status Indicator */}
         <div className="flex items-center justify-between mb-4">
           <Heading level="h3">{t('home.recordTitle')}</Heading>

@@ -128,7 +128,7 @@ export function UploadPanel({ onFileUpload, uploadedFile, onFileRemove }: Upload
   };
 
   return (
-    <GlassCard variant="light" className="p-6">
+    <GlassCard variant="dark" className="p-6 h-full flex flex-col justify-between">
       <Heading level="h3" className="mb-4">
         {t('home.uploadTitle')}
       </Heading>
