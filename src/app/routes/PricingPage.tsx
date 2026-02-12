@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useUser } from '@clerk/clerk-react';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { Button } from '@/lib/components/ui/Button';
+import { GlassCard } from '@/lib';
 import { LoadingSpinner } from '@/lib/components/ui/LoadingSpinner';
 import { Check, Zap } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -202,18 +203,17 @@ export function PricingPage() {
             const isLoading = loadingTier === tier.id;
 
             return (
-              <div
+              <GlassCard
                 key={tier.id}
-                className={`relative rounded-2xl border-2 ${
-                  tier.popular
-                    ? 'border-indigo-500 dark:border-indigo-400 shadow-xl scale-105'
-                    : 'border-gray-200 dark:border-gray-700'
-                } bg-white dark:bg-gray-800 p-8 transition-all hover:shadow-lg`}
+                variant={tier.popular ? 'glow' : 'light'}
+                className={`relative p-8 transition-all hover:shadow-glass hover:-translate-y-1 ${
+                  tier.popular ? 'border-primary/50 scale-105 z-10' : ''
+                }`}
               >
                 {/* Popular Badge */}
                 {tier.popular && (
                   <div className="absolute -top-5 left-0 right-0 flex justify-center">
-                    <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 px-4 py-1 text-sm font-semibold text-white shadow-lg">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-primary to-indigo-600 px-4 py-1 text-sm font-semibold text-white shadow-lg">
                       <Zap className="w-4 h-4" />
                       {t('pricing.popular', 'Most Popular')}
                     </span>
@@ -222,8 +222,8 @@ export function PricingPage() {
 
                 {/* Tier Name */}
                 <div className="mb-4">
-                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white">{tier.name}</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  <h3 className="text-2xl font-bold text-text-primary">{tier.name}</h3>
+                  <p className="text-sm text-text-secondary mt-1">
                     {tier.description}
                   </p>
                 </div>
@@ -231,15 +231,15 @@ export function PricingPage() {
                 {/* Price */}
                 <div className="mb-6">
                   <div className="flex items-baseline">
-                    <span className="text-5xl font-bold text-gray-900 dark:text-white">
+                    <span className="text-5xl font-bold text-text-primary">
                       ${price}
                     </span>
                     {price > 0 && (
-                      <span className="text-gray-600 dark:text-gray-400 ml-2">{interval}</span>
+                      <span className="text-text-secondary ml-2">{interval}</span>
                     )}
                   </div>
                   {savings > 0 && (
-                    <p className="text-sm text-green-600 dark:text-green-400 mt-1">
+                    <p className="text-sm text-accent-success mt-1">
                       {t('pricing.saveAmount', 'Save ${{amount}}/year', { amount: savings })}
                     </p>
                   )}
@@ -266,12 +266,12 @@ export function PricingPage() {
                 <ul className="space-y-3">
                   {tier.features.map((feature, index) => (
                     <li key={index} className="flex items-start gap-3">
-                      <Check className="w-5 h-5 text-green-500 dark:text-green-400 flex-shrink-0 mt-0.5" />
-                      <span className="text-sm text-gray-700 dark:text-gray-300">{feature}</span>
+                      <Check className="w-5 h-5 text-accent-success flex-shrink-0 mt-0.5" />
+                      <span className="text-sm text-text-secondary">{feature}</span>
                     </li>
                   ))}
                 </ul>
-              </div>
+              </GlassCard>
             );
           })}
         </div>

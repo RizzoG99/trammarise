@@ -133,12 +133,11 @@ export function UploadRecordPage() {
 
       {/* Configuration Section (3-column grid) */}
       <GlassCard
-        variant="light"
-        className="p-6 mb-8 border rounded-xl shadow-lg"
-        style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-border)' }}
+        variant="dark"
+        className="p-6 mb-8 border rounded-xl shadow-glass"
       >
         <div className="flex items-center gap-2 mb-6">
-          <SlidersHorizontal size={20} className="text-gray-500" />
+          <SlidersHorizontal size={20} className="text-gray-400" />
           <Heading level="h3">{t('nav.configure')}</Heading>
         </div>
 
