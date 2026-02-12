@@ -1,5 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
+import '@testing-library/jest-dom/vitest';
 import { WelcomePage } from './WelcomePage';
 import { BrowserRouter } from 'react-router-dom';
 
@@ -32,7 +33,6 @@ describe('WelcomePage', () => {
 
     expect(screen.getByText(/Transcribe & Summarize/i)).toBeInTheDocument();
     expect(screen.getByText(/In Seconds/i)).toBeInTheDocument();
-    expect(screen.getByText(/Advanced Audio Intelligence/i)).toBeInTheDocument();
     expect(screen.getByText(/Transform your meetings/i)).toBeInTheDocument();
   });
 
@@ -70,7 +70,7 @@ describe('WelcomePage', () => {
       </BrowserRouter>
     );
 
-    const buttons = screen.getAllByText('Get Started');
+    const buttons = screen.getAllByText('Get Started Free');
     fireEvent.click(buttons[0]); // Click the hero button
 
     expect(mockOpenSignIn).toHaveBeenCalledWith({

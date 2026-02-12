@@ -24,7 +24,6 @@ export function ResultPdfDocument({
   transcript,
   config,
   fileName,
-  tier = 'free',
 }: ResultPdfDocumentProps) {
   const props: PdfTemplateProps = { summary, transcript, config, fileName };
 

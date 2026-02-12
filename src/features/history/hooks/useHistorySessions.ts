@@ -1,9 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import type { HistorySession } from '../types/history';
 import type { ContentType } from '@/types/content-types';
 import type { LanguageCode } from '@/types/languages';
-import { isLanguageCode } from '@/types/languages';
 import {
   getAllSessionIds,
   loadSessionMetadata,
@@ -19,6 +18,26 @@ interface UseHistorySessionsReturn {
   deleteSession: (sessionId: string) => Promise<void>;
   reload: () => Promise<void>;
   totalCount: number;
+}
+
+// Helper to load sessions from local storage
+async function loadSessionsFromLocal(): Promise<HistorySession[]> {
+  const ids = getAllSessionIds();
+  const rawSessions = await Promise.all(ids.map((id) => loadSessionMetadata(id)));
+
+  return rawSessions
+    .filter((s): s is NonNullable<typeof s> => s !== null)
+    .map((s) => ({
+      sessionId: s.sessionId,
+      audioName: s.audioName || 'Untitled Audio',
+      contentType: s.contentType,
+      language: s.language as LanguageCode,
+      hasTranscript: !!s.result?.transcript,
+      hasSummary: !!s.result?.summary,
+      createdAt: s.createdAt,
+      updatedAt: s.updatedAt,
+      fileSizeBytes: s.fileSizeBytes,
+    }));
 }
 
 // ... existing code ...
@@ -76,7 +95,6 @@ export function useHistorySessions(): UseHistorySessionsReturn {
       } else {
         setSessions(loadedSessions);
       }
-
     } catch (err) {
       setError('Failed to load sessions');
       console.error('Error loading sessions:', err);

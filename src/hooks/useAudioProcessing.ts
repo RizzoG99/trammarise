@@ -64,7 +64,7 @@ export function useAudioProcessing({ onProgress, onComplete, onError }: UseAudio
       // We check if they have ANY minutes left. Strict duration check happens on backend.
       if (subscription) {
         const minutesRemaining =
-          (TIER_MINUTES[subscription.tier] || 0) - (subscription.minutes_used || 0);
+          (TIER_MINUTES[subscription.tier] || 0) - (subscription.minutesUsed || 0);
 
         if (minutesRemaining <= 0 && subscription.tier !== 'pro' && subscription.tier !== 'team') {
           // Technically Pro/Team should have high limits, but if they hit it, they hit it.
@@ -191,7 +191,7 @@ export function useAudioProcessing({ onProgress, onComplete, onError }: UseAudio
         currentJobIdRef.current = null;
       }
     },
-    [isProcessing, onProgress, onComplete, onError]
+    [isProcessing, onProgress, onComplete, onError, subscription]
   );
 
   /**
@@ -230,7 +230,7 @@ function handleError(errorMsg: string, _session: SessionData, onError: (error: E
     onError(
       new Error(
         'Transcription job failed or timed out. This may happen with very long audio files. ' +
-        'Please try again or split your audio into shorter segments.'
+          'Please try again or split your audio into shorter segments.'
       )
     );
     return;
@@ -241,9 +241,9 @@ function handleError(errorMsg: string, _session: SessionData, onError: (error: E
     onError(
       new Error(
         'Processing timed out. Your audio may be too long or complex. Try:\n' +
-        '1. Trimming the audio to a shorter segment\n' +
-        '2. Using a faster model\n' +
-        '3. Splitting into smaller files'
+          '1. Trimming the audio to a shorter segment\n' +
+          '2. Using a faster model\n' +
+          '3. Splitting into smaller files'
       )
     );
     return;
@@ -254,8 +254,8 @@ function handleError(errorMsg: string, _session: SessionData, onError: (error: E
     onError(
       new Error(
         'Invalid API credentials. Please check your API keys in .env.local:\n' +
-        'VITE_OPENAI_API_KEY=sk-...\n\n' +
-        'Get your key at: https://platform.openai.com/api-keys'
+          'VITE_OPENAI_API_KEY=sk-...\n\n' +
+          'Get your key at: https://platform.openai.com/api-keys'
       )
     );
     return;

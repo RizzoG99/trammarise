@@ -563,6 +563,53 @@
       "dismissButton": "Forse più tardi"
     }
   },
+  "welcome": {
+    "hero": {
+      "newBadge": "✨ Introduzione al Liquid Glass Design",
+      "titlePart1": "Trascrivi e Riassumi",
+      "titlePart2": "In Secondi",
+      "description": "Trasforma le tue riunioni, lezioni e interviste in informazioni utili con la nostra trascrizione AI sicura e lato client.",
+      "cta": {
+        "getStarted": "Inizia Gratis",
+        "viewFeatures": "Vedi Funzionalità",
+        "appPreview": "[Visualizzazione Anteprima App]"
+      }
+    },
+    "features": {
+      "title": "Strumenti Potenti per l'Audio",
+      "subtitle": "Tutto ciò di cui hai bisogno per gestire le tue registrazioni.",
+      "cards": {
+        "transcription": {
+          "title": "Trascrizione Cristallina",
+          "description": "Carica file o registra direttamente. Trascrizione accurata per record affidabili utilizzando l'elaborazione avanzata sul dispositivo."
+        },
+        "summaries": {
+          "title": "Riassunti AI Istantanei",
+          "description": "Ottieni punti chiave, azioni e riassunti strutturati generati automaticamente dai migliori modelli AI."
+        },
+        "security": {
+          "title": "Privato e Sicuro",
+          "description": "I tuoi dati rimangono tuoi. L'elaborazione lato client garantisce la massima privacy. Nessun audio lascia il tuo dispositivo senza permesso."
+        }
+      }
+    },
+    "ctaSection": {
+      "title": "Pronto a trasformare il tuo flusso di lavoro?",
+      "description": "Unisciti a migliaia di utenti che risparmiano ore ogni settimana con Trammarise.",
+      "button": "Inizia Gratis"
+    },
+    "footer": {
+      "tagline": "Trascrizione e riassunto audio basati su IA",
+      "links": {
+        "docs": "Documentazione",
+        "pricing": "Prezzi",
+        "privacy": "Privacy",
+        "terms": "Termini",
+        "contact": "Contatti"
+      },
+      "copyright": "© {{year}} Trammarise. Tutti i diritti riservati."
+    }
+  },
   "pricing": {
     "title": "Scegli il tuo piano",
     "subtitle": "Inizia gratis con le tue chiavi API, oppure passa a un piano premium per AI ospitato e funzionalità avanzate",
