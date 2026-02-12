@@ -18,13 +18,13 @@ import type {
  * For speaker diarization, use AssemblyAIProvider instead.
  *
  * @example
- * const provider = new OpenAIProvider('your-api-key');
+ * const provider = new OpenAITranscriptionAdapter('your-api-key');
  * const result = await provider.transcribe({
  *   audioFile: buffer,
  *   language: 'en',
  * });
  */
-export class OpenAIProvider implements TranscriptionProvider {
+export class OpenAITranscriptionAdapter implements TranscriptionProvider {
   private apiKey: string;
 
   constructor(apiKey?: string) {

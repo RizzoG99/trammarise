@@ -15,9 +15,13 @@ export class OpenAIProvider implements AIProvider {
   async transcribe(params: TranscribeParams): Promise<string> {
     const openai = new OpenAI({ baseURL: 'https://api.openai.com/v1', apiKey: params.apiKey });
 
+    // Use Whisper API for all transcription (stable, reliable)
+    const modelToUse = params.model || 'whisper-1';
+    console.log(`[OpenAI] Transcribing with model=${modelToUse}`);
+
     const completion = await openai.audio.transcriptions.create({
       file: fs.createReadStream(params.filePath),
-      model: params.model || 'whisper-1',
+      model: modelToUse,
       language: params.language,
       prompt: params.prompt,
       temperature: params.temperature,

@@ -53,7 +53,8 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
 
       if (!response.ok) {
         if (response.status === 404) {
-          // No subscription found, use free tier
+          // No subscription found OR API not implemented yet - use free tier
+          console.debug('Subscription API not available, using free tier');
           setSubscription(FREE_SUBSCRIPTION);
           return;
         }
@@ -73,7 +74,8 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
         creditsBalance: data.creditsBalance || 0,
       });
     } catch (err) {
-      console.error('Failed to fetch subscription:', err);
+      // Use debug logging since failing gracefully to free tier is expected
+      console.debug('Subscription fetch failed, falling back to free tier:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch subscription');
       // Fallback to free tier on error
       setSubscription(FREE_SUBSCRIPTION);

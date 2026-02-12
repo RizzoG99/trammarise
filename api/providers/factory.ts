@@ -1,5 +1,5 @@
 import type { TranscriptionProvider } from '../types/provider';
-import { OpenAIProvider } from './openai-transcription-adapter';
+import { OpenAITranscriptionAdapter } from './openai-transcription-adapter';
 import { AssemblyAIProvider } from './assemblyai';
 
 /**
@@ -44,14 +44,14 @@ export class TranscriptionProviderFactory {
   static create(config: ProviderConfig): TranscriptionProvider {
     switch (config.provider) {
       case 'openai':
-        return new OpenAIProvider(config.apiKey);
+        return new OpenAITranscriptionAdapter(config.apiKey);
 
       case 'assemblyai':
         if (config.enableSpeakerDiarization) {
           return new AssemblyAIProvider({ apiKey: config.apiKey });
         }
         // If speaker diarization not needed, use OpenAI for cost efficiency
-        return new OpenAIProvider(config.apiKey);
+        return new OpenAITranscriptionAdapter(config.apiKey);
 
       default:
         throw new Error(`Unknown provider: ${config.provider}`);

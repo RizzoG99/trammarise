@@ -2,10 +2,6 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import busboy from 'busboy';
 import { API_VALIDATION } from '../src/utils/constants';
 import { WHISPER_STYLE_PROMPT } from '../src/utils/transcription-prompts';
-import {
-  getTranscriptionModelForLevel,
-  type PerformanceLevel,
-} from '../src/types/performance-levels';
 import { JobManager } from './utils/job-manager';
 import { chunkAudio, cleanupChunks } from './utils/audio-chunker';
 import { RateLimitGovernor } from './utils/rate-limit-governor';
@@ -15,7 +11,7 @@ import { TranscriptionProviderFactory } from './providers/factory';
 import { assembleTranscript } from './utils/transcript-assembler';
 import type { ProcessingMode } from './types/chunking';
 import type { JobConfiguration } from './types/job';
-import { requireAuth, AuthError } from './middleware/auth';
+import { optionalAuth, AuthError } from './middleware/auth';
 import { rateLimit, RateLimitError, RATE_LIMITS } from './middleware/rate-limit';
 import { checkQuota, trackUsage } from './middleware/usage-tracking';
 import { validateAudioFile } from './utils/file-validator';
@@ -38,13 +34,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    // 1. AUTHENTICATION - All users must authenticate
-    const { userId } = await requireAuth();
+    // 1. AUTHENTICATION - Optional (support both authenticated and BYOK users)
+    const authResult = await optionalAuth();
+    const userId = authResult?.userId;
 
     // 2. RATE LIMITING - Prevent abuse
     await rateLimit(req, {
       ...RATE_LIMITS.TRANSCRIBE,
-      keyGenerator: () => `user:${userId}`,
+      keyGenerator: () =>
+        userId ? `user:${userId}` : `ip:${req.headers['x-forwarded-for'] || 'unknown'}`,
     });
 
     // Parse multipart form data with busboy
@@ -61,8 +59,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const audioChunks: Buffer[] = [];
     let apiKey: string | null = null;
     let language: string | undefined = undefined;
-    let model: string | undefined = undefined;
-
     let performanceLevel: string | undefined = undefined;
     let enableSpeakerDiarization = false;
     let speakersExpected: number | undefined = undefined;
@@ -104,8 +100,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           apiKey = value;
         } else if (fieldname === 'language') {
           language = value || undefined;
-        } else if (fieldname === 'model') {
-          model = value || undefined;
         } else if (fieldname === 'performanceLevel') {
           performanceLevel = value || undefined;
         } else if (fieldname === 'enableSpeakerDiarization') {
@@ -147,18 +141,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     }
 
-    // 4. API KEY LOGIC - Tier-based enforcement
+    // 4. API KEY LOGIC - Support both authenticated (with quota) and BYOK users
     const userProvidedKey = apiKey; // From form data
     let finalApiKey: string;
     let shouldTrackQuota = false;
 
     if (userProvidedKey) {
-      // User provided their own API key - use it (any tier allowed)
+      // BYOK Mode: User provided their own API key - use it (works for both authenticated and non-authenticated)
       finalApiKey = userProvidedKey;
       shouldTrackQuota = false; // Analytics only, no quota deduction
-      console.log(`[Transcribe] User ${userId} using own API key`);
-    } else {
-      // No user key provided - check tier
+      console.log(
+        `[Transcribe] ${userId ? `User ${userId}` : 'Anonymous user'} using own API key (BYOK mode)`
+      );
+    } else if (userId) {
+      // Authenticated user without own key - check subscription and use platform key
       const { data: subscription, error: subError } = await supabaseAdmin
         .from('subscriptions')
         .select('tier')
@@ -168,8 +164,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (subError || !subscription) {
         return res.status(403).json({
           error: 'Subscription required',
-          message:
-            'Please check your subscription status.',
+          message: 'Please check your subscription status or provide your own API key.',
           upgradeUrl: '/pricing',
         });
       }
@@ -192,18 +187,29 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       console.log(
         `[Transcribe] User ${userId} (${subscription.tier}) using platform key with quota`
       );
+    } else {
+      // Not authenticated and no API key - reject
+      return res.status(401).json({
+        error: 'Authentication or API key required',
+        message: 'Please sign in or provide your own OpenAI API key.',
+      });
     }
 
     // Determine processing mode from performance level
-    const mode: ProcessingMode = performanceLevel === 'best_quality' ? 'best_quality' : 'balanced';
+    const mode: ProcessingMode =
+      performanceLevel === 'best_quality' || performanceLevel === 'advanced'
+        ? 'best_quality'
+        : 'balanced';
 
-    // Determine transcription model
-    const transcriptionModel = model
-      ? getTranscriptionModelForLevel(model as PerformanceLevel)
-      : 'gpt-4o-mini-transcribe';
+    // Use Whisper API for all transcription (stable, reliable)
+    const transcriptionModel = 'whisper-1';
 
     // Handle auto-detection: Convert 'auto' to undefined for Whisper API
     const transcriptionLanguage = language === 'auto' ? undefined : language;
+
+    console.log(
+      `[Transcribe API] Job configuration: model=${transcriptionModel}, mode=${mode}, language=${transcriptionLanguage || 'auto'}`
+    );
 
     // Create job configuration with Whisper style prompt
     const jobConfig: JobConfiguration = {
