@@ -145,12 +145,25 @@ export const SpeakerTranscriptView = memo(function SpeakerTranscriptView({
               <div
                 key={utteranceId}
                 id={utteranceId}
+                onClick={() => onTimestampClick?.(utterance.start / 1000)}
+                onKeyDown={(e) => {
+                  if ((e.key === 'Enter' || e.key === ' ') && onTimestampClick) {
+                    e.preventDefault();
+                    onTimestampClick(utterance.start / 1000);
+                  }
+                }}
+                tabIndex={onTimestampClick ? 0 : undefined}
+                role={onTimestampClick ? 'button' : undefined}
+                aria-label={
+                  onTimestampClick ? `Jump to ${formatTimestamp(utterance.start)}` : undefined
+                }
                 className={`
                   p-4 rounded-lg border transition-all
+                  ${onTimestampClick ? 'cursor-pointer' : ''}
                   ${
                     isActive
                       ? 'border-primary bg-gradient-to-r ' + colorClass + ' shadow-md scale-[1.02]'
-                      : 'border-border bg-bg-surface hover:border-border-hover'
+                      : 'border-border bg-bg-surface hover:border-border-hover hover:shadow-sm'
                   }
                 `}
               >
@@ -161,28 +174,32 @@ export const SpeakerTranscriptView = memo(function SpeakerTranscriptView({
                       className={`
                       px-3 py-1 rounded-full text-xs font-medium
                       bg-gradient-to-r ${colorClass}
-                      border border-border
+                      border border-border pointer-events-none
                     `}
+                      aria-hidden="true"
                     >
                       {utterance.speaker}
                     </span>
                     {utterance.confidence && (
-                      <span className="text-xs text-text-tertiary">
+                      <span
+                        className="text-xs text-text-tertiary pointer-events-none"
+                        aria-hidden="true"
+                      >
                         {Math.round(utterance.confidence * 100)}%
                       </span>
                     )}
                   </div>
+                  {/* Timestamp Badge (visual only) */}
                   {onTimestampClick && (
-                    <button
-                      onClick={() => onTimestampClick(utterance.start / 1000)}
+                    <span
                       className="
-                        text-xs text-primary hover:text-primary-dark
-                        font-mono transition-colors
+                        text-xs text-primary
+                        font-mono pointer-events-none
                       "
-                      aria-label={`Jump to ${formatTimestamp(utterance.start)}`}
+                      aria-hidden="true"
                     >
                       {formatTimestamp(utterance.start)}
-                    </button>
+                    </span>
                   )}
                 </div>
 

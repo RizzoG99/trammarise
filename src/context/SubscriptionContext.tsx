@@ -1,9 +1,10 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import type { ReactNode } from 'react';
-import { useUser } from '@clerk/clerk-react';
+import { useUser, useAuth } from '@clerk/clerk-react';
 import { TIER_FEATURES, FREE_SUBSCRIPTION } from './subscription-tiers';
 import type { SubscriptionTier, SubscriptionStatus, Subscription } from './subscription-types';
+import { fetchWithAuth } from '@/utils/fetch-with-auth';
 
 interface SubscriptionContextValue {
   subscription: Subscription | null;
@@ -33,6 +34,7 @@ interface SubscriptionProviderProps {
 
 export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
   const { isSignedIn, isLoaded } = useUser();
+  const { getToken } = useAuth();
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -49,7 +51,7 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
     setError(null);
 
     try {
-      const response = await fetch('/api/subscriptions/current');
+      const response = await fetchWithAuth(getToken, '/api/subscriptions/current');
 
       if (!response.ok) {
         if (response.status === 404) {
@@ -82,7 +84,7 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
     } finally {
       setIsLoading(false);
     }
-  }, [isSignedIn]);
+  }, [isSignedIn, getToken]);
 
   useEffect(() => {
     if (isLoaded) {

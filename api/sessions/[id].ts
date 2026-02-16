@@ -19,7 +19,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     // Authenticate user
-    const { userId } = await requireAuth();
+    const { userId } = await requireAuth(req);
 
     switch (req.method) {
       case 'GET':

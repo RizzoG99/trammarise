@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { ProviderFactory, type ProviderType } from './providers/factory';
+import { AIProviderFactory, type AIProviderType } from './providers/ai-factory';
 import { API_VALIDATION } from '../src/utils/constants';
 import { rateLimit, RateLimitError, RATE_LIMITS } from './middleware/rate-limit';
 
@@ -33,7 +33,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ error: 'Invalid API key format', valid: false });
     }
 
-    const aiProvider = ProviderFactory.getProvider(provider as ProviderType);
+    const aiProvider = AIProviderFactory.getProvider(provider as AIProviderType);
     const isValid = await aiProvider.validateApiKey(apiKey);
 
     if (isValid) {

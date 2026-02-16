@@ -11,7 +11,7 @@ import { TranscriptionProviderFactory } from './providers/factory';
 import { assembleTranscript } from './utils/transcript-assembler';
 import type { ProcessingMode } from './types/chunking';
 import type { JobConfiguration } from './types/job';
-import { optionalAuth, AuthError } from './middleware/auth';
+import { requireAuth, AuthError } from './middleware/auth';
 import { rateLimit, RateLimitError, RATE_LIMITS } from './middleware/rate-limit';
 import { checkQuota, trackUsage } from './middleware/usage-tracking';
 import { validateAudioFile } from './utils/file-validator';
@@ -34,15 +34,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    // 1. AUTHENTICATION - Optional (support both authenticated and BYOK users)
-    const authResult = await optionalAuth();
-    const userId = authResult?.userId;
+    // 1. AUTHENTICATION - Required for all users
+    const { userId } = await requireAuth(req);
 
     // 2. RATE LIMITING - Prevent abuse
     await rateLimit(req, {
       ...RATE_LIMITS.TRANSCRIBE,
-      keyGenerator: () =>
-        userId ? `user:${userId}` : `ip:${req.headers['x-forwarded-for'] || 'unknown'}`,
+      keyGenerator: () => `user:${userId}`,
     });
 
     // Parse multipart form data with busboy
@@ -57,13 +55,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     let audioData: Buffer | null = null;
     const audioChunks: Buffer[] = [];
-    let apiKey: string | null = null;
     let language: string | undefined = undefined;
     let performanceLevel: string | undefined = undefined;
     let enableSpeakerDiarization = false;
     let speakersExpected: number | undefined = undefined;
     let uploadedFilename: string = 'audio.webm';
     let fileSizeExceeded = false;
+    let apiKey: string | null = null; // BYOK support
 
     const parsePromise = new Promise<void>((resolve, reject) => {
       bb.on('file', (_fieldname, file, info) => {
@@ -97,7 +95,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       bb.on('field', (fieldname, value) => {
         if (fieldname === 'apiKey') {
-          apiKey = value;
+          apiKey = value || null;
         } else if (fieldname === 'language') {
           language = value || undefined;
         } else if (fieldname === 'performanceLevel') {
@@ -141,35 +139,35 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     }
 
-    // 4. API KEY LOGIC - Support both authenticated (with quota) and BYOK users
-    const userProvidedKey = apiKey; // From form data
+    // 4. API KEY LOGIC - Two-tier system (BYOK or Platform)
     let finalApiKey: string;
     let shouldTrackQuota = false;
 
-    if (userProvidedKey) {
-      // BYOK Mode: User provided their own API key - use it (works for both authenticated and non-authenticated)
-      finalApiKey = userProvidedKey;
+    if (apiKey) {
+      // BYOK Mode: User provided their own API key (free tier or paid tier preference)
+      finalApiKey = apiKey;
       shouldTrackQuota = false; // Analytics only, no quota deduction
-      console.log(
-        `[Transcribe] ${userId ? `User ${userId}` : 'Anonymous user'} using own API key (BYOK mode)`
-      );
-    } else if (userId) {
-      // Authenticated user without own key - check subscription and use platform key
-      const { data: subscription, error: subError } = await supabaseAdmin
+      console.log(`[Transcribe] User ${userId} using BYOK mode`);
+    } else {
+      // No API key provided - check if user has paid subscription
+      const { data: subscription } = await supabaseAdmin
         .from('subscriptions')
         .select('tier')
         .eq('user_id', userId)
         .single();
 
-      if (subError || !subscription) {
+      if (!subscription || subscription.tier === 'free') {
+        // Free user without API key - require them to configure one
         return res.status(403).json({
-          error: 'Subscription required',
-          message: 'Please check your subscription status or provide your own API key.',
+          error: 'API key required',
+          message:
+            'Free tier users must provide their own OpenAI API key. Configure it in Settings or upgrade to Pro.',
           upgradeUrl: '/pricing',
+          requiresApiKey: true, // Flag for frontend to show API key setup modal
         });
       }
 
-      // Pro/Team user without own key - use platform key with quota check
+      // Paid user (Pro/Team) - use platform key with quota tracking
       const estimatedMinutes = Math.ceil((validation.duration || 0) / 60);
       const quotaCheck = await checkQuota(userId, estimatedMinutes);
 
@@ -179,20 +177,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           minutesRemaining: quotaCheck.minutesRemaining,
           minutesRequired: quotaCheck.minutesRequired,
           message: 'Insufficient quota. Please upgrade your plan or purchase additional credits.',
+          upgradeUrl: '/pricing',
         });
       }
 
       finalApiKey = process.env.OPENAI_API_KEY!;
-      shouldTrackQuota = true; // Track + deduct from quota
+      shouldTrackQuota = true;
       console.log(
-        `[Transcribe] User ${userId} (${subscription.tier}) using platform key with quota`
+        `[Transcribe] User ${userId} (${subscription.tier}) using platform API with quota tracking`
       );
-    } else {
-      // Not authenticated and no API key - reject
-      return res.status(401).json({
-        error: 'Authentication or API key required',
-        message: 'Please sign in or provide your own OpenAI API key.',
-      });
     }
 
     // Determine processing mode from performance level
@@ -319,6 +312,9 @@ async function processJobInBackground(
       JobManager.setJobTranscript(jobId, result.text);
       if (result.utterances) {
         JobManager.setJobUtterances(jobId, result.utterances);
+      }
+      if (result.segments) {
+        JobManager.setJobSegments(jobId, result.segments);
       }
 
       // Mark job as completed

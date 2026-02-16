@@ -65,6 +65,8 @@ import { PageLoader } from '@/lib/components/ui/PageLoader/PageLoader';
 import { migrateFromSessionStorage } from '@/utils/session-manager';
 import { HeaderProvider } from '@/context/HeaderContext';
 import { SubscriptionProvider } from '@/context/SubscriptionContext';
+import { OnboardingProvider, useOnboarding } from '@/context/OnboardingContext';
+import { ApiKeyOnboardingModal } from '@/components/modals/ApiKeyOnboardingModal';
 
 // Get Clerk publishable key from environment
 const CLERK_PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || '';
@@ -75,6 +77,7 @@ if (!CLERK_PUBLISHABLE_KEY) {
 
 function AppRoutes() {
   const { isSignedIn, isLoaded } = useUser();
+  const { needsOnboarding, isCheckingOnboarding, completeOnboarding } = useOnboarding();
   const navigate = useNavigate();
   const [showStorageWarning, setShowStorageWarning] = useState(false);
 
@@ -101,8 +104,25 @@ function AppRoutes() {
     navigate(ROUTES.HISTORY);
   };
 
-  if (!isLoaded) {
+  if (!isLoaded || isCheckingOnboarding) {
     return <PageLoader />;
+  }
+
+  // If signed in and needs onboarding, block routes except pricing
+  if (isSignedIn && needsOnboarding) {
+    return (
+      <>
+        <ApiKeyOnboardingModal isOpen={true} onComplete={completeOnboarding} />
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            {/* Only allow pricing page during onboarding */}
+            <Route path="/pricing" element={<PricingPage />} />
+            {/* Redirect everything else to home (which will show modal) */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Suspense>
+      </>
+    );
   }
 
   return (
@@ -162,7 +182,7 @@ function AppRoutes() {
             <>
               {/* Unauthenticated Routes */}
               <Route path="/" element={<WelcomePage />} />
-              
+
               {/* Redirect any other access to Welcome Page */}
               <Route path="*" element={<Navigate to="/" replace />} />
             </>
@@ -177,9 +197,11 @@ function App() {
   return (
     <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY}>
       <SubscriptionProvider>
-        <HeaderProvider>
-          <AppRoutes />
-        </HeaderProvider>
+        <OnboardingProvider>
+          <HeaderProvider>
+            <AppRoutes />
+          </HeaderProvider>
+        </OnboardingProvider>
       </SubscriptionProvider>
     </ClerkProvider>
   );

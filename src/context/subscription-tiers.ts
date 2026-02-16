@@ -6,7 +6,6 @@ import type { SubscriptionTier } from './subscription-types';
 export const TIER_FEATURES: Record<SubscriptionTier, string[]> = {
   free: ['byok', 'basic-editing', 'export-pdf', 'local-storage'],
   pro: [
-    'byok',
     'basic-editing',
     'export-pdf',
     'local-storage',
@@ -19,7 +18,6 @@ export const TIER_FEATURES: Record<SubscriptionTier, string[]> = {
     'email-support',
   ],
   team: [
-    'byok',
     'basic-editing',
     'export-pdf',
     'local-storage',

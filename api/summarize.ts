@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { ProviderFactory, type ProviderType } from './providers/factory';
+import { AIProviderFactory, type AIProviderType } from './providers/ai-factory';
 import { API_VALIDATION, CONTENT_TYPES } from '../src/utils/constants';
 import busboy from 'busboy';
 import { extractPdfText } from './utils/pdf-extractor';
@@ -35,7 +35,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     // 1. AUTHENTICATION - All users must authenticate
-    const { userId } = await requireAuth();
+    const { userId } = await requireAuth(req);
 
     // 2. RATE LIMITING - Prevent abuse
     await rateLimit(req, {
@@ -184,7 +184,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ error: 'Model is required for OpenRouter' });
     }
 
-    const aiProvider = ProviderFactory.getProvider(provider as ProviderType);
+    const aiProvider = AIProviderFactory.getProvider(provider as AIProviderType);
 
     // Map performance level to actual model name
     const actualModel = model

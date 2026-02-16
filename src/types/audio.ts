@@ -102,6 +102,13 @@ export interface ProcessingResult {
   configuration: AIConfiguration;
   /** Speaker-labeled utterances (if speaker diarization was enabled) */
   utterances?: Utterance[];
+  /** Whisper API segments with real timestamps (for accurate syncing) */
+  segments?: Array<{
+    text: string;
+    start: number; // seconds
+    end: number;
+    id: number;
+  }>;
 }
 
 // Processing state
@@ -116,6 +123,13 @@ export interface TranscriptionResponse {
   transcript: string;
   /** Speaker-labeled utterances (if speaker diarization was enabled) */
   utterances?: Utterance[];
+  /** Whisper API segments with real timestamps */
+  segments?: Array<{
+    text: string;
+    start: number; // seconds
+    end: number;
+    id: number;
+  }>;
 }
 
 export interface SummarizationResponse {

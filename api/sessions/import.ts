@@ -23,7 +23,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     // Authenticate user
-    const { userId } = await requireAuth();
+    const { userId } = await requireAuth(req);
 
     // Validate request body
     const { localSessions } = req.body;

@@ -98,7 +98,7 @@ export function useAudioProcessing({ onProgress, onComplete, onError }: UseAudio
           config.language,
           config.model,
           config.contentType,
-          config.model, // performance level
+          config.mode === 'simple' ? config.model : 'advanced', // Pass correct performance level
           session.audioFile.file.name
         );
 

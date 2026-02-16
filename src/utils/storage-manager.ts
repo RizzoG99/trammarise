@@ -2,45 +2,96 @@
  * Storage Manager - Handle audio file uploads to Supabase Storage
  *
  * Provides utilities for uploading audio files to Supabase Storage bucket
- * and retrieving public URLs for playback.
+ * with hybrid strategy based on user subscription tier.
  */
 
 import { supabaseClient } from '@/lib/supabase/client';
+import type { SubscriptionTier } from '@/context/subscription-types';
 
 const BUCKET_NAME = 'audio-files';
 
+type UploadStrategy = 'none' | 'metadata' | 'full';
+
 /**
- * Upload audio file to Supabase Storage
+ * Determine upload strategy based on user subscription tier
+ *
+ * @param tier - User's subscription tier (undefined = free/unauthenticated)
+ * @returns Upload strategy to use
+ */
+function getUploadStrategy(tier?: SubscriptionTier): UploadStrategy {
+  if (!tier || tier === 'free') {
+    // Free/BYOK users: local-only (no cloud upload)
+    return 'none';
+  }
+
+  if (tier === 'pro') {
+    // Pro users: metadata only (audio stays local)
+    // Metadata upload is handled separately in session-manager
+    return 'metadata';
+  }
+
+  // Team users: full audio backup
+  return 'full';
+}
+
+/**
+ * Upload audio file to Supabase Storage (private bucket)
+ *
+ * Implements hybrid storage strategy based on subscription tier:
+ * - Free: No upload (local-only)
+ * - Pro: Metadata only (no audio upload)
+ * - Team: Full audio backup
  *
  * @param sessionId - Unique session identifier
  * @param blob - Audio file blob
  * @param filename - Original filename
- * @returns Public URL to the uploaded file
- * @throws Error if upload fails
+ * @param tier - Optional subscription tier (defaults to free if not provided)
+ * @returns Private URL to the uploaded file, or null if upload skipped
+ * @throws Error if upload fails (only for team tier)
  */
 export async function uploadAudioFile(
   sessionId: string,
   blob: Blob,
-  filename: string
-): Promise<string> {
-  // Create unique path: sessions/{sessionId}/{filename}
-  const filePath = `${sessionId}/${filename}`;
+  filename: string,
+  tier?: SubscriptionTier
+): Promise<string | null> {
+  const uploadStrategy = getUploadStrategy(tier);
 
-  // Upload to Supabase Storage
-  const { data, error } = await supabaseClient.storage.from(BUCKET_NAME).upload(filePath, blob, {
-    cacheControl: '3600',
-    upsert: false, // Don't overwrite existing files
-  });
-
-  if (error) {
-    console.error('Failed to upload audio file:', error);
-    throw new Error(`Failed to upload audio file: ${error.message}`);
+  if (uploadStrategy === 'none') {
+    console.log('[Storage] Local-only mode: skipping Supabase upload (free tier)');
+    return null;
   }
 
-  // Get public URL for the uploaded file
-  const { data: urlData } = supabaseClient.storage.from(BUCKET_NAME).getPublicUrl(data.path);
+  if (uploadStrategy === 'metadata') {
+    console.log('[Storage] Pro mode: skipping audio upload (metadata only)');
+    return null;
+  }
 
-  return urlData.publicUrl;
+  // Team tier: Upload full audio to private bucket
+  const filePath = `${sessionId}/${filename}`;
+
+  try {
+    const { data, error } = await supabaseClient.storage.from(BUCKET_NAME).upload(filePath, blob, {
+      cacheControl: '3600',
+      upsert: false,
+    });
+
+    if (error) {
+      console.error('[Storage] Failed to upload audio file:', error);
+      throw new Error(`Failed to upload audio file: ${error.message}`);
+    }
+
+    // Return private URL (will be accessed via /api/audio/:sessionId)
+    const {
+      data: { publicUrl },
+    } = supabaseClient.storage.from(BUCKET_NAME).getPublicUrl(data.path);
+
+    console.log('[Storage] Team mode: Full audio uploaded successfully');
+    return publicUrl;
+  } catch (error) {
+    console.error('[Storage] Upload error:', error);
+    throw error;
+  }
 }
 
 /**

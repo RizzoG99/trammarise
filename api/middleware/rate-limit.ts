@@ -121,6 +121,6 @@ export const RATE_LIMITS = {
   /** Rate limit for chat endpoint */
   CHAT: {
     windowMs: 60 * 1000, // 1 minute
-    maxRequests: 30,
+    maxRequests: 60, // 60 messages per minute per user
   },
 } as const;

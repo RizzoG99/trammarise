@@ -30,7 +30,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const { userId } = await requireAuth();
+    const { userId } = await requireAuth(req);
 
     // Get current billing period (first day of current month)
     const now = new Date();

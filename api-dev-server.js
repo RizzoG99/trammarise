@@ -1,3 +1,7 @@
+// Load environment variables from .env.local FIRST before any other imports
+import dotenv from 'dotenv';
+dotenv.config({ path: '.env.local' });
+
 import express from 'express';
 import cors from 'cors';
 import { fileURLToPath } from 'url';
@@ -9,7 +13,11 @@ const __dirname = dirname(__filename);
 const app = express();
 const PORT = 3001;
 
-app.use(cors());
+// Configure CORS to allow credentials (cookies) from frontend
+app.use(cors({
+  origin: 'http://localhost:5173', // Vite dev server
+  credentials: true // Allow cookies and auth headers
+}));
 app.use(express.json({ limit: '50mb' })); // Support large audio file uploads
 
 console.log('Starting API dev server...');
@@ -108,6 +116,63 @@ app.post('/api/generate-pdf', async (req, res) => {
   }
 });
 
+// Session management endpoints
+app.post('/api/sessions/create', async (req, res) => {
+  console.log('POST /api/sessions/create');
+  try {
+    const handler = await loadHandler('./api/sessions/create.ts');
+    await handler(req, res);
+  } catch (error) {
+    console.error('Error in sessions/create:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.post('/api/sessions/upsert', async (req, res) => {
+  console.log('POST /api/sessions/upsert');
+  try {
+    const handler = await loadHandler('./api/sessions/upsert.ts');
+    await handler(req, res);
+  } catch (error) {
+    console.error('Error in sessions/upsert:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.get('/api/sessions/list', async (req, res) => {
+  console.log('GET /api/sessions/list');
+  try {
+    const handler = await loadHandler('./api/sessions/list.ts');
+    await handler(req, res);
+  } catch (error) {
+    console.error('Error in sessions/list:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.post('/api/sessions/import', async (req, res) => {
+  console.log('POST /api/sessions/import');
+  try {
+    const handler = await loadHandler('./api/sessions/import.ts');
+    await handler(req, res);
+  } catch (error) {
+    console.error('Error in sessions/import:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Session CRUD (GET/PATCH/DELETE) - uses app.all() for multiple methods
+app.all('/api/sessions/:id', async (req, res) => {
+  console.log(`${req.method} /api/sessions/${req.params.id}`);
+  try {
+    const handler = await loadHandler('./api/sessions/[id].ts');
+    await handler(req, res);
+  } catch (error) {
+    console.error('Error in sessions/:id:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // Job status endpoint
 app.get('/api/transcribe-job/:jobId/status', async (req, res) => {
   console.log(`GET /api/transcribe-job/${req.params.jobId}/status`);
@@ -128,6 +193,76 @@ app.post('/api/transcribe-job/:jobId/cancel', async (req, res) => {
     await handler(req, res);
   } catch (error) {
     console.error('Error in job cancel:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Stripe checkout session endpoint
+app.post('/api/stripe/create-checkout-session', async (req, res) => {
+  console.log('POST /api/stripe/create-checkout-session');
+  try {
+    const handler = await loadHandler('./api/stripe/create-checkout-session.ts');
+    await handler(req, res);
+  } catch (error) {
+    console.error('Error in create-checkout-session:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Subscriptions endpoint
+app.get('/api/subscriptions/current', async (req, res) => {
+  console.log('GET /api/subscriptions/current');
+  try {
+    const handler = await loadHandler('./api/subscriptions/current.ts');
+    await handler(req, res);
+  } catch (error) {
+    console.error('Error in subscriptions/current:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// User settings - API key management
+app.post('/api/user-settings/api-key', async (req, res) => {
+  console.log('POST /api/user-settings/api-key');
+  try {
+    const handler = await loadHandler('./api/user-settings/api-key.ts');
+    await handler(req, res);
+  } catch (error) {
+    console.error('Error in user-settings/api-key:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.get('/api/user-settings/api-key', async (req, res) => {
+  console.log('GET /api/user-settings/api-key');
+  try {
+    const handler = await loadHandler('./api/user-settings/api-key.ts');
+    await handler(req, res);
+  } catch (error) {
+    console.error('Error in user-settings/api-key:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.delete('/api/user-settings/api-key', async (req, res) => {
+  console.log('DELETE /api/user-settings/api-key');
+  try {
+    const handler = await loadHandler('./api/user-settings/api-key.ts');
+    await handler(req, res);
+  } catch (error) {
+    console.error('Error in user-settings/api-key:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Audio endpoint
+app.get('/api/audio/:sessionId', async (req, res) => {
+  console.log(`GET /api/audio/${req.params.sessionId}`);
+  try {
+    const handler = await loadHandler('./api/audio/[sessionId].ts');
+    await handler(req, res);
+  } catch (error) {
+    console.error('Error in audio endpoint:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

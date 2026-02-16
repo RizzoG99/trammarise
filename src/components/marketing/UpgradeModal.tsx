@@ -109,7 +109,7 @@ export function UpgradeModal({
 
   const handleUpgrade = () => {
     onClose();
-    navigate('/pricing');
+    navigate('/pricing', { state: { from: 'results' } });
   };
 
   return (

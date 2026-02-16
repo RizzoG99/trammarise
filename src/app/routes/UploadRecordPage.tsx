@@ -18,10 +18,12 @@ import type { NoiseProfile } from '../../types/noise-profiles';
 import { ProcessAudioButton } from '../../features/upload/components/ProcessAudioButton';
 import { generateSessionId, saveSession } from '../../utils/session-manager';
 import { buildRoutePath, ROUTES } from '../../types/routing';
+import { useSubscription } from '../../context/SubscriptionContext';
 
 export function UploadRecordPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { subscription } = useSubscription();
   const recordPanelRef = useRef<RecordPanelRef>(null);
   const [audioFile, setAudioFile] = useState<File | Blob | null>(null);
   const [contextFiles, setContextFiles] = useState<File[]>([]);
@@ -31,6 +33,8 @@ export function UploadRecordPage() {
   const [noiseProfile, setNoiseProfile] = useState<NoiseProfile>('quiet');
   const [enableSpeakerDiarization, setEnableSpeakerDiarization] = useState<boolean>(false);
   const [speakersExpected, setSpeakersExpected] = useState<number | undefined>(undefined);
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [processingError, setProcessingError] = useState<string | null>(null);
 
   const handleFileUpload = async (file: File) => {
     // Stop any active recording when uploading a file
@@ -67,38 +71,48 @@ export function UploadRecordPage() {
       return;
     }
 
-    // Create session ID
-    const sessionId = generateSessionId();
+    setProcessingError(null);
+    setIsProcessing(true);
 
     try {
+      // Create session ID
+      const sessionId = generateSessionId();
+
       // Save complete session with ALL configuration
-      await saveSession(sessionId, {
-        audioFile: {
-          name: audioFile instanceof File ? audioFile.name : 'recording.webm',
-          blob: audioFile,
-          file:
-            audioFile instanceof File
-              ? audioFile
-              : new File([audioFile], 'recording.webm', { type: 'audio/webm' }),
-        },
-        contextFiles,
-        language, // Save user configuration
-        contentType, // Save user configuration
-        processingMode, // Save user configuration
-        noiseProfile, // Save noise profile
-        enableSpeakerDiarization, // Save speaker diarization config
-        speakersExpected, // Save expected speaker count
+      // Pass subscription tier for hybrid storage strategy
+      await saveSession(
         sessionId,
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-      });
+        {
+          audioFile: {
+            name: audioFile instanceof File ? audioFile.name : 'recording.webm',
+            blob: audioFile,
+            file:
+              audioFile instanceof File
+                ? audioFile
+                : new File([audioFile], 'recording.webm', { type: 'audio/webm' }),
+          },
+          contextFiles,
+          language, // Save user configuration
+          contentType, // Save user configuration
+          processingMode, // Save user configuration
+          noiseProfile, // Save noise profile
+          enableSpeakerDiarization, // Save speaker diarization config
+          speakersExpected, // Save expected speaker count
+          sessionId,
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+        },
+        subscription?.tier
+      );
 
       // Navigate ONLY after successful save
       const path = buildRoutePath(ROUTES.AUDIO, { sessionId });
       navigate(path);
     } catch (error) {
       console.error('Failed to save session:', error);
-      // TODO: Show error toast/notification to user
+      setProcessingError(t('home.processingError', 'Failed to save session. Please try again.'));
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -132,10 +146,7 @@ export function UploadRecordPage() {
       </div>
 
       {/* Configuration Section (3-column grid) */}
-      <GlassCard
-        variant="dark"
-        className="p-6 mb-8 border rounded-xl shadow-glass"
-      >
+      <GlassCard variant="dark" className="p-6 mb-8 border rounded-xl shadow-glass">
         <div className="flex items-center gap-2 mb-6">
           <SlidersHorizontal size={20} className="text-gray-400" />
           <Heading level="h3">{t('nav.configure')}</Heading>
@@ -168,8 +179,19 @@ export function UploadRecordPage() {
         </div>
       </GlassCard>
 
+      {/* Error Display */}
+      {processingError && (
+        <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/30">
+          <Text className="text-red-600 dark:text-red-400 text-sm">{processingError}</Text>
+        </div>
+      )}
+
       {/* Process Audio Button */}
-      <ProcessAudioButton disabled={!audioFile} onProcess={handleProcessAudio} />
+      <ProcessAudioButton
+        disabled={!audioFile || isProcessing}
+        onProcess={handleProcessAudio}
+        isLoading={isProcessing}
+      />
     </PageLayout>
   );
 }

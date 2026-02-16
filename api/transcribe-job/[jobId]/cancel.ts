@@ -24,7 +24,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     // Require authentication
-    const { userId } = await requireAuth();
+    const { userId } = await requireAuth(req);
 
     // Validate job ownership
     if (!JobManager.validateOwnership(jobId, userId)) {

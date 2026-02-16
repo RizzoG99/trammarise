@@ -176,6 +176,22 @@ class JobManagerClass {
   }
 
   /**
+   * Set job segments (Whisper API segments for accurate syncing)
+   */
+  setJobSegments(
+    jobId: string,
+    segments: Array<{ text: string; start: number; end: number; id: number }>
+  ): void {
+    const job = this.jobs.get(jobId);
+    if (!job) {
+      throw new Error(`Job ${jobId} not found`);
+    }
+
+    job.segments = segments;
+    job.lastUpdated = new Date();
+  }
+
+  /**
    * Delete a job
    */
   deleteJob(jobId: string): void {
@@ -220,6 +236,10 @@ class JobManagerClass {
 
     if (job.utterances) {
       response.utterances = job.utterances;
+    }
+
+    if (job.segments) {
+      response.segments = job.segments;
     }
 
     if (job.error) {

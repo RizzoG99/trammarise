@@ -9,6 +9,21 @@ import type {
 } from '../types/provider';
 
 /**
+ * Whisper API verbose response with segments
+ */
+interface WhisperVerboseResponse {
+  text: string;
+  duration?: number;
+  language?: string;
+  segments?: Array<{
+    text: string;
+    start: number;
+    end: number;
+    id?: number;
+  }>;
+}
+
+/**
  * OpenAI Transcription Provider Adapter
  *
  * Adapts OpenAI Whisper API to the TranscriptionProvider interface.
@@ -72,10 +87,19 @@ export class OpenAITranscriptionAdapter implements TranscriptionProvider {
         );
       }
 
+      const verboseCompletion = completion as WhisperVerboseResponse;
+
       return {
-        text: completion.text,
-        duration: completion.duration,
-        language: completion.language,
+        text: verboseCompletion.text,
+        duration: verboseCompletion.duration,
+        language: verboseCompletion.language,
+        // Extract segments from verbose_json response for accurate syncing
+        segments: verboseCompletion.segments?.map((seg, index) => ({
+          text: seg.text,
+          start: seg.start, // already in seconds
+          end: seg.end,
+          id: seg.id ?? index,
+        })),
         metadata: {
           provider: 'OpenAI',
           model: 'whisper-1',

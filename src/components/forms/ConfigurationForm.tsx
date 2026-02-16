@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useUser } from '@clerk/clerk-react';
 import { ApiKeyInfo } from './ApiKeyInfo';
 import { Button, Input, SelectCard, ToggleSwitch } from '@/lib';
-import { validateApiKey } from '../../utils/api';
+import { validateApiKey, saveApiKey, getSavedApiKey } from '../../utils/api';
 import { getApiConfig, saveApiConfig } from '../../utils/session-storage';
 import type { AIConfiguration, ConfigMode } from '../../types/audio';
 import { CURATED_MODELS } from '../../constants/models';
@@ -19,6 +20,7 @@ interface ConfigurationFormProps {
 }
 
 export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ onSubmit, onCancel }) => {
+  const { isSignedIn } = useUser();
   const [mode, setMode] = useState<ConfigMode>('simple');
   const [contentType, setContentType] = useState<ContentType>('meeting');
   const [customContentType, setCustomContentType] = useState('');
@@ -29,17 +31,44 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ onSubmit, 
   const [openrouterKey, setOpenrouterKey] = useState('');
   const [isValidating, setIsValidating] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [rememberApiKey, setRememberApiKey] = useState(false);
+  const [isLoadingKey, setIsLoadingKey] = useState(false);
 
-  // Load saved config from session storage
+  // Load saved config from session storage and backend
   useEffect(() => {
-    const saved = getApiConfig();
-    if (saved) {
-      setOpenaiKey(saved.openaiKey);
-      if (saved.apiKey) {
-        setOpenrouterKey(saved.apiKey);
+    const loadApiKey = async () => {
+      // First, check session storage (fast)
+      const saved = getApiConfig();
+      if (saved?.openaiKey) {
+        setOpenaiKey(saved.openaiKey);
+        if (saved.apiKey) {
+          setOpenrouterKey(saved.apiKey);
+        }
+        return; // Found in session storage, no need to check backend
       }
-    }
-  }, []);
+
+      // If authenticated and not in session storage, try loading from backend
+      if (isSignedIn) {
+        setIsLoadingKey(true);
+        try {
+          const { hasKey, apiKey } = await getSavedApiKey();
+          if (hasKey && apiKey) {
+            setOpenaiKey(apiKey);
+            setRememberApiKey(true); // Indicate key was previously saved
+            // Cache in session storage for current session
+            saveApiConfig('openai', apiKey, apiKey);
+          }
+        } catch (error) {
+          console.error('Failed to load saved API key:', error);
+          // Silently fail - user can still enter key manually
+        } finally {
+          setIsLoadingKey(false);
+        }
+      }
+    };
+
+    loadApiKey();
+  }, [isSignedIn]);
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
@@ -100,11 +129,22 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ onSubmit, 
 
       const finalContentType = contentType === 'other' ? customContentType : contentType;
 
-      // Save to session storage
+      // Save to session storage (always)
       if (mode === 'simple') {
         saveApiConfig('openai', openaiKey, openaiKey);
       } else {
         saveApiConfig('openrouter', openrouterKey, openaiKey);
+      }
+
+      // Save to backend if "Remember my API key" is checked and user is authenticated
+      if (rememberApiKey && isSignedIn) {
+        try {
+          await saveApiKey(openaiKey, 'openai');
+        } catch (error) {
+          console.error('Failed to save API key to backend:', error);
+          // Don't block form submission if backend save fails
+          // User can still proceed with session-only storage
+        }
       }
 
       // Submit configuration (contextFiles will be added by App.tsx)
@@ -241,7 +281,30 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ onSubmit, 
               hint="Used for context-aware transcription and summarization"
               required
               fullWidth
+              disabled={isLoadingKey}
             />
+
+            {isSignedIn && (
+              <div className="mt-3">
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={rememberApiKey}
+                    onChange={(e) => setRememberApiKey(e.target.checked)}
+                    className="mt-1 w-[18px] h-[18px] flex-shrink-0 accent-indigo-600 cursor-pointer"
+                    disabled={isLoadingKey}
+                  />
+                  <div className="flex flex-col gap-1">
+                    <span className="text-sm font-medium text-slate-900 dark:text-white">
+                      Remember my API key
+                    </span>
+                    <span className="text-xs text-slate-600 dark:text-slate-400">
+                      Securely encrypted and stored for future sessions. Only you can access it.
+                    </span>
+                  </div>
+                </label>
+              </div>
+            )}
           </div>
 
           <div className="p-4 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg mt-4">
@@ -304,7 +367,30 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ onSubmit, 
               hint="Used for context-aware audio transcription"
               required
               fullWidth
+              disabled={isLoadingKey}
             />
+
+            {isSignedIn && (
+              <div className="mt-3">
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={rememberApiKey}
+                    onChange={(e) => setRememberApiKey(e.target.checked)}
+                    className="mt-1 w-[18px] h-[18px] flex-shrink-0 accent-indigo-600 cursor-pointer"
+                    disabled={isLoadingKey}
+                  />
+                  <div className="flex flex-col gap-1">
+                    <span className="text-sm font-medium text-slate-900 dark:text-white">
+                      Remember my API key
+                    </span>
+                    <span className="text-xs text-slate-600 dark:text-slate-400">
+                      Securely encrypted and stored for future sessions. Only you can access it.
+                    </span>
+                  </div>
+                </label>
+              </div>
+            )}
           </div>
 
           <div className="mb-8">

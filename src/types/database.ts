@@ -179,6 +179,23 @@ export interface Database {
         };
         Update: Partial<Database['public']['Tables']['credit_transactions']['Insert']>;
       };
+      user_settings: {
+        Row: {
+          id: string;
+          user_id: string;
+          openai_api_key_encrypted: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          openai_api_key_encrypted?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database['public']['Tables']['user_settings']['Insert']>;
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;

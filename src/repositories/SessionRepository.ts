@@ -93,6 +93,24 @@ export class SessionRepository {
   }
 
   /**
+   * Create or update a session (upsert)
+   * @throws Error if upsert fails
+   */
+  async upsert(data: CreateSessionDTO): Promise<Session> {
+    const response = await fetch(`${this.baseUrl}/upsert`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to upsert session');
+    }
+
+    return response.json();
+  }
+
+  /**
    * Fetch a session by sessionId
    * @returns Session or null if not found
    * @throws Error on server errors

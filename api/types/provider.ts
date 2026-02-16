@@ -61,6 +61,13 @@ export interface TranscriptionResponse {
   text: string;
   /** Speaker-labeled utterances (if diarization enabled) */
   utterances?: Utterance[];
+  /** Whisper API segments with real timestamps (for accurate syncing) */
+  segments?: Array<{
+    text: string;
+    start: number; // seconds
+    end: number;
+    id: number;
+  }>;
   /** Audio duration in seconds */
   duration?: number;
   /** Language detected */

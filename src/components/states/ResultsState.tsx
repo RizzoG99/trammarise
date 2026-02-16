@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { Modal, ChatInterface, Snackbar, AILoadingOrb, Text } from '@/lib';
 import { chatWithAI } from '../../utils/api';
+import { useAuth } from '@clerk/clerk-react';
 
 import type { ProcessingResult, ChatMessage, AudioFile, AIConfiguration } from '../../types/audio';
 import { ResultsLayout } from '../../features/results/components/ResultsLayout';
@@ -11,7 +12,10 @@ import { SpeakerTranscriptView } from '../../features/results/components/Speaker
 import { FloatingChatButton } from '../../features/results/components/FloatingChatButton';
 import { useHeader, useHeaderConfig } from '../../hooks/useHeader';
 import { useAudioPlayer } from '../../features/results/hooks/useAudioPlayer';
-import { parseTranscriptToSegments } from '../../features/results/utils/transcriptParser';
+import {
+  parseTranscriptToSegments,
+  parseSegmentsToTranscript,
+} from '../../features/results/utils/transcriptParser';
 
 /**
  * Safely extracts API key from configuration.
@@ -53,7 +57,7 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
   const [isPdfGenerating, setIsPdfGenerating] = useState(false);
   const [pdfError, setPdfError] = useState<string | null>(null);
   const [pdfSuccess, setPdfSuccess] = useState(false);
-  
+
   // Upgrade Modal State
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
   const [upgradeTrigger, setUpgradeTrigger] = useState<UpgradeTrigger>('generic');
@@ -61,17 +65,28 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
   const { subscription } = useSubscription();
   const userTier = subscription?.tier || 'free';
 
+  // Clerk authentication
+  const { getToken } = useAuth();
+
   // Get current filename from global header context
   const { fileName } = useHeader();
 
   // Audio player state (shared between AudioPlayerBar and SearchableTranscript)
   const audioPlayer = useAudioPlayer(audioFile);
 
+  // Detect if diarization was used (check if utterances exist)
+  const hasDiarization = result.utterances && result.utterances.length > 0;
+
   // Parse transcript into segments (memoized)
-  const transcriptSegments = useMemo(
-    () => parseTranscriptToSegments(result.transcript),
-    [result.transcript]
-  );
+  // Prefer real segments from Whisper API when available, otherwise use mock parsing
+  const transcriptSegments = useMemo(() => {
+    if (result.segments && result.segments.length > 0) {
+      // Use real Whisper API segments for accurate syncing
+      return parseSegmentsToTranscript(result.segments, hasDiarization);
+    }
+    // Fallback to mock parsing when real segments unavailable
+    return parseTranscriptToSegments(result.transcript, hasDiarization);
+  }, [result.transcript, result.segments, hasDiarization]);
 
   // Find active segment based on current audio time
   const activeSegmentId = useMemo(() => {
@@ -104,9 +119,9 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
   const handleSendMessage = async (message: string) => {
     // Double check gating although UI should prevent it
     if (userTier === 'free') {
-       setUpgradeTrigger('chat_gate');
-       setIsUpgradeModalOpen(true);
-       return;
+      setUpgradeTrigger('chat_gate');
+      setIsUpgradeModalOpen(true);
+      return;
     }
 
     setIsLoadingChat(true);
@@ -131,6 +146,7 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
         result.chatHistory,
         result.configuration.provider,
         apiKey,
+        getToken,
         result.configuration.model,
         language
       );
@@ -171,9 +187,9 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
       // Dynamically import to reduce bundle size (1.6MB+)
       const { generatePDF } = await import('../../utils/pdf-generator');
       await generatePDF(
-        result.summary, 
-        result.transcript, 
-        result.configuration, 
+        result.summary,
+        result.transcript,
+        result.configuration,
         fileName,
         userTier
       );
@@ -183,6 +199,14 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
 
       // Auto-dismiss success message after 3 seconds
       setTimeout(() => setPdfSuccess(false), 3000);
+
+      // For free users, show upgrade modal to remove watermark
+      if (userTier === 'free') {
+        setTimeout(() => {
+          setUpgradeTrigger('watermark_remove');
+          setIsUpgradeModalOpen(true);
+        }, 2000);
+      }
     } catch (error) {
       console.error('❌ PDF generation error:', error);
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
@@ -219,11 +243,7 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
           )
         }
         floatingChatButton={
-          <FloatingChatButton
-            onClick={handleChatOpen}
-            isOpen={isChatOpen}
-            hasNewMessages={false}
-          />
+          <FloatingChatButton onClick={handleChatOpen} isOpen={isChatOpen} hasNewMessages={false} />
         }
         chatModal={
           isChatOpen && (

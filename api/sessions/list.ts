@@ -22,7 +22,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     // Authenticate user
-    const { userId } = await requireAuth();
+    const { userId } = await requireAuth(req);
 
     // Parse pagination parameters
     const limit = Math.min(parseInt((req.query.limit as string) || '50', 10), 100);

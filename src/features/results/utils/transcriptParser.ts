@@ -22,9 +22,13 @@ export interface TranscriptSegment {
  * - Use real speaker diarization
  *
  * @param transcript - Flat transcript text
+ * @param includeSpeakers - Whether to include speaker labels (default: true)
  * @returns Array of structured segments
  */
-export function parseTranscriptToSegments(transcript: string): TranscriptSegment[] {
+export function parseTranscriptToSegments(
+  transcript: string,
+  includeSpeakers: boolean = true
+): TranscriptSegment[] {
   if (!transcript || transcript.trim().length === 0) {
     return [];
   }
@@ -42,9 +46,7 @@ export function parseTranscriptToSegments(transcript: string): TranscriptSegment
 
   paragraphs.forEach((paragraph, index) => {
     // Split long paragraphs into sentences
-    const sentences = paragraph
-      .split(/(?<=[.!?])\s+/)
-      .filter((s) => s.trim().length > 0);
+    const sentences = paragraph.split(/(?<=[.!?])\s+/).filter((s) => s.trim().length > 0);
 
     // If paragraph is short, keep as one segment
     if (paragraph.length < 200 || sentences.length <= 1) {
@@ -52,7 +54,7 @@ export function parseTranscriptToSegments(transcript: string): TranscriptSegment
         id: `segment-${index}`,
         timestamp: formatTimestamp(currentTime),
         timestampSeconds: currentTime,
-        speaker: speakers[currentSpeaker % speakers.length],
+        speaker: includeSpeakers ? speakers[currentSpeaker % speakers.length] : '',
         text: paragraph,
       });
       currentTime += 15; // Mock: 15 seconds per segment
@@ -64,7 +66,7 @@ export function parseTranscriptToSegments(transcript: string): TranscriptSegment
           id: `segment-${index}-${sentenceIndex}`,
           timestamp: formatTimestamp(currentTime),
           timestampSeconds: currentTime,
-          speaker: speakers[currentSpeaker % speakers.length],
+          speaker: includeSpeakers ? speakers[currentSpeaker % speakers.length] : '',
           text: sentence,
         });
         currentTime += 8; // Mock: 8 seconds per sentence
@@ -74,6 +76,30 @@ export function parseTranscriptToSegments(transcript: string): TranscriptSegment
   });
 
   return segments;
+}
+
+/**
+ * Parse Whisper API segments into structured transcript segments.
+ *
+ * Uses real timestamps from Whisper API for accurate audio syncing.
+ *
+ * @param segments - Whisper API segments with real timestamps
+ * @param includeSpeakers - Whether to include mock speaker labels (default: true)
+ * @returns Array of structured segments with real timestamps
+ */
+export function parseSegmentsToTranscript(
+  segments: Array<{ text: string; start: number; end: number }>,
+  includeSpeakers: boolean = true
+): TranscriptSegment[] {
+  const speakers = ['Speaker A', 'Speaker B', 'Speaker C'];
+
+  return segments.map((seg, index) => ({
+    id: `segment-${index}`,
+    timestamp: formatTimestamp(seg.start),
+    timestampSeconds: seg.start,
+    speaker: includeSpeakers ? speakers[index % speakers.length] : '',
+    text: seg.text.trim(),
+  }));
 }
 
 /**

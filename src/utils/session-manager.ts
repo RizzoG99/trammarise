@@ -1,4 +1,5 @@
 import type { SessionData } from '../types/routing';
+import type { SubscriptionTier } from '@/context/subscription-types';
 import {
   saveAudioFile,
   loadAudioFile,
@@ -12,6 +13,15 @@ import { sessionRepository } from '@/repositories/SessionRepository';
 import { uploadAudioFile, deleteAudioFile as deleteStorageAudioFile } from './storage-manager';
 
 const SESSION_KEY_PREFIX = 'trammarise_session_';
+
+/**
+ * Cache to prevent File object re-creation for same session blob.
+ * Key: sessionId, Value: { blob, file }
+ *
+ * This ensures stable File references across loadSession() calls,
+ * preventing unnecessary useEffect cleanup/re-initialization in hooks.
+ */
+const audioFileCache = new Map<string, { blob: Blob; file: File }>();
 
 /**
  * Generate a unique session ID
@@ -30,8 +40,16 @@ function getSessionKey(sessionId: string): string {
 /**
  * Save session data to localStorage and IndexedDB
  * Files and Blobs are stored in IndexedDB, metadata in localStorage
+ *
+ * @param sessionId - Unique session identifier
+ * @param data - Session data to save
+ * @param tier - Optional subscription tier for determining upload strategy
  */
-export async function saveSession(sessionId: string, data: Partial<SessionData>): Promise<void> {
+export async function saveSession(
+  sessionId: string,
+  data: Partial<SessionData>,
+  tier?: SubscriptionTier
+): Promise<void> {
   try {
     const existingData = await loadSession(sessionId);
 
@@ -69,63 +87,38 @@ export async function saveSession(sessionId: string, data: Partial<SessionData>)
       let audioUrl: string | undefined;
 
       // Upload audio file to Supabase Storage if present
+      // Strategy depends on subscription tier (free=none, pro=metadata, team=full)
       if (audioFile) {
-        audioUrl = await uploadAudioFile(sessionId, audioFile.blob, audioFile.name);
+        audioUrl = await uploadAudioFile(sessionId, audioFile.blob, audioFile.name, tier);
       }
 
-      // Check if session exists
-      const existingSession = await sessionRepository.get(sessionId);
+      // Upsert session (create or update in one operation)
+      const upsertData: import('../repositories/SessionRepository').CreateSessionDTO = {
+        sessionId,
+        audioName: sessionData.audioName || 'unknown.wav',
+        fileSizeBytes: sessionData.fileSizeBytes || 0,
+        language: sessionData.language || 'en',
+        contentType: sessionData.contentType || 'other',
+      };
 
-      if (existingSession) {
-        // Update existing session - only send fields that changed
-        const updateData: Record<string, unknown> = {};
-        if (audioUrl) updateData.audioUrl = audioUrl;
-        if (sessionData.processingMode) updateData.processingMode = sessionData.processingMode;
-        if (sessionData.noiseProfile) updateData.noiseProfile = sessionData.noiseProfile;
-        if (sessionData.selectionMode) updateData.selectionMode = sessionData.selectionMode;
-        if (sessionData.regionStart !== undefined) updateData.regionStart = sessionData.regionStart;
-        if (sessionData.regionEnd !== undefined) updateData.regionEnd = sessionData.regionEnd;
+      // Add all optional fields
+      if (audioUrl) upsertData.audioUrl = audioUrl;
+      if (sessionData.processingMode) upsertData.processingMode = sessionData.processingMode;
+      if (sessionData.noiseProfile) upsertData.noiseProfile = sessionData.noiseProfile;
+      if (sessionData.selectionMode) upsertData.selectionMode = sessionData.selectionMode;
+      if (sessionData.regionStart !== undefined) upsertData.regionStart = sessionData.regionStart;
+      if (sessionData.regionEnd !== undefined) upsertData.regionEnd = sessionData.regionEnd;
 
-        // Extract from result if present
-        if (sessionData.result) {
-          if (sessionData.result.transcript) updateData.transcript = sessionData.result.transcript;
-          if (sessionData.result.summary) updateData.summary = sessionData.result.summary;
-          if (sessionData.result.chatHistory)
-            updateData.chatHistory = sessionData.result.chatHistory;
-          if (sessionData.result.configuration)
-            updateData.aiConfig = sessionData.result.configuration;
-        }
-
-        await sessionRepository.update(sessionId, updateData);
-      } else {
-        // Create new session - all required fields must be present
-        const createData: import('../repositories/SessionRepository').CreateSessionDTO = {
-          sessionId,
-          audioName: sessionData.audioName || 'unknown.wav',
-          fileSizeBytes: sessionData.fileSizeBytes || 0,
-          language: sessionData.language || 'en',
-          contentType: sessionData.contentType || 'other',
-        };
-
-        if (audioUrl) createData.audioUrl = audioUrl;
-        if (sessionData.processingMode) createData.processingMode = sessionData.processingMode;
-        if (sessionData.noiseProfile) createData.noiseProfile = sessionData.noiseProfile;
-        if (sessionData.selectionMode) createData.selectionMode = sessionData.selectionMode;
-        if (sessionData.regionStart !== undefined) createData.regionStart = sessionData.regionStart;
-        if (sessionData.regionEnd !== undefined) createData.regionEnd = sessionData.regionEnd;
-
-        // Extract from result if present
-        if (sessionData.result) {
-          if (sessionData.result.transcript) createData.transcript = sessionData.result.transcript;
-          if (sessionData.result.summary) createData.summary = sessionData.result.summary;
-          if (sessionData.result.chatHistory)
-            createData.chatHistory = sessionData.result.chatHistory;
-          if (sessionData.result.configuration)
-            createData.aiConfig = sessionData.result.configuration;
-        }
-
-        await sessionRepository.create(createData);
+      // Extract from result if present
+      if (sessionData.result) {
+        if (sessionData.result.transcript) upsertData.transcript = sessionData.result.transcript;
+        if (sessionData.result.summary) upsertData.summary = sessionData.result.summary;
+        if (sessionData.result.chatHistory) upsertData.chatHistory = sessionData.result.chatHistory;
+        if (sessionData.result.configuration)
+          upsertData.aiConfig = sessionData.result.configuration;
       }
+
+      await sessionRepository.upsert(upsertData);
     } catch (apiError) {
       // Silently fail - user might not be authenticated or API might be unavailable
       // localStorage is the fallback, so we don't throw
@@ -169,12 +162,22 @@ export async function loadSession(sessionId: string): Promise<SessionData | null
     // Load files from IndexedDB
     const audioFileRecord = await loadAudioFile(sessionId);
     if (audioFileRecord) {
+      // Check cache to avoid creating new File objects for same blob
+      let cached = audioFileCache.get(sessionId);
+
+      // Only create new File if blob has changed or not cached
+      if (!cached || cached.blob !== audioFileRecord.audioBlob) {
+        const file = new File([audioFileRecord.audioBlob], audioFileRecord.audioName, {
+          type: audioFileRecord.audioBlob.type,
+        });
+        cached = { blob: audioFileRecord.audioBlob, file };
+        audioFileCache.set(sessionId, cached);
+      }
+
       session.audioFile = {
         name: audioFileRecord.audioName,
-        blob: audioFileRecord.audioBlob,
-        file: new File([audioFileRecord.audioBlob], audioFileRecord.audioName, {
-          type: audioFileRecord.audioBlob.type,
-        }),
+        blob: cached.blob,
+        file: cached.file,
       };
     }
 
@@ -200,6 +203,9 @@ export async function loadSession(sessionId: string): Promise<SessionData | null
  */
 export async function deleteSession(sessionId: string): Promise<void> {
   try {
+    // Clear cache entry to prevent memory leaks
+    audioFileCache.delete(sessionId);
+
     // Remove from localStorage and IndexedDB
     localStorage.removeItem(getSessionKey(sessionId));
     await Promise.all([deleteAudioFile(sessionId), deleteContextFiles(sessionId)]);
@@ -244,6 +250,9 @@ export function getAllSessionIds(): string[] {
  * Clear all sessions (useful for testing/reset)
  */
 export async function clearAllSessions(): Promise<void> {
+  // Clear entire cache
+  audioFileCache.clear();
+
   const sessionIds = getAllSessionIds();
   await Promise.all(sessionIds.map(deleteSession));
   await deleteAllFiles();

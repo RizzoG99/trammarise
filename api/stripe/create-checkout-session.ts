@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import Stripe from 'stripe';
-import { requireAuth } from '../middleware/auth';
+import { requireAuth, AuthError } from '../middleware/auth';
 import { supabaseAdmin } from '../lib/supabase-admin';
 
 // Lazy initialization of Stripe
@@ -9,7 +9,7 @@ let stripe: Stripe | null = null;
 function getStripeClient(): Stripe {
   if (!stripe) {
     stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-      apiVersion: '2024-12-18.acacia',
+      apiVersion: '2026-01-28.clover',
     });
   }
   return stripe;
@@ -48,7 +48,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     // Authenticate user
-    const { userId, clerkId } = await requireAuth();
+    const { userId, clerkId } = await requireAuth(req);
 
     // Get user email from database
     const { data: user, error: userError } = await supabaseAdmin
@@ -103,8 +103,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   } catch (error) {
     console.error('Stripe checkout session error:', error);
 
-    if (error instanceof Error && error.message === 'Unauthorized') {
-      return res.status(401).json({ error: 'Unauthorized' });
+    // Handle authentication errors
+    if (error instanceof AuthError) {
+      return res.status(error.statusCode).json({ error: error.message });
+    }
+
+    // Handle Stripe API errors
+    if (error instanceof Error && error.message.includes('Stripe')) {
+      return res.status(400).json({ error: error.message });
     }
 
     return res.status(500).json({ error: 'Failed to create checkout session' });

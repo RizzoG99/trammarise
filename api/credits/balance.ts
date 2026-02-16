@@ -22,7 +22,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const { userId } = await requireAuth();
+    const { userId } = await requireAuth(req);
 
     // Fetch subscription with credits balance
     const { data: subscription, error: subError } = await supabaseAdmin

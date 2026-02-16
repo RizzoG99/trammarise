@@ -21,7 +21,7 @@ let stripe: Stripe | null = null;
 function getStripeClient(): Stripe {
   if (!stripe) {
     stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-      apiVersion: '2024-12-18.acacia',
+      apiVersion: '2026-01-28.clover',
     });
   }
   return stripe;
@@ -41,7 +41,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const { userId, clerkId } = await requireAuth();
+    const { userId, clerkId } = await requireAuth(req);
     const { credits } = req.body;
 
     // Validate credit amount

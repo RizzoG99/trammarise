@@ -148,6 +148,14 @@ export interface TranscriptionJob {
   /** Speaker-labeled utterances (if speaker diarization enabled) */
   utterances?: Utterance[];
 
+  /** Whisper API segments with real timestamps (for accurate syncing) */
+  segments?: Array<{
+    text: string;
+    start: number; // seconds
+    end: number;
+    id: number;
+  }>;
+
   /** Error message (if failed) */
   error?: string;
 
@@ -219,6 +227,14 @@ export interface JobStatusResponse {
 
   /** Speaker-labeled utterances (if speaker diarization enabled) */
   utterances?: Utterance[];
+
+  /** Whisper API segments with real timestamps */
+  segments?: Array<{
+    text: string;
+    start: number; // seconds
+    end: number;
+    id: number;
+  }>;
 
   /** Error message (if failed) */
   error?: string;
