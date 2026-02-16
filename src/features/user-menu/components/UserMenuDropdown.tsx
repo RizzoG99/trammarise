@@ -1,7 +1,11 @@
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { useClerk } from '@clerk/clerk-react';
-import { User, Key, CreditCard, LogOut, Sparkles } from 'lucide-react';
+import { User, Key, CreditCard, LogOut, Sparkles, History } from 'lucide-react';
 import type { ModalTab } from '../hooks/useUserMenu';
+import { clearApiConfig } from '@/utils/session-storage';
+import { deleteSavedApiKey } from '@/utils/api';
+import { ROUTES } from '@/types/routing';
 
 interface UserMenuDropdownProps {
   isSubscribed: boolean;
@@ -15,9 +19,24 @@ export function UserMenuDropdown({
   onClose,
 }: UserMenuDropdownProps) {
   const { t } = useTranslation();
-  const { signOut } = useClerk();
+  const navigate = useNavigate();
+  const { signOut, session } = useClerk();
 
   const handleSignOut = async () => {
+    try {
+      // Clear session storage API key
+      clearApiConfig();
+
+      // Delete saved API key from database
+      if (session) {
+        const getToken = async () => session.getToken();
+        await deleteSavedApiKey(getToken);
+      }
+    } catch (error) {
+      console.error('Error clearing API keys on logout:', error);
+      // Continue with logout even if cleanup fails
+    }
+
     await signOut();
     onClose();
   };
@@ -57,6 +76,23 @@ export function UserMenuDropdown({
       aria-label={t('userMenu.ariaLabel')}
       className="absolute right-0 mt-2 w-56 py-2 bg-bg-surface border border-border rounded-lg shadow-xl z-50 backdrop-blur-md"
     >
+      {/* History - Only visible on mobile */}
+      <button
+        type="button"
+        role="menuitem"
+        className="md:hidden w-full flex items-center gap-3 px-4 py-2.5 text-sm text-text-primary hover:bg-bg-hover transition-colors"
+        onClick={() => {
+          navigate(ROUTES.HISTORY);
+          onClose();
+        }}
+      >
+        <History className="w-4 h-4" />
+        <span>{t('nav.history', 'History')}</span>
+      </button>
+
+      {/* Divider after History (mobile only) */}
+      <div className="md:hidden my-1 border-t border-border" />
+
       {menuItems.map((item, index) => {
         const Icon = item.icon;
         return (

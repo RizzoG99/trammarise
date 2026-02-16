@@ -201,9 +201,12 @@ export function UploadPanel({ onFileUpload, uploadedFile, onFileRemove }: Upload
       <input
         ref={fileInputRef}
         type="file"
+        id="audio-file-upload"
+        name="audio-file"
         accept="audio/*"
         onChange={handleFileSelect}
         className="hidden"
+        aria-label="Upload audio file (drag and drop or click to browse)"
         data-testid="file-input"
       />
     </GlassCard>

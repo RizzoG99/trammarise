@@ -54,9 +54,11 @@ export function GlassCard({
   style,
 }: GlassCardProps) {
   const variantClasses = {
-    light: 'bg-white/80 dark:bg-slate-900/40 border-white/20 dark:border-white/10 shadow-lg backdrop-blur-md',
-    dark: 'bg-slate-900/80 dark:bg-slate-950/60 border-slate-700/50 dark:border-white/5 shadow-xl backdrop-blur-xl',
-    primary: 'bg-blue-500/10 dark:bg-blue-500/5 border-blue-200/50 dark:border-blue-500/20 shadow-lg shadow-blue-500/5 backdrop-blur-md',
+    light:
+      'bg-white/80 dark:bg-slate-900/40 border-white/20 dark:border-white/10 shadow-lg backdrop-blur-md',
+    dark: 'bg-[var(--color-bg-surface)] border-[var(--color-border)] shadow-xl backdrop-blur-xl',
+    primary:
+      'bg-blue-500/10 dark:bg-blue-500/5 border-blue-200/50 dark:border-blue-500/20 shadow-lg shadow-blue-500/5 backdrop-blur-md',
     glow: 'bg-slate-900/40 dark:bg-slate-900/30 border-white/10 dark:border-white/5 shadow-[0_0_15px_rgba(59,130,246,0.1)] backdrop-blur-xl',
   };
 
@@ -76,7 +78,9 @@ export function GlassCard({
         shadow-[var(--shadow-glass)]
         transition-all duration-[var(--transition-normal)]
         ${className}
-      `.trim().replace(/\s+/g, ' ')}
+      `
+        .trim()
+        .replace(/\s+/g, ' ')}
       style={style}
     >
       {children}

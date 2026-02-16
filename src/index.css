@@ -99,10 +99,10 @@
     --color-bg-tertiary: #1e293b;
     --color-bg-glass: rgba(15, 23, 42, 0.6);
 
-    --color-bg-surface: rgba(30, 41, 59, 0.4);
-    --color-bg-surface-hover: rgba(51, 65, 85, 0.5);
+    --color-bg-surface: rgba(30, 41, 59, 0.95);
+    --color-bg-surface-hover: rgba(51, 65, 85, 0.8);
 
-    --color-border: rgba(255, 255, 255, 0.1);
+    --color-border: rgba(255, 255, 255, 0.15);
     --color-border-glass: rgba(255, 255, 255, 0.08);
 
     --color-text-primary: #f8fafc;
@@ -119,8 +119,7 @@
     /* Glassmorphism for Dark Mode - 5% opacity, 24px blur */
     --glass-bg: rgba(15, 23, 42, 0.5); /* Slightly more opaque for legibility */
     --glass-bg-light: rgba(30, 41, 59, 0.4);
-    --glass-border: rgba(255, 255, 255, 0.08); 
-  }
+    --glass-border: rgba(255, 255, 255, 0.08);
   }
 
   body {

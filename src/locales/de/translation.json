@@ -93,6 +93,8 @@
     "startRecording": "Aufnahme starten",
     "stopRecording": "Stoppen & Speichern",
     "processButton": "Audio verarbeiten",
+    "processingButton": "Verarbeitung...",
+    "processingError": "Fehler beim Speichern der Sitzung. Bitte versuchen Sie es erneut.",
     "audioOnly": "Bitte laden Sie nur Audiodateien hoch",
     "fileTooLarge": "Datei zu groß",
     "maxSize": "Maximale Größe",
@@ -512,7 +514,15 @@
   },
   "history": {
     "title": "Aufnahmeverlauf",
+    "subtitle": "{{count}} Aufnahmen insgesamt",
     "description": "Verwalten Sie Ihre Aufnahmen und generierten Zusammenfassungen",
+    "searchPlaceholder": "Nach Name oder Inhalt suchen...",
+    "sort": {
+      "newest": "Neueste zuerst",
+      "oldest": "Älteste zuerst",
+      "nameAsc": "Name (A-Z)",
+      "nameDesc": "Name (Z-A)"
+    },
     "dashboard": {
       "totalProcessed": "Gesamt Verarbeitet",
       "topCategory": "Top Kategorie",

@@ -92,6 +92,8 @@
     "startRecording": "Start Recording",
     "stopRecording": "Stop & Save",
     "processButton": "Process Audio",
+    "processingButton": "Processing...",
+    "processingError": "Failed to save session. Please try again.",
     "audioOnly": "Please upload an audio file only",
     "fileTooLarge": "File too large",
     "maxSize": "Maximum size",
@@ -518,7 +520,15 @@
       "sessions_plural": "{{count}} sessions"
     },
     "title": "Recording History",
+    "subtitle": "{{count}} total recordings",
     "description": "Manage your recordings and generated summaries",
+    "searchPlaceholder": "Search by name or content...",
+    "sort": {
+      "newest": "Newest First",
+      "oldest": "Oldest First",
+      "nameAsc": "Name (A-Z)",
+      "nameDesc": "Name (Z-A)"
+    },
     "stats": {
       "recordingCount": "{{count}} recording",
       "recordingCount_plural": "{{count}} recordings"
@@ -567,12 +577,15 @@
       "newBadge": "✨ Introducing Liquid Glass Design",
       "titlePart1": "Transcribe & Summarize",
       "titlePart2": "In Seconds",
-      "description": "Transform your meetings, lectures, and interviews into actionable insights with our secure, client-side AI transcription.",
+      "description": "Transform your meetings, lectures, and interviews into actionable insights. Start with 60 free minutes, upgrade for unlimited access.",
       "cta": {
+        "primary": "Start Free Trial",
+        "secondary": "View Pricing",
         "getStarted": "Get Started Free",
         "viewFeatures": "View Features",
         "appPreview": "[App Preview Visualization]"
-      }
+      },
+      "noCreditCard": "No credit card required"
     },
     "features": {
       "title": "Power Tools for Audio",
@@ -591,6 +604,39 @@
           "description": "Your data stays yours. Client-side processing ensures maximum privacy. No audio leaves your device without permission."
         }
       }
+    },
+    "pricing": {
+      "title": "Simple, Transparent Pricing",
+      "subtitle": "Choose the plan that fits your needs",
+      "free": {
+        "name": "Free",
+        "price": "$0",
+        "interval": "/month",
+        "description": "Try before you upgrade",
+        "cta": "Start Free Trial"
+      },
+      "pro": {
+        "name": "Pro",
+        "price": "$19",
+        "interval": "/month",
+        "badge": "Most Popular",
+        "description": "For professionals",
+        "cta": "Upgrade to Pro"
+      },
+      "team": {
+        "name": "Team",
+        "price": "$49",
+        "interval": "/month",
+        "description": "For teams",
+        "cta": "Contact Sales"
+      },
+      "viewComparison": "View detailed comparison"
+    },
+    "cta": {
+      "title": "Ready to boost your productivity?",
+      "description": "Join professionals who save hours every week with AI-powered transcription.",
+      "free": "Start Free Trial (60 min)",
+      "pro": "Unlock Pro Features"
     },
     "ctaSection": {
       "title": "Ready to transform your workflow?",
@@ -611,7 +657,7 @@
   },
   "pricing": {
     "title": "Choose Your Plan",
-    "subtitle": "Start for free with your own API keys, or upgrade for hosted AI and premium features",
+    "subtitle": "Start with 60 free minutes per month, then upgrade for more capacity and premium features",
     "monthly": "Monthly",
     "annual": "Annual",
     "save2Months": "Save 2 months",
@@ -620,18 +666,60 @@
     "saveAmount": "Save ${{amount}}/year",
     "faq": {
       "title": "Frequently Asked Questions",
+      "freeTrial": {
+        "question": "How does the free trial work?",
+        "answer": "Sign up for free and get 60 minutes of transcription per month. No credit card required. Upgrade anytime for more minutes and advanced features."
+      },
       "byok": {
         "question": "What does BYOK mean?",
         "answer": "BYOK (Bring Your Own Key) means you provide your own OpenAI API key. This gives you full control and pay-as-you-go pricing directly from OpenAI, with no monthly fees."
       },
       "cancel": {
         "question": "Can I cancel anytime?",
-        "answer": "Yes! You can cancel your subscription at any time. Your access will continue until the end of your billing period, and you can always downgrade to the free BYOK tier."
+        "answer": "Yes! You can cancel your subscription at any time. Your access will continue until the end of your billing period, and you can always downgrade to the free tier."
       },
       "minutes": {
         "question": "What happens if I exceed my minutes?",
-        "answer": "You can purchase additional credits at any time. Unused minutes don't roll over, but you can always use your own API keys for unlimited processing."
+        "answer": "You can purchase additional credits at any time. Unused minutes don't roll over, so choose a plan that fits your needs."
       }
+    }
+  },
+  "onboarding": {
+    "modal": {
+      "title": "🔑 Welcome to Trammarise",
+      "heading": "One More Step to Get Started",
+      "description": "To use Trammarise, you need to either provide your own OpenAI API key or upgrade to a Pro plan.",
+      "option1": {
+        "title": "Option 1: Use Your Own API Key (Free)",
+        "placeholder": "sk-...",
+        "rememberKey": "Remember my API key (stored encrypted)",
+        "continueButton": "Continue with API Key",
+        "saving": "Saving...",
+        "instructions": {
+          "toggle": "How to get an OpenAI API key",
+          "step1": "Go to platform.openai.com",
+          "step2": "Sign in or create an account",
+          "step3": "Click \"Create new secret key\"",
+          "step4": "Copy the key (starts with \"sk-\")",
+          "step5": "Paste it in the field above",
+          "note": "💡 You'll pay OpenAI directly for usage (typically $0.006/minute for Whisper)"
+        },
+        "errors": {
+          "empty": "Please enter your API key",
+          "invalidFormat": "Invalid API key format. OpenAI keys start with \"sk-\"",
+          "saveFailed": "Failed to save API key. Please try again."
+        }
+      },
+      "option2": {
+        "title": "Option 2: Upgrade to Pro",
+        "description": "Get 500 minutes/month with hosted API, cloud sync, and priority support.",
+        "button": "View Pro Plans →"
+      },
+      "divider": "or"
+    },
+    "banner": {
+      "message": "You're almost there! Complete setup to unlock Trammarise.",
+      "button": "Back to Setup"
     }
   }
 }

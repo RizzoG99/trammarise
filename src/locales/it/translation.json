@@ -93,6 +93,8 @@
     "startRecording": "Avvia Registrazione",
     "stopRecording": "Ferma e Salva",
     "processButton": "Elabora Audio",
+    "processingButton": "Elaborazione...",
+    "processingError": "Impossibile salvare la sessione. Riprova.",
     "audioOnly": "Carica solo file audio",
     "fileTooLarge": "File troppo grande",
     "maxSize": "Dimensione massima",
@@ -519,7 +521,15 @@
       "sessions_plural": "{{count}} sessioni"
     },
     "title": "Cronologia Registrazioni",
+    "subtitle": "{{count}} registrazioni totali",
     "description": "Gestisci le tue registrazioni e i riassunti generati",
+    "searchPlaceholder": "Cerca per nome o contenuto...",
+    "sort": {
+      "newest": "Più Recenti",
+      "oldest": "Più Vecchi",
+      "nameAsc": "Nome (A-Z)",
+      "nameDesc": "Nome (Z-A)"
+    },
     "stats": {
       "recordingCount": "{{count}} registrazione",
       "recordingCount_plural": "{{count}} registrazioni"

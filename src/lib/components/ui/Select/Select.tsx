@@ -64,6 +64,7 @@ export function Select({
 }: SelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [highlightedIndex, setHighlightedIndex] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
@@ -94,6 +95,20 @@ export function Select({
       onSearch(searchQuery);
     }
   }, [searchQuery, onSearch]);
+
+  // Scroll highlighted option into view
+  useEffect(() => {
+    if (isOpen && highlightedIndex >= 0) {
+      // Small timeout to ensure DOM is updated
+      setTimeout(() => {
+        const optionElements = containerRef.current?.querySelectorAll('[role="option"]');
+        optionElements?.[highlightedIndex]?.scrollIntoView({
+          block: 'nearest',
+          behavior: 'smooth',
+        });
+      }, 0);
+    }
+  }, [highlightedIndex, isOpen]);
 
   // Helper to check if options are grouped
   const isGrouped = (opts: SelectOption[] | SelectGroup[]): opts is SelectGroup[] => {
@@ -135,6 +150,19 @@ export function Select({
     return (options as SelectOption[]).filter((opt) => opt.label.toLowerCase().includes(query));
   }, [options, searchQuery, searchable, onSearch]);
 
+  // Flatten filtered options for keyboard navigation
+  const flattenedFilteredOptions = useMemo(() => {
+    if (isGrouped(filteredOptions)) {
+      return filteredOptions.flatMap((group) => group.options);
+    }
+    return filteredOptions as SelectOption[];
+  }, [filteredOptions]);
+
+  // Reset highlighted index when filtered options change
+  useEffect(() => {
+    setHighlightedIndex(0);
+  }, [flattenedFilteredOptions]);
+
   const handleSelect = (optionValue: string) => {
     onChange(optionValue);
     setIsOpen(false);
@@ -148,8 +176,9 @@ export function Select({
   };
 
   // Render a single option
-  const renderSingleOption = (option: SelectOption) => {
+  const renderSingleOption = (option: SelectOption, index: number) => {
     const isSelected = option.value === value;
+    const isHighlighted = index === highlightedIndex;
 
     if (renderOption) {
       return (
@@ -157,10 +186,19 @@ export function Select({
           key={option.value}
           type="button"
           onClick={() => handleSelect(option.value)}
+          onMouseEnter={() => setHighlightedIndex(index)}
+          role="option"
+          aria-selected={isSelected}
           className={`
             w-full px-3 py-2.5 rounded-md text-left text-sm
             transition-colors flex items-center justify-between group
-            ${isSelected ? 'bg-primary/10 text-primary' : 'text-text-primary hover:bg-bg-surface-hover'}
+            ${
+              isHighlighted
+                ? 'bg-primary/10 text-primary'
+                : isSelected
+                  ? 'bg-primary/5 text-primary'
+                  : 'text-text-primary hover:bg-bg-surface-hover'
+            }
           `}
         >
           {renderOption(option, isSelected)}
@@ -173,15 +211,24 @@ export function Select({
         key={option.value}
         type="button"
         onClick={() => handleSelect(option.value)}
+        onMouseEnter={() => setHighlightedIndex(index)}
+        role="option"
+        aria-selected={isSelected}
         className={`
           w-full px-3 py-2.5 rounded-md text-left text-sm
           transition-colors flex items-center justify-between group
-          ${isSelected ? 'bg-primary/10 text-primary' : 'text-text-primary hover:bg-bg-surface-hover'}
+          ${
+            isHighlighted
+              ? 'bg-primary/10 text-primary'
+              : isSelected
+                ? 'bg-primary/5 text-primary'
+                : 'text-text-primary hover:bg-bg-surface-hover'
+          }
         `}
       >
         <span className="flex items-center gap-2 flex-1 truncate">
           {option.icon}
-          <span className={isSelected ? 'font-medium' : ''}>{option.label}</span>
+          <span className={isSelected || isHighlighted ? 'font-medium' : ''}>{option.label}</span>
         </span>
         {isSelected && <Check className="w-4 h-4 text-primary" />}
       </button>
@@ -250,7 +297,34 @@ export function Select({
                   ref={searchInputRef}
                   type="text"
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setHighlightedIndex(0); // Reset to first option when search changes
+                  }}
+                  onKeyDown={(e) => {
+                    const maxIndex = flattenedFilteredOptions.length - 1;
+
+                    switch (e.key) {
+                      case 'ArrowDown':
+                        e.preventDefault();
+                        setHighlightedIndex((prev) => Math.min(prev + 1, maxIndex));
+                        break;
+                      case 'ArrowUp':
+                        e.preventDefault();
+                        setHighlightedIndex((prev) => Math.max(prev - 1, 0));
+                        break;
+                      case 'Enter':
+                        e.preventDefault();
+                        if (flattenedFilteredOptions[highlightedIndex]) {
+                          handleSelect(flattenedFilteredOptions[highlightedIndex].value);
+                        }
+                        break;
+                      case 'Escape':
+                        e.preventDefault();
+                        setIsOpen(false);
+                        break;
+                    }
+                  }}
                   placeholder={searchPlaceholder}
                   className="
                     w-full pl-10 pr-8 py-2 rounded-md
@@ -279,20 +353,28 @@ export function Select({
               <div className="p-4 text-center text-text-secondary text-sm">No options found</div>
             ) : isGrouped(filteredOptions) ? (
               // Render Groups
-              filteredOptions.map((group, groupIndex) => (
-                <div
-                  key={group.label}
-                  className={groupIndex > 0 ? 'border-t border-border mt-1 pt-1' : ''}
-                >
-                  <div className="px-3 py-2 text-xs font-medium text-text-tertiary uppercase tracking-wider bg-bg-primary/50">
-                    {group.label}
+              (() => {
+                let flatIndex = 0;
+                return filteredOptions.map((group, groupIndex) => (
+                  <div
+                    key={group.label}
+                    className={groupIndex > 0 ? 'border-t border-border mt-1 pt-1' : ''}
+                  >
+                    <div className="px-3 py-2 text-xs font-medium text-text-tertiary uppercase tracking-wider bg-bg-primary/50">
+                      {group.label}
+                    </div>
+                    {group.options.map((option) => {
+                      const currentIndex = flatIndex++;
+                      return renderSingleOption(option, currentIndex);
+                    })}
                   </div>
-                  {group.options.map((option) => renderSingleOption(option))}
-                </div>
-              ))
+                ));
+              })()
             ) : (
               // Render Flat List
-              (filteredOptions as SelectOption[]).map((option) => renderSingleOption(option))
+              (filteredOptions as SelectOption[]).map((option, index) =>
+                renderSingleOption(option, index)
+              )
             )}
           </div>
         </div>

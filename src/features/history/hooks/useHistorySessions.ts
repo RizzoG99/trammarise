@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import type { HistorySession } from '../types/history';
 import type { ContentType } from '@/types/content-types';
@@ -122,6 +122,11 @@ export function useHistorySessions(): UseHistorySessionsReturn {
     },
     [loadSessions]
   );
+
+  // Load sessions on mount and when dependencies change
+  useEffect(() => {
+    loadSessions();
+  }, [loadSessions]);
 
   return {
     sessions,

@@ -93,6 +93,8 @@
     "startRecording": "Iniciar Grabación",
     "stopRecording": "Detener y Guardar",
     "processButton": "Procesar Audio",
+    "processingButton": "Procesando...",
+    "processingError": "Error al guardar la sesión. Por favor, inténtalo de nuevo.",
     "audioOnly": "Por favor, sube solo archivos de audio",
     "fileTooLarge": "Archivo demasiado grande",
     "maxSize": "Tamaño máximo",
@@ -512,7 +514,15 @@
   },
   "history": {
     "title": "Historial de Grabaciones",
+    "subtitle": "{{count}} grabaciones totales",
     "description": "Gestiona tus grabaciones y resúmenes generados",
+    "searchPlaceholder": "Buscar por nombre o contenido...",
+    "sort": {
+      "newest": "Más Recientes",
+      "oldest": "Más Antiguos",
+      "nameAsc": "Nombre (A-Z)",
+      "nameDesc": "Nombre (Z-A)"
+    },
     "dashboard": {
       "totalProcessed": "Total Procesado",
       "topCategory": "Categoría Principal",
