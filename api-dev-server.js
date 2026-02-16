@@ -20,6 +20,30 @@ app.use(cors({
 }));
 app.use(express.json({ limit: '50mb' })); // Support large audio file uploads
 
+// Validate critical environment variables at startup
+console.log('Validating environment variables...');
+
+const REQUIRED_ENV_VARS = [
+  'ENCRYPTION_KEY',
+  'CLERK_SECRET_KEY',
+  'CLERK_WEBHOOK_SECRET',
+  'STRIPE_SECRET_KEY',
+  'STRIPE_WEBHOOK_SECRET',
+  'NEXT_PUBLIC_APP_URL',
+  'VITE_SUPABASE_URL',
+  'SUPABASE_SERVICE_ROLE_KEY'
+];
+
+const missing = REQUIRED_ENV_VARS.filter(key => !process.env[key]);
+
+if (missing.length > 0) {
+  console.error('\n❌ CRITICAL: Missing required environment variables:');
+  missing.forEach(key => console.error(`   - ${key}`));
+  console.error('\nPlease check your .env.local file against .env.local.example\n');
+  process.exit(1);
+}
+
+console.log('✅ All required environment variables are present\n');
 console.log('Starting API dev server...');
 
 // Helper to wrap Express req/res to match Vercel's interface

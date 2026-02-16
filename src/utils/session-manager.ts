@@ -84,7 +84,7 @@ export async function saveSession(
     // If authenticated, also save to server
     // This will fail silently if user is not authenticated (API returns 401)
     try {
-      let audioUrl: string | undefined;
+      let audioUrl: string | undefined | null;
 
       // Upload audio file to Supabase Storage if present
       // Strategy depends on subscription tier (free=none, pro=metadata, team=full)

@@ -131,7 +131,7 @@ describe('FileSizeWarningModal', () => {
           onCompress={() => {}}
         />
       );
-      const icon = container.querySelector('.text-amber-500');
+      const icon = container.querySelector('svg.text-amber-500');
       expect(icon).toBeInTheDocument();
     });
   });
@@ -199,7 +199,7 @@ describe('FileSizeWarningModal', () => {
           onCompress={() => {}}
         />
       );
-      const icon = container.querySelector('.text-red-500');
+      const icon = container.querySelector('svg.text-red-500');
       expect(icon).toBeInTheDocument();
     });
   });

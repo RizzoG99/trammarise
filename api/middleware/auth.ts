@@ -22,10 +22,9 @@ export interface AuthResult {
  * Required for Clerk's authenticateRequest which expects a full URL
  */
 function toWebRequest(req: VercelRequest): Request {
-  // Construct full URL from request
-  const protocol = req.headers['x-forwarded-proto'] || 'http';
-  const host = req.headers['x-forwarded-host'] || req.headers.host || 'localhost:3001';
-  const url = `${protocol}://${host}${req.url}`;
+  // Use trusted app URL instead of untrusted headers (prevents SSRF)
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:5173';
+  const url = `${baseUrl}${req.url}`;
 
   // Create web standard Request with headers
   const headers = new Headers();

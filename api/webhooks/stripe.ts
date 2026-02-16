@@ -51,7 +51,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const sig = req.headers['stripe-signature'] as string;
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || '';
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+  if (!webhookSecret) {
+    console.error('CRITICAL: STRIPE_WEBHOOK_SECRET is not configured');
+    return res.status(500).json({ error: 'Webhook configuration error' });
+  }
 
   let event: Stripe.Event;
 
