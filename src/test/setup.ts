@@ -4,6 +4,15 @@ import * as matchers from '@testing-library/jest-dom/matchers';
 
 expect.extend(matchers);
 
+// Set Supabase environment variables for testing
+// These are dummy values used only in test environment
+if (!import.meta.env.VITE_SUPABASE_URL) {
+  import.meta.env.VITE_SUPABASE_URL = 'https://test.supabase.co';
+}
+if (!import.meta.env.VITE_SUPABASE_ANON_KEY) {
+  import.meta.env.VITE_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.test';
+}
+
 import enTranslation from '../locales/en/translation.json';
 
 // Helper to get nested value from object
