@@ -14,6 +14,7 @@
     "preview": "vite preview",
     "setup:ffmpeg": "bash scripts/setup-ffmpeg.sh",
     "test": "vitest",
+    "test:all": "npm test && npm run api-test",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
     "api-test": "vitest --config vitest.api.config.ts",

@@ -9,8 +9,9 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './src/test/setup.ts',
     css: true,
-    include: ['src/**/*.{test,spec}.{ts,tsx}', 'api/**/*.{test,spec}.{ts,tsx}'],
+    include: ['src/**/*.{test,spec}.{ts,tsx}'],
     exclude: [
+      'api/**', // API tests use vitest.api.config.ts
       '**/node_modules/**',
       '**/dist/**',
       '**/e2e/**',
