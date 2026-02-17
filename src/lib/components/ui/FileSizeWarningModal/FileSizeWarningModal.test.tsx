@@ -122,7 +122,7 @@ describe('FileSizeWarningModal', () => {
     });
 
     it('shows warning icon for warning state', () => {
-      const { container } = render(
+      render(
         <FileSizeWarningModal
           isOpen={true}
           onClose={() => {}}
@@ -131,8 +131,7 @@ describe('FileSizeWarningModal', () => {
           onCompress={() => {}}
         />
       );
-      const icon = container.querySelector('.text-amber-500');
-      expect(icon).toBeInTheDocument();
+      expect(screen.getByTestId('warning-icon')).toBeInTheDocument();
     });
   });
 
@@ -190,7 +189,7 @@ describe('FileSizeWarningModal', () => {
     });
 
     it('shows error icon for error state', () => {
-      const { container } = render(
+      render(
         <FileSizeWarningModal
           isOpen={true}
           onClose={() => {}}
@@ -199,8 +198,7 @@ describe('FileSizeWarningModal', () => {
           onCompress={() => {}}
         />
       );
-      const icon = container.querySelector('.text-red-500');
-      expect(icon).toBeInTheDocument();
+      expect(screen.getByTestId('error-icon')).toBeInTheDocument();
     });
   });
 

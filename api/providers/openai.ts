@@ -6,6 +6,7 @@ import type {
 } from 'openai/resources/chat/completions';
 import type { AIProvider, SummarizeParams, ChatParams, TranscribeParams } from './base';
 import { getSummarizationPrompt } from '../../src/utils/transcription-prompts';
+import { getLanguagePrompts } from '../../src/utils/language-prompts';
 import type { ContentType } from '../../src/types/content-types';
 
 export class OpenAIProvider implements AIProvider {
@@ -14,9 +15,13 @@ export class OpenAIProvider implements AIProvider {
   async transcribe(params: TranscribeParams): Promise<string> {
     const openai = new OpenAI({ baseURL: 'https://api.openai.com/v1', apiKey: params.apiKey });
 
+    // Use Whisper API for all transcription (stable, reliable)
+    const modelToUse = params.model || 'whisper-1';
+    console.log(`[OpenAI] Transcribing with model=${modelToUse}`);
+
     const completion = await openai.audio.transcriptions.create({
       file: fs.createReadStream(params.filePath),
-      model: params.model || 'whisper-1',
+      model: modelToUse,
       language: params.language,
       prompt: params.prompt,
       temperature: params.temperature,
@@ -86,15 +91,20 @@ export class OpenAIProvider implements AIProvider {
     history,
     apiKey,
     model,
+    language,
   }: ChatParams & { model?: string }): Promise<string> {
     const openai = new OpenAI({ baseURL: 'https://api.openai.com/v1', apiKey });
+
+    // Get language-specific chat prompt (defaults to English if not supported)
+    const languageCode = language || 'en';
+    const langPrompts = getLanguagePrompts(languageCode);
 
     const completion = await openai.chat.completions.create({
       model: model || 'gpt-4o',
       messages: [
         {
           role: 'system',
-          content: `You are a helpful assistant with access to an audio transcript and its summary.
+          content: `${langPrompts.chatSystemPrompt}
 
 Transcript: ${transcript}
 

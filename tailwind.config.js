@@ -14,6 +14,7 @@ export default {
         'bg-glass': 'var(--color-bg-glass)',
         'bg-surface': 'var(--color-bg-surface)',
         'bg-surface-hover': 'var(--color-bg-surface-hover)',
+        'border': 'var(--color-border)',
         'border-glass': 'var(--color-border-glass)',
         'text-primary': 'var(--color-text-primary)',
         'text-secondary': 'var(--color-text-secondary)',

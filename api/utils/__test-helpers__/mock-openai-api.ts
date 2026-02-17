@@ -128,17 +128,29 @@ export class MockOpenAIAPI {
 
       // Only intercept OpenAI Whisper API calls
       const urlString = url.toString();
-      if (!urlString.includes('openai.com/v1/audio/transcriptions')) {
+      const isWhisper = urlString.includes('openai.com/v1/audio/transcriptions');
+      const isChat = urlString.includes('openai.com/v1/chat/completions');
+
+      if (!isWhisper && !isChat) {
         return new Response(null, { status: 404, statusText: 'Not Found' });
       }
 
-      // Extract chunk index from request body (assert as FormData for testing)
-      const formData = options?.body as FormData;
-      const chunkIndex = this.extractChunkIndex(formData);
+      // Extract chunkIndex from request body
+      let chunkIndex = 0;
 
-      // Notify callback if registered
-      if (this.transcribeCallback) {
-        this.transcribeCallback(chunkIndex, formData);
+      if (isWhisper) {
+        // Whisper uses FormData
+        const formData = options?.body as FormData;
+        chunkIndex = this.extractChunkIndex(formData);
+
+        // Notify callback
+        if (this.transcribeCallback) {
+          this.transcribeCallback(chunkIndex, formData);
+        }
+      } else {
+        // Chat uses JSON body - we don't parse it as we don't use it currently
+        // If we add advanced tests later, we might need better index tracking.
+        chunkIndex = this.callCount;
       }
 
       // Apply response delay if configured
@@ -176,6 +188,25 @@ export class MockOpenAIAPI {
       const transcript = this.config.transcriptGenerator
         ? this.config.transcriptGenerator(chunkIndex)
         : this.generateDefaultTranscript(chunkIndex);
+
+      if (isChat) {
+        return new Response(
+          JSON.stringify({
+            choices: [
+              {
+                message: {
+                  content: transcript,
+                },
+              },
+            ],
+          }),
+          {
+            status: 200,
+            statusText: 'OK',
+            headers: { 'content-type': 'application/json' },
+          }
+        );
+      }
 
       return new Response(JSON.stringify({ text: transcript }), {
         status: 200,

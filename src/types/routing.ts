@@ -1,5 +1,4 @@
 import type { AudioFile, AIConfiguration, ProcessingResult } from './audio';
-import type { LanguageCode } from './languages';
 import type { ContentType } from './content-types';
 import type { ProcessingMode } from '../features/configuration/components/ProcessingModeSelector';
 
@@ -13,10 +12,12 @@ export interface SessionData {
   contextFiles: File[];
 
   // Configuration fields captured during upload/record flow
-  language: LanguageCode;
+  language: string; // Language code (e.g., 'en', 'es', 'auto') - supports 50+ languages
   contentType: ContentType;
   processingMode: ProcessingMode;
   noiseProfile?: string; // Audio environment profile
+  enableSpeakerDiarization?: boolean; // Speaker identification
+  speakersExpected?: number; // Expected number of speakers (2-10)
 
   // Audio editing fields (set in AudioEditingPage)
   selectionMode?: 'full' | 'selection';
@@ -44,6 +45,7 @@ export interface RouteParams {
  * Route paths as constants for type-safe navigation
  */
 export const ROUTES = {
+  WELCOME: '/welcome',
   HOME: '/',
   AUDIO: '/audio/:sessionId',
   CONFIGURE: '/configure/:sessionId',
@@ -52,6 +54,7 @@ export const ROUTES = {
   HISTORY: '/history',
   SETUP: '/setup-api-key',
   DOCS: '/docs',
+  PRICING: '/pricing',
   PREVIEW: '/preview', // Dev only
 } as const;
 

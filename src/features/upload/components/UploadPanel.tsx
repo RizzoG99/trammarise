@@ -128,7 +128,7 @@ export function UploadPanel({ onFileUpload, uploadedFile, onFileRemove }: Upload
   };
 
   return (
-    <GlassCard variant="light" className="p-6">
+    <GlassCard variant="dark" className="p-6 h-full flex flex-col justify-between">
       <Heading level="h3" className="mb-4">
         {t('home.uploadTitle')}
       </Heading>
@@ -201,9 +201,12 @@ export function UploadPanel({ onFileUpload, uploadedFile, onFileRemove }: Upload
       <input
         ref={fileInputRef}
         type="file"
+        id="audio-file-upload"
+        name="audio-file"
         accept="audio/*"
         onChange={handleFileSelect}
         className="hidden"
+        aria-label="Upload audio file (drag and drop or click to browse)"
         data-testid="file-input"
       />
     </GlassCard>

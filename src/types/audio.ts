@@ -31,6 +31,10 @@ export interface AIConfiguration {
   language: LanguageCode;
   contextFiles?: File[];
   noiseProfile?: string; // Audio environment: 'quiet', 'meeting_room', 'cafe', 'outdoor', 'phone'
+  // Speaker diarization options
+  enableSpeakerDiarization?: boolean;
+  speakersExpected?: number;
+  knownSpeakers?: string[]; // Optional speaker names for identification
 }
 
 // Recording state
@@ -76,12 +80,35 @@ export interface ChatMessage {
   content: string;
 }
 
+// Speaker utterance (for speaker diarization)
+export interface Utterance {
+  /** Speaker label (e.g., "A", "B", or custom name) */
+  speaker: string;
+  /** Transcribed text for this utterance */
+  text: string;
+  /** Start time in milliseconds */
+  start: number;
+  /** End time in milliseconds */
+  end: number;
+  /** Confidence score (0-1) */
+  confidence: number;
+}
+
 // Processing result
 export interface ProcessingResult {
   transcript: string;
   summary: string;
   chatHistory: ChatMessage[];
   configuration: AIConfiguration;
+  /** Speaker-labeled utterances (if speaker diarization was enabled) */
+  utterances?: Utterance[];
+  /** Whisper API segments with real timestamps (for accurate syncing) */
+  segments?: Array<{
+    text: string;
+    start: number; // seconds
+    end: number;
+    id: number;
+  }>;
 }
 
 // Processing state
@@ -94,6 +121,15 @@ export interface ProcessingStateData {
 // API response types
 export interface TranscriptionResponse {
   transcript: string;
+  /** Speaker-labeled utterances (if speaker diarization was enabled) */
+  utterances?: Utterance[];
+  /** Whisper API segments with real timestamps */
+  segments?: Array<{
+    text: string;
+    start: number; // seconds
+    end: number;
+    id: number;
+  }>;
 }
 
 export interface SummarizationResponse {

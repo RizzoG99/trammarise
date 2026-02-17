@@ -23,12 +23,14 @@ export interface FileSizeWarningModalProps {
 /**
  * Warning icon for large files
  */
-const WarningIcon = () => <AlertTriangle className="w-16 h-16 text-amber-500" />;
+const WarningIcon = () => (
+  <AlertTriangle className="w-16 h-16 text-amber-500" data-testid="warning-icon" />
+);
 
 /**
  * Error icon for files that are too large
  */
-const ErrorIcon = () => <XCircle className="w-16 h-16 text-red-500" />;
+const ErrorIcon = () => <XCircle className="w-16 h-16 text-red-500" data-testid="error-icon" />;
 
 /**
  * Modal dialog for warning users about large file sizes.

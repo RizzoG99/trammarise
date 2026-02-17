@@ -13,10 +13,15 @@ import { RateLimitGovernor } from '../utils/rate-limit-governor';
 import { generateMockAudio } from '../utils/__test-helpers__/mock-audio-generator';
 import { createTestJob, createTestChunk } from '../utils/__test-helpers__/test-fixtures';
 import { JOB_SAFEGUARDS } from '../types/job';
-import type {
-  MockFluentFFmpegCommand,
-  MockFluentFFmpegStatic,
-} from '../utils/__test-helpers__/types';
+import { mockFFmpeg, mockFileSystem } from '../vitest.setup';
+import type { MockFluentFFmpegCommand } from '../utils/__test-helpers__/types';
+
+// Mock ffmpeg-setup to prevent it from configuring real binaries
+vi.mock('../utils/ffmpeg-setup', () => ({
+  setupFFmpeg: vi.fn(),
+  getFFmpegPath: vi.fn(() => '/mock/ffmpeg'),
+  getFFprobePath: vi.fn(() => '/mock/ffprobe'),
+}));
 
 describe('Edge Cases', () => {
   beforeEach(() => {
@@ -26,18 +31,11 @@ describe('Edge Cases', () => {
   describe('Empty Audio File', () => {
     it('should handle 0 duration audio gracefully', async () => {
       const audioBuffer = Buffer.from('');
-      const mockFFmpegModule = await import('fluent-ffmpeg');
-      const mockFfprobe = vi.fn((path, callback) => {
+
+      // Override ffprobe for this test using mockImplementation (not Once)
+      mockFFmpeg.ffprobe.mockImplementationOnce((path, callback) => {
         callback(null, { format: { duration: 0 } });
       });
-      const mockModule = mockFFmpegModule as unknown as {
-        default?: { ffprobe: unknown };
-        ffprobe?: unknown;
-      };
-      mockModule.ffprobe = mockFfprobe;
-      if (mockModule.default) {
-        mockModule.default.ffprobe = mockFfprobe;
-      }
 
       const result = await chunkAudio(audioBuffer, 'empty.mp3', 'balanced');
 
@@ -116,15 +114,17 @@ describe('Edge Cases', () => {
 
   describe('Hash Collision Handling', () => {
     it('should generate unique hashes for different chunks', async () => {
-      const fs = await import('fs/promises');
       const hashes: string[] = [];
 
-      // Generate hashes for different buffers
+      // Generate hashes for different buffers using global mockFileSystem
       for (let i = 0; i < 10; i++) {
         const buffer = Buffer.from(`chunk data ${i}`);
-        vi.spyOn(fs, 'readFile').mockResolvedValue(buffer);
+        const path = `/tmp/chunk_${i}.mp3`;
 
-        const hash = await computeChunkHash(`/tmp/chunk_${i}.mp3`);
+        // Write to mock file system
+        mockFileSystem.files.set(path, buffer);
+
+        const hash = await computeChunkHash(path);
         hashes.push(hash);
       }
 
@@ -135,44 +135,13 @@ describe('Edge Cases', () => {
   });
 
   describe('FFmpeg Failure During Chunking', () => {
-    let originalFFmpegMock: unknown;
-
-    beforeEach(async () => {
-      // Save original mock implementation
-      const mockFFmpegModule = (
-        (await import('fluent-ffmpeg')) as unknown as { default: MockFluentFFmpegStatic }
-      ).default;
-      originalFFmpegMock = vi.mocked(mockFFmpegModule).getMockImplementation();
-    });
-
-    afterEach(async () => {
-      // Restore original mock implementation
-      if (originalFFmpegMock) {
-        const mockFFmpegModule = (
-          (await import('fluent-ffmpeg')) as unknown as {
-            default: MockFluentFFmpegStatic;
-          }
-        ).default;
-        vi.mocked(mockFFmpegModule).mockImplementation(originalFFmpegMock as never);
-      }
-      vi.clearAllMocks();
-    });
-
     it('should propagate error when ffprobe fails', async () => {
       const audioBuffer = generateMockAudio({ durationSeconds: 100, format: 'mp3' });
 
-      const mockFFmpegModule = await import('fluent-ffmpeg');
-      const mockFfprobe = vi.fn((path, callback) => {
+      // Use global mockFFmpeg and override ffprobe to simulate failure
+      mockFFmpeg.ffprobe.mockImplementationOnce((path, callback) => {
         callback(new Error('FFprobe failed'), null);
       });
-      const mockModule = mockFFmpegModule as unknown as {
-        default?: { ffprobe: unknown };
-        ffprobe?: unknown;
-      };
-      mockModule.ffprobe = mockFfprobe;
-      if (mockModule.default) {
-        mockModule.default.ffprobe = mockFfprobe;
-      }
 
       await expect(chunkAudio(audioBuffer, 'test.mp3', 'balanced')).rejects.toThrow(
         /Failed to probe audio file/
@@ -197,12 +166,8 @@ describe('Edge Cases', () => {
         run: vi.fn(),
       };
 
-      const mockFFmpeg = (
-        (await import('fluent-ffmpeg')) as unknown as { default: MockFluentFFmpegStatic }
-      ).default;
-      vi.mocked(mockFFmpeg).mockReturnValue(
-        mockFFmpegInstance as unknown as MockFluentFFmpegCommand
-      );
+      // Override global mockFFmpeg to return error instance
+      mockFFmpeg.mockReturnValueOnce(mockFFmpegInstance as unknown as MockFluentFFmpegCommand);
 
       const { extractChunk } = await import('../utils/audio-chunker');
 
@@ -292,16 +257,18 @@ describe('Edge Cases', () => {
         createTestChunk(2, { filePath: '/tmp/chunk_2.mp3' }),
       ];
 
-      const fs = await import('fs/promises');
-      const unlinkSpy = vi.spyOn(fs, 'unlink').mockResolvedValue();
+      // Add files to mock file system
+      chunks.forEach((chunk) => {
+        mockFileSystem.files.set(chunk.filePath, Buffer.from('test'));
+      });
 
       await cleanupChunks(chunks);
 
       // Should have attempted to delete all chunk files
-      expect(unlinkSpy).toHaveBeenCalledTimes(3);
-      expect(unlinkSpy).toHaveBeenCalledWith('/tmp/chunk_0.mp3');
-      expect(unlinkSpy).toHaveBeenCalledWith('/tmp/chunk_1.mp3');
-      expect(unlinkSpy).toHaveBeenCalledWith('/tmp/chunk_2.mp3');
+      expect(mockFileSystem.unlink).toHaveBeenCalledTimes(3);
+      expect(mockFileSystem.unlink).toHaveBeenCalledWith('/tmp/chunk_0.mp3');
+      expect(mockFileSystem.unlink).toHaveBeenCalledWith('/tmp/chunk_1.mp3');
+      expect(mockFileSystem.unlink).toHaveBeenCalledWith('/tmp/chunk_2.mp3');
     });
 
     it('should not leak jobs in memory', () => {
@@ -358,44 +325,22 @@ describe('Edge Cases', () => {
   });
 
   describe('Extreme Values', () => {
-    let originalFfprobe: unknown;
-
     // Use real timers for chunkAudio() tests
-    beforeEach(async () => {
+    beforeEach(() => {
       vi.useRealTimers();
-      // Save original ffprobe implementation
-      const mockFFmpegModule = (await import('fluent-ffmpeg')) as unknown as {
-        default: MockFluentFFmpegStatic;
-      };
-      originalFfprobe = mockFFmpegModule.default.ffprobe;
     });
 
-    afterEach(async () => {
+    afterEach(() => {
       vi.useFakeTimers();
-      // Restore original ffprobe implementation
-      if (originalFfprobe) {
-        const mockFFmpegModule = (await import('fluent-ffmpeg')) as unknown as {
-          default: MockFluentFFmpegStatic;
-        };
-        mockFFmpegModule.default.ffprobe = originalFfprobe as never;
-      }
     });
 
     it('should handle very short chunks (1 second)', async () => {
       const audioBuffer = generateMockAudio({ durationSeconds: 1, format: 'mp3' });
 
-      const mockFFmpegModule = await import('fluent-ffmpeg');
-      const mockFfprobe = vi.fn((_path, callback) => {
+      // Use global mockFFmpeg and override ffprobe for this test
+      mockFFmpeg.ffprobe.mockImplementationOnce((_path, callback) => {
         callback(null, { format: { duration: 1 } });
       });
-      const mockModule = mockFFmpegModule as unknown as {
-        default?: { ffprobe: unknown };
-        ffprobe?: unknown;
-      };
-      mockModule.ffprobe = mockFfprobe;
-      if (mockModule.default) {
-        mockModule.default.ffprobe = mockFfprobe;
-      }
 
       const result = await chunkAudio(audioBuffer, 'short.mp3', 'balanced');
 
@@ -434,20 +379,10 @@ describe('Edge Cases', () => {
       // Simulate extremely long audio (10 hours)
       const duration = 10 * 60 * 60; // 36000 seconds
 
-      const mockFFmpegModule = await import('fluent-ffmpeg');
-      const mockFfprobe = vi.fn((_path, callback) => {
+      // Use global mockFFmpeg and override ffprobe for this test
+      mockFFmpeg.ffprobe.mockImplementationOnce((_path, callback) => {
         callback(null, { format: { duration } });
       });
-
-      // Mock on both namespace and default to catch all import styles
-      const mockModule = mockFFmpegModule as unknown as {
-        default?: { ffprobe: unknown };
-        ffprobe?: unknown;
-      };
-      mockModule.ffprobe = mockFfprobe;
-      if (mockModule.default) {
-        mockModule.default.ffprobe = mockFfprobe;
-      }
 
       const audioBuffer = generateMockAudio({ durationSeconds: 100, format: 'mp3' });
       const result = await chunkAudio(audioBuffer, 'long.mp3', 'balanced');

@@ -37,7 +37,7 @@ export function ResultsLayout({
   chatModal,
 }: ResultsLayoutProps) {
   return (
-    <div className="min-h-screen flex flex-col bg-[var(--color-background)]">
+    <div className="min-h-screen flex flex-col bg-bg-primary">
       {/* Header is now handled by AppLayout/HeaderContext */}
 
       {/* Audio Player Bar */}

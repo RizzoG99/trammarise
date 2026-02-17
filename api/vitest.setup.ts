@@ -4,8 +4,62 @@
  * Global setup, teardown, and mocks for API testing.
  */
 
+// Set test environment variables FIRST (before any imports)
+process.env.VITE_SUPABASE_URL = 'https://test.supabase.co';
+process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-service-role-key';
+process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
+process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-anon-key';
+process.env.CLERK_WEBHOOK_SECRET = 'whsec_test123456789';
+
 import { beforeEach, afterEach, vi } from 'vitest';
 import { MockOpenAIAPI } from './utils/__test-helpers__/mock-openai-api';
+
+// CRITICAL: Mock @supabase/supabase-js BEFORE any imports
+const mockSupabaseFactory = vi.hoisted(() => {
+  const mockClient = {
+    auth: {
+      getUser: vi.fn().mockResolvedValue({
+        data: { user: { id: 'test-user-id' } },
+        error: null,
+      }),
+    },
+    from: vi.fn(() => ({
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      single: vi.fn().mockResolvedValue({
+        data: { id: 'test-user-id', clerk_user_id: 'test-clerk-id' },
+        error: null,
+      }),
+      insert: vi.fn().mockResolvedValue({ data: {}, error: null }),
+      update: vi.fn().mockReturnThis(),
+      delete: vi.fn().mockReturnThis(),
+    })),
+  };
+
+  return {
+    createClient: vi.fn(() => mockClient),
+  };
+});
+
+vi.mock('@supabase/supabase-js', () => mockSupabaseFactory);
+
+// Mock authentication middleware to bypass auth in most tests
+// Individual tests can override this mock if they need to test auth failures
+vi.mock('./middleware/auth', () => ({
+  requireAuth: vi.fn().mockResolvedValue({
+    userId: 'test-user-id',
+    clerkId: 'test-clerk-id',
+  }),
+  AuthError: class AuthError extends Error {
+    constructor(
+      message: string,
+      public statusCode: number
+    ) {
+      super(message);
+      this.name = 'AuthError';
+    }
+  },
+}));
 
 // CRITICAL: Mock fluent-ffmpeg BEFORE any imports
 // Create hoisted factory for FFmpeg mock

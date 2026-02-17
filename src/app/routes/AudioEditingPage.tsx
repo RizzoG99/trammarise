@@ -229,14 +229,12 @@ export function AudioEditingPage() {
 
       {/* Waveform Card */}
       <GlassCard
-        variant="light"
-        className="flex flex-col mb-6 border rounded-xl shadow-lg overflow-hidden"
-        style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-border)' }}
+        variant="dark"
+        className="flex flex-col mb-6 border rounded-xl shadow-glass overflow-hidden"
       >
         {/* Toolbar */}
         <div
-          className="flex flex-wrap items-center justify-end gap-4 p-4 border-b"
-          style={{ borderColor: 'var(--color-border)' }}
+          className="flex flex-wrap items-center justify-end gap-4 p-4 border-b border-border"
         >
           {/* Region Time Display */}
           <RegionTimeDisplay startTime={region?.start ?? null} endTime={region?.end ?? null} />
@@ -273,8 +271,7 @@ export function AudioEditingPage() {
 
       {/* Action Buttons */}
       <div
-        className="flex flex-col sm:flex-row gap-4 border-t pt-4"
-        style={{ borderColor: 'var(--color-border)' }}
+        className="flex flex-col sm:flex-row gap-4 border-t border-border pt-4"
       >
         {hasRegion ? (
           <>
@@ -295,17 +292,11 @@ export function AudioEditingPage() {
             {/* Secondary: Process Full Audio */}
             <button
               onClick={handleProcessFullAudio}
-              className="flex-1 flex flex-col items-center justify-center py-4 px-6 rounded-xl border-2 transition-all transform active:scale-[0.99]"
-              style={{
-                backgroundColor: 'var(--color-bg-secondary)',
-                borderColor: 'var(--color-border)',
-                color: 'var(--color-text-primary)',
-              }}
+              className="flex-1 flex flex-col items-center justify-center py-4 px-6 rounded-xl border-2 transition-all transform active:scale-[0.99] bg-bg-secondary border-border text-text-primary hover:bg-bg-tertiary"
             >
               <span className="text-lg font-bold flex items-center gap-2">Process Full Audio</span>
               <span
-                className="text-sm font-medium mt-1"
-                style={{ color: 'var(--color-text-secondary)' }}
+                className="text-sm font-medium mt-1 text-text-secondary"
               >
                 Transcribe all {formatTime(duration)}
               </span>

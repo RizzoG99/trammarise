@@ -43,6 +43,7 @@ export interface ChatConfig {
   provider: string;
   apiKey: string;
   model?: string;
+  language?: string;
 }
 
 /**
@@ -164,6 +165,7 @@ export class AudioRepository {
           provider: config.provider,
           apiKey: config.apiKey,
           model: config.model,
+          language: config.language,
         }),
       },
       API_DEFAULT_TIMEOUT
