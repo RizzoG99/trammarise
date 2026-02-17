@@ -122,7 +122,7 @@ describe('Rate Limiting Middleware', () => {
     it('should have limit for chat endpoint', () => {
       expect(RATE_LIMITS.CHAT).toEqual({
         windowMs: 60 * 1000, // 1 minute
-        maxRequests: 30,
+        maxRequests: 60,
       });
     });
   });

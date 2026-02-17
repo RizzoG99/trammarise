@@ -187,6 +187,7 @@ describe('Job Manager', () => {
     });
 
     it('should set completedAt for terminal states', () => {
+      vi.useFakeTimers();
       const config: JobConfiguration = {
         apiKey: 'test-key',
         mode: 'balanced',
@@ -213,6 +214,7 @@ describe('Job Manager', () => {
     });
 
     it('should calculate processing time for terminal states', () => {
+      vi.useFakeTimers();
       const config: JobConfiguration = {
         apiKey: 'test-key',
         mode: 'balanced',
@@ -397,6 +399,7 @@ describe('Job Manager', () => {
     });
 
     it('should calculate estimated time remaining', () => {
+      vi.useFakeTimers();
       const config: JobConfiguration = {
         apiKey: 'test-key',
         mode: 'balanced',
@@ -438,6 +441,7 @@ describe('Job Manager', () => {
 
   describe('cleanup()', () => {
     it('should remove jobs older than MAX_JOB_AGE', () => {
+      vi.useFakeTimers();
       const config: JobConfiguration = {
         apiKey: 'test-key',
         mode: 'balanced',
@@ -472,6 +476,7 @@ describe('Job Manager', () => {
     });
 
     it('should not remove recent jobs', () => {
+      vi.useFakeTimers();
       const config: JobConfiguration = {
         apiKey: 'test-key',
         mode: 'balanced',

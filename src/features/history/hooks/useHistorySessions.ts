@@ -23,7 +23,16 @@ interface UseHistorySessionsReturn {
 // Helper to load sessions from local storage
 async function loadSessionsFromLocal(): Promise<HistorySession[]> {
   const ids = getAllSessionIds();
-  const rawSessions = await Promise.all(ids.map((id) => loadSessionMetadata(id)));
+  const rawSessions = await Promise.all(
+    ids.map(async (id) => {
+      try {
+        return await loadSessionMetadata(id);
+      } catch (error) {
+        console.warn(`Failed to load session ${id}:`, error);
+        return null;
+      }
+    })
+  );
 
   return rawSessions
     .filter((s): s is NonNullable<typeof s> => s !== null)

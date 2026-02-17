@@ -2,6 +2,62 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { Readable } from 'stream';
 
+// Mock authentication and dependencies
+vi.mock('../middleware/auth', () => ({
+  requireAuth: vi.fn().mockResolvedValue({ userId: 'test-user-123', clerkId: 'clerk_123' }),
+  AuthError: class AuthError extends Error {
+    constructor(
+      message: string,
+      public statusCode: number
+    ) {
+      super(message);
+      this.name = 'AuthError';
+    }
+  },
+}));
+
+vi.mock('../lib/supabase-admin', () => ({
+  supabaseAdmin: {
+    from: vi.fn().mockReturnValue({
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      single: vi.fn().mockResolvedValue({
+        data: { tier: 'pro' },
+        error: null,
+      }),
+    }),
+    rpc: vi.fn().mockResolvedValue({ error: null }),
+  },
+}));
+
+vi.mock('../middleware/rate-limit', () => ({
+  rateLimit: vi.fn().mockResolvedValue(undefined),
+  RateLimitError: class RateLimitError extends Error {
+    constructor(
+      message: string,
+      public retryAfter: number
+    ) {
+      super(message);
+      this.name = 'RateLimitError';
+    }
+  },
+  RATE_LIMITS: {
+    TRANSCRIBE: { maxRequests: 50, windowMs: 60000 },
+  },
+}));
+
+vi.mock('../middleware/usage-tracking', () => ({
+  checkQuota: vi.fn().mockResolvedValue({ allowed: true }),
+  trackUsage: vi.fn().mockResolvedValue(undefined),
+}));
+
+vi.mock('../utils/file-validator', () => ({
+  validateAudioFile: vi.fn().mockResolvedValue({
+    valid: true,
+    duration: 120,
+  }),
+}));
+
 // Mock the provider factory
 const mockTranscribe = vi.fn();
 const mockCreate = vi.fn().mockReturnValue({
@@ -114,6 +170,8 @@ describe('POST /api/transcribe - Speaker Diarization', () => {
     // Convert body to stream
     const stream = Readable.from([body]);
     Object.assign(req, stream);
+    // Explicitly bind pipe method (sometimes not copied by Object.assign)
+    req.pipe = stream.pipe.bind(stream);
 
     const res = {
       status: vi.fn().mockReturnThis(),
@@ -214,6 +272,8 @@ describe('POST /api/transcribe - Speaker Diarization', () => {
 
     const stream = Readable.from([body]);
     Object.assign(req, stream);
+    // Explicitly bind pipe method (sometimes not copied by Object.assign)
+    req.pipe = stream.pipe.bind(stream);
 
     const res = {
       status: vi.fn().mockReturnThis(),
@@ -260,6 +320,8 @@ describe('POST /api/transcribe - Speaker Diarization', () => {
 
     const stream = Readable.from([body]);
     Object.assign(req, stream);
+    // Explicitly bind pipe method (sometimes not copied by Object.assign)
+    req.pipe = stream.pipe.bind(stream);
 
     const res = {
       status: vi.fn().mockReturnThis(),

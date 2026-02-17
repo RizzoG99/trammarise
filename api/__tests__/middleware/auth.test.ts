@@ -1,5 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
+// Unmock the auth module to test the real implementation
+vi.unmock('../../middleware/auth');
+
 // Create mock functions
 const mockAuthenticateRequest = vi.fn();
 const mockGetUser = vi.fn();
