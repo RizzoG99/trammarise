@@ -2,7 +2,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 // Mock Svix webhook verification
-const mockVerify = vi.fn();
+const mockVerify = vi.fn((payload) => {
+  return JSON.parse(payload); // Return the parsed webhook event
+});
 
 // Create a proper mock constructor for Webhook
 class MockWebhook {
@@ -29,6 +31,9 @@ vi.mock('../../lib/supabase-admin', () => ({
 describe('POST /api/webhooks/clerk', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+
+    // Set required environment variable
+    process.env.CLERK_WEBHOOK_SECRET = 'test_webhook_secret_123';
 
     // Setup default mock chains
     mockSupabaseFrom.mockImplementation(() => ({

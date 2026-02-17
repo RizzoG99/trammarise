@@ -1,10 +1,27 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
+// Mock AuthError class
+class AuthError extends Error {
+  constructor(
+    message: string,
+    public statusCode: number
+  ) {
+    super(message);
+    this.name = 'AuthError';
+  }
+}
+
 // Mock auth middleware
-const mockRequireAuth = vi.fn();
+const mockRequireAuth = vi.fn(async (req) => {
+  if (!req.headers.authorization) {
+    throw new AuthError('Unauthorized', 401);
+  }
+  return { userId: 'test-user-id', clerkId: 'clerk_123' };
+});
 vi.mock('../../middleware/auth', () => ({
   requireAuth: mockRequireAuth,
+  AuthError,
 }));
 
 // Mock Supabase admin
@@ -266,7 +283,7 @@ describe('POST /api/stripe/create-checkout-session', () => {
   describe('Authentication', () => {
     it('should return 401 for unauthenticated requests', async () => {
       // Arrange
-      mockRequireAuth.mockRejectedValue(new Error('Unauthorized'));
+      mockRequireAuth.mockRejectedValue(new AuthError('Unauthorized', 401));
 
       const { default: handler } = await import('../../stripe/create-checkout-session');
       const mockReq = {
@@ -291,7 +308,7 @@ describe('POST /api/stripe/create-checkout-session', () => {
   describe('Error Handling', () => {
     it('should return 500 on Stripe API error', async () => {
       // Arrange
-      mockCheckoutSessionsCreate.mockRejectedValue(new Error('Stripe API error'));
+      mockCheckoutSessionsCreate.mockRejectedValue(new Error('API connection failed'));
 
       const { default: handler } = await import('../../stripe/create-checkout-session');
       const mockReq = {

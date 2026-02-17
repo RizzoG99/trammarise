@@ -17,11 +17,14 @@ vi.mock('../../utils/ffmpeg-setup', () => ({
 }));
 
 // Mock ffmpeg with hoisted function
-vi.mock('fluent-ffmpeg', () => ({
-  default: {
+vi.mock('fluent-ffmpeg', () => {
+  const mockFfmpegModule = {
     ffprobe: mockFfprobe,
-  },
-}));
+  };
+  return {
+    default: mockFfmpegModule,
+  };
+});
 
 // Mock fs/promises with hoisted functions
 vi.mock('fs/promises', () => ({
@@ -38,6 +41,10 @@ type FfprobeCallback = (err: Error | null, metadata?: { format: { duration?: num
 describe('File Validation', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+
+    // Setup fs/promises mocks to return promises
+    mockWriteFile.mockResolvedValue(undefined);
+    mockUnlink.mockResolvedValue(undefined);
   });
 
   describe('Audio File Validation', () => {

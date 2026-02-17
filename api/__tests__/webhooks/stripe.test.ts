@@ -297,6 +297,54 @@ describe('POST /api/webhooks/stripe', () => {
       expect(mockSupabaseEq).toHaveBeenCalledWith('stripe_subscription_id', 'sub_123');
       expect(mockRes.json).toHaveBeenCalledWith({ received: true });
     });
+
+    it('should update status but not delete the record', async () => {
+      // Arrange
+      const subscriptionEvent = {
+        type: 'customer.subscription.deleted',
+        data: {
+          object: {
+            id: 'sub_456',
+          },
+        },
+      };
+
+      mockConstructEvent.mockReturnValue(subscriptionEvent);
+
+      const mockSupabaseDelete = vi.fn();
+      mockSupabaseFrom.mockReturnValue({
+        update: mockSupabaseUpdate,
+        delete: mockSupabaseDelete,
+      });
+      mockSupabaseUpdate.mockReturnValue({
+        eq: mockSupabaseEq,
+      });
+      mockSupabaseEq.mockResolvedValue({
+        data: { id: 'subscription-uuid' },
+        error: null,
+      });
+
+      const { default: handler } = await import('../../webhooks/stripe');
+      const mockReq = {
+        method: 'POST',
+        headers: { 'stripe-signature': 'valid-signature' },
+        body: JSON.stringify(subscriptionEvent),
+      } as unknown as VercelRequest;
+
+      const mockRes = {
+        status: vi.fn().mockReturnThis(),
+        json: vi.fn().mockReturnThis(),
+        send: vi.fn().mockReturnThis(),
+      } as unknown as VercelResponse;
+
+      // Act
+      await handler(mockReq, mockRes);
+
+      // Assert - verify update was called, NOT delete
+      expect(mockSupabaseUpdate).toHaveBeenCalledWith({ status: 'canceled' });
+      expect(mockSupabaseDelete).not.toHaveBeenCalled();
+      expect(mockRes.json).toHaveBeenCalledWith({ received: true });
+    });
   });
 
   describe('Validation', () => {
@@ -487,6 +535,340 @@ describe('POST /api/webhooks/stripe', () => {
       expect(mockRes.json).toHaveBeenCalledWith({ received: true });
       // Should not call Supabase for non-credit purchases
       expect(mockSupabaseFrom).not.toHaveBeenCalled();
+    });
+
+    it('should create transaction record with description', async () => {
+      // Arrange
+      const paymentEvent = {
+        type: 'payment_intent.succeeded',
+        data: {
+          object: {
+            id: 'pi_test_789',
+            amount: 2500, // $25.00
+            metadata: {
+              type: 'credit_purchase',
+              userId: 'user-uuid-789',
+              credits: '250',
+            },
+          },
+        },
+      };
+
+      mockConstructEvent.mockReturnValue(paymentEvent);
+
+      const mockSupabaseSelect = vi.fn();
+      const mockSupabaseEq = vi.fn();
+      const mockSupabaseSingle = vi.fn();
+      const mockSupabaseInsert = vi.fn();
+
+      mockSupabaseFrom
+        .mockReturnValueOnce({
+          select: mockSupabaseSelect,
+        })
+        .mockReturnValueOnce({
+          insert: mockSupabaseInsert,
+        });
+
+      mockSupabaseSelect.mockReturnValue({ eq: mockSupabaseEq });
+      mockSupabaseEq.mockReturnValue({ single: mockSupabaseSingle });
+      mockSupabaseSingle.mockResolvedValue({
+        data: { id: 'sub-uuid-789', credits_balance: 50 },
+        error: null,
+      });
+
+      mockSupabaseRpc.mockResolvedValue({ data: null, error: null });
+      mockSupabaseInsert.mockResolvedValue({ data: { id: 'tx-uuid-789' }, error: null });
+
+      const { default: handler } = await import('../../webhooks/stripe');
+      const mockReq = {
+        method: 'POST',
+        headers: { 'stripe-signature': 'valid-signature' },
+        body: JSON.stringify(paymentEvent),
+      } as unknown as VercelRequest;
+
+      const mockRes = {
+        status: vi.fn().mockReturnThis(),
+        json: vi.fn().mockReturnThis(),
+        send: vi.fn().mockReturnThis(),
+      } as unknown as VercelResponse;
+
+      // Act
+      await handler(mockReq, mockRes);
+
+      // Assert - verify transaction includes description
+      expect(mockSupabaseInsert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          description: 'Purchased 250 credits for $25.00',
+          credits_amount: 250,
+          amount_paid_cents: 2500,
+        })
+      );
+    });
+
+    it('should handle missing userId in metadata', async () => {
+      // Arrange
+      const paymentEvent = {
+        type: 'payment_intent.succeeded',
+        data: {
+          object: {
+            id: 'pi_test_no_user',
+            amount: 500,
+            metadata: {
+              type: 'credit_purchase',
+              credits: '50',
+              // userId is missing
+            },
+          },
+        },
+      };
+
+      mockConstructEvent.mockReturnValue(paymentEvent);
+
+      const { default: handler } = await import('../../webhooks/stripe');
+      const mockReq = {
+        method: 'POST',
+        headers: { 'stripe-signature': 'valid-signature' },
+        body: JSON.stringify(paymentEvent),
+      } as unknown as VercelRequest;
+
+      const mockRes = {
+        status: vi.fn().mockReturnThis(),
+        json: vi.fn().mockReturnThis(),
+        send: vi.fn().mockReturnThis(),
+      } as unknown as VercelResponse;
+
+      // Act
+      await handler(mockReq, mockRes);
+
+      // Assert - should skip processing but not fail
+      expect(mockRes.json).toHaveBeenCalledWith({ received: true });
+      expect(mockSupabaseFrom).not.toHaveBeenCalled();
+    });
+
+    it('should handle missing credits in metadata', async () => {
+      // Arrange
+      const paymentEvent = {
+        type: 'payment_intent.succeeded',
+        data: {
+          object: {
+            id: 'pi_test_no_credits',
+            amount: 500,
+            metadata: {
+              type: 'credit_purchase',
+              userId: 'user-uuid-123',
+              // credits is missing
+            },
+          },
+        },
+      };
+
+      mockConstructEvent.mockReturnValue(paymentEvent);
+
+      const { default: handler } = await import('../../webhooks/stripe');
+      const mockReq = {
+        method: 'POST',
+        headers: { 'stripe-signature': 'valid-signature' },
+        body: JSON.stringify(paymentEvent),
+      } as unknown as VercelRequest;
+
+      const mockRes = {
+        status: vi.fn().mockReturnThis(),
+        json: vi.fn().mockReturnThis(),
+        send: vi.fn().mockReturnThis(),
+      } as unknown as VercelResponse;
+
+      // Act
+      await handler(mockReq, mockRes);
+
+      // Assert - should skip processing but not fail
+      expect(mockRes.json).toHaveBeenCalledWith({ received: true });
+      expect(mockSupabaseFrom).not.toHaveBeenCalled();
+    });
+
+    it('should handle subscription fetch error', async () => {
+      // Arrange
+      const paymentEvent = {
+        type: 'payment_intent.succeeded',
+        data: {
+          object: {
+            id: 'pi_test_sub_error',
+            amount: 500,
+            metadata: {
+              type: 'credit_purchase',
+              userId: 'user-uuid-nonexistent',
+              credits: '50',
+            },
+          },
+        },
+      };
+
+      mockConstructEvent.mockReturnValue(paymentEvent);
+
+      const mockSupabaseSelect = vi.fn();
+      const mockSupabaseEq = vi.fn();
+      const mockSupabaseSingle = vi.fn();
+
+      mockSupabaseFrom.mockReturnValue({ select: mockSupabaseSelect });
+      mockSupabaseSelect.mockReturnValue({ eq: mockSupabaseEq });
+      mockSupabaseEq.mockReturnValue({ single: mockSupabaseSingle });
+      mockSupabaseSingle.mockResolvedValue({
+        data: null,
+        error: { message: 'Subscription not found' },
+      });
+
+      const { default: handler } = await import('../../webhooks/stripe');
+      const mockReq = {
+        method: 'POST',
+        headers: { 'stripe-signature': 'valid-signature' },
+        body: JSON.stringify(paymentEvent),
+      } as unknown as VercelRequest;
+
+      const mockRes = {
+        status: vi.fn().mockReturnThis(),
+        json: vi.fn().mockReturnThis(),
+        send: vi.fn().mockReturnThis(),
+      } as unknown as VercelResponse;
+
+      // Act
+      await handler(mockReq, mockRes);
+
+      // Assert - should return 500 on subscription fetch error
+      expect(mockRes.status).toHaveBeenCalledWith(500);
+      expect(mockRes.send).toHaveBeenCalledWith('Webhook handler failed');
+    });
+
+    it('should handle RPC error when adding credits', async () => {
+      // Arrange
+      const paymentEvent = {
+        type: 'payment_intent.succeeded',
+        data: {
+          object: {
+            id: 'pi_test_rpc_error',
+            amount: 500,
+            metadata: {
+              type: 'credit_purchase',
+              userId: 'user-uuid-123',
+              credits: '50',
+            },
+          },
+        },
+      };
+
+      mockConstructEvent.mockReturnValue(paymentEvent);
+
+      const mockSupabaseSelect = vi.fn();
+      const mockSupabaseEq = vi.fn();
+      const mockSupabaseSingle = vi.fn();
+
+      mockSupabaseFrom.mockReturnValue({ select: mockSupabaseSelect });
+      mockSupabaseSelect.mockReturnValue({ eq: mockSupabaseEq });
+      mockSupabaseEq.mockReturnValue({ single: mockSupabaseSingle });
+      mockSupabaseSingle.mockResolvedValue({
+        data: { id: 'sub-uuid-123', credits_balance: 100 },
+        error: null,
+      });
+
+      mockSupabaseRpc.mockResolvedValue({
+        data: null,
+        error: { message: 'RPC failed' },
+      });
+
+      const { default: handler } = await import('../../webhooks/stripe');
+      const mockReq = {
+        method: 'POST',
+        headers: { 'stripe-signature': 'valid-signature' },
+        body: JSON.stringify(paymentEvent),
+      } as unknown as VercelRequest;
+
+      const mockRes = {
+        status: vi.fn().mockReturnThis(),
+        json: vi.fn().mockReturnThis(),
+        send: vi.fn().mockReturnThis(),
+      } as unknown as VercelResponse;
+
+      // Act
+      await handler(mockReq, mockRes);
+
+      // Assert - should return 500 on RPC error
+      expect(mockRes.status).toHaveBeenCalledWith(500);
+      expect(mockRes.send).toHaveBeenCalledWith('Webhook handler failed');
+    });
+
+    it('should handle idempotency - same payment intent processed twice', async () => {
+      // Arrange
+      const paymentEvent = {
+        type: 'payment_intent.succeeded',
+        data: {
+          object: {
+            id: 'pi_test_duplicate',
+            amount: 500,
+            metadata: {
+              type: 'credit_purchase',
+              userId: 'user-uuid-123',
+              credits: '50',
+            },
+          },
+        },
+      };
+
+      mockConstructEvent.mockReturnValue(paymentEvent);
+
+      const mockSupabaseSelect = vi.fn();
+      const mockSupabaseEq = vi.fn();
+      const mockSupabaseSingle = vi.fn();
+      const mockSupabaseInsert = vi.fn();
+
+      mockSupabaseFrom
+        .mockReturnValueOnce({ select: mockSupabaseSelect })
+        .mockReturnValueOnce({ insert: mockSupabaseInsert });
+
+      mockSupabaseSelect.mockReturnValue({ eq: mockSupabaseEq });
+      mockSupabaseEq.mockReturnValue({ single: mockSupabaseSingle });
+      mockSupabaseSingle.mockResolvedValue({
+        data: { id: 'sub-uuid-123', credits_balance: 100 },
+        error: null,
+      });
+
+      mockSupabaseRpc.mockResolvedValue({ data: null, error: null });
+      mockSupabaseInsert.mockResolvedValue({ data: { id: 'tx-uuid' }, error: null });
+
+      const { default: handler } = await import('../../webhooks/stripe');
+      const mockReq = {
+        method: 'POST',
+        headers: { 'stripe-signature': 'valid-signature' },
+        body: JSON.stringify(paymentEvent),
+      } as unknown as VercelRequest;
+
+      const mockRes = {
+        status: vi.fn().mockReturnThis(),
+        json: vi.fn().mockReturnThis(),
+        send: vi.fn().mockReturnThis(),
+      } as unknown as VercelResponse;
+
+      // Act - process the same event twice
+      await handler(mockReq, mockRes);
+
+      // Clear mocks and process again
+      vi.clearAllMocks();
+      mockConstructEvent.mockReturnValue(paymentEvent);
+      mockSupabaseFrom
+        .mockReturnValueOnce({ select: mockSupabaseSelect })
+        .mockReturnValueOnce({ insert: mockSupabaseInsert });
+      mockSupabaseSelect.mockReturnValue({ eq: mockSupabaseEq });
+      mockSupabaseEq.mockReturnValue({ single: mockSupabaseSingle });
+      mockSupabaseSingle.mockResolvedValue({
+        data: { id: 'sub-uuid-123', credits_balance: 150 }, // Already credited
+        error: null,
+      });
+      mockSupabaseRpc.mockResolvedValue({ data: null, error: null });
+      mockSupabaseInsert.mockResolvedValue({ data: { id: 'tx-uuid-2' }, error: null });
+
+      await handler(mockReq, mockRes);
+
+      // Assert - both calls should succeed (Stripe handles idempotency at webhook level)
+      // Each call processes independently; the payment_intent_id uniqueness constraint
+      // in the database would prevent duplicate transactions
+      expect(mockRes.json).toHaveBeenCalledWith({ received: true });
     });
   });
 

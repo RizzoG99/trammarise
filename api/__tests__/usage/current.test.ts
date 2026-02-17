@@ -20,6 +20,8 @@ vi.mock('../../middleware/auth', () => ({
 const mockSupabaseFrom = vi.fn();
 const mockSupabaseSelect = vi.fn();
 const mockSupabaseEq = vi.fn();
+const mockSupabaseIn = vi.fn();
+const mockSupabaseSingle = vi.fn();
 const mockSupabaseSecondEq = vi.fn();
 
 vi.mock('../../lib/supabase-admin', () => ({
@@ -47,7 +49,25 @@ describe('GET /api/usage/current', () => {
 
     mockRequireAuth.mockResolvedValueOnce({ userId, clerkId: 'clerk-123' });
 
-    // Mock Supabase query chain: .from().select().eq().eq()
+    // Mock first query: subscriptions with .in() and .single()
+    mockSupabaseFrom.mockReturnValueOnce({
+      select: mockSupabaseSelect,
+    });
+    mockSupabaseSelect.mockReturnValueOnce({
+      eq: mockSupabaseEq,
+    });
+    mockSupabaseEq.mockReturnValueOnce({
+      in: mockSupabaseIn,
+    });
+    mockSupabaseIn.mockReturnValueOnce({
+      single: mockSupabaseSingle,
+    });
+    mockSupabaseSingle.mockResolvedValueOnce({
+      data: { tier: 'pro', status: 'active' },
+      error: null,
+    });
+
+    // Mock second query: usage_events with .eq().eq()
     mockSupabaseFrom.mockReturnValueOnce({
       select: mockSupabaseSelect,
     });
@@ -80,6 +100,10 @@ describe('GET /api/usage/current', () => {
       totalMinutes: 30,
       eventCount: 3,
       billingPeriod: '2024-01-01T00:00:00.000Z',
+      tier: 'pro',
+      limit: 500,
+      remainingMinutes: 470,
+      isOverLimit: false,
     });
 
     // Verify correct billing period was queried (2024-01-01)
@@ -94,6 +118,25 @@ describe('GET /api/usage/current', () => {
 
     mockRequireAuth.mockResolvedValueOnce({ userId, clerkId: 'clerk-123' });
 
+    // Mock subscription query
+    mockSupabaseFrom.mockReturnValueOnce({
+      select: mockSupabaseSelect,
+    });
+    mockSupabaseSelect.mockReturnValueOnce({
+      eq: mockSupabaseEq,
+    });
+    mockSupabaseEq.mockReturnValueOnce({
+      in: mockSupabaseIn,
+    });
+    mockSupabaseIn.mockReturnValueOnce({
+      single: mockSupabaseSingle,
+    });
+    mockSupabaseSingle.mockResolvedValueOnce({
+      data: { tier: 'free', status: 'active' },
+      error: null,
+    });
+
+    // Mock usage_events query
     mockSupabaseFrom.mockReturnValueOnce({
       select: mockSupabaseSelect,
     });
@@ -126,6 +169,10 @@ describe('GET /api/usage/current', () => {
       totalMinutes: 0,
       eventCount: 0,
       billingPeriod: '2024-01-01T00:00:00.000Z',
+      tier: 'free',
+      limit: 60,
+      remainingMinutes: 60,
+      isOverLimit: false,
     });
   });
 
@@ -181,6 +228,25 @@ describe('GET /api/usage/current', () => {
 
     mockRequireAuth.mockResolvedValueOnce({ userId, clerkId: 'clerk-123' });
 
+    // Mock subscription query
+    mockSupabaseFrom.mockReturnValueOnce({
+      select: mockSupabaseSelect,
+    });
+    mockSupabaseSelect.mockReturnValueOnce({
+      eq: mockSupabaseEq,
+    });
+    mockSupabaseEq.mockReturnValueOnce({
+      in: mockSupabaseIn,
+    });
+    mockSupabaseIn.mockReturnValueOnce({
+      single: mockSupabaseSingle,
+    });
+    mockSupabaseSingle.mockResolvedValueOnce({
+      data: { tier: 'free', status: 'active' },
+      error: null,
+    });
+
+    // Mock usage_events query with error
     mockSupabaseFrom.mockReturnValueOnce({
       select: mockSupabaseSelect,
     });
@@ -229,6 +295,25 @@ describe('GET /api/usage/current', () => {
 
       mockRequireAuth.mockResolvedValueOnce({ userId, clerkId: 'clerk-123' });
 
+      // Mock subscription query
+      mockSupabaseFrom.mockReturnValueOnce({
+        select: mockSupabaseSelect,
+      });
+      mockSupabaseSelect.mockReturnValueOnce({
+        eq: mockSupabaseEq,
+      });
+      mockSupabaseEq.mockReturnValueOnce({
+        in: mockSupabaseIn,
+      });
+      mockSupabaseIn.mockReturnValueOnce({
+        single: mockSupabaseSingle,
+      });
+      mockSupabaseSingle.mockResolvedValueOnce({
+        data: { tier: 'pro', status: 'active' },
+        error: null,
+      });
+
+      // Mock usage_events query
       mockSupabaseFrom.mockReturnValueOnce({
         select: mockSupabaseSelect,
       });

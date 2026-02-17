@@ -573,6 +573,89 @@
       "dismissButton": "Vielleicht später"
     }
   },
+  "welcome": {
+    "hero": {
+      "newBadge": "✨ Einführung des Liquid Glass Designs",
+      "titlePart1": "Transkribieren & Zusammenfassen",
+      "titlePart2": "In Sekunden",
+      "description": "Verwandeln Sie Ihre Meetings, Vorlesungen und Interviews in umsetzbare Erkenntnisse. Beginnen Sie mit 60 kostenlosen Minuten, upgraden Sie für unbegrenzten Zugang.",
+      "cta": {
+        "primary": "Kostenlose Testversion starten",
+        "secondary": "Preise ansehen",
+        "getStarted": "Kostenlos starten",
+        "viewFeatures": "Funktionen ansehen",
+        "appPreview": "[App-Vorschau-Visualisierung]"
+      },
+      "noCreditCard": "Keine Kreditkarte erforderlich"
+    },
+    "features": {
+      "title": "Leistungsstarke Tools für Audio",
+      "subtitle": "Alles, was Sie brauchen, um Ihre Aufnahmen zu beherrschen.",
+      "cards": {
+        "transcription": {
+          "title": "Kristallklare Transkription",
+          "description": "Laden Sie Dateien hoch oder nehmen Sie direkt auf. Genaue Transkription für zuverlässige Aufzeichnungen mit fortschrittlicher On-Device-Verarbeitung."
+        },
+        "summaries": {
+          "title": "Sofortige KI-Zusammenfassungen",
+          "description": "Erhalten Sie Schlüsselpunkte, Aktionselemente und strukturierte Zusammenfassungen, die automatisch von erstklassigen KI-Modellen generiert werden."
+        },
+        "security": {
+          "title": "Privat & Sicher",
+          "description": "Ihre Daten bleiben Ihre Daten. Client-seitige Verarbeitung gewährleistet maximale Privatsphäre. Kein Audio verlässt Ihr Gerät ohne Erlaubnis."
+        }
+      }
+    },
+    "pricing": {
+      "title": "Einfache, Transparente Preise",
+      "subtitle": "Wählen Sie den Plan, der zu Ihren Bedürfnissen passt",
+      "free": {
+        "name": "Kostenlos",
+        "price": "$0",
+        "interval": "/Monat",
+        "description": "Testen Sie, bevor Sie upgraden",
+        "cta": "Kostenlose Testversion starten"
+      },
+      "pro": {
+        "name": "Pro",
+        "price": "$19",
+        "interval": "/Monat",
+        "badge": "Am beliebtesten",
+        "description": "Für Profis",
+        "cta": "Auf Pro upgraden"
+      },
+      "team": {
+        "name": "Team",
+        "price": "$49",
+        "interval": "/Monat",
+        "description": "Für Teams",
+        "cta": "Vertrieb kontaktieren"
+      },
+      "viewComparison": "Detaillierten Vergleich ansehen"
+    },
+    "cta": {
+      "title": "Bereit, Ihre Produktivität zu steigern?",
+      "description": "Schließen Sie sich Profis an, die jede Woche Stunden mit KI-gestützter Transkription sparen.",
+      "free": "Kostenlose Testversion starten (60 Min)",
+      "pro": "Pro-Funktionen freischalten"
+    },
+    "ctaSection": {
+      "title": "Bereit, Ihren Workflow zu transformieren?",
+      "description": "Treten Sie Tausenden von Benutzern bei, die jede Woche Stunden mit Trammarise sparen.",
+      "button": "Kostenlos starten"
+    },
+    "footer": {
+      "tagline": "KI-gestützte Audio-Transkription und Zusammenfassung",
+      "links": {
+        "docs": "Dokumentation",
+        "pricing": "Preise",
+        "privacy": "Datenschutz",
+        "terms": "Bedingungen",
+        "contact": "Kontakt"
+      },
+      "copyright": "© {{year}} Trammarise. Alle Rechte vorbehalten."
+    }
+  },
   "pricing": {
     "title": "Wählen Sie Ihren Plan",
     "subtitle": "Starten Sie kostenlos mit Ihren eigenen API-Schlüsseln oder upgraden Sie für gehostete KI und Premium-Funktionen",
@@ -584,6 +667,10 @@
     "saveAmount": "Sparen Sie ${{amount}}/Jahr",
     "faq": {
       "title": "Häufig gestellte Fragen",
+      "freeTrial": {
+        "question": "Wie funktioniert die kostenlose Testversion?",
+        "answer": "Melden Sie sich kostenlos an und erhalten Sie 60 Minuten Transkription pro Monat. Keine Kreditkarte erforderlich. Upgraden Sie jederzeit für mehr Minuten und erweiterte Funktionen."
+      },
       "byok": {
         "question": "Was bedeutet BYOK?",
         "answer": "BYOK (Bring Your Own Key) bedeutet, dass Sie Ihren eigenen OpenAI API-Schlüssel bereitstellen. Dies gibt Ihnen volle Kontrolle und Pay-as-you-go-Preise direkt von OpenAI, ohne monatliche Gebühren."
@@ -596,6 +683,44 @@
         "question": "Was passiert, wenn ich meine Minuten überschreite?",
         "answer": "Sie können jederzeit zusätzliche Credits kaufen. Nicht genutzte Minuten werden nicht übertragen, aber Sie können immer Ihre eigenen API-Schlüssel für unbegrenzte Verarbeitung verwenden."
       }
+    }
+  },
+  "onboarding": {
+    "modal": {
+      "title": "🔑 Willkommen bei Trammarise",
+      "heading": "Ein weiterer Schritt zum Start",
+      "description": "Um Trammarise zu verwenden, müssen Sie entweder Ihren eigenen OpenAI API-Schlüssel bereitstellen oder auf einen Pro-Plan upgraden.",
+      "option1": {
+        "title": "Option 1: Verwenden Sie Ihren eigenen API-Schlüssel (Kostenlos)",
+        "placeholder": "sk-...",
+        "rememberKey": "Meinen API-Schlüssel merken (verschlüsselt gespeichert)",
+        "continueButton": "Mit API-Schlüssel fortfahren",
+        "saving": "Speichern...",
+        "instructions": {
+          "toggle": "So erhalten Sie einen OpenAI API-Schlüssel",
+          "step1": "Gehen Sie zu platform.openai.com",
+          "step2": "Melden Sie sich an oder erstellen Sie ein Konto",
+          "step3": "Klicken Sie auf \"Neuen geheimen Schlüssel erstellen\"",
+          "step4": "Kopieren Sie den Schlüssel (beginnt mit \"sk-\")",
+          "step5": "Fügen Sie ihn in das obige Feld ein",
+          "note": "💡 Sie zahlen OpenAI direkt für die Nutzung (typischerweise $0.006/Minute für Whisper)"
+        },
+        "errors": {
+          "empty": "Bitte geben Sie Ihren API-Schlüssel ein",
+          "invalidFormat": "Ungültiges API-Schlüssel-Format. OpenAI-Schlüssel beginnen mit \"sk-\"",
+          "saveFailed": "Fehler beim Speichern des API-Schlüssels. Bitte versuchen Sie es erneut."
+        }
+      },
+      "option2": {
+        "title": "Option 2: Auf Pro upgraden",
+        "description": "Erhalten Sie 500 Minuten/Monat mit gehosteter API, Cloud-Sync und Priority-Support.",
+        "button": "Pro-Pläne ansehen →"
+      },
+      "divider": "oder"
+    },
+    "banner": {
+      "message": "Sie sind fast fertig! Schließen Sie das Setup ab, um Trammarise freizuschalten.",
+      "button": "Zurück zum Setup"
     }
   }
 }

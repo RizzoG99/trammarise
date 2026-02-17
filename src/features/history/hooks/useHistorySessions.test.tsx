@@ -2,14 +2,34 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { useHistorySessions } from './useHistorySessions';
 import * as sessionManager from '@/utils/session-manager';
+import { SubscriptionProvider } from '@/context/SubscriptionContext';
 
 // Mock Clerk
 vi.mock('@clerk/clerk-react', () => ({
-  useUser: () => ({ isSignedIn: false }), // Default to not signed in for localStorage tests
+  useUser: () => ({ user: null, isSignedIn: false, isLoaded: true }), // Default to not signed in for localStorage tests
+  useAuth: () => ({ userId: null, isLoaded: true, isSignedIn: false }),
 }));
 
 vi.mock('@/utils/session-manager');
 vi.mock('@/repositories/SessionRepository');
+
+// Mock fetch-with-auth for SubscriptionProvider
+vi.mock('@/utils/fetch-with-auth', () => ({
+  fetchWithAuth: vi.fn().mockResolvedValue({
+    subscription: {
+      tier: 'free',
+      status: 'active',
+      credits: 60,
+      creditsUsed: 0,
+      creditsRemaining: 60,
+    },
+  }),
+}));
+
+// Wrapper for SubscriptionProvider
+const wrapper = ({ children }: { children: React.ReactNode }) => (
+  <SubscriptionProvider>{children}</SubscriptionProvider>
+);
 
 describe('useHistorySessions', () => {
   beforeEach(() => {
@@ -65,7 +85,7 @@ describe('useHistorySessions', () => {
       mockSessionData(id, Date.now())
     );
 
-    const { result } = renderHook(() => useHistorySessions());
+    const { result } = renderHook(() => useHistorySessions(), { wrapper });
 
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false);
@@ -82,7 +102,7 @@ describe('useHistorySessions', () => {
       mockSessionData('session-1', createdAt)
     );
 
-    const { result } = renderHook(() => useHistorySessions());
+    const { result } = renderHook(() => useHistorySessions(), { wrapper });
 
     await waitFor(() => {
       expect(result.current.sessions).toHaveLength(1);
@@ -106,7 +126,7 @@ describe('useHistorySessions', () => {
       fileSizeBytes: expectedSize,
     });
 
-    const { result } = renderHook(() => useHistorySessions());
+    const { result } = renderHook(() => useHistorySessions(), { wrapper });
 
     await waitFor(() => {
       expect(result.current.sessions).toHaveLength(1);
@@ -126,7 +146,7 @@ describe('useHistorySessions', () => {
       return mockSessionData(id, createdAt);
     });
 
-    const { result } = renderHook(() => useHistorySessions());
+    const { result } = renderHook(() => useHistorySessions(), { wrapper });
 
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false);
@@ -146,7 +166,7 @@ describe('useHistorySessions', () => {
       return mockSessionData(id, Date.now());
     });
 
-    const { result } = renderHook(() => useHistorySessions());
+    const { result } = renderHook(() => useHistorySessions(), { wrapper });
 
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false);
@@ -164,7 +184,7 @@ describe('useHistorySessions', () => {
       mockSessionData('session-1', Date.now())
     );
 
-    const { result } = renderHook(() => useHistorySessions());
+    const { result } = renderHook(() => useHistorySessions(), { wrapper });
 
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false);
@@ -182,7 +202,7 @@ describe('useHistorySessions', () => {
     );
     vi.mocked(sessionManager.deleteSession).mockResolvedValue(undefined);
 
-    const { result } = renderHook(() => useHistorySessions());
+    const { result } = renderHook(() => useHistorySessions(), { wrapper });
 
     await waitFor(() => {
       expect(result.current.sessions).toHaveLength(2);
@@ -205,7 +225,7 @@ describe('useHistorySessions', () => {
     );
     vi.mocked(sessionManager.deleteSession).mockResolvedValue(undefined);
 
-    const { result } = renderHook(() => useHistorySessions());
+    const { result } = renderHook(() => useHistorySessions(), { wrapper });
 
     await waitFor(() => {
       expect(result.current.sessions).toHaveLength(1);
@@ -226,7 +246,7 @@ describe('useHistorySessions', () => {
     );
     vi.mocked(sessionManager.deleteSession).mockRejectedValue(new Error('Delete failed'));
 
-    const { result } = renderHook(() => useHistorySessions());
+    const { result } = renderHook(() => useHistorySessions(), { wrapper });
 
     await waitFor(() => {
       expect(result.current.sessions).toHaveLength(1);
@@ -248,7 +268,7 @@ describe('useHistorySessions', () => {
       mockSessionData('session-1', Date.now())
     );
 
-    const { result } = renderHook(() => useHistorySessions());
+    const { result } = renderHook(() => useHistorySessions(), { wrapper });
 
     // Should start loading
     expect(result.current.isLoading).toBe(true);

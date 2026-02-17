@@ -578,12 +578,15 @@
       "newBadge": "✨ Introduzione al Liquid Glass Design",
       "titlePart1": "Trascrivi e Riassumi",
       "titlePart2": "In Secondi",
-      "description": "Trasforma le tue riunioni, lezioni e interviste in informazioni utili con la nostra trascrizione AI sicura e lato client.",
+      "description": "Trasforma le tue riunioni, lezioni e interviste in informazioni utili. Inizia con 60 minuti gratuiti, aggiorna per accesso illimitato.",
       "cta": {
+        "primary": "Inizia la Prova Gratuita",
+        "secondary": "Vedi Prezzi",
         "getStarted": "Inizia Gratis",
         "viewFeatures": "Vedi Funzionalità",
         "appPreview": "[Visualizzazione Anteprima App]"
-      }
+      },
+      "noCreditCard": "Nessuna carta di credito richiesta"
     },
     "features": {
       "title": "Strumenti Potenti per l'Audio",
@@ -602,6 +605,39 @@
           "description": "I tuoi dati rimangono tuoi. L'elaborazione lato client garantisce la massima privacy. Nessun audio lascia il tuo dispositivo senza permesso."
         }
       }
+    },
+    "pricing": {
+      "title": "Prezzi Semplici e Trasparenti",
+      "subtitle": "Scegli il piano che si adatta alle tue esigenze",
+      "free": {
+        "name": "Gratuito",
+        "price": "$0",
+        "interval": "/mese",
+        "description": "Prova prima di aggiornare",
+        "cta": "Inizia la Prova Gratuita"
+      },
+      "pro": {
+        "name": "Pro",
+        "price": "$19",
+        "interval": "/mese",
+        "badge": "Più Popolare",
+        "description": "Per professionisti",
+        "cta": "Aggiorna a Pro"
+      },
+      "team": {
+        "name": "Team",
+        "price": "$49",
+        "interval": "/mese",
+        "description": "Per team",
+        "cta": "Contatta Vendite"
+      },
+      "viewComparison": "Vedi confronto dettagliato"
+    },
+    "cta": {
+      "title": "Pronto a aumentare la tua produttività?",
+      "description": "Unisciti ai professionisti che risparmiano ore ogni settimana con la trascrizione basata su IA.",
+      "free": "Inizia la Prova Gratuita (60 min)",
+      "pro": "Sblocca Funzionalità Pro"
     },
     "ctaSection": {
       "title": "Pronto a trasformare il tuo flusso di lavoro?",
@@ -631,6 +667,10 @@
     "saveAmount": "Risparmia ${{amount}}/anno",
     "faq": {
       "title": "Domande frequenti",
+      "freeTrial": {
+        "question": "Come funziona la prova gratuita?",
+        "answer": "Registrati gratuitamente e ottieni 60 minuti di trascrizione al mese. Nessuna carta di credito richiesta. Aggiorna in qualsiasi momento per più minuti e funzionalità avanzate."
+      },
       "byok": {
         "question": "Cosa significa BYOK?",
         "answer": "BYOK (Bring Your Own Key) significa che fornisci la tua chiave API OpenAI. Questo ti dà il pieno controllo e prezzi pay-as-you-go direttamente da OpenAI, senza costi mensili."
@@ -643,6 +683,44 @@
         "question": "Cosa succede se supero i miei minuti?",
         "answer": "Puoi acquistare crediti aggiuntivi in qualsiasi momento. I minuti inutilizzati non vengono trasferiti, ma puoi sempre usare le tue chiavi API per elaborazioni illimitate."
       }
+    }
+  },
+  "onboarding": {
+    "modal": {
+      "title": "🔑 Benvenuto in Trammarise",
+      "heading": "Un Altro Passo per Iniziare",
+      "description": "Per utilizzare Trammarise, devi fornire la tua chiave API OpenAI o aggiornare a un piano Pro.",
+      "option1": {
+        "title": "Opzione 1: Usa la Tua Chiave API (Gratuito)",
+        "placeholder": "sk-...",
+        "rememberKey": "Ricorda la mia chiave API (memorizzata crittografata)",
+        "continueButton": "Continua con la Chiave API",
+        "saving": "Salvataggio...",
+        "instructions": {
+          "toggle": "Come ottenere una chiave API OpenAI",
+          "step1": "Vai su platform.openai.com",
+          "step2": "Accedi o crea un account",
+          "step3": "Clicca \"Crea nuova chiave segreta\"",
+          "step4": "Copia la chiave (inizia con \"sk-\")",
+          "step5": "Incollala nel campo sopra",
+          "note": "💡 Pagherai OpenAI direttamente per l'utilizzo (tipicamente $0.006/minuto per Whisper)"
+        },
+        "errors": {
+          "empty": "Inserisci la tua chiave API",
+          "invalidFormat": "Formato chiave API non valido. Le chiavi OpenAI iniziano con \"sk-\"",
+          "saveFailed": "Impossibile salvare la chiave API. Riprova."
+        }
+      },
+      "option2": {
+        "title": "Opzione 2: Aggiorna a Pro",
+        "description": "Ottieni 500 minuti/mese con API ospitata, sincronizzazione cloud e supporto prioritario.",
+        "button": "Vedi Piani Pro →"
+      },
+      "divider": "oppure"
+    },
+    "banner": {
+      "message": "Ci sei quasi! Completa la configurazione per sbloccare Trammarise.",
+      "button": "Torna alla Configurazione"
     }
   }
 }
