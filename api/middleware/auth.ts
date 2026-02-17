@@ -88,7 +88,8 @@ export async function requireAuth(req: VercelRequest): Promise<AuthResult> {
       .eq('clerk_user_id', clerkUserId)
       .single<{ id: string; clerk_user_id: string }>();
 
-    // If user doesn't exist, create them (fallback for webhook failures)
+    // If user doesn't exist, create them (fallback for webhook delays/failures)
+    // Uses upsert to handle race condition where webhook and auth run concurrently
     if (error || !user) {
       console.log(`[Auth] User not found in database, creating for Clerk ID: ${clerkUserId}`);
 
@@ -106,13 +107,19 @@ export async function requireAuth(req: VercelRequest): Promise<AuthResult> {
         throw new AuthError('Could not retrieve user email from Clerk', 500);
       }
 
-      // Create the user in Supabase
+      // Create the user in Supabase (upsert handles concurrent creation)
       const { data: newUser, error: createError } = await supabaseAdmin
         .from('users')
-        .insert({
-          clerk_user_id: clerkUserId,
-          email,
-        })
+        .upsert(
+          {
+            clerk_user_id: clerkUserId,
+            email,
+          },
+          {
+            onConflict: 'clerk_user_id',
+            ignoreDuplicates: false,
+          }
+        )
         .select('id, clerk_user_id')
         .single<{ id: string; clerk_user_id: string }>();
 

@@ -109,7 +109,7 @@ describe('requireAuth middleware', () => {
         toAuth: () => ({ userId: 'user_clerk123' }),
       });
 
-      // First call: user not found, Second call after insert: return new user
+      // First call: user not found, Second call after upsert: return new user
       const mockSingle = vi
         .fn()
         .mockResolvedValueOnce({
@@ -125,7 +125,7 @@ describe('requireAuth middleware', () => {
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
         single: mockSingle,
-        insert: vi.fn().mockReturnThis(),
+        upsert: vi.fn().mockReturnThis(),
       });
 
       // Mock Clerk user fetch for email
