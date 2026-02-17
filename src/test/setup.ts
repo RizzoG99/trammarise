@@ -5,12 +5,12 @@ import * as matchers from '@testing-library/jest-dom/matchers';
 expect.extend(matchers);
 
 // Set Supabase environment variables for testing
-// These are dummy values used only in test environment
+// These are fake/dummy values used ONLY in test environment - not real credentials
 if (!import.meta.env.VITE_SUPABASE_URL) {
-  import.meta.env.VITE_SUPABASE_URL = 'https://test.supabase.co';
+  import.meta.env.VITE_SUPABASE_URL = 'http://localhost:54321'; // Standard Supabase local dev URL
 }
 if (!import.meta.env.VITE_SUPABASE_ANON_KEY) {
-  import.meta.env.VITE_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.test';
+  import.meta.env.VITE_SUPABASE_ANON_KEY = 'test-anon-key-not-real'; // Dummy key for testing only
 }
 
 import enTranslation from '../locales/en/translation.json';
