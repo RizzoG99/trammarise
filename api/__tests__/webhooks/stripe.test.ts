@@ -203,6 +203,51 @@ describe('POST /api/webhooks/stripe', () => {
         })
       );
     });
+
+    it('should warn when subscription price ID is not in the known price map', async () => {
+      // Arrange - price ID that isn't in PRICE_TO_TIER → customer silently demoted to free
+      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      const subscriptionEvent = {
+        type: 'customer.subscription.created',
+        data: {
+          object: {
+            id: 'sub_unknown',
+            customer: 'cus_unknown',
+            status: 'active',
+            current_period_start: 1704067200,
+            current_period_end: 1706745600,
+            cancel_at_period_end: false,
+            items: { data: [{ price: { id: 'price_unknown_xyz' } }] },
+            metadata: { userId: 'user-uuid-999' },
+          },
+        },
+      };
+
+      mockConstructEvent.mockReturnValue(subscriptionEvent);
+      mockSupabaseFrom.mockReturnValue({ upsert: mockSupabaseUpsert });
+      mockSupabaseUpsert.mockResolvedValue({ data: {}, error: null });
+
+      const { default: handler } = await import('../../webhooks/stripe');
+      const mockReq = createMockReq({
+        method: 'POST',
+        headers: { 'stripe-signature': 'valid-signature' },
+        body: JSON.stringify(subscriptionEvent),
+      });
+
+      const mockRes = {
+        status: vi.fn().mockReturnThis(),
+        json: vi.fn().mockReturnThis(),
+        send: vi.fn().mockReturnThis(),
+      } as unknown as VercelResponse;
+
+      // Act
+      await handler(mockReq, mockRes);
+
+      // Assert - warn so the unrecognised ID is visible in logs
+      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('price_unknown_xyz'));
+      consoleSpy.mockRestore();
+    });
   });
 
   describe('customer.subscription.updated', () => {

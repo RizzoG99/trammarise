@@ -35,7 +35,14 @@ if (process.env.STRIPE_PRICE_TEAM_ANNUAL)
  */
 function determineTier(priceId: string | undefined): string {
   if (!priceId) return 'free';
-  return PRICE_TO_TIER[priceId] || 'free';
+  const tier = PRICE_TO_TIER[priceId];
+  if (!tier) {
+    console.warn(
+      `[determineTier] unrecognised price ID "${priceId}" — defaulting to free. Check STRIPE_PRICE_* env vars.`
+    );
+    return 'free';
+  }
+  return tier;
 }
 
 /**

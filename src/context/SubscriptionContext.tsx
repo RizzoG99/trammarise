@@ -35,6 +35,9 @@ interface SubscriptionProviderProps {
 export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
   const { isSignedIn, isLoaded } = useUser();
   const { getToken } = useAuth();
+  // Stable ref so fetchSubscription can call the latest getToken without
+  // including it as a useCallback dependency (which would cause an infinite
+  // re-render loop because Clerk re-creates getToken on every render).
   const getTokenRef = useRef(getToken);
   getTokenRef.current = getToken;
   const [subscription, setSubscription] = useState<Subscription | null>(null);

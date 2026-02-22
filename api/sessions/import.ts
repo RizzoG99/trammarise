@@ -57,12 +57,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ error: 'localSessions must be an array' });
     }
 
-    // Limit to 50 sessions
-    const sessionsToImport = localSessions.slice(0, 50).filter(validateSession);
+    // Limit to 50 sessions and filter out structurally invalid ones
+    const sliced = localSessions.slice(0, 50);
+    const sessionsToImport = sliced.filter(validateSession);
+    const rejectedCount = sliced.length - sessionsToImport.length;
 
     // If no sessions to import, return early
     if (sessionsToImport.length === 0) {
-      return res.status(200).json({ imported: 0 });
+      return res.status(200).json({ imported: 0, rejected: rejectedCount });
     }
 
     // Get existing session IDs to avoid duplicates
@@ -80,7 +82,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // If no new sessions to import, return early
     if (newSessions.length === 0) {
-      return res.status(200).json({ imported: 0 });
+      return res.status(200).json({ imported: 0, rejected: rejectedCount });
     }
 
     // Transform sessions to database format
@@ -128,7 +130,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(500).json({ error: 'Failed to import sessions' });
     }
 
-    return res.status(200).json({ imported: newSessions.length });
+    return res.status(200).json({ imported: newSessions.length, rejected: rejectedCount });
   } catch (error) {
     console.error('Session import error:', error);
 

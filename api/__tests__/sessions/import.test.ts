@@ -83,7 +83,7 @@ describe('POST /api/sessions/import', () => {
 
       // Assert
       expect(mockRes.status).toHaveBeenCalledWith(200);
-      expect(mockRes.json).toHaveBeenCalledWith({ imported: 50 });
+      expect(mockRes.json).toHaveBeenCalledWith({ imported: 50, rejected: 0 });
     });
 
     it('should skip duplicate sessionIds', async () => {
@@ -160,7 +160,7 @@ describe('POST /api/sessions/import', () => {
       await handler(mockReq, mockRes);
 
       // Assert
-      expect(mockRes.json).toHaveBeenCalledWith({ imported: 2 });
+      expect(mockRes.json).toHaveBeenCalledWith({ imported: 2, rejected: 0 });
     });
 
     it('should import empty array successfully', async () => {
@@ -181,7 +181,63 @@ describe('POST /api/sessions/import', () => {
 
       // Assert
       expect(mockRes.status).toHaveBeenCalledWith(200);
-      expect(mockRes.json).toHaveBeenCalledWith({ imported: 0 });
+      expect(mockRes.json).toHaveBeenCalledWith({ imported: 0, rejected: 0 });
+    });
+  });
+
+  describe('Partial Import with Invalid Sessions', () => {
+    it('should report rejected count when some sessions fail validation', async () => {
+      // Arrange - 2 valid sessions, 1 invalid (bad UUID)
+      const sessions = [
+        {
+          sessionId: 'a1b2c3d4-e5f6-4789-a0b1-c2d3e4f5a601',
+          contentType: 'meeting',
+          fileSizeBytes: 1024,
+          language: 'en',
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+        },
+        {
+          sessionId: 'not-a-valid-uuid',
+          contentType: 'meeting',
+        },
+        {
+          sessionId: 'a1b2c3d4-e5f6-4789-a0b1-c2d3e4f5a603',
+          contentType: 'other',
+          fileSizeBytes: 2048,
+          language: 'it',
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+        },
+      ];
+
+      // Mock existing sessions check (none exist)
+      mockSupabaseFrom.mockReturnValueOnce({ select: mockSupabaseSelect });
+      mockSupabaseSelect.mockReturnValueOnce({ eq: mockSupabaseEq });
+      mockSupabaseEq.mockReturnValueOnce({ in: mockSupabaseIn });
+      mockSupabaseIn.mockResolvedValueOnce({ data: [], error: null });
+
+      // Mock insert
+      mockSupabaseFrom.mockReturnValueOnce({ insert: mockSupabaseInsert });
+      mockSupabaseInsert.mockResolvedValueOnce({ data: [], error: null });
+
+      const { default: handler } = await import('../../sessions/import');
+      const mockReq = {
+        method: 'POST',
+        body: { localSessions: sessions },
+      } as unknown as VercelRequest;
+
+      const mockRes = {
+        status: vi.fn().mockReturnThis(),
+        json: vi.fn().mockReturnThis(),
+      } as unknown as VercelResponse;
+
+      // Act
+      await handler(mockReq, mockRes);
+
+      // Assert - response includes rejected count so callers can surface it
+      expect(mockRes.status).toHaveBeenCalledWith(200);
+      expect(mockRes.json).toHaveBeenCalledWith({ imported: 2, rejected: 1 });
     });
   });
 
