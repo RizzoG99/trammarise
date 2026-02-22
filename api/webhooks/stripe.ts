@@ -2,6 +2,12 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import Stripe from 'stripe';
 import { supabaseAdmin } from '../lib/supabase-admin';
 
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
 // Lazy initialization of Stripe
 let stripe: Stripe | null = null;
 
@@ -58,12 +64,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(500).json({ error: 'Webhook configuration error' });
   }
 
+  // Accumulate raw body for signature verification (bodyParser is disabled)
+  const rawBody = await new Promise<Buffer>((resolve, reject) => {
+    const chunks: Buffer[] = [];
+    req.on('data', (chunk) => chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk)));
+    req.on('end', () => resolve(Buffer.concat(chunks)));
+    req.on('error', reject);
+  });
+
   let event: Stripe.Event;
 
   try {
-    // Verify webhook signature
+    // Verify webhook signature using raw buffer (required by Stripe)
     const stripeClient = getStripeClient();
-    event = stripeClient.webhooks.constructEvent(req.body, sig, webhookSecret);
+    event = stripeClient.webhooks.constructEvent(rawBody, sig, webhookSecret);
   } catch (err) {
     const error = err as Error;
     console.error('Webhook signature verification failed:', error.message);
@@ -152,31 +166,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             return res.status(500).send('Webhook handler failed');
           }
 
-          // Add credits to balance
+          // Add credits to balance (RPC handles transaction record atomically)
           const { error: rpcError } = await supabaseAdmin.rpc('add_credits', {
             sub_id: subscription.id,
             credits,
+            stripe_payment_intent_id: paymentIntent.id,
+            amount_paid_cents: paymentIntent.amount,
+            p_description: `Purchased ${credits} credits for $${(paymentIntent.amount / 100).toFixed(2)}`,
           });
 
           if (rpcError) {
             console.error('Failed to add credits:', rpcError);
             return res.status(500).send('Webhook handler failed');
-          }
-
-          // Record transaction
-          const { error: txError } = await supabaseAdmin.from('credit_transactions').insert({
-            user_id: userId,
-            transaction_type: 'purchase',
-            credits_amount: credits,
-            balance_after: (subscription.credits_balance || 0) + credits,
-            stripe_payment_intent_id: paymentIntent.id,
-            amount_paid_cents: paymentIntent.amount,
-            description: `Purchased ${credits} credits for $${(paymentIntent.amount / 100).toFixed(2)}`,
-          });
-
-          if (txError) {
-            console.error('Failed to record credit transaction:', txError);
-            // Don't fail the webhook - credits were already added
           }
 
           console.log(`Added ${credits} credits to user ${userId} via payment ${paymentIntent.id}`);

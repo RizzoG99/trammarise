@@ -359,7 +359,8 @@
       "browserOnly": "Keys are stored only in your browser session",
       "neverSaved": "Never saved to disk or cloud",
       "clearedOnClose": "Cleared when you close the tab",
-      "recommendLimits": "We recommend using API keys with spending limits"
+      "recommendLimits": "We recommend using API keys with spending limits",
+      "transmittedNotStored": "Your API key is transmitted through our servers to process requests but is never stored or logged"
     }
   },
   "chat": {

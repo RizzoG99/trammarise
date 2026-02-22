@@ -2,6 +2,19 @@ import type { VercelRequest } from '@vercel/node';
 import { createClerkClient } from '@clerk/backend';
 import { supabaseAdmin } from '../lib/supabase-admin';
 
+// Lazy singleton — avoids creating a new client per request
+let _clerkClient: ReturnType<typeof createClerkClient> | null = null;
+
+function getClerkClient(): ReturnType<typeof createClerkClient> {
+  if (!_clerkClient) {
+    _clerkClient = createClerkClient({
+      secretKey: process.env.CLERK_SECRET_KEY,
+      publishableKey: process.env.CLERK_PUBLISHABLE_KEY,
+    });
+  }
+  return _clerkClient;
+}
+
 export class AuthError extends Error {
   constructor(
     message: string,
@@ -55,11 +68,7 @@ function toWebRequest(req: VercelRequest): Request {
  * }
  */
 export async function requireAuth(req: VercelRequest): Promise<AuthResult> {
-  // Create Clerk client with both secret and publishable keys
-  const clerkClient = createClerkClient({
-    secretKey: process.env.CLERK_SECRET_KEY,
-    publishableKey: process.env.CLERK_PUBLISHABLE_KEY,
-  });
+  const clerkClient = getClerkClient();
 
   try {
     // Use authenticateRequest for both dev and production

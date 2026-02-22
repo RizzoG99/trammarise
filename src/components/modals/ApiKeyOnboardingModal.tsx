@@ -214,6 +214,12 @@ export function ApiKeyOnboardingModal({ isOpen, onComplete }: ApiKeyOnboardingMo
                   "💡 You'll pay OpenAI directly for usage (typically $0.006/minute for Whisper)"
                 )}
               </Text>
+              <Text variant="small" className="text-gray-500 dark:text-gray-400 mt-1">
+                {t(
+                  'onboarding.modal.option1.instructions.privacyNote',
+                  'Your API key is transmitted through our servers to process requests but is never stored or logged.'
+                )}
+              </Text>
             </div>
           )}
         </div>

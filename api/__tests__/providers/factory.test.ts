@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { TranscriptionProviderFactory, type ProviderType } from '../../providers/factory';
 
 describe('TranscriptionProviderFactory', () => {
@@ -30,6 +30,8 @@ describe('TranscriptionProviderFactory', () => {
     });
 
     it('should create OpenAI provider for assemblyai without speaker diarization', () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
       const provider = TranscriptionProviderFactory.create({
         provider: 'assemblyai',
         apiKey: 'test-key',
@@ -38,6 +40,11 @@ describe('TranscriptionProviderFactory', () => {
 
       // Falls back to OpenAI for cost efficiency
       expect(provider.getProviderName()).toBe('OpenAI');
+      expect(warnSpy).toHaveBeenCalledWith(
+        '[ProviderFactory] assemblyai requested without speaker diarization — falling back to OpenAI for cost efficiency'
+      );
+
+      warnSpy.mockRestore();
     });
 
     it('should throw error for unknown provider', () => {

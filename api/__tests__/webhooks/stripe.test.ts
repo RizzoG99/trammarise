@@ -30,6 +30,25 @@ vi.mock('../../lib/supabase-admin', () => ({
   },
 }));
 
+/** Creates a mock VercelRequest with Node.js stream event support for raw body handlers */
+function createMockReq(options: {
+  method?: string;
+  headers?: Record<string, string>;
+  body?: string;
+}): VercelRequest {
+  const bodyBuffer = Buffer.from(options.body ?? '');
+  const req = {
+    method: options.method ?? 'POST',
+    headers: options.headers ?? {},
+    on(event: string, cb: (...args: unknown[]) => void) {
+      if (event === 'data') cb(bodyBuffer);
+      if (event === 'end') cb();
+      return req;
+    },
+  };
+  return req as unknown as VercelRequest;
+}
+
 describe('POST /api/webhooks/stripe', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -85,11 +104,11 @@ describe('POST /api/webhooks/stripe', () => {
       });
 
       const { default: handler } = await import('../../webhooks/stripe');
-      const mockReq = {
+      const mockReq = createMockReq({
         method: 'POST',
         headers: { 'stripe-signature': 'valid-signature' },
         body: JSON.stringify(subscriptionEvent),
-      } as unknown as VercelRequest;
+      });
 
       const mockRes = {
         status: vi.fn().mockReturnThis(),
@@ -102,7 +121,7 @@ describe('POST /api/webhooks/stripe', () => {
 
       // Assert
       expect(mockConstructEvent).toHaveBeenCalledWith(
-        JSON.stringify(subscriptionEvent),
+        expect.any(Buffer),
         'valid-signature',
         'whsec_test_123'
       );
@@ -162,11 +181,11 @@ describe('POST /api/webhooks/stripe', () => {
       });
 
       const { default: handler } = await import('../../webhooks/stripe');
-      const mockReq = {
+      const mockReq = createMockReq({
         method: 'POST',
         headers: { 'stripe-signature': 'valid-signature' },
         body: JSON.stringify(subscriptionEvent),
-      } as unknown as VercelRequest;
+      });
 
       const mockRes = {
         status: vi.fn().mockReturnThis(),
@@ -227,11 +246,11 @@ describe('POST /api/webhooks/stripe', () => {
       });
 
       const { default: handler } = await import('../../webhooks/stripe');
-      const mockReq = {
+      const mockReq = createMockReq({
         method: 'POST',
         headers: { 'stripe-signature': 'valid-signature' },
         body: JSON.stringify(subscriptionEvent),
-      } as unknown as VercelRequest;
+      });
 
       const mockRes = {
         status: vi.fn().mockReturnThis(),
@@ -277,11 +296,11 @@ describe('POST /api/webhooks/stripe', () => {
       });
 
       const { default: handler } = await import('../../webhooks/stripe');
-      const mockReq = {
+      const mockReq = createMockReq({
         method: 'POST',
         headers: { 'stripe-signature': 'valid-signature' },
         body: JSON.stringify(subscriptionEvent),
-      } as unknown as VercelRequest;
+      });
 
       const mockRes = {
         status: vi.fn().mockReturnThis(),
@@ -325,11 +344,11 @@ describe('POST /api/webhooks/stripe', () => {
       });
 
       const { default: handler } = await import('../../webhooks/stripe');
-      const mockReq = {
+      const mockReq = createMockReq({
         method: 'POST',
         headers: { 'stripe-signature': 'valid-signature' },
         body: JSON.stringify(subscriptionEvent),
-      } as unknown as VercelRequest;
+      });
 
       const mockRes = {
         status: vi.fn().mockReturnThis(),
@@ -351,11 +370,7 @@ describe('POST /api/webhooks/stripe', () => {
     it('should return 405 for non-POST requests', async () => {
       // Arrange
       const { default: handler } = await import('../../webhooks/stripe');
-      const mockReq = {
-        method: 'GET',
-        headers: {},
-        body: '',
-      } as unknown as VercelRequest;
+      const mockReq = createMockReq({ method: 'GET', headers: {}, body: '' });
 
       const mockRes = {
         status: vi.fn().mockReturnThis(),
@@ -377,11 +392,11 @@ describe('POST /api/webhooks/stripe', () => {
       });
 
       const { default: handler } = await import('../../webhooks/stripe');
-      const mockReq = {
+      const mockReq = createMockReq({
         method: 'POST',
         headers: { 'stripe-signature': 'invalid-signature' },
         body: JSON.stringify({ type: 'test' }),
-      } as unknown as VercelRequest;
+      });
 
       const mockRes = {
         status: vi.fn().mockReturnThis(),
@@ -421,16 +436,9 @@ describe('POST /api/webhooks/stripe', () => {
       const mockSupabaseSelect = vi.fn();
       const mockSupabaseEq = vi.fn();
       const mockSupabaseSingle = vi.fn();
-      const mockSupabaseRpc = vi.fn();
-      const mockSupabaseInsert = vi.fn();
-
-      mockSupabaseFrom
-        .mockReturnValueOnce({
-          select: mockSupabaseSelect,
-        })
-        .mockReturnValueOnce({
-          insert: mockSupabaseInsert,
-        });
+      mockSupabaseFrom.mockReturnValueOnce({
+        select: mockSupabaseSelect,
+      });
 
       mockSupabaseSelect.mockReturnValue({
         eq: mockSupabaseEq,
@@ -448,26 +456,17 @@ describe('POST /api/webhooks/stripe', () => {
         error: null,
       });
 
-      // Mock RPC call
-      const { supabaseAdmin } = await import('../../lib/supabase-admin');
-      (supabaseAdmin as typeof supabaseAdmin & { rpc: typeof mockSupabaseRpc }).rpc =
-        mockSupabaseRpc;
       mockSupabaseRpc.mockResolvedValue({
         data: null,
         error: null,
       });
 
-      mockSupabaseInsert.mockResolvedValue({
-        data: { id: 'tx-uuid-123' },
-        error: null,
-      });
-
       const { default: handler } = await import('../../webhooks/stripe');
-      const mockReq = {
+      const mockReq = createMockReq({
         method: 'POST',
         headers: { 'stripe-signature': 'valid-signature' },
         body: JSON.stringify(paymentEvent),
-      } as unknown as VercelRequest;
+      });
 
       const mockRes = {
         status: vi.fn().mockReturnThis(),
@@ -482,18 +481,10 @@ describe('POST /api/webhooks/stripe', () => {
       expect(mockSupabaseRpc).toHaveBeenCalledWith('add_credits', {
         sub_id: 'sub-uuid-123',
         credits: 50,
+        stripe_payment_intent_id: 'pi_test_123',
+        amount_paid_cents: 500,
+        p_description: 'Purchased 50 credits for $5.00',
       });
-
-      expect(mockSupabaseInsert).toHaveBeenCalledWith(
-        expect.objectContaining({
-          user_id: 'user-uuid-123',
-          transaction_type: 'purchase',
-          credits_amount: 50,
-          balance_after: 150, // 100 + 50
-          stripe_payment_intent_id: 'pi_test_123',
-          amount_paid_cents: 500,
-        })
-      );
 
       expect(mockRes.json).toHaveBeenCalledWith({ received: true });
     });
@@ -516,11 +507,11 @@ describe('POST /api/webhooks/stripe', () => {
       mockConstructEvent.mockReturnValue(paymentEvent);
 
       const { default: handler } = await import('../../webhooks/stripe');
-      const mockReq = {
+      const mockReq = createMockReq({
         method: 'POST',
         headers: { 'stripe-signature': 'valid-signature' },
         body: JSON.stringify(paymentEvent),
-      } as unknown as VercelRequest;
+      });
 
       const mockRes = {
         status: vi.fn().mockReturnThis(),
@@ -559,15 +550,9 @@ describe('POST /api/webhooks/stripe', () => {
       const mockSupabaseSelect = vi.fn();
       const mockSupabaseEq = vi.fn();
       const mockSupabaseSingle = vi.fn();
-      const mockSupabaseInsert = vi.fn();
-
-      mockSupabaseFrom
-        .mockReturnValueOnce({
-          select: mockSupabaseSelect,
-        })
-        .mockReturnValueOnce({
-          insert: mockSupabaseInsert,
-        });
+      mockSupabaseFrom.mockReturnValueOnce({
+        select: mockSupabaseSelect,
+      });
 
       mockSupabaseSelect.mockReturnValue({ eq: mockSupabaseEq });
       mockSupabaseEq.mockReturnValue({ single: mockSupabaseSingle });
@@ -577,14 +562,13 @@ describe('POST /api/webhooks/stripe', () => {
       });
 
       mockSupabaseRpc.mockResolvedValue({ data: null, error: null });
-      mockSupabaseInsert.mockResolvedValue({ data: { id: 'tx-uuid-789' }, error: null });
 
       const { default: handler } = await import('../../webhooks/stripe');
-      const mockReq = {
+      const mockReq = createMockReq({
         method: 'POST',
         headers: { 'stripe-signature': 'valid-signature' },
         body: JSON.stringify(paymentEvent),
-      } as unknown as VercelRequest;
+      });
 
       const mockRes = {
         status: vi.fn().mockReturnThis(),
@@ -595,14 +579,14 @@ describe('POST /api/webhooks/stripe', () => {
       // Act
       await handler(mockReq, mockRes);
 
-      // Assert - verify transaction includes description
-      expect(mockSupabaseInsert).toHaveBeenCalledWith(
-        expect.objectContaining({
-          description: 'Purchased 250 credits for $25.00',
-          credits_amount: 250,
-          amount_paid_cents: 2500,
-        })
-      );
+      // Assert - verify RPC is called with description (transaction recorded atomically in DB function)
+      expect(mockSupabaseRpc).toHaveBeenCalledWith('add_credits', {
+        sub_id: 'sub-uuid-789',
+        credits: 250,
+        stripe_payment_intent_id: 'pi_test_789',
+        amount_paid_cents: 2500,
+        p_description: 'Purchased 250 credits for $25.00',
+      });
     });
 
     it('should handle missing userId in metadata', async () => {
@@ -625,11 +609,11 @@ describe('POST /api/webhooks/stripe', () => {
       mockConstructEvent.mockReturnValue(paymentEvent);
 
       const { default: handler } = await import('../../webhooks/stripe');
-      const mockReq = {
+      const mockReq = createMockReq({
         method: 'POST',
         headers: { 'stripe-signature': 'valid-signature' },
         body: JSON.stringify(paymentEvent),
-      } as unknown as VercelRequest;
+      });
 
       const mockRes = {
         status: vi.fn().mockReturnThis(),
@@ -665,11 +649,11 @@ describe('POST /api/webhooks/stripe', () => {
       mockConstructEvent.mockReturnValue(paymentEvent);
 
       const { default: handler } = await import('../../webhooks/stripe');
-      const mockReq = {
+      const mockReq = createMockReq({
         method: 'POST',
         headers: { 'stripe-signature': 'valid-signature' },
         body: JSON.stringify(paymentEvent),
-      } as unknown as VercelRequest;
+      });
 
       const mockRes = {
         status: vi.fn().mockReturnThis(),
@@ -717,11 +701,11 @@ describe('POST /api/webhooks/stripe', () => {
       });
 
       const { default: handler } = await import('../../webhooks/stripe');
-      const mockReq = {
+      const mockReq = createMockReq({
         method: 'POST',
         headers: { 'stripe-signature': 'valid-signature' },
         body: JSON.stringify(paymentEvent),
-      } as unknown as VercelRequest;
+      });
 
       const mockRes = {
         status: vi.fn().mockReturnThis(),
@@ -774,11 +758,11 @@ describe('POST /api/webhooks/stripe', () => {
       });
 
       const { default: handler } = await import('../../webhooks/stripe');
-      const mockReq = {
+      const mockReq = createMockReq({
         method: 'POST',
         headers: { 'stripe-signature': 'valid-signature' },
         body: JSON.stringify(paymentEvent),
-      } as unknown as VercelRequest;
+      });
 
       const mockRes = {
         status: vi.fn().mockReturnThis(),
@@ -816,11 +800,7 @@ describe('POST /api/webhooks/stripe', () => {
       const mockSupabaseSelect = vi.fn();
       const mockSupabaseEq = vi.fn();
       const mockSupabaseSingle = vi.fn();
-      const mockSupabaseInsert = vi.fn();
-
-      mockSupabaseFrom
-        .mockReturnValueOnce({ select: mockSupabaseSelect })
-        .mockReturnValueOnce({ insert: mockSupabaseInsert });
+      mockSupabaseFrom.mockReturnValueOnce({ select: mockSupabaseSelect });
 
       mockSupabaseSelect.mockReturnValue({ eq: mockSupabaseEq });
       mockSupabaseEq.mockReturnValue({ single: mockSupabaseSingle });
@@ -830,14 +810,13 @@ describe('POST /api/webhooks/stripe', () => {
       });
 
       mockSupabaseRpc.mockResolvedValue({ data: null, error: null });
-      mockSupabaseInsert.mockResolvedValue({ data: { id: 'tx-uuid' }, error: null });
 
       const { default: handler } = await import('../../webhooks/stripe');
-      const mockReq = {
+      const mockReq = createMockReq({
         method: 'POST',
         headers: { 'stripe-signature': 'valid-signature' },
         body: JSON.stringify(paymentEvent),
-      } as unknown as VercelRequest;
+      });
 
       const mockRes = {
         status: vi.fn().mockReturnThis(),
@@ -851,9 +830,7 @@ describe('POST /api/webhooks/stripe', () => {
       // Clear mocks and process again
       vi.clearAllMocks();
       mockConstructEvent.mockReturnValue(paymentEvent);
-      mockSupabaseFrom
-        .mockReturnValueOnce({ select: mockSupabaseSelect })
-        .mockReturnValueOnce({ insert: mockSupabaseInsert });
+      mockSupabaseFrom.mockReturnValueOnce({ select: mockSupabaseSelect });
       mockSupabaseSelect.mockReturnValue({ eq: mockSupabaseEq });
       mockSupabaseEq.mockReturnValue({ single: mockSupabaseSingle });
       mockSupabaseSingle.mockResolvedValue({
@@ -861,7 +838,6 @@ describe('POST /api/webhooks/stripe', () => {
         error: null,
       });
       mockSupabaseRpc.mockResolvedValue({ data: null, error: null });
-      mockSupabaseInsert.mockResolvedValue({ data: { id: 'tx-uuid-2' }, error: null });
 
       await handler(mockReq, mockRes);
 
@@ -883,11 +859,11 @@ describe('POST /api/webhooks/stripe', () => {
       mockConstructEvent.mockReturnValue(unknownEvent);
 
       const { default: handler } = await import('../../webhooks/stripe');
-      const mockReq = {
+      const mockReq = createMockReq({
         method: 'POST',
         headers: { 'stripe-signature': 'valid-signature' },
         body: JSON.stringify(unknownEvent),
-      } as unknown as VercelRequest;
+      });
 
       const mockRes = {
         status: vi.fn().mockReturnThis(),
@@ -946,11 +922,11 @@ describe('POST /api/webhooks/stripe', () => {
       });
 
       const { default: handler } = await import('../../webhooks/stripe');
-      const mockReq = {
+      const mockReq = createMockReq({
         method: 'POST',
         headers: { 'stripe-signature': 'valid-signature' },
         body: JSON.stringify(subscriptionEvent),
-      } as unknown as VercelRequest;
+      });
 
       const mockRes = {
         status: vi.fn().mockReturnThis(),

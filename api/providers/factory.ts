@@ -50,7 +50,10 @@ export class TranscriptionProviderFactory {
         if (config.enableSpeakerDiarization) {
           return new AssemblyAIProvider({ apiKey: config.apiKey });
         }
-        // If speaker diarization not needed, use OpenAI for cost efficiency
+        // If speaker diarization not needed, fall back to OpenAI for cost efficiency
+        console.warn(
+          '[ProviderFactory] assemblyai requested without speaker diarization — falling back to OpenAI for cost efficiency'
+        );
         return new OpenAITranscriptionAdapter(config.apiKey);
 
       default:

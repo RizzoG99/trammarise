@@ -44,6 +44,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     }
 
+    const UUID_V4 = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    if (!UUID_V4.test(sessionId)) {
+      return res.status(400).json({ error: 'sessionId must be a valid UUID v4' });
+    }
+
     // Build insert data with only provided fields
     const insertData: Record<string, unknown> = {
       user_id: userId,

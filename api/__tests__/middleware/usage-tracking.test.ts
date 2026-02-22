@@ -1,5 +1,4 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 // Mock Supabase admin
 const mockSupabaseFrom = vi.fn();
@@ -313,50 +312,6 @@ describe('Usage Tracking Middleware', () => {
       expect(result.allowed).toBe(true); // Allowed via credits
       expect(result.usingCredits).toBe(true);
       expect(result.creditsRemaining).toBe(100);
-    });
-  });
-
-  describe('withUsageTracking middleware', () => {
-    it('should track usage after successful handler execution', async () => {
-      // Arrange
-      const { withUsageTracking } = await import('../../middleware/usage-tracking');
-      const mockHandler = vi.fn().mockResolvedValue({
-        success: true,
-        durationSeconds: 300,
-      });
-
-      const wrappedHandler = withUsageTracking(mockHandler, 'transcription');
-
-      const mockReq = {
-        method: 'POST',
-        body: { userId: 'user-123' },
-      } as unknown as VercelRequest;
-
-      const mockRes = {
-        status: vi.fn().mockReturnThis(),
-        json: vi.fn().mockReturnThis(),
-      } as unknown as VercelResponse;
-
-      // Mock successful tracking
-      mockSupabaseFrom.mockReturnValue({
-        select: mockSupabaseSelect,
-      });
-      mockSupabaseSelect.mockReturnValue({
-        eq: mockSupabaseEq,
-      });
-      mockSupabaseEq.mockReturnValue({
-        single: mockSupabaseSingle,
-      });
-      mockSupabaseSingle.mockResolvedValue({
-        data: { id: 'sub-123', tier: 'pro', minutes_used: 0 },
-        error: null,
-      });
-
-      // Act
-      await wrappedHandler(mockReq, mockRes);
-
-      // Assert
-      expect(mockHandler).toHaveBeenCalled();
     });
   });
 });

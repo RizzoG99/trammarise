@@ -46,7 +46,7 @@ describe('POST /api/sessions/create', () => {
     it('should create session for authenticated user', async () => {
       // Arrange
       const requestBody = {
-        sessionId: 'test-session-123',
+        sessionId: '550e8400-e29b-41d4-a716-446655440000',
         audioName: 'test-audio.mp3',
         fileSizeBytes: 1024000,
         language: 'en',
@@ -56,7 +56,7 @@ describe('POST /api/sessions/create', () => {
       const mockDbResponse = {
         id: 'uuid-123',
         user_id: 'user-uuid-123',
-        session_id: 'test-session-123',
+        session_id: '550e8400-e29b-41d4-a716-446655440000',
         audio_name: 'test-audio.mp3',
         file_size_bytes: 1024000,
         audio_url: null,
@@ -101,7 +101,7 @@ describe('POST /api/sessions/create', () => {
       expect(mockSupabaseFrom).toHaveBeenCalledWith('sessions');
       expect(mockSupabaseInsert).toHaveBeenCalledWith({
         user_id: 'user-uuid-123',
-        session_id: 'test-session-123',
+        session_id: '550e8400-e29b-41d4-a716-446655440000',
         audio_name: 'test-audio.mp3',
         file_size_bytes: 1024000,
         language: 'en',
@@ -110,7 +110,7 @@ describe('POST /api/sessions/create', () => {
       expect(mockRes.status).toHaveBeenCalledWith(201);
       expect(mockRes.json).toHaveBeenCalledWith(
         expect.objectContaining({
-          sessionId: 'test-session-123',
+          sessionId: '550e8400-e29b-41d4-a716-446655440000',
           audioName: 'test-audio.mp3',
         })
       );
@@ -119,7 +119,7 @@ describe('POST /api/sessions/create', () => {
     it('should create session with optional fields', async () => {
       // Arrange
       const requestBody = {
-        sessionId: 'test-session-456',
+        sessionId: '550e8400-e29b-41d4-a716-446655440001',
         audioName: 'test-audio.mp3',
         fileSizeBytes: 2048000,
         language: 'it',
@@ -131,7 +131,7 @@ describe('POST /api/sessions/create', () => {
       };
 
       mockSupabaseSingle.mockResolvedValue({
-        data: { id: 'uuid-456', session_id: 'test-session-456' },
+        data: { id: 'uuid-456', session_id: '550e8400-e29b-41d4-a716-446655440001' },
         error: null,
       });
 
@@ -152,7 +152,7 @@ describe('POST /api/sessions/create', () => {
       // Assert
       expect(mockSupabaseInsert).toHaveBeenCalledWith({
         user_id: 'user-uuid-123',
-        session_id: 'test-session-456',
+        session_id: '550e8400-e29b-41d4-a716-446655440001',
         audio_name: 'test-audio.mp3',
         file_size_bytes: 2048000,
         language: 'it',
@@ -189,7 +189,7 @@ describe('POST /api/sessions/create', () => {
     it('should return 400 for missing required fields', async () => {
       // Arrange
       const requestBody = {
-        sessionId: 'test-session-123',
+        sessionId: '550e8400-e29b-41d4-a716-446655440000',
         // Missing audioName, fileSizeBytes, language, contentType
       };
 
@@ -214,6 +214,35 @@ describe('POST /api/sessions/create', () => {
           error: expect.stringContaining('Missing required fields'),
         })
       );
+    });
+
+    it('should return 400 for invalid sessionId format', async () => {
+      // Arrange
+      const requestBody = {
+        sessionId: 'not-a-uuid',
+        audioName: 'test-audio.mp3',
+        fileSizeBytes: 1024000,
+        language: 'en',
+        contentType: 'meeting',
+      };
+
+      const { default: handler } = await import('../../sessions/create');
+      const mockReq = {
+        method: 'POST',
+        body: requestBody,
+      } as unknown as VercelRequest;
+
+      const mockRes = {
+        status: vi.fn().mockReturnThis(),
+        json: vi.fn().mockReturnThis(),
+      } as unknown as VercelResponse;
+
+      // Act
+      await handler(mockReq, mockRes);
+
+      // Assert
+      expect(mockRes.status).toHaveBeenCalledWith(400);
+      expect(mockRes.json).toHaveBeenCalledWith({ error: 'sessionId must be a valid UUID v4' });
     });
   });
 
@@ -251,7 +280,7 @@ describe('POST /api/sessions/create', () => {
     it('should return 500 on database errors', async () => {
       // Arrange
       const requestBody = {
-        sessionId: 'test-session-123',
+        sessionId: '550e8400-e29b-41d4-a716-446655440000',
         audioName: 'test-audio.mp3',
         fileSizeBytes: 1024000,
         language: 'en',

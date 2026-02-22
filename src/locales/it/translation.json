@@ -360,7 +360,8 @@
       "browserOnly": "Le chiavi sono memorizzate solo nella sessione del browser",
       "neverSaved": "Mai salvate su disco o cloud",
       "clearedOnClose": "Cancellate quando chiudi la scheda",
-      "recommendLimits": "Consigliamo di utilizzare chiavi API con limiti di spesa"
+      "recommendLimits": "Consigliamo di utilizzare chiavi API con limiti di spesa",
+      "transmittedNotStored": "La tua chiave API viene trasmessa attraverso i nostri server per elaborare le richieste, ma non viene mai salvata o registrata"
     }
   },
   "chat": {

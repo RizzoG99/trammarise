@@ -1,4 +1,3 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { supabaseAdmin } from '../lib/supabase-admin';
 
 /**
@@ -189,45 +188,4 @@ export async function checkQuota(
       reason: 'Error checking quota',
     };
   }
-}
-
-/**
- * DEPRECATED: withUsageTracking middleware
- *
- * This middleware wrapper is flawed because:
- * 1. req.body is not populated by auth middleware (it's from form data)
- * 2. It tries to extract userId from request body instead of auth result
- * 3. It doesn't support the new dual-mode tracking (with/without quota deduction)
- *
- * Instead, track usage directly in handlers after successful operations:
- *
- * @example
- * const { userId } = await requireAuth();
- * // ... perform operation ...
- * await trackUsage(userId, 'transcription', duration, mode);
- *
- * DO NOT USE THIS FUNCTION - it exists only for reference and will be removed.
- */
-export function withUsageTracking(
-  handler: (req: VercelRequest, res: VercelResponse) => Promise<void>,
-  operationType: 'transcription' | 'summarization' | 'chat'
-) {
-  console.warn(
-    '[DEPRECATED] withUsageTracking is deprecated and should not be used. Track usage directly in handlers.'
-  );
-
-  return async (req: VercelRequest, res: VercelResponse): Promise<void> => {
-    // Execute handler first
-    await handler(req, res);
-
-    // Track usage after successful execution
-    // Note: This is a simplified version - in production, you'd extract
-    // userId from auth middleware and duration from request body
-    const userId = req.body?.userId;
-    const durationSeconds = req.body?.durationSeconds || 0;
-
-    if (userId && durationSeconds) {
-      await trackUsage(userId, operationType, durationSeconds);
-    }
-  };
 }

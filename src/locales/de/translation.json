@@ -360,7 +360,8 @@
       "browserOnly": "Schlüssel werden nur in Ihrer Browser-Sitzung gespeichert",
       "neverSaved": "Niemals auf Festplatte oder Cloud gespeichert",
       "clearedOnClose": "Werden gelöscht, wenn Sie die Registerkarte schließen",
-      "recommendLimits": "Wir empfehlen die Verwendung von API-Schlüsseln mit Ausgabenlimits"
+      "recommendLimits": "Wir empfehlen die Verwendung von API-Schlüsseln mit Ausgabenlimits",
+      "transmittedNotStored": "Ihr API-Schlüssel wird über unsere Server übertragen, um Anfragen zu verarbeiten, wird aber niemals gespeichert oder protokolliert"
     }
   },
   "chat": {

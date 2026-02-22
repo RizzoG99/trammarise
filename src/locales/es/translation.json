@@ -360,7 +360,8 @@
       "browserOnly": "Las claves se almacenan solo en tu sesión del navegador",
       "neverSaved": "Nunca se guardan en disco o nube",
       "clearedOnClose": "Se borran cuando cierras la pestaña",
-      "recommendLimits": "Recomendamos usar claves API con límites de gasto"
+      "recommendLimits": "Recomendamos usar claves API con límites de gasto",
+      "transmittedNotStored": "Tu clave API se transmite a través de nuestros servidores para procesar solicitudes, pero nunca se almacena ni se registra"
     }
   },
   "chat": {

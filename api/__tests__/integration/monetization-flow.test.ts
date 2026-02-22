@@ -1,6 +1,27 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
+/** Creates a mock VercelRequest with Node.js stream event support for raw body handlers */
+function createStreamMockReq(options: {
+  method?: string;
+  headers?: Record<string, string>;
+  body?: object | string;
+}): VercelRequest {
+  const bodyStr =
+    typeof options.body === 'string' ? options.body : JSON.stringify(options.body ?? {});
+  const bodyBuffer = Buffer.from(bodyStr);
+  const req = {
+    method: options.method ?? 'POST',
+    headers: options.headers ?? {},
+    on(event: string, cb: (...args: unknown[]) => void) {
+      if (event === 'data') cb(bodyBuffer);
+      if (event === 'end') cb();
+      return req;
+    },
+  };
+  return req as unknown as VercelRequest;
+}
+
 /**
  * E2E Monetization Flow Integration Test
  *
@@ -110,7 +131,7 @@ describe('E2E Monetization Flow', () => {
     });
 
     const { default: clerkHandler } = await import('../../webhooks/clerk');
-    const clerkReq = {
+    const clerkReq = createStreamMockReq({
       method: 'POST',
       body: clerkWebhookEvent,
       headers: {
@@ -118,7 +139,7 @@ describe('E2E Monetization Flow', () => {
         'svix-timestamp': '1234567890',
         'svix-signature': 'valid',
       },
-    } as unknown as VercelRequest;
+    });
 
     const clerkRes = {
       status: vi.fn().mockReturnThis(),
@@ -344,21 +365,12 @@ describe('E2E Monetization Flow', () => {
       error: null,
     });
 
-    // Mock transaction insert
-    mockSupabaseFrom.mockReturnValueOnce({
-      insert: mockSupabaseInsert,
-    });
-    mockSupabaseInsert.mockResolvedValueOnce({
-      data: { id: 'tx-uuid-123' },
-      error: null,
-    });
-
     const { default: stripeHandler } = await import('../../webhooks/stripe');
-    const stripeReq = {
+    const stripeReq = createStreamMockReq({
       method: 'POST',
       headers: { 'stripe-signature': 'valid' },
       body: JSON.stringify(stripeWebhookEvent),
-    } as unknown as VercelRequest;
+    });
     const stripeRes = {
       status: vi.fn().mockReturnThis(),
       json: vi.fn().mockReturnThis(),
@@ -370,18 +382,10 @@ describe('E2E Monetization Flow', () => {
     expect(mockSupabaseRpc).toHaveBeenCalledWith('add_credits', {
       sub_id: 'sub-uuid-123',
       credits: 50,
+      stripe_payment_intent_id: 'pi_test_123',
+      amount_paid_cents: 500,
+      p_description: 'Purchased 50 credits for $5.00',
     });
-
-    expect(mockSupabaseInsert).toHaveBeenCalledWith(
-      expect.objectContaining({
-        user_id: userId,
-        transaction_type: 'purchase',
-        credits_amount: 50,
-        balance_after: 50, // 0 + 50
-        stripe_payment_intent_id: 'pi_test_123',
-        amount_paid_cents: 500,
-      })
-    );
 
     console.log('✅ Credits added: 0 → 50');
 

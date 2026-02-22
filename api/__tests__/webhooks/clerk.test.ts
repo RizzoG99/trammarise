@@ -28,6 +28,27 @@ vi.mock('../../lib/supabase-admin', () => ({
   },
 }));
 
+/** Creates a mock VercelRequest with Node.js stream event support for raw body handlers */
+function createMockReq(options: {
+  method?: string;
+  headers?: Record<string, string>;
+  body?: object | string;
+}): VercelRequest {
+  const bodyStr =
+    typeof options.body === 'string' ? options.body : JSON.stringify(options.body ?? {});
+  const bodyBuffer = Buffer.from(bodyStr);
+  const req = {
+    method: options.method ?? 'POST',
+    headers: options.headers ?? {},
+    on(event: string, cb: (...args: unknown[]) => void) {
+      if (event === 'data') cb(bodyBuffer);
+      if (event === 'end') cb();
+      return req;
+    },
+  };
+  return req as unknown as VercelRequest;
+}
+
 describe('POST /api/webhooks/clerk', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -64,7 +85,7 @@ describe('POST /api/webhooks/clerk', () => {
       mockVerify.mockReturnValue(webhookPayload);
 
       const { default: handler } = await import('../../webhooks/clerk');
-      const mockReq = {
+      const mockReq = createMockReq({
         method: 'POST',
         body: webhookPayload,
         headers: {
@@ -72,7 +93,7 @@ describe('POST /api/webhooks/clerk', () => {
           'svix-timestamp': '1234567890',
           'svix-signature': 'valid-signature',
         },
-      };
+      });
       const mockRes = {
         status: vi.fn().mockReturnThis(),
         json: vi.fn().mockReturnThis(),
@@ -112,7 +133,7 @@ describe('POST /api/webhooks/clerk', () => {
       mockVerify.mockReturnValue(webhookPayload);
 
       const { default: handler } = await import('../../webhooks/clerk');
-      const mockReq = {
+      const mockReq = createMockReq({
         method: 'POST',
         body: webhookPayload,
         headers: {
@@ -120,7 +141,7 @@ describe('POST /api/webhooks/clerk', () => {
           'svix-timestamp': '1234567890',
           'svix-signature': 'valid-signature',
         },
-      };
+      });
       const mockRes = {
         status: vi.fn().mockReturnThis(),
         json: vi.fn().mockReturnThis(),
@@ -158,7 +179,7 @@ describe('POST /api/webhooks/clerk', () => {
       mockVerify.mockReturnValue(webhookPayload);
 
       const { default: handler } = await import('../../webhooks/clerk');
-      const mockReq = {
+      const mockReq = createMockReq({
         method: 'POST',
         body: webhookPayload,
         headers: {
@@ -166,7 +187,7 @@ describe('POST /api/webhooks/clerk', () => {
           'svix-timestamp': '1234567890',
           'svix-signature': 'valid-signature',
         },
-      };
+      });
       const mockRes = {
         status: vi.fn().mockReturnThis(),
         json: vi.fn().mockReturnThis(),
@@ -202,7 +223,7 @@ describe('POST /api/webhooks/clerk', () => {
       mockVerify.mockReturnValue(webhookPayload);
 
       const { default: handler } = await import('../../webhooks/clerk');
-      const mockReq = {
+      const mockReq = createMockReq({
         method: 'POST',
         body: webhookPayload,
         headers: {
@@ -210,7 +231,7 @@ describe('POST /api/webhooks/clerk', () => {
           'svix-timestamp': '1234567890',
           'svix-signature': 'valid-signature',
         },
-      };
+      });
       const mockRes = {
         status: vi.fn().mockReturnThis(),
         json: vi.fn().mockReturnThis(),
@@ -236,7 +257,7 @@ describe('POST /api/webhooks/clerk', () => {
       });
 
       const { default: handler } = await import('../../webhooks/clerk');
-      const mockReq = {
+      const mockReq = createMockReq({
         method: 'POST',
         body: {},
         headers: {
@@ -244,7 +265,7 @@ describe('POST /api/webhooks/clerk', () => {
           'svix-timestamp': '1234567890',
           'svix-signature': 'invalid-signature',
         },
-      };
+      });
       const mockRes = {
         status: vi.fn().mockReturnThis(),
         send: vi.fn().mockReturnThis(),
@@ -264,9 +285,7 @@ describe('POST /api/webhooks/clerk', () => {
     it('should reject non-POST requests', async () => {
       // Arrange
       const { default: handler } = await import('../../webhooks/clerk');
-      const mockReq = {
-        method: 'GET',
-      };
+      const mockReq = createMockReq({ method: 'GET' });
       const mockRes = {
         status: vi.fn().mockReturnThis(),
         json: vi.fn().mockReturnThis(),
@@ -301,7 +320,7 @@ describe('POST /api/webhooks/clerk', () => {
       });
 
       const { default: handler } = await import('../../webhooks/clerk');
-      const mockReq = {
+      const mockReq = createMockReq({
         method: 'POST',
         body: webhookPayload,
         headers: {
@@ -309,7 +328,7 @@ describe('POST /api/webhooks/clerk', () => {
           'svix-timestamp': '1234567890',
           'svix-signature': 'valid-signature',
         },
-      };
+      });
       const mockRes = {
         status: vi.fn().mockReturnThis(),
         json: vi.fn().mockReturnThis(),

@@ -2,6 +2,12 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { Webhook } from 'svix';
 import { supabaseAdmin } from '../lib/supabase-admin';
 
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
 /**
  * Clerk webhook handler
  * Syncs user events (created/updated/deleted) to Supabase
@@ -32,12 +38,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).send('Webhook Error: Missing svix headers');
   }
 
-  // Verify the webhook
+  // Accumulate raw body for signature verification (bodyParser is disabled)
+  const rawBody = await new Promise<Buffer>((resolve, reject) => {
+    const chunks: Buffer[] = [];
+    req.on('data', (chunk) => chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk)));
+    req.on('end', () => resolve(Buffer.concat(chunks)));
+    req.on('error', reject);
+  });
+
+  // Verify the webhook using raw buffer (required for reliable HMAC verification)
   const wh = new Webhook(webhookSecret);
   let evt;
 
   try {
-    evt = wh.verify(JSON.stringify(req.body), {
+    evt = wh.verify(rawBody.toString(), {
       'svix-id': svixId,
       'svix-timestamp': svixTimestamp,
       'svix-signature': svixSignature,
