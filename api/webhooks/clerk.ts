@@ -77,7 +77,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         // Extract user data
         const email = eventData.email_addresses?.[0]?.email_address;
         if (!email) {
-          return res.status(400).json({ error: 'Missing email address' });
+          console.warn('user.created received without email, skipping sync');
+          return res.status(200).json({ received: true });
         }
 
         const firstName = eventData.first_name;

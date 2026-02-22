@@ -2,6 +2,31 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { requireAuth } from '../middleware/auth';
 import { supabaseAdmin } from '../lib/supabase-admin';
 
+const UUID_V4 = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const VALID_CONTENT_TYPES = ['meeting', 'lecture', 'interview', 'podcast', 'voice_memo', 'other'];
+
+function validateSession(session: Record<string, unknown>): boolean {
+  if (!session.sessionId || !UUID_V4.test(String(session.sessionId))) return false;
+  if (session.contentType && !VALID_CONTENT_TYPES.includes(String(session.contentType)))
+    return false;
+  if (session.language !== undefined) {
+    const lang = String(session.language);
+    if (!lang || lang.length > 10) return false;
+  }
+  if (session.fileSizeBytes !== undefined) {
+    const size = Number(session.fileSizeBytes);
+    if (isNaN(size) || size < 0 || size > 524288000) return false;
+  }
+  if (session.audioUrl !== undefined) {
+    try {
+      new URL(String(session.audioUrl));
+    } catch {
+      return false;
+    }
+  }
+  return true;
+}
+
 /**
  * POST /api/sessions/import
  * Import local sessions to database for authenticated user
@@ -33,7 +58,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     // Limit to 50 sessions
-    const sessionsToImport = localSessions.slice(0, 50);
+    const sessionsToImport = localSessions.slice(0, 50).filter(validateSession);
 
     // If no sessions to import, return early
     if (sessionsToImport.length === 0) {

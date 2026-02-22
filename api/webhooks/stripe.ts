@@ -20,18 +20,21 @@ function getStripeClient(): Stripe {
   return stripe;
 }
 
-// Map price IDs to tiers
-const PRICE_TO_TIER: Record<string, string> = {
-  [process.env.STRIPE_PRICE_PRO_MONTHLY || '']: 'pro',
-  [process.env.STRIPE_PRICE_PRO_ANNUAL || '']: 'pro',
-  [process.env.STRIPE_PRICE_TEAM_MONTHLY || '']: 'team',
-  [process.env.STRIPE_PRICE_TEAM_ANNUAL || '']: 'team',
-};
+// Map price IDs to tiers (only populate when env vars are set to avoid empty-string key collisions)
+const PRICE_TO_TIER: Record<string, string> = {};
+if (process.env.STRIPE_PRICE_PRO_MONTHLY)
+  PRICE_TO_TIER[process.env.STRIPE_PRICE_PRO_MONTHLY] = 'pro';
+if (process.env.STRIPE_PRICE_PRO_ANNUAL) PRICE_TO_TIER[process.env.STRIPE_PRICE_PRO_ANNUAL] = 'pro';
+if (process.env.STRIPE_PRICE_TEAM_MONTHLY)
+  PRICE_TO_TIER[process.env.STRIPE_PRICE_TEAM_MONTHLY] = 'team';
+if (process.env.STRIPE_PRICE_TEAM_ANNUAL)
+  PRICE_TO_TIER[process.env.STRIPE_PRICE_TEAM_ANNUAL] = 'team';
 
 /**
  * Determine subscription tier from Stripe price ID
  */
-function determineTier(priceId: string): string {
+function determineTier(priceId: string | undefined): string {
+  if (!priceId) return 'free';
   return PRICE_TO_TIER[priceId] || 'free';
 }
 
@@ -62,6 +65,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!webhookSecret) {
     console.error('CRITICAL: STRIPE_WEBHOOK_SECRET is not configured');
     return res.status(500).json({ error: 'Webhook configuration error' });
+  }
+
+  if (!sig) {
+    return res.status(400).send('Missing stripe-signature header');
   }
 
   // Accumulate raw body for signature verification (bodyParser is disabled)
@@ -151,7 +158,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
           if (!userId || !credits) {
             console.error('Missing userId or credits in payment intent metadata');
-            break;
+            return res.status(500).send('Missing required payment metadata');
           }
 
           // Fetch user's subscription

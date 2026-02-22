@@ -106,14 +106,19 @@ async function handlePatch(
  * DELETE - Soft delete session (set deleted_at)
  */
 async function handleDelete(sessionId: string, userId: string, res: VercelResponse) {
-  const { error } = await supabaseAdmin
+  const { data, error } = await supabaseAdmin
     .from('sessions')
     .update({ deleted_at: new Date().toISOString() })
     .eq('session_id', sessionId)
-    .eq('user_id', userId);
+    .eq('user_id', userId)
+    .select();
 
   if (error) {
     return res.status(500).json({ error: 'Failed to delete session' });
+  }
+
+  if (!data || data.length === 0) {
+    return res.status(404).json({ error: 'Session not found' });
   }
 
   return res.status(200).json({ success: true });

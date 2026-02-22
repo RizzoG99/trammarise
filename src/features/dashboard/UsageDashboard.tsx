@@ -29,12 +29,19 @@ export function UsageDashboard() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!isSubscribed) {
+      setLoading(false);
+      return;
+    }
+
+    const controller = new AbortController();
+
     async function fetchUsage() {
       try {
         setLoading(true);
         setError(null);
 
-        const response = await fetch('/api/usage/current');
+        const response = await fetch('/api/usage/current', { signal: controller.signal });
 
         if (!response.ok) {
           if (response.status === 404) {
@@ -48,6 +55,7 @@ export function UsageDashboard() {
         const data = await response.json();
         setUsage(data);
       } catch (err) {
+        if (err instanceof Error && err.name === 'AbortError') return;
         console.error('Failed to fetch usage:', err);
         setError(err instanceof Error ? err.message : 'Failed to fetch usage data');
       } finally {
@@ -55,11 +63,8 @@ export function UsageDashboard() {
       }
     }
 
-    if (isSubscribed) {
-      fetchUsage();
-    } else {
-      setLoading(false);
-    }
+    fetchUsage();
+    return () => controller.abort();
   }, [isSubscribed]);
 
   if (loading) {

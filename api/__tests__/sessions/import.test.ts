@@ -32,9 +32,9 @@ describe('POST /api/sessions/import', () => {
 
   describe('Successful Import', () => {
     it('should import up to 50 sessions', async () => {
-      // Arrange - Create 60 sessions to test limit
+      // Arrange - Create 60 sessions to test limit (using valid UUID v4 format)
       const sessions = Array.from({ length: 60 }, (_, i) => ({
-        sessionId: `session-${i}`,
+        sessionId: `00000000-0000-4000-a000-${String(i + 1).padStart(12, '0')}`,
         audioName: `audio-${i}.mp3`,
         fileSizeBytes: 1024000,
         language: 'en',
@@ -90,7 +90,7 @@ describe('POST /api/sessions/import', () => {
       // Arrange
       const sessions = [
         {
-          sessionId: 'session-1',
+          sessionId: 'a1b2c3d4-e5f6-4789-a0b1-c2d3e4f5a601',
           audioName: 'audio-1.mp3',
           fileSizeBytes: 1024000,
           language: 'en',
@@ -99,7 +99,7 @@ describe('POST /api/sessions/import', () => {
           updatedAt: Date.now(),
         },
         {
-          sessionId: 'session-2',
+          sessionId: 'a1b2c3d4-e5f6-4789-a0b1-c2d3e4f5a602',
           audioName: 'audio-2.mp3',
           fileSizeBytes: 2048000,
           language: 'it',
@@ -108,7 +108,7 @@ describe('POST /api/sessions/import', () => {
           updatedAt: Date.now(),
         },
         {
-          sessionId: 'session-3',
+          sessionId: 'a1b2c3d4-e5f6-4789-a0b1-c2d3e4f5a603',
           audioName: 'audio-3.mp3',
           fileSizeBytes: 3072000,
           language: 'es',
@@ -118,7 +118,7 @@ describe('POST /api/sessions/import', () => {
         },
       ];
 
-      // Mock existing sessions (session-1 already exists)
+      // Mock existing sessions (a601 already exists)
       mockSupabaseFrom.mockReturnValueOnce({
         select: mockSupabaseSelect,
       });
@@ -129,18 +129,18 @@ describe('POST /api/sessions/import', () => {
         in: mockSupabaseIn,
       });
       mockSupabaseIn.mockResolvedValueOnce({
-        data: [{ session_id: 'session-1' }],
+        data: [{ session_id: 'a1b2c3d4-e5f6-4789-a0b1-c2d3e4f5a601' }],
         error: null,
       });
 
-      // Mock insert (should only insert session-2 and session-3)
+      // Mock insert (should only insert a602 and a603)
       mockSupabaseFrom.mockReturnValueOnce({
         insert: mockSupabaseInsert,
       });
       mockSupabaseInsert.mockResolvedValueOnce({
         data: [
-          { id: 'uuid-2', session_id: 'session-2' },
-          { id: 'uuid-3', session_id: 'session-3' },
+          { id: 'uuid-2', session_id: 'a1b2c3d4-e5f6-4789-a0b1-c2d3e4f5a602' },
+          { id: 'uuid-3', session_id: 'a1b2c3d4-e5f6-4789-a0b1-c2d3e4f5a603' },
         ],
         error: null,
       });
@@ -284,7 +284,7 @@ describe('POST /api/sessions/import', () => {
       // Arrange
       const sessions = [
         {
-          sessionId: 'session-1',
+          sessionId: 'a1b2c3d4-e5f6-4789-a0b1-c2d3e4f5a601',
           audioName: 'audio-1.mp3',
           fileSizeBytes: 1024000,
           language: 'en',

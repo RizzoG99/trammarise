@@ -224,9 +224,11 @@ describe('api/sessions/[id]', () => {
         eq: mockSupabaseEq,
       });
       mockSupabaseEq.mockReturnValue({
-        eq: vi.fn().mockResolvedValue({
-          data: { id: 'uuid-123' },
-          error: null,
+        eq: vi.fn().mockReturnValue({
+          select: vi.fn().mockResolvedValue({
+            data: [{ id: 'uuid-123' }],
+            error: null,
+          }),
         }),
       });
     });

@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import type { ReactNode } from 'react';
 import { useUser, useAuth } from '@clerk/clerk-react';
 import { TIER_FEATURES, FREE_SUBSCRIPTION } from './subscription-tiers';
@@ -35,6 +35,8 @@ interface SubscriptionProviderProps {
 export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
   const { isSignedIn, isLoaded } = useUser();
   const { getToken } = useAuth();
+  const getTokenRef = useRef(getToken);
+  getTokenRef.current = getToken;
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -51,7 +53,7 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
     setError(null);
 
     try {
-      const response = await fetchWithAuth(getToken, '/api/subscriptions/current');
+      const response = await fetchWithAuth(getTokenRef.current, '/api/subscriptions/current');
 
       if (!response.ok) {
         if (response.status === 404) {
@@ -84,7 +86,7 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
     } finally {
       setIsLoading(false);
     }
-  }, [isSignedIn, getToken]);
+  }, [isSignedIn]);
 
   useEffect(() => {
     if (isLoaded) {

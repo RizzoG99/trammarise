@@ -624,8 +624,9 @@ describe('POST /api/webhooks/stripe', () => {
       // Act
       await handler(mockReq, mockRes);
 
-      // Assert - should skip processing but not fail
-      expect(mockRes.json).toHaveBeenCalledWith({ received: true });
+      // Assert - should return 500 so Stripe retries (missing userId means credits won't be delivered)
+      expect(mockRes.status).toHaveBeenCalledWith(500);
+      expect(mockRes.send).toHaveBeenCalledWith('Missing required payment metadata');
       expect(mockSupabaseFrom).not.toHaveBeenCalled();
     });
 
@@ -664,8 +665,9 @@ describe('POST /api/webhooks/stripe', () => {
       // Act
       await handler(mockReq, mockRes);
 
-      // Assert - should skip processing but not fail
-      expect(mockRes.json).toHaveBeenCalledWith({ received: true });
+      // Assert - should return 500 so Stripe retries (missing credits means credits won't be delivered)
+      expect(mockRes.status).toHaveBeenCalledWith(500);
+      expect(mockRes.send).toHaveBeenCalledWith('Missing required payment metadata');
       expect(mockSupabaseFrom).not.toHaveBeenCalled();
     });
 
