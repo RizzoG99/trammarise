@@ -1,17 +1,22 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { Modal, ChatInterface, Snackbar, AILoadingOrb, Text } from '@/lib';
 import { chatWithAI } from '../../utils/api';
+import { useAuth } from '@clerk/clerk-react';
 
 import type { ProcessingResult, ChatMessage, AudioFile, AIConfiguration } from '../../types/audio';
 import { ResultsLayout } from '../../features/results/components/ResultsLayout';
 import { AudioPlayerBar } from '../../features/results/components/AudioPlayerBar';
 import { SummaryPanel } from '../../features/results/components/SummaryPanel';
 import { SearchableTranscript } from '../../features/results/components/SearchableTranscript';
+import { SpeakerTranscriptView } from '../../features/results/components/SpeakerTranscriptView';
 import { FloatingChatButton } from '../../features/results/components/FloatingChatButton';
 import { ExportPDFDialog } from '../../features/results/components/ExportPDFDialog';
 import { useHeader, useHeaderConfig } from '../../hooks/useHeader';
 import { useAudioPlayer } from '../../features/results/hooks/useAudioPlayer';
-import { parseTranscriptToSegments } from '../../features/results/utils/transcriptParser';
+import {
+  parseTranscriptToSegments,
+  parseSegmentsToTranscript,
+} from '../../features/results/utils/transcriptParser';
 
 /**
  * Safely extracts API key from configuration.
@@ -33,14 +38,19 @@ interface ResultsStateProps {
   audioName: string;
   audioFile: AudioFile;
   result: ProcessingResult;
+  language?: string; // Language code for multi-language support
   onBack: () => void;
   onUpdateResult: (result: ProcessingResult) => void;
 }
+
+import { useSubscription } from '../../context/SubscriptionContext';
+import { UpgradeModal, type UpgradeTrigger } from '../../components/marketing/UpgradeModal';
 
 export const ResultsState: React.FC<ResultsStateProps> = ({
   audioName,
   audioFile,
   result,
+  language,
   onUpdateResult,
 }) => {
   const [isLoadingChat, setIsLoadingChat] = useState(false);
@@ -51,17 +61,35 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
   const [pdfError, setPdfError] = useState<string | null>(null);
   const [pdfSuccess, setPdfSuccess] = useState(false);
 
+  // Upgrade Modal State
+  const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
+  const [upgradeTrigger, setUpgradeTrigger] = useState<UpgradeTrigger>('generic');
+
+  const { subscription } = useSubscription();
+  const userTier = subscription?.tier || 'free';
+
+  // Clerk authentication
+  const { getToken } = useAuth();
+
   // Get current filename from global header context
   const { fileName } = useHeader();
 
   // Audio player state (shared between AudioPlayerBar and SearchableTranscript)
   const audioPlayer = useAudioPlayer(audioFile);
 
+  // Detect if diarization was used (check if utterances exist)
+  const hasDiarization = result.utterances && result.utterances.length > 0;
+
   // Parse transcript into segments (memoized)
-  const transcriptSegments = useMemo(
-    () => parseTranscriptToSegments(result.transcript),
-    [result.transcript]
-  );
+  // Prefer real segments from Whisper API when available, otherwise use mock parsing
+  const transcriptSegments = useMemo(() => {
+    if (result.segments && result.segments.length > 0) {
+      // Use real Whisper API segments for accurate syncing
+      return parseSegmentsToTranscript(result.segments, hasDiarization);
+    }
+    // Fallback to mock parsing when real segments unavailable
+    return parseTranscriptToSegments(result.transcript, hasDiarization);
+  }, [result.transcript, result.segments, hasDiarization]);
 
   // Find active segment based on waveform playback time (driven by WaveSurfer)
   const activeSegmentId = useMemo(() => {
@@ -82,7 +110,23 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
     }
   };
 
+  const handleChatOpen = () => {
+    if (userTier === 'free') {
+      setUpgradeTrigger('chat_gate');
+      setIsUpgradeModalOpen(true);
+      return;
+    }
+    setIsChatOpen(true);
+  };
+
   const handleSendMessage = async (message: string) => {
+    // Double check gating although UI should prevent it
+    if (userTier === 'free') {
+      setUpgradeTrigger('chat_gate');
+      setIsUpgradeModalOpen(true);
+      return;
+    }
+
     setIsLoadingChat(true);
 
     // Add user message to chat history
@@ -105,7 +149,9 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
         result.chatHistory,
         result.configuration.provider,
         apiKey,
-        result.configuration.model
+        getToken,
+        result.configuration.model,
+        language
       );
       // Add assistant response to chat history
       const assistantMessage: ChatMessage = { role: 'assistant', content: response };
@@ -149,7 +195,8 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
           result.summary,
           result.transcript,
           result.configuration,
-          effectiveFileName
+          effectiveFileName,
+          userTier
         );
 
         console.log('✅ PDF downloaded successfully');
@@ -157,6 +204,14 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
 
         // Auto-dismiss success message after 3 seconds
         setTimeout(() => setPdfSuccess(false), 3000);
+
+        // For free users, show upgrade modal to remove watermark
+        if (userTier === 'free') {
+          setTimeout(() => {
+            setUpgradeTrigger('watermark_remove');
+            setIsUpgradeModalOpen(true);
+          }, 2000);
+        }
       } catch (error) {
         console.error('❌ PDF generation error:', error);
         const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
@@ -165,7 +220,7 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
         setIsPdfGenerating(false);
       }
     },
-    [result.summary, result.transcript, result.configuration, fileName]
+    [result.summary, result.transcript, result.configuration, fileName, userTier]
   );
 
   const handleOpenExportDialog = useCallback(() => setIsExportDialogOpen(true), []);
@@ -188,18 +243,22 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
         }
         summaryPanel={<SummaryPanel summary={result.summary} />}
         transcriptPanel={
-          <SearchableTranscript
-            transcript={result.transcript}
-            activeSegmentId={activeSegmentId}
-            onTimestampClick={handleTimestampClick}
-          />
+          result.utterances && result.utterances.length > 0 ? (
+            <SpeakerTranscriptView
+              utterances={result.utterances}
+              currentTime={audioPlayer.state.currentTime}
+              onTimestampClick={handleTimestampClick}
+            />
+          ) : (
+            <SearchableTranscript
+              transcript={result.transcript}
+              activeSegmentId={activeSegmentId}
+              onTimestampClick={handleTimestampClick}
+            />
+          )
         }
         floatingChatButton={
-          <FloatingChatButton
-            onClick={() => setIsChatOpen(true)}
-            isOpen={isChatOpen}
-            hasNewMessages={false}
-          />
+          <FloatingChatButton onClick={handleChatOpen} isOpen={isChatOpen} hasNewMessages={false} />
         }
         chatModal={
           isChatOpen && (
@@ -233,6 +292,13 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
         summary={result.summary}
         transcript={result.transcript}
         config={result.configuration}
+      />
+
+      {/* Upgrade Modal */}
+      <UpgradeModal
+        isOpen={isUpgradeModalOpen}
+        onClose={() => setIsUpgradeModalOpen(false)}
+        trigger={upgradeTrigger}
       />
 
       {/* PDF Generation Loading Modal */}

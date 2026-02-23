@@ -75,4 +75,14 @@ export const pdfStyles = StyleSheet.create({
     borderTop: '1px solid #eee',
     paddingTop: 10,
   },
+  watermark: {
+    position: 'absolute',
+    top: '40%',
+    left: '20%',
+    transform: 'rotate(-45deg)',
+    fontSize: 60,
+    color: '#e5e7eb', // gray-200
+    opacity: 0.5,
+    zIndex: -1,
+  },
 });

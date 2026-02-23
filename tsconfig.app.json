@@ -37,6 +37,9 @@
   "exclude": [
     "**/*.stories.tsx",
     "**/*.stories.ts",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/__tests__/**",
     "src/App.refactored.tsx",
     "src/utils/audio-processor.ts"
   ]

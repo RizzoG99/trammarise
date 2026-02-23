@@ -34,22 +34,6 @@ export function isPerformanceLevel(value: string): value is PerformanceLevel {
 }
 
 /**
- * Maps performance level to OpenAI transcription model.
- *
- * Models and their limits:
- * - gpt-4o-mini-transcribe: 16K token context (~15 min audio max, conservative)
- * - gpt-4o-transcribe: Larger context (~23 min audio max)
- *
- * @param level - The performance level selected by the user
- * @returns The OpenAI transcription model identifier
- */
-export function getTranscriptionModelForLevel(level: PerformanceLevel): string {
-  return level === 'advanced'
-    ? 'gpt-4o-transcribe' // High performance: better accuracy, higher cost
-    : 'gpt-4o-mini-transcribe'; // Standard: good accuracy, cost-effective
-}
-
-/**
  * Maps performance level to summarization/chat model
  * @param level - The performance level selected by the user
  * @returns The OpenAI chat model identifier

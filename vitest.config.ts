@@ -11,10 +11,10 @@ export default defineConfig({
     css: true,
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
     exclude: [
+      'api/**', // API tests use vitest.api.config.ts
       '**/node_modules/**',
       '**/dist/**',
       '**/e2e/**',
-      '**/api/**',
       '**/.{idea,git,cache,output,temp}/**',
     ],
   },

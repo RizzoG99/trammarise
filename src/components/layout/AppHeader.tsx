@@ -1,9 +1,11 @@
 import { FileDown, AudioWaveform } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ThemeToggle, Button } from '@/lib';
+import { SignInButton, useUser } from '@clerk/clerk-react';
+import { ThemeToggle, Button, Input } from '@/lib';
 import { useTheme } from '../../hooks/useTheme';
 import { LanguageSwitcher } from '../../features/i18n/components/LanguageSwitcher';
+import { CustomUserMenu } from '../../features/user-menu';
 import { Link, NavLink } from 'react-router-dom';
 import { ROUTES } from '@/types/routing';
 import { useHeader } from '../../hooks/useHeader';
@@ -11,6 +13,7 @@ import { useHeader } from '../../hooks/useHeader';
 export function AppHeader() {
   const { t } = useTranslation();
   const { theme, setTheme } = useTheme();
+  const { isSignedIn } = useUser();
   // Consume global header context
   const { fileName, setFileName, onExport } = useHeader();
 
@@ -50,8 +53,7 @@ export function AppHeader() {
             {onExport && (
               <div className="flex flex-col">
                 <div className="flex items-center gap-2">
-                  <input
-                    type="text"
+                  <Input
                     value={editValue}
                     onChange={(e) => setEditValue(e.target.value)}
                     onBlur={handleBlur}
@@ -60,16 +62,9 @@ export function AppHeader() {
                         e.currentTarget.blur();
                       }
                     }}
-                    className={`
-                      px-3 py-1 rounded-lg
-                      bg-bg-primary
-                      border ${!editValue.trim() ? 'border-accent-error' : 'border-border'}
-                      text-text-primary
-                      text-sm
-                      focus:outline-none focus:ring-2 ${!editValue.trim() ? 'focus:ring-accent-error' : 'focus:ring-primary'}
-                    `}
-                    style={{ width: '300px' }}
                     placeholder="Enter file name..."
+                    className="w-[300px]"
+                    error={!editValue.trim() ? 'File name is required' : undefined}
                   />
                   <span className="text-sm text-text-secondary">.pdf</span>
                 </div>
@@ -82,15 +77,11 @@ export function AppHeader() {
             )}
           </div>
 
-          {/* Center Section: Navigation */}
-          <nav className="hidden md:flex items-center gap-6">
-            {[
-              { label: t('nav.history'), path: ROUTES.HISTORY },
-              { label: t('nav.settings'), path: ROUTES.SETUP },
-            ].map((tab) => (
+          {/* Center Section: Navigation - Only show when authenticated */}
+          {isSignedIn && (
+            <nav className="hidden md:flex items-center gap-6">
               <NavLink
-                key={tab.path}
-                to={tab.path}
+                to={ROUTES.HISTORY}
                 className={({ isActive }) => `
                   px-3 py-1 text-sm font-medium border-b-2 transition-colors duration-200
                   ${
@@ -100,10 +91,10 @@ export function AppHeader() {
                   }
                 `}
               >
-                {tab.label}
+                {t('nav.history')}
               </NavLink>
-            ))}
-          </nav>
+            </nav>
+          )}
 
           {/* Right Section */}
           <div className="flex items-center gap-3">
@@ -125,6 +116,21 @@ export function AppHeader() {
 
             {/* Theme Toggle */}
             <ThemeToggle theme={theme} onThemeChange={setTheme} />
+
+            {/* Authentication - MOVED TO LAST */}
+            {isSignedIn ? (
+              <CustomUserMenu />
+            ) : (
+              <SignInButton mode="modal">
+                <Button
+                  variant="ghost"
+                  className="flex items-center gap-2 px-3"
+                  aria-label="Select language"
+                >
+                  <span className="text-sm font-medium">{t('auth.signIn')}</span>
+                </Button>
+              </SignInButton>
+            )}
           </div>
         </div>
       </div>

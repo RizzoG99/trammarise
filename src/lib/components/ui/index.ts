@@ -56,3 +56,7 @@ export type { FileSizeWarningModalProps } from './FileSizeWarningModal';
 // Badge
 export { Badge } from './Badge';
 export type { BadgeProps } from './Badge';
+
+// Select
+export { Select } from './Select';
+export type { SelectProps, SelectOption, SelectGroup } from './Select';

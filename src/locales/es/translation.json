@@ -8,7 +8,8 @@
     "cancel": "Cancelar",
     "back": "Atrás",
     "next": "Siguiente",
-    "processing": "Procesando"
+    "processing": "Procesando",
+    "close": "Cerrar"
   },
   "nav": {
     "home": "Inicio",
@@ -16,6 +17,57 @@
     "configure": "Configurar",
     "history": "Historial",
     "settings": "Configuración"
+  },
+  "userMenu": {
+    "ariaLabel": "Menú de usuario",
+    "menuItems": {
+      "profile": "Configuración del Perfil",
+      "apiKeys": "Claves API",
+      "usage": "Uso",
+      "billing": "Uso y Facturación",
+      "upgrade": "Actualizar a Pro",
+      "signOut": "Cerrar Sesión"
+    },
+    "manageAccount": "Administrar Cuenta",
+    "tabs": {
+      "profile": "Perfil",
+      "apiKeys": "Claves API",
+      "usage": "Uso y Facturación"
+    },
+    "profile": {
+      "name": "Nombre Completo",
+      "email": "Correo Electrónico",
+      "memberSince": "Miembro desde",
+      "managedByClerk": "Perfil administrado por autenticación Clerk"
+    },
+    "apiKeys": {
+      "openAiKey": "Clave API de OpenAI",
+      "optionalForPaid": "Opcional: Usa tu propia clave API",
+      "optionalExplanation": "Como suscriptor de pago, puedes proporcionar tu propia clave API de OpenAI para ahorrar costos. Tus minutos de suscripción seguirán siendo rastreados.",
+      "showKey": "Mostrar clave API",
+      "hideKey": "Ocultar clave API",
+      "testConnection": "Probar Conexión",
+      "testing": "Probando...",
+      "connectionSuccess": "✓ ¡Conexión exitosa!",
+      "connectionError": "✗ Conexión fallida. Por favor verifica tu clave API.",
+      "clear": "Limpiar",
+      "securityNotice": "Tu clave API se almacena de forma segura en tu navegador y nunca se envía a nuestros servidores."
+    },
+    "usage": {
+      "freeTier": "Plan Gratuito",
+      "freeTierDescription": "Estás usando el plan gratuito con BYOK (Trae tu propia clave). Actualiza para desbloquear API alojada y funciones avanzadas.",
+      "upgradeTitle": "Desbloquea con Pro:",
+      "benefit1": "No se requiere clave API - nos encargamos nosotros",
+      "benefit2": "500 minutos de transcripción al mes",
+      "benefit3": "Cola de procesamiento prioritaria",
+      "benefit4": "Funciones avanzadas: diarización de hablantes, chat",
+      "upgradeToPro": "Actualizar a Pro",
+      "currentPlan": "Plan Actual",
+      "minutesUsed": "Minutos Usados",
+      "minutesRemaining": "minutos restantes en este período",
+      "renewsOn": "Se renueva el",
+      "manageSubscription": "Administrar Suscripción"
+    }
   },
   "header": {
     "export": "Exportar",
@@ -33,6 +85,11 @@
       "editFile": "Editar nombre de archivo"
     }
   },
+  "auth": {
+    "signIn": "Iniciar Sesión",
+    "signUp": "Registrarse",
+    "signOut": "Cerrar Sesión"
+  },
   "home": {
     "title": "Nueva Sesión",
     "subtitle": "Configura los ajustes de transcripción",
@@ -42,6 +99,8 @@
     "startRecording": "Iniciar Grabación",
     "stopRecording": "Detener y Guardar",
     "processButton": "Procesar Audio",
+    "processingButton": "Procesando...",
+    "processingError": "Error al guardar la sesión. Por favor, inténtalo de nuevo.",
     "audioOnly": "Por favor, sube solo archivos de audio",
     "fileTooLarge": "Archivo demasiado grande",
     "maxSize": "Tamaño máximo",
@@ -187,6 +246,13 @@
       "outdoor": "Exterior",
       "phone": "Teléfono / Llamada Digital"
     },
+    "speakerDiarization": {
+      "title": "Identificación de Oradores",
+      "description": "Identifica y etiqueta diferentes oradores en la transcripción",
+      "speakersExpected": "Número de Oradores Esperados (Opcional)",
+      "speakersPlaceholder": "Auto-detectar",
+      "speakersHint": "Especifica 2-10 oradores para mayor precisión, o deja en blanco para detección automática"
+    },
     "meetingType": {
       "title": "Tipo de Reunión",
       "options": {
@@ -300,7 +366,8 @@
       "browserOnly": "Las claves se almacenan solo en tu sesión del navegador",
       "neverSaved": "Nunca se guardan en disco o nube",
       "clearedOnClose": "Se borran cuando cierras la pestaña",
-      "recommendLimits": "Recomendamos usar claves API con límites de gasto"
+      "recommendLimits": "Recomendamos usar claves API con límites de gasto",
+      "transmittedNotStored": "Tu clave API se transmite a través de nuestros servidores para procesar solicitudes, pero nunca se almacena ni se registra"
     }
   },
   "chat": {
@@ -382,7 +449,11 @@
       "title": "Transcripción",
       "searchPlaceholder": "Buscar en transcripción...",
       "noTranscript": "No hay transcripción disponible",
-      "matches": "{{current}} de {{total}} coincidencias"
+      "matches": "{{current}} de {{total}} coincidencias",
+      "utterances": "intervenciones",
+      "resultsFound": "resultados encontrados",
+      "noResults": "No se encontraron resultados",
+      "noUtterances": "No hay intervenciones disponibles"
     },
     "summary": {
       "title": "Resumen",
@@ -450,7 +521,15 @@
   },
   "history": {
     "title": "Historial de Grabaciones",
+    "subtitle": "{{count}} grabaciones totales",
     "description": "Gestiona tus grabaciones y resúmenes generados",
+    "searchPlaceholder": "Buscar por nombre o contenido...",
+    "sort": {
+      "newest": "Más Recientes",
+      "oldest": "Más Antiguos",
+      "nameAsc": "Nombre (A-Z)",
+      "nameDesc": "Nombre (Z-A)"
+    },
     "dashboard": {
       "totalProcessed": "Total Procesado",
       "topCategory": "Categoría Principal",
@@ -490,6 +569,165 @@
       "selectAll": "Seleccionar Todo",
       "deselectAll": "Deseleccionar Todo",
       "delete": "Eliminar Selección"
+    },
+    "migration": {
+      "title": "Sincroniza tus sesiones",
+      "successTitle": "¡Sesiones importadas!",
+      "description": "Importa tus {{count}} sesiones locales para sincronizarlas entre dispositivos y no perder nunca tu trabajo.",
+      "successMessage": "Tus sesiones locales ahora están sincronizadas en todos tus dispositivos.",
+      "importButton": "Importar ahora",
+      "importing": "Importando...",
+      "dismissButton": "Tal vez más tarde"
+    }
+  },
+  "welcome": {
+    "hero": {
+      "newBadge": "✨ Presentamos el Diseño Liquid Glass",
+      "titlePart1": "Transcribe y Resume",
+      "titlePart2": "En Segundos",
+      "description": "Transforma tus reuniones, conferencias y entrevistas en información útil. Comienza con 60 minutos gratis, actualiza para acceso ilimitado.",
+      "cta": {
+        "primary": "Iniciar Prueba Gratuita",
+        "secondary": "Ver Precios",
+        "getStarted": "Comenzar Gratis",
+        "viewFeatures": "Ver Características",
+        "appPreview": "[Visualización de Vista Previa de la App]"
+      },
+      "noCreditCard": "No se requiere tarjeta de crédito"
+    },
+    "features": {
+      "title": "Herramientas Potentes para Audio",
+      "subtitle": "Todo lo que necesitas para dominar tus grabaciones.",
+      "cards": {
+        "transcription": {
+          "title": "Transcripción Cristalina",
+          "description": "Sube archivos o graba directamente. Transcripción precisa para registros confiables utilizando procesamiento avanzado en el dispositivo."
+        },
+        "summaries": {
+          "title": "Resúmenes AI Instantáneos",
+          "description": "Obtén puntos clave, elementos de acción y resúmenes estructurados generados automáticamente por modelos AI de primera categoría."
+        },
+        "security": {
+          "title": "Privado y Seguro",
+          "description": "Tus datos siguen siendo tuyos. El procesamiento del lado del cliente garantiza la máxima privacidad. Ningún audio sale de tu dispositivo sin permiso."
+        }
+      }
+    },
+    "pricing": {
+      "title": "Precios Simples y Transparentes",
+      "subtitle": "Elige el plan que se adapte a tus necesidades",
+      "free": {
+        "name": "Gratis",
+        "price": "$0",
+        "interval": "/mes",
+        "description": "Prueba antes de actualizar",
+        "cta": "Iniciar Prueba Gratuita"
+      },
+      "pro": {
+        "name": "Pro",
+        "price": "$19",
+        "interval": "/mes",
+        "badge": "Más Popular",
+        "description": "Para profesionales",
+        "cta": "Actualizar a Pro"
+      },
+      "team": {
+        "name": "Equipo",
+        "price": "$49",
+        "interval": "/mes",
+        "description": "Para equipos",
+        "cta": "Contactar Ventas"
+      },
+      "viewComparison": "Ver comparación detallada"
+    },
+    "cta": {
+      "title": "¿Listo para aumentar tu productividad?",
+      "description": "Únete a profesionales que ahorran horas cada semana con transcripción impulsada por IA.",
+      "free": "Iniciar Prueba Gratuita (60 min)",
+      "pro": "Desbloquear Características Pro"
+    },
+    "ctaSection": {
+      "title": "¿Listo para transformar tu flujo de trabajo?",
+      "description": "Únete a miles de usuarios que ahorran horas cada semana con Trammarise.",
+      "button": "Comenzar Gratis"
+    },
+    "footer": {
+      "tagline": "Transcripción y resumen de audio con IA",
+      "links": {
+        "docs": "Documentación",
+        "pricing": "Precios",
+        "privacy": "Privacidad",
+        "terms": "Términos",
+        "contact": "Contacto"
+      },
+      "copyright": "© {{year}} Trammarise. Todos los derechos reservados."
+    }
+  },
+  "pricing": {
+    "title": "Elige tu plan",
+    "subtitle": "Comienza gratis con tus propias claves API, o actualiza para IA alojada y funciones premium",
+    "monthly": "Mensual",
+    "annual": "Anual",
+    "save2Months": "Ahorra 2 meses",
+    "popular": "Más popular",
+    "loading": "Cargando...",
+    "saveAmount": "Ahorra ${{amount}}/año",
+    "faq": {
+      "title": "Preguntas frecuentes",
+      "freeTrial": {
+        "question": "¿Cómo funciona la prueba gratuita?",
+        "answer": "Regístrate gratis y obtén 60 minutos de transcripción al mes. No se requiere tarjeta de crédito. Actualiza en cualquier momento para más minutos y características avanzadas."
+      },
+      "byok": {
+        "question": "¿Qué significa BYOK?",
+        "answer": "BYOK (Bring Your Own Key) significa que proporcionas tu propia clave API de OpenAI. Esto te da control total y precios de pago por uso directamente desde OpenAI, sin tarifas mensuales."
+      },
+      "cancel": {
+        "question": "¿Puedo cancelar en cualquier momento?",
+        "answer": "¡Sí! Puedes cancelar tu suscripción en cualquier momento. Tu acceso continuará hasta el final de tu período de facturación, y siempre puedes volver al plan BYOK gratuito."
+      },
+      "minutes": {
+        "question": "¿Qué pasa si supero mis minutos?",
+        "answer": "Puedes comprar créditos adicionales en cualquier momento. Los minutos no utilizados no se transfieren, pero siempre puedes usar tus propias claves API para procesamiento ilimitado."
+      }
+    }
+  },
+  "onboarding": {
+    "modal": {
+      "title": "🔑 Bienvenido a Trammarise",
+      "heading": "Un Paso Más para Comenzar",
+      "description": "Para usar Trammarise, necesitas proporcionar tu propia clave API de OpenAI o actualizar a un plan Pro.",
+      "option1": {
+        "title": "Opción 1: Usa tu Propia Clave API (Gratis)",
+        "placeholder": "sk-...",
+        "rememberKey": "Recordar mi clave API (almacenada encriptada)",
+        "continueButton": "Continuar con Clave API",
+        "saving": "Guardando...",
+        "instructions": {
+          "toggle": "Cómo obtener una clave API de OpenAI",
+          "step1": "Ve a platform.openai.com",
+          "step2": "Inicia sesión o crea una cuenta",
+          "step3": "Haz clic en \"Crear nueva clave secreta\"",
+          "step4": "Copia la clave (comienza con \"sk-\")",
+          "step5": "Pégala en el campo de arriba",
+          "note": "💡 Pagarás a OpenAI directamente por el uso (típicamente $0.006/minuto para Whisper)"
+        },
+        "errors": {
+          "empty": "Por favor ingresa tu clave API",
+          "invalidFormat": "Formato de clave API no válido. Las claves de OpenAI comienzan con \"sk-\"",
+          "saveFailed": "Error al guardar la clave API. Por favor inténtalo de nuevo."
+        }
+      },
+      "option2": {
+        "title": "Opción 2: Actualizar a Pro",
+        "description": "Obtén 500 minutos/mes con API alojada, sincronización en la nube y soporte prioritario.",
+        "button": "Ver Planes Pro →"
+      },
+      "divider": "o"
+    },
+    "banner": {
+      "message": "¡Ya casi estás! Completa la configuración para desbloquear Trammarise.",
+      "button": "Volver a Configuración"
     }
   }
 }

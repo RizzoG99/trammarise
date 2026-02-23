@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from 'react';
+import { useUser } from '@clerk/clerk-react';
 import { ApiKeyInfo } from './ApiKeyInfo';
 import { Button, Input, SelectCard, ToggleSwitch } from '@/lib';
-import { validateApiKey } from '../../utils/api';
+import { validateApiKey, saveApiKey, getSavedApiKey } from '../../utils/api';
 import { getApiConfig, saveApiConfig } from '../../utils/session-storage';
 import type { AIConfiguration, ConfigMode } from '../../types/audio';
 import { CURATED_MODELS } from '../../constants/models';
 import { CONTENT_TYPE_OPTIONS, type ContentType } from '../../types/content-types';
 import { LANGUAGE_OPTIONS, type LanguageCode } from '../../types/languages';
-import { PERFORMANCE_LEVEL_OPTIONS, getTranscriptionModelForLevel, getSummarizationModelForLevel, type PerformanceLevel } from '../../types/performance-levels';
+import {
+  PERFORMANCE_LEVEL_OPTIONS,
+  getSummarizationModelForLevel,
+  type PerformanceLevel,
+} from '../../types/performance-levels';
 
 interface ConfigurationFormProps {
   onSubmit: (config: AIConfiguration) => void;
@@ -15,6 +20,7 @@ interface ConfigurationFormProps {
 }
 
 export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ onSubmit, onCancel }) => {
+  const { isSignedIn } = useUser();
   const [mode, setMode] = useState<ConfigMode>('simple');
   const [contentType, setContentType] = useState<ContentType>('meeting');
   const [customContentType, setCustomContentType] = useState('');
@@ -25,17 +31,44 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ onSubmit, 
   const [openrouterKey, setOpenrouterKey] = useState('');
   const [isValidating, setIsValidating] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [rememberApiKey, setRememberApiKey] = useState(false);
+  const [isLoadingKey, setIsLoadingKey] = useState(false);
 
-  // Load saved config from session storage
+  // Load saved config from session storage and backend
   useEffect(() => {
-    const saved = getApiConfig();
-    if (saved) {
-      setOpenaiKey(saved.openaiKey);
-      if (saved.apiKey) {
-        setOpenrouterKey(saved.apiKey);
+    const loadApiKey = async () => {
+      // First, check session storage (fast)
+      const saved = getApiConfig();
+      if (saved?.openaiKey) {
+        setOpenaiKey(saved.openaiKey);
+        if (saved.apiKey) {
+          setOpenrouterKey(saved.apiKey);
+        }
+        return; // Found in session storage, no need to check backend
       }
-    }
-  }, []);
+
+      // If authenticated and not in session storage, try loading from backend
+      if (isSignedIn) {
+        setIsLoadingKey(true);
+        try {
+          const { hasKey, apiKey } = await getSavedApiKey();
+          if (hasKey && apiKey) {
+            setOpenaiKey(apiKey);
+            setRememberApiKey(true); // Indicate key was previously saved
+            // Cache in session storage for current session
+            saveApiConfig('openai', apiKey, apiKey);
+          }
+        } catch (error) {
+          console.error('Failed to load saved API key:', error);
+          // Silently fail - user can still enter key manually
+        } finally {
+          setIsLoadingKey(false);
+        }
+      }
+    };
+
+    loadApiKey();
+  }, [isSignedIn]);
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
@@ -96,11 +129,22 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ onSubmit, 
 
       const finalContentType = contentType === 'other' ? customContentType : contentType;
 
-      // Save to session storage
+      // Save to session storage (always)
       if (mode === 'simple') {
         saveApiConfig('openai', openaiKey, openaiKey);
       } else {
         saveApiConfig('openrouter', openrouterKey, openaiKey);
+      }
+
+      // Save to backend if "Remember my API key" is checked and user is authenticated
+      if (rememberApiKey && isSignedIn) {
+        try {
+          await saveApiKey(openaiKey, 'openai');
+        } catch (error) {
+          console.error('Failed to save API key to backend:', error);
+          // Don't block form submission if backend save fails
+          // User can still proceed with session-only storage
+        }
       }
 
       // Submit configuration (contextFiles will be added by App.tsx)
@@ -124,7 +168,6 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ onSubmit, 
 
   return (
     <form className="w-full max-w-[600px] mx-auto" onSubmit={handleSubmit} noValidate>
-
       {/* Language Selection */}
       <div className="mb-8">
         <label className="block mb-3 font-semibold text-slate-900 dark:text-white text-base">
@@ -137,7 +180,11 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ onSubmit, 
           onChange={(e) => setLanguage(e.target.value as LanguageCode)}
         >
           {LANGUAGE_OPTIONS.map((lang) => (
-            <option key={lang.value} value={lang.value} className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white p-2">
+            <option
+              key={lang.value}
+              value={lang.value}
+              className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white p-2"
+            >
               {lang.label}
             </option>
           ))}
@@ -161,7 +208,9 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ onSubmit, 
             />
           ))}
         </div>
-        {errors.contentType && <span className="block mt-2 text-red-500 text-sm">{errors.contentType}</span>}
+        {errors.contentType && (
+          <span className="block mt-2 text-red-500 text-sm">{errors.contentType}</span>
+        )}
 
         {contentType === 'other' && (
           <div className="mt-3 animate-[slideDown_0.2s_ease-out]">
@@ -176,7 +225,7 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ onSubmit, 
         )}
       </div>
 
-       {/* Mode Toggle */}
+      {/* Mode Toggle */}
       <div className="mb-8">
         <ToggleSwitch
           label="Advanced mode"
@@ -195,7 +244,10 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ onSubmit, 
             </label>
             <div className="flex flex-col gap-3">
               {PERFORMANCE_LEVEL_OPTIONS.map((model) => (
-                <label key={model.value} className="flex items-start gap-3 p-4 bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 rounded-lg cursor-pointer transition-all hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-indigo-300 has-[:checked]:border-indigo-600 has-[:checked]:bg-indigo-50 dark:has-[:checked]:bg-indigo-900/20 has-[:checked]:shadow-sm">
+                <label
+                  key={model.value}
+                  className="flex items-start gap-3 p-4 bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 rounded-lg cursor-pointer transition-all hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-indigo-300 has-[:checked]:border-indigo-600 has-[:checked]:bg-indigo-50 dark:has-[:checked]:bg-indigo-900/20 has-[:checked]:shadow-sm"
+                >
                   <input
                     type="radio"
                     name="simpleModel"
@@ -205,8 +257,12 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ onSubmit, 
                     className="mt-1 cursor-pointer w-[18px] h-[18px] flex-shrink-0 accent-indigo-600"
                   />
                   <div className="flex flex-col gap-1 flex-1">
-                    <strong className="text-base text-slate-900 dark:text-white">{model.label}</strong>
-                    <span className="text-sm text-slate-600 dark:text-slate-400">{model.description}</span>
+                    <strong className="text-base text-slate-900 dark:text-white">
+                      {model.label}
+                    </strong>
+                    <span className="text-sm text-slate-600 dark:text-slate-400">
+                      {model.description}
+                    </span>
                   </div>
                 </label>
               ))}
@@ -225,21 +281,43 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ onSubmit, 
               hint="Used for context-aware transcription and summarization"
               required
               fullWidth
+              disabled={isLoadingKey}
             />
+
+            {isSignedIn && (
+              <div className="mt-3">
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={rememberApiKey}
+                    onChange={(e) => setRememberApiKey(e.target.checked)}
+                    className="mt-1 w-[18px] h-[18px] flex-shrink-0 accent-indigo-600 cursor-pointer"
+                    disabled={isLoadingKey}
+                  />
+                  <div className="flex flex-col gap-1">
+                    <span className="text-sm font-medium text-slate-900 dark:text-white">
+                      Remember my API key
+                    </span>
+                    <span className="text-xs text-slate-600 dark:text-slate-400">
+                      Securely encrypted and stored for future sessions. Only you can access it.
+                    </span>
+                  </div>
+                </label>
+              </div>
+            )}
           </div>
 
           <div className="p-4 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg mt-4">
-            <strong className="block mb-2 text-indigo-900 dark:text-indigo-100">ℹ️ What's included:</strong>
+            <strong className="block mb-2 text-indigo-900 dark:text-indigo-100">
+              ℹ️ What's included:
+            </strong>
             <ul className="m-0 pl-6 text-indigo-800 dark:text-indigo-200">
-              <li className="my-1 text-sm">
-                {getTranscriptionModelForLevel(simpleModel as PerformanceLevel)
-                  .replace('gpt-4o-transcribe', 'GPT-4o')
-                  .replace('gpt-4o-mini-transcribe', 'GPT-4o-mini')} transcription with context awareness
-              </li>
+              <li className="my-1 text-sm">Whisper transcription with context awareness</li>
               <li className="my-1 text-sm">
                 {getSummarizationModelForLevel(simpleModel as PerformanceLevel)
                   .replace('gpt-4o', 'GPT-4o')
-                  .replace('o3-mini', 'GPT-o3 Mini')} summarization
+                  .replace('o3-mini', 'GPT-o3 Mini')}{' '}
+                summarization
               </li>
               <li className="my-1 text-sm">Single API key for simplicity</li>
             </ul>
@@ -263,12 +341,18 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ onSubmit, 
               onChange={(e) => setAdvancedModel(e.target.value)}
             >
               {CURATED_MODELS.map((m) => (
-                <option key={m.id} value={m.id} className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white p-2">
+                <option
+                  key={m.id}
+                  value={m.id}
+                  className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white p-2"
+                >
                   {m.name} - {m.provider} ({m.description})
                 </option>
               ))}
             </select>
-            {errors.advancedModel && <span className="block mt-2 text-red-500 text-sm">{errors.advancedModel}</span>}
+            {errors.advancedModel && (
+              <span className="block mt-2 text-red-500 text-sm">{errors.advancedModel}</span>
+            )}
           </div>
 
           <div className="mb-8">
@@ -283,7 +367,30 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ onSubmit, 
               hint="Used for context-aware audio transcription"
               required
               fullWidth
+              disabled={isLoadingKey}
             />
+
+            {isSignedIn && (
+              <div className="mt-3">
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={rememberApiKey}
+                    onChange={(e) => setRememberApiKey(e.target.checked)}
+                    className="mt-1 w-[18px] h-[18px] flex-shrink-0 accent-indigo-600 cursor-pointer"
+                    disabled={isLoadingKey}
+                  />
+                  <div className="flex flex-col gap-1">
+                    <span className="text-sm font-medium text-slate-900 dark:text-white">
+                      Remember my API key
+                    </span>
+                    <span className="text-xs text-slate-600 dark:text-slate-400">
+                      Securely encrypted and stored for future sessions. Only you can access it.
+                    </span>
+                  </div>
+                </label>
+              </div>
+            )}
           </div>
 
           <div className="mb-8">
@@ -306,10 +413,21 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({ onSubmit, 
       )}
 
       <div className="flex gap-4 mt-8 pt-8 border-t border-slate-200 dark:border-slate-700 flex-col-reverse sm:flex-row">
-        <Button type="button" variant="outline" onClick={onCancel} disabled={isValidating} className="w-full sm:w-auto flex-1">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onCancel}
+          disabled={isValidating}
+          className="w-full sm:w-auto flex-1"
+        >
           Back
         </Button>
-        <Button type="submit" variant="primary" disabled={isValidating} className="w-full sm:w-auto flex-1">
+        <Button
+          type="submit"
+          variant="primary"
+          disabled={isValidating}
+          className="w-full sm:w-auto flex-1"
+        >
           {isValidating ? 'Validating...' : 'Validate & Continue'}
         </Button>
       </div>

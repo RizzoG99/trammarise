@@ -77,9 +77,7 @@ export const Input: React.FC<InputProps> = ({
   const inputId = id || props.name || generatedId;
 
   return (
-    <div
-      className={`flex flex-col gap-2 mb-4 ${fullWidth ? 'w-full' : ''} ${className}`}
-    >
+    <div className={`flex flex-col gap-2 mb-4 ${fullWidth ? 'w-full' : ''} ${className}`}>
       {label && (
         <label
           htmlFor={inputId}
@@ -99,24 +97,17 @@ export const Input: React.FC<InputProps> = ({
           focus:ring-indigo-600/20 focus:bg-white dark:focus:bg-slate-800
           placeholder:text-slate-400 dark:placeholder:text-slate-500
           disabled:opacity-50 disabled:cursor-not-allowed
-          ${
-            error
-              ? 'border-red-500 focus:ring-red-500/20'
-              : 'border-slate-300 dark:border-slate-600'
-          }
+          hover:border-primary
+          ${error ? 'border-accent-error focus:ring-accent-error-alpha-20' : 'border-border'}
         `}
         {...props}
       />
 
       {error && (
-        <span className="text-xs text-red-500 animate-[slideDown_0.2s_ease-out]">
-          {error}
-        </span>
+        <span className="text-xs text-red-500 animate-[slideDown_0.2s_ease-out]">{error}</span>
       )}
 
-      {hint && !error && (
-        <span className="text-xs text-slate-500 dark:text-slate-400">{hint}</span>
-      )}
+      {hint && !error && <span className="text-xs text-slate-500 dark:text-slate-400">{hint}</span>}
     </div>
   );
 };

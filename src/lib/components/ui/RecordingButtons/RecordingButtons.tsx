@@ -131,7 +131,7 @@ export function PauseButton({
         color: !disabled ? 'white' : 'var(--color-text-tertiary)',
       }}
       onMouseEnter={(e) => {
-        if (!disabled) e.currentTarget.style.backgroundColor = 'var(--color-text-primary)';
+        if (!disabled) e.currentTarget.style.backgroundColor = 'var(--color-primary)';
       }}
       onMouseLeave={(e) => {
         if (!disabled) e.currentTarget.style.backgroundColor = 'var(--color-text-secondary)';

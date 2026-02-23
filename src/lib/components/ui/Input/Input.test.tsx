@@ -25,13 +25,7 @@ describe('Input', () => {
     });
 
     it('hides hint when error is present', () => {
-      render(
-        <Input
-          label="Email"
-          hint="This is a hint"
-          error="This is an error"
-        />
-      );
+      render(<Input label="Email" hint="This is a hint" error="This is an error" />);
       expect(screen.getByText('This is an error')).toBeInTheDocument();
       expect(screen.queryByText('This is a hint')).not.toBeInTheDocument();
     });
@@ -53,13 +47,13 @@ describe('Input', () => {
     it('applies error border class when error is present', () => {
       render(<Input error="Invalid input" />);
       const input = screen.getByRole('textbox');
-      expect(input).toHaveClass('border-red-500');
+      expect(input).toHaveClass('border-accent-error');
     });
 
     it('applies normal border class when no error', () => {
       render(<Input />);
       const input = screen.getByRole('textbox');
-      expect(input).toHaveClass('border-slate-300');
+      expect(input).toHaveClass('border-border');
     });
   });
 
@@ -138,15 +132,7 @@ describe('Input', () => {
 
   describe('Props', () => {
     it('forwards standard input attributes', () => {
-      render(
-        <Input
-          type="email"
-          placeholder="Email"
-          name="email"
-          disabled
-          maxLength={50}
-        />
-      );
+      render(<Input type="email" placeholder="Email" name="email" disabled maxLength={50} />);
       const input = screen.getByRole('textbox');
 
       expect(input).toHaveAttribute('type', 'email');
@@ -171,12 +157,7 @@ describe('Input', () => {
     });
 
     it('supports aria-describedby for hint', () => {
-      render(
-        <Input
-          aria-describedby="hint-text"
-          hint="This is a hint"
-        />
-      );
+      render(<Input aria-describedby="hint-text" hint="This is a hint" />);
       expect(screen.getByRole('textbox')).toHaveAttribute('aria-describedby', 'hint-text');
     });
   });

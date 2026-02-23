@@ -39,6 +39,7 @@ export function ResultsPage() {
       audioName={session.audioFile.name}
       audioFile={session.audioFile}
       result={session.result}
+      language={session.language}
       onBack={goToAudio}
       onUpdateResult={(newResult) => {
         updateSession({ result: newResult });

@@ -42,6 +42,7 @@ const arePropsEqual = (prev: AudioPlayerBarProps, next: AudioPlayerBarProps): bo
  * Memoized to prevent unnecessary re-renders.
  *
  * @param audioFile - Audio file from session storage
+ * @param audioPlayer - Audio player instance for playback control
  */
 export const AudioPlayerBar = memo(function AudioPlayerBar({
   audioFile,

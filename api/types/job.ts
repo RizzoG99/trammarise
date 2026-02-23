@@ -5,6 +5,7 @@
  */
 
 import type { ChunkMetadata, ProcessingMode } from './chunking';
+import type { Utterance } from './provider';
 
 /**
  * Job status states
@@ -73,6 +74,18 @@ export interface JobConfiguration {
 
   /** Custom prompt for Whisper */
   prompt?: string;
+
+  /** Enable speaker diarization (requires AssemblyAI) */
+  enableSpeakerDiarization?: boolean;
+
+  /** Expected number of speakers (2-10, optional) */
+  speakersExpected?: number;
+
+  /** User ID who created this job (for ownership validation) */
+  userId?: string;
+
+  /** Whether to track usage with quota deduction (false = analytics only) */
+  shouldTrackQuota?: boolean;
 }
 
 /**
@@ -132,6 +145,17 @@ export interface TranscriptionJob {
   /** Final assembled transcript (if completed) */
   transcript?: string;
 
+  /** Speaker-labeled utterances (if speaker diarization enabled) */
+  utterances?: Utterance[];
+
+  /** Whisper API segments with real timestamps (for accurate syncing) */
+  segments?: Array<{
+    text: string;
+    start: number; // seconds
+    end: number;
+    id: number;
+  }>;
+
   /** Error message (if failed) */
   error?: string;
 
@@ -143,6 +167,9 @@ export interface TranscriptionJob {
 
   /** Last update timestamp */
   lastUpdated: Date;
+
+  /** User ID who owns this job (for authorization) */
+  userId?: string;
 }
 
 /**
@@ -197,6 +224,17 @@ export interface JobStatusResponse {
 
   /** Final transcript (if completed) */
   transcript?: string;
+
+  /** Speaker-labeled utterances (if speaker diarization enabled) */
+  utterances?: Utterance[];
+
+  /** Whisper API segments with real timestamps */
+  segments?: Array<{
+    text: string;
+    start: number; // seconds
+    end: number;
+    id: number;
+  }>;
 
   /** Error message (if failed) */
   error?: string;

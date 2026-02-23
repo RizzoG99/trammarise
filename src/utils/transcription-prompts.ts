@@ -5,9 +5,11 @@
  * - WHISPER_STYLE_PROMPT: For Whisper API to guide transcription style
  * - Plaud-style summarization templates with few-shot examples
  * - Noise profile handling for low-quality audio
+ * - Language-specific prompts for multi-language support
  */
 
 import type { ContentType } from './constants';
+import { getLanguagePrompts } from './language-prompts';
 
 /**
  * Whisper API Style Prompt
@@ -26,21 +28,6 @@ CRITICAL INSTRUCTIONS:
 2. **Remove Filler**: Clean up any remaining filler words or grammatical errors without losing meaning.
 3. **Use Markdown**: Format your output with proper headers, tables, and lists for maximum readability.
 4. **Be Comprehensive**: Capture all important details, decisions, and action items.`;
-
-/**
- * Language name mapping
- */
-const LANGUAGE_NAMES: Record<string, string> = {
-  en: 'English',
-  it: 'Italian',
-  es: 'Spanish',
-  fr: 'French',
-  de: 'German',
-  pt: 'Portuguese',
-  nl: 'Dutch',
-  ja: 'Japanese',
-  zh: 'Chinese',
-};
 
 /**
  * Noise profile warnings
@@ -576,13 +563,6 @@ NOW: Analyze the provided transcript and create a summary following this exact s
 };
 
 /**
- * Get language name from code
- */
-function getLanguageName(code: string): string {
-  return LANGUAGE_NAMES[code] || 'English';
-}
-
-/**
  * Get noise profile warning
  */
 function getNoiseWarning(noiseProfile?: string): string {
@@ -600,9 +580,12 @@ export function getSummarizationPrompt(
   language?: string,
   noiseProfile?: string
 ): string {
-  const languageInstruction = language
-    ? `\n\nIMPORTANT: Generate your summary in ${getLanguageName(language)}. Use natural, idiomatic section headers and content appropriate for ${getLanguageName(language)}. Follow the structure and quality shown in the example below, but adapt all text naturally to ${getLanguageName(language)}.`
-    : '';
+  // Get language-specific prompts (defaults to English if not supported)
+  const languageCode = language || 'en';
+  const langPrompts = getLanguagePrompts(languageCode);
+
+  // Use language-specific summarization prompt as the language instruction
+  const languageInstruction = `\n\nIMPORTANT: ${langPrompts.summarizationPrompt}`;
 
   const noiseWarning = getNoiseWarning(noiseProfile);
   const noiseInstruction = noiseWarning ? `\n\n${noiseWarning}` : '';

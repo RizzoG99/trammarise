@@ -641,5 +641,232 @@ and never need to understand why.
 - Retries absorb instability
 - UX absorbs none of it
 
-The system bends.  
+The system bends.
 It does not snap.
+
+---
+
+## 25. Session Storage & Cloud Sync Strategy
+
+### 25.1 Hybrid Storage Model
+
+The system uses a tiered storage approach based on user subscription:
+
+| Tier          | Local Storage | Cloud Storage    | Cross-Device Sync | Cost/Session |
+| ------------- | ------------- | ---------------- | ----------------- | ------------ |
+| **Free/BYOK** | ✅ IndexedDB  | ❌ None          | ❌ No             | $0           |
+| **Pro**       | ✅ IndexedDB  | ✅ Metadata only | ⚠️ Results only   | ~$0.0001     |
+| **Team**      | ✅ IndexedDB  | ✅ Full audio    | ✅ Full sync      | ~$0.006      |
+
+### 25.2 Privacy & Security Architecture
+
+**Private Bucket Design:**
+
+- Supabase Storage bucket is **private** (not publicly accessible)
+- All audio files require authentication to access
+- Files served through `/api/audio/:sessionId` endpoint only
+- RLS policies enforce owner-only access at database level
+- Direct URLs cannot be stolen or shared
+
+**Access Flow:**
+
+```
+User Request → Frontend
+            ↓
+    /api/audio/:sessionId (with auth token)
+            ↓
+    Verify Clerk JWT
+            ↓
+    Check session ownership in DB
+            ↓
+    Download from private bucket (if authorized)
+            ↓
+    Stream audio to user
+```
+
+**Security Guarantees:**
+
+1. ✅ Authentication required (Clerk JWT)
+2. ✅ Ownership verification (session.user_id === userId)
+3. ✅ Private bucket (no public URLs)
+4. ✅ RLS policies (database-level enforcement)
+5. ✅ File size limits (100MB max)
+6. ✅ MIME type restrictions (audio only)
+
+### 25.3 Storage Decision Tree
+
+```mermaid
+flowchart TD
+    Start([User clicks Process Audio]) --> Auth{User Authenticated?}
+
+    Auth -->|No| LocalOnly[Save to IndexedDB only]
+    Auth -->|Yes| CheckTier{Check Subscription Tier}
+
+    CheckTier -->|Free/BYOK| LocalOnly
+    CheckTier -->|Pro| Meta[Save locally + Upload metadata]
+    CheckTier -->|Team| Full[Save locally + Upload full audio]
+
+    LocalOnly --> Privacy1[Privacy: ✅ Stays on device<br/>Cost: $0]
+    Meta --> Privacy2[Privacy: ✅ Private bucket + RLS<br/>Cost: ~$0.0001/session]
+    Full --> Privacy3[Privacy: ✅ Private bucket + RLS<br/>Cost: ~$0.006/session]
+
+    Privacy1 --> Done([Navigate to audio editing page])
+    Privacy2 --> Done
+    Privacy3 --> Done
+
+    style LocalOnly fill:#e3f2fd
+    style Meta fill:#fff3e0
+    style Full fill:#f3e5f5
+```
+
+### 25.4 Cost Optimization Analysis
+
+**Supabase Storage Pricing (2024):**
+
+- Storage: $0.021/GB/month
+- Egress bandwidth: $0.09/GB
+
+**Average Session Size:**
+
+- Audio file: ~50MB (varies by length/quality)
+- Metadata: ~10KB (transcript + summary + config)
+
+**Monthly Cost Per 100 Active Users:**
+
+| Scenario                | Storage Cost | Bandwidth Cost | Total/Month |
+| ----------------------- | ------------ | -------------- | ----------- |
+| All Free                | $0           | $0             | $0          |
+| All Pro (metadata only) | $0.01        | $0.01          | $0.02       |
+| All Team (full audio)   | $10.50       | $45.00         | $55.50      |
+
+**Why Hybrid Strategy:**
+
+- **Free users**: Local-only eliminates cloud costs entirely
+- **Pro users**: 99% storage savings (10KB vs 50MB avg)
+- **Team users**: Full features with cost aligned to premium pricing
+
+**Cost Control Mechanisms:**
+
+1. Tier-based uploads (automatic via `storage-manager.ts`)
+2. File size limits (100MB max enforced by bucket)
+3. MIME type restrictions (audio only)
+4. Automatic cleanup (future: delete old files after 90 days)
+
+### 25.5 Cross-Device Sync Capabilities
+
+**Free Tier:**
+
+- ❌ No cloud storage
+- ❌ No cross-device sync
+- ✅ Full local functionality
+- ✅ Privacy: data never leaves device
+
+**Pro Tier:**
+
+- ✅ Metadata synced to cloud
+- ✅ View results on any device
+- ⚠️ Cannot re-process audio on other devices
+- ✅ Privacy: audio stays local, metadata encrypted
+
+**Team Tier:**
+
+- ✅ Full audio synced to cloud
+- ✅ Access sessions from any device
+- ✅ Re-process audio on any device
+- ✅ Share sessions with team members (future)
+- ✅ Privacy: private bucket + RLS enforcement
+
+### 25.6 Failure Modes & Resilience
+
+**Scenario 1: Supabase Upload Fails**
+
+```
+saveSession() → uploadAudioFile() → Supabase error
+                                         ↓
+                                   Caught by try/catch
+                                         ↓
+                                   Logged to console
+                                         ↓
+                              Session saved locally anyway
+                                         ↓
+                              User can continue working
+```
+
+**Result**: Graceful degradation to local-only mode
+
+**Scenario 2: Network Offline During Save**
+
+```
+User clicks "Process Audio"
+        ↓
+setIsProcessing(true) → Show spinner
+        ↓
+saveSession() → IndexedDB save succeeds
+        ↓
+uploadAudioFile() → Network error
+        ↓
+Caught by session-manager try/catch
+        ↓
+Session saved locally, user warned
+        ↓
+setIsProcessing(false) → Hide spinner
+```
+
+**Result**: User sees error message, can retry when online
+
+**Scenario 3: User A Tries to Access User B's File**
+
+```
+User A → GET /api/audio/:sessionIdOfUserB
+              ↓
+        Verify JWT (User A authenticated)
+              ↓
+        Fetch session from DB
+              ↓
+        Check: session.user_id === userId?
+              ↓
+           NO → 403 Forbidden
+              ↓
+        "Access denied: You do not own this session"
+```
+
+**Result**: Security enforced at API level
+
+### 25.7 Implementation Details
+
+**Key Files:**
+
+- `src/utils/storage-manager.ts` - Upload strategy logic
+- `src/utils/session-manager.ts` - Session save orchestration
+- `api/audio/[sessionId].ts` - Authenticated file serving
+- `supabase/migrations/003_audio_storage_bucket.sql` - Bucket creation
+
+**Upload Strategy Function:**
+
+```typescript
+function getUploadStrategy(tier?: SubscriptionTier): UploadStrategy {
+  if (!tier || tier === 'free') return 'none'; // Local-only
+  if (tier === 'pro') return 'metadata'; // Metadata only
+  return 'full'; // Full audio (team)
+}
+```
+
+**Benefits:**
+
+- ✅ Simple tier-based logic
+- ✅ Testable and predictable
+- ✅ Easy to add new tiers
+- ✅ Cost-optimized by design
+
+---
+
+## 26. Storage System Summary
+
+- **Local storage** is the source of truth
+- **Cloud storage** is an optional backup
+- **Privacy** is enforced at multiple layers
+- **Costs** scale with user value
+
+The system stores intelligently.
+It protects ruthlessly.
+It costs wisely.

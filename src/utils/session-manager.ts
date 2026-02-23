@@ -1,4 +1,5 @@
 import type { SessionData } from '../types/routing';
+import type { SubscriptionTier } from '@/context/subscription-types';
 import {
   saveAudioFile,
   loadAudioFile,
@@ -8,8 +9,19 @@ import {
   deleteContextFiles,
   deleteAllFiles,
 } from './indexeddb';
+import { sessionRepository } from '@/repositories/SessionRepository';
+import { uploadAudioFile, deleteAudioFile as deleteStorageAudioFile } from './storage-manager';
 
 const SESSION_KEY_PREFIX = 'trammarise_session_';
+
+/**
+ * Cache to prevent File object re-creation for same session blob.
+ * Key: sessionId, Value: { blob, file }
+ *
+ * This ensures stable File references across loadSession() calls,
+ * preventing unnecessary useEffect cleanup/re-initialization in hooks.
+ */
+const audioFileCache = new Map<string, { blob: Blob; file: File }>();
 
 /**
  * Generate a unique session ID
@@ -28,8 +40,16 @@ function getSessionKey(sessionId: string): string {
 /**
  * Save session data to localStorage and IndexedDB
  * Files and Blobs are stored in IndexedDB, metadata in localStorage
+ *
+ * @param sessionId - Unique session identifier
+ * @param data - Session data to save
+ * @param tier - Optional subscription tier for determining upload strategy
  */
-export async function saveSession(sessionId: string, data: Partial<SessionData>): Promise<void> {
+export async function saveSession(
+  sessionId: string,
+  data: Partial<SessionData>,
+  tier?: SubscriptionTier
+): Promise<void> {
   try {
     const existingData = await loadSession(sessionId);
 
@@ -60,6 +80,50 @@ export async function saveSession(sessionId: string, data: Partial<SessionData>)
     };
 
     localStorage.setItem(getSessionKey(sessionId), JSON.stringify(sessionData));
+
+    // If authenticated, also save to server
+    // This will fail silently if user is not authenticated (API returns 401)
+    try {
+      let audioUrl: string | undefined | null;
+
+      // Upload audio file to Supabase Storage if present
+      // Strategy depends on subscription tier (free=none, pro=metadata, team=full)
+      if (audioFile) {
+        audioUrl = await uploadAudioFile(sessionId, audioFile.blob, audioFile.name, tier);
+      }
+
+      // Upsert session (create or update in one operation)
+      const upsertData: import('../repositories/SessionRepository').CreateSessionDTO = {
+        sessionId,
+        audioName: sessionData.audioName || 'unknown.wav',
+        fileSizeBytes: sessionData.fileSizeBytes || 0,
+        language: sessionData.language || 'en',
+        contentType: sessionData.contentType || 'other',
+      };
+
+      // Add all optional fields
+      if (audioUrl) upsertData.audioUrl = audioUrl;
+      if (sessionData.processingMode) upsertData.processingMode = sessionData.processingMode;
+      if (sessionData.noiseProfile) upsertData.noiseProfile = sessionData.noiseProfile;
+      if (sessionData.selectionMode) upsertData.selectionMode = sessionData.selectionMode;
+      if (sessionData.regionStart !== undefined) upsertData.regionStart = sessionData.regionStart;
+      if (sessionData.regionEnd !== undefined) upsertData.regionEnd = sessionData.regionEnd;
+
+      // Extract from result if present
+      if (sessionData.result) {
+        if (sessionData.result.transcript) upsertData.transcript = sessionData.result.transcript;
+        if (sessionData.result.summary) upsertData.summary = sessionData.result.summary;
+        if (sessionData.result.chatHistory) upsertData.chatHistory = sessionData.result.chatHistory;
+        if (sessionData.result.configuration)
+          upsertData.aiConfig = sessionData.result.configuration;
+      }
+
+      await sessionRepository.upsert(upsertData);
+    } catch (apiError) {
+      // Silently fail - user might not be authenticated or API might be unavailable
+      // localStorage is the fallback, so we don't throw
+      console.debug('Server save skipped (user may not be authenticated):', apiError);
+    }
   } catch (error) {
     console.error('Failed to save session:', error);
     throw new Error('Failed to save session data');
@@ -98,12 +162,22 @@ export async function loadSession(sessionId: string): Promise<SessionData | null
     // Load files from IndexedDB
     const audioFileRecord = await loadAudioFile(sessionId);
     if (audioFileRecord) {
+      // Check cache to avoid creating new File objects for same blob
+      let cached = audioFileCache.get(sessionId);
+
+      // Only create new File if blob has changed or not cached
+      if (!cached || cached.blob !== audioFileRecord.audioBlob) {
+        const file = new File([audioFileRecord.audioBlob], audioFileRecord.audioName, {
+          type: audioFileRecord.audioBlob.type,
+        });
+        cached = { blob: audioFileRecord.audioBlob, file };
+        audioFileCache.set(sessionId, cached);
+      }
+
       session.audioFile = {
         name: audioFileRecord.audioName,
-        blob: audioFileRecord.audioBlob,
-        file: new File([audioFileRecord.audioBlob], audioFileRecord.audioName, {
-          type: audioFileRecord.audioBlob.type,
-        }),
+        blob: cached.blob,
+        file: cached.file,
       };
     }
 
@@ -125,12 +199,30 @@ export async function loadSession(sessionId: string): Promise<SessionData | null
 }
 
 /**
- * Delete a session from localStorage and IndexedDB
+ * Delete a session from localStorage, IndexedDB, and server
  */
 export async function deleteSession(sessionId: string): Promise<void> {
   try {
+    // Clear cache entry to prevent memory leaks
+    audioFileCache.delete(sessionId);
+
+    // Remove from localStorage and IndexedDB
     localStorage.removeItem(getSessionKey(sessionId));
     await Promise.all([deleteAudioFile(sessionId), deleteContextFiles(sessionId)]);
+
+    // Try to delete from server as well
+    // This will fail silently if user is not authenticated
+    try {
+      await sessionRepository.delete(sessionId);
+      // Also try to delete audio file from Supabase Storage
+      const metadata = loadSessionMetadata(sessionId);
+      if (metadata?.audioName) {
+        await deleteStorageAudioFile(sessionId, metadata.audioName);
+      }
+    } catch (apiError) {
+      // Silently fail - user might not be authenticated or API might be unavailable
+      console.debug('Server delete skipped (user may not be authenticated):', apiError);
+    }
   } catch (error) {
     console.error('Failed to delete session:', error);
   }
@@ -158,6 +250,9 @@ export function getAllSessionIds(): string[] {
  * Clear all sessions (useful for testing/reset)
  */
 export async function clearAllSessions(): Promise<void> {
+  // Clear entire cache
+  audioFileCache.clear();
+
   const sessionIds = getAllSessionIds();
   await Promise.all(sessionIds.map(deleteSession));
   await deleteAllFiles();
