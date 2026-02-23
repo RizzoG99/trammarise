@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Button } from '../Button';
 import type { ButtonVariant } from '../Button';
 
@@ -34,6 +35,8 @@ export interface ModalProps extends Omit<
   actions?: ModalAction[];
   /** Prevent closing when clicking backdrop */
   disableBackdropClick?: boolean;
+  /** Hide the close button in header */
+  hideCloseButton?: boolean;
   /** Additional CSS classes for modal content */
   className?: string;
 }
@@ -49,12 +52,13 @@ export const Modal: React.FC<ModalProps> = ({
   children,
   actions,
   disableBackdropClick = false,
+  hideCloseButton = false,
   className = '',
   ...rest
 }) => {
   // Handle ESC key to close modal
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen || disableBackdropClick) return;
 
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -64,7 +68,7 @@ export const Modal: React.FC<ModalProps> = ({
 
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, disableBackdropClick]);
 
   // Prevent body scroll when modal is open
   useEffect(() => {
@@ -87,7 +91,7 @@ export const Modal: React.FC<ModalProps> = ({
     }
   };
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 bg-black/70 flex items-center justify-center z-[1000] animate-[fadeIn_0.2s_ease-out]"
       onClick={handleBackdropClick}
@@ -97,7 +101,7 @@ export const Modal: React.FC<ModalProps> = ({
       {...rest}
     >
       <div
-        className={`bg-white dark:bg-[#1e1e1e] rounded-xl max-w-[500px] w-[90%] max-h-[80vh] overflow-y-auto shadow-2xl animate-[slideUp_0.3s_ease-out] ${className}`}
+        className={`bg-white dark:bg-[#1e1e1e] rounded-xl w-[90%] max-h-[80vh] overflow-y-auto shadow-2xl animate-[slideUp_0.3s_ease-out] ${className}`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -105,14 +109,16 @@ export const Modal: React.FC<ModalProps> = ({
           <h2 id="modal-title" className="m-0 text-2xl text-[#333] dark:text-white">
             {title}
           </h2>
-          <button
-            className="bg-transparent border-none text-[2rem] text-[#999] cursor-pointer p-0 w-8 h-8 flex items-center justify-center rounded transition-all hover:bg-gray-100 hover:text-[#333] dark:hover:bg-[#333] dark:hover:text-white"
-            onClick={onClose}
-            aria-label="Close modal"
-            type="button"
-          >
-            ×
-          </button>
+          {!hideCloseButton && (
+            <button
+              className="bg-transparent border-none text-[2rem] text-[#999] cursor-pointer p-0 w-8 h-8 flex items-center justify-center rounded transition-all hover:bg-gray-100 hover:text-[#333] dark:hover:bg-[#333] dark:hover:text-white"
+              onClick={onClose}
+              aria-label="Close modal"
+              type="button"
+            >
+              ×
+            </button>
+          )}
         </div>
 
         {/* Body */}
@@ -129,6 +135,7 @@ export const Modal: React.FC<ModalProps> = ({
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

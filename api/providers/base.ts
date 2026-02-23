@@ -25,6 +25,7 @@ export interface ChatParams {
   history: ChatMessage[];
   apiKey: string;
   model?: string; // Optional model parameter for providers that support it
+  language?: string; // Optional language for chat prompts
 }
 
 export interface AIProvider {

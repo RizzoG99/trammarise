@@ -4,7 +4,9 @@ WaveSurfer.js, FFmpeg, OpenAI, etc.).
 ## Commands
 
 - `npm run dev` - Start dev server (API + Vite)
-- `npm test` - Run Vitest tests
+- `npm test` - Run frontend tests only (React components, jsdom environment)
+- `npm run api-test` - Run API tests only (endpoints, utils, Node.js environment)
+- `npm run test:all` - Run all tests (frontend + API)
 - `npm test path/to/file.test.tsx` - Test specific file
 - `npm run build` - Build production
 - `npm run lint` - ESLint validation

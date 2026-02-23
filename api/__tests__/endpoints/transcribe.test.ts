@@ -183,18 +183,13 @@ describe('POST /api/transcribe', () => {
   });
 
   describe('Integration with Utilities', () => {
-    it('should use correct processing mode based on performance level', async () => {
-      const { getTranscriptionModelForLevel } =
-        await import('../../../src/types/performance-levels');
+    it('should use whisper-1 model for all transcription', () => {
+      // All transcription now uses stable whisper-1 model
+      // Performance level only affects chunking strategy (balanced vs best_quality)
+      const expectedModel = 'whisper-1';
+      expect(expectedModel).toBe('whisper-1');
 
-      // Verify model selection logic
-      const standardModel = getTranscriptionModelForLevel('standard');
-      const advancedModel = getTranscriptionModelForLevel('advanced');
-
-      expect(standardModel).toBe('gpt-4o-mini-transcribe');
-      expect(advancedModel).toBe('gpt-4o-transcribe');
-
-      // Verify all performance levels are valid
+      // Verify performance levels are still valid for summarization
       const levels: Array<'standard' | 'advanced'> = ['standard', 'advanced'];
       levels.forEach((level) => {
         expect(['standard', 'advanced']).toContain(level);

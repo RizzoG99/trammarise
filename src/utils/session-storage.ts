@@ -36,7 +36,5 @@ export function clearApiConfig(): void {
   sessionStorage.removeItem(STORAGE_KEY);
 }
 
-// Auto-clear on window close (extra safety)
-if (typeof window !== 'undefined') {
-  window.addEventListener('beforeunload', clearApiConfig);
-}
+// Note: sessionStorage automatically clears when the tab/window closes
+// No need to manually clear on beforeunload (which also fires on refresh/navigation)

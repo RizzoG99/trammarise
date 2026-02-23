@@ -26,7 +26,7 @@ export const useHeaderConfig = (config: {
       setFileName(config.initialFileName);
     }
     if (config.onExport) {
-      setOnExport(() => config.onExport);
+      setOnExport(config.onExport);
     }
 
     return () => {

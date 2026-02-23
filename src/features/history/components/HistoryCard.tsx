@@ -70,10 +70,10 @@ export function HistoryCard({
       className="block group relative"
     >
       <GlassCard
-        variant="light"
-        className={`h-full p-5 hover:shadow-xl transition-all duration-300 border 
-          ${selected ? 'border-primary ring-2 ring-primary/20' : 'border-gray-200/50 dark:border-gray-700/50'} 
-          hover:border-primary/30 dark:hover:border-primary/30 group-hover:-translate-y-1`}
+        variant="dark"
+        className={`h-full p-5 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-[0_0_20px_rgba(59,130,246,0.15)]
+          ${selected ? 'ring-2 ring-primary border-primary/50' : 'border-white/5'} 
+          hover:border-primary/30`}
       >
         <div className="flex flex-col h-full">
           {/* Header */}

@@ -1,6 +1,7 @@
 import type { SummarizationResponse, ChatResponse, ChatMessage } from '../types/audio';
 import { API_VALIDATION } from './constants';
 import { fetchWithTimeout } from './fetch-with-timeout';
+import { fetchWithAuth } from './fetch-with-auth';
 
 const { API_DEFAULT_TIMEOUT, TRANSCRIBE_TIMEOUT, VALIDATION_TIMEOUT } = API_VALIDATION;
 
@@ -258,14 +259,26 @@ export async function chatWithAI(
   history: ChatMessage[],
   provider: string,
   apiKey: string,
-  model?: string
+  getToken: (() => Promise<string | null>) | null,
+  model?: string,
+  language?: string
 ): Promise<ChatResponse> {
-  const response = await fetchWithTimeout(
+  const response = await fetchWithAuth(
+    getToken,
     '/api/chat',
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ transcript, summary, message, history, provider, apiKey, model }),
+      body: JSON.stringify({
+        transcript,
+        summary,
+        message,
+        history,
+        provider,
+        apiKey,
+        model,
+        language,
+      }),
     },
     API_DEFAULT_TIMEOUT
   );
@@ -337,5 +350,102 @@ export async function copyToClipboard(text: string): Promise<boolean> {
   } catch (error) {
     console.error('Copy failed:', error);
     return false;
+  }
+}
+
+/**
+ * Save API key to backend (encrypted storage)
+ * Requires authentication
+ */
+export async function saveApiKey(
+  apiKey: string,
+  provider: string = 'openai',
+  getToken?: (() => Promise<string | null>) | null
+): Promise<{ success: boolean; message: string }> {
+  try {
+    const response = await fetchWithAuth(
+      getToken || null,
+      '/api/user-settings/api-key',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ apiKey, provider }),
+      },
+      API_DEFAULT_TIMEOUT
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to save API key');
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error saving API key:', error);
+    throw error;
+  }
+}
+
+/**
+ * Retrieve saved API key from backend (decrypted)
+ * Requires authentication
+ */
+export async function getSavedApiKey(getToken?: (() => Promise<string | null>) | null): Promise<{
+  hasKey: boolean;
+  apiKey: string | null;
+}> {
+  try {
+    const response = await fetchWithAuth(
+      getToken || null,
+      '/api/user-settings/api-key',
+      {
+        method: 'GET',
+      },
+      API_DEFAULT_TIMEOUT
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to retrieve API key');
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error retrieving API key:', error);
+    // Return default instead of throwing for non-critical error
+    return { hasKey: false, apiKey: null };
+  }
+}
+
+/**
+ * Delete saved API key from backend
+ * Requires authentication
+ */
+export async function deleteSavedApiKey(getToken?: (() => Promise<string | null>) | null): Promise<{
+  success: boolean;
+  message: string;
+}> {
+  try {
+    const response = await fetchWithAuth(
+      getToken || null,
+      '/api/user-settings/api-key',
+      {
+        method: 'DELETE',
+      },
+      API_DEFAULT_TIMEOUT
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to delete API key');
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error deleting API key:', error);
+    throw error;
   }
 }

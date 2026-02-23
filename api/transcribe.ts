@@ -2,18 +2,20 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import busboy from 'busboy';
 import { API_VALIDATION } from '../src/utils/constants';
 import { WHISPER_STYLE_PROMPT } from '../src/utils/transcription-prompts';
-import {
-  getTranscriptionModelForLevel,
-  type PerformanceLevel,
-} from '../src/types/performance-levels';
 import { JobManager } from './utils/job-manager';
 import { chunkAudio, cleanupChunks } from './utils/audio-chunker';
 import { RateLimitGovernor } from './utils/rate-limit-governor';
 import { processChunk } from './utils/chunk-processor';
 import { OpenAIProvider } from './providers/openai';
+import { TranscriptionProviderFactory } from './providers/factory';
 import { assembleTranscript } from './utils/transcript-assembler';
 import type { ProcessingMode } from './types/chunking';
 import type { JobConfiguration } from './types/job';
+import { requireAuth, AuthError } from './middleware/auth';
+import { rateLimit, RateLimitError, RATE_LIMITS } from './middleware/rate-limit';
+import { checkQuota, trackUsage } from './middleware/usage-tracking';
+import { validateAudioFile } from './utils/file-validator';
+import { supabaseAdmin } from './lib/supabase-admin';
 
 export const config = {
   api: {
@@ -32,6 +34,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
+    // 1. AUTHENTICATION - Required for all users
+    const { userId } = await requireAuth(req);
+
+    // 2. RATE LIMITING - Prevent abuse
+    await rateLimit(req, {
+      ...RATE_LIMITS.TRANSCRIBE,
+      keyGenerator: () => `user:${userId}`,
+    });
+
     // Parse multipart form data with busboy
     const bb = busboy({
       headers: req.headers,
@@ -44,20 +55,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     let audioData: Buffer | null = null;
     const audioChunks: Buffer[] = [];
-    let apiKey: string | null = null;
     let language: string | undefined = undefined;
-    let model: string | undefined = undefined;
-
     let performanceLevel: string | undefined = undefined;
+    let enableSpeakerDiarization = false;
+    let speakersExpected: number | undefined = undefined;
     let uploadedFilename: string = 'audio.webm';
     let fileSizeExceeded = false;
+    let apiKey: string | null = null; // BYOK support
 
     const parsePromise = new Promise<void>((resolve, reject) => {
       bb.on('file', (_fieldname, file, info) => {
         const { filename, mimeType } = info;
         uploadedFilename = filename || 'audio.webm';
 
-        // Validate file type
+        // Basic MIME type check
         if (!mimeType.startsWith('audio/')) {
           file.resume();
           reject(new Error('Invalid file type. Audio files only.'));
@@ -84,13 +95,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       bb.on('field', (fieldname, value) => {
         if (fieldname === 'apiKey') {
-          apiKey = value;
+          apiKey = value || null;
         } else if (fieldname === 'language') {
           language = value || undefined;
-        } else if (fieldname === 'model') {
-          model = value || undefined;
         } else if (fieldname === 'performanceLevel') {
           performanceLevel = value || undefined;
+        } else if (fieldname === 'enableSpeakerDiarization') {
+          enableSpeakerDiarization = value === 'true';
+        } else if (fieldname === 'speakersExpected') {
+          const parsed = parseInt(value, 10);
+          speakersExpected = !isNaN(parsed) ? parsed : undefined;
         }
       });
 
@@ -110,35 +124,104 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ error: 'No audio file found in request' });
     }
 
-    if (!apiKey) {
-      return res.status(400).json({ error: 'API key is required' });
-    }
-
     // Narrow audioData type to Buffer (TypeScript needs explicit assertion in async callbacks)
     const audioBuffer: Buffer = audioData;
 
-    // Determine processing mode from performance level
-    const mode: ProcessingMode = performanceLevel === 'best_quality' ? 'best_quality' : 'balanced';
+    // 3. FILE VALIDATION - Magic bytes and duration check
+    // Note: We'll do a quick validation here, full validation happens during chunking
+    const mimeType = req.headers['content-type']?.split(';')[0] || 'audio/webm';
+    const validation = await validateAudioFile(audioBuffer, mimeType, 7200);
 
-    // Determine transcription model
-    const transcriptionModel = model
-      ? getTranscriptionModelForLevel(model as PerformanceLevel)
-      : 'gpt-4o-mini-transcribe';
+    if (!validation.valid) {
+      return res.status(400).json({
+        error: 'File validation failed',
+        message: validation.error,
+      });
+    }
+
+    // 4. API KEY LOGIC - Two-tier system (BYOK or Platform)
+    let finalApiKey: string;
+    let shouldTrackQuota = false;
+
+    if (apiKey) {
+      // BYOK Mode: User provided their own API key (free tier or paid tier preference)
+      finalApiKey = apiKey;
+      shouldTrackQuota = false; // Analytics only, no quota deduction
+      console.log(`[Transcribe] User ${userId} using BYOK mode`);
+    } else {
+      // No API key provided - check if user has paid subscription
+      const { data: subscription } = await supabaseAdmin
+        .from('subscriptions')
+        .select('tier')
+        .eq('user_id', userId)
+        .single();
+
+      if (!subscription || subscription.tier === 'free') {
+        // Free user without API key - require them to configure one
+        return res.status(403).json({
+          error: 'API key required',
+          message:
+            'Free tier users must provide their own OpenAI API key. Configure it in Settings or upgrade to Pro.',
+          upgradeUrl: '/pricing',
+          requiresApiKey: true, // Flag for frontend to show API key setup modal
+        });
+      }
+
+      // Paid user (Pro/Team) - use platform key with quota tracking
+      const estimatedMinutes = Math.ceil((validation.duration || 0) / 60);
+      const quotaCheck = await checkQuota(userId, estimatedMinutes);
+
+      if (!quotaCheck.allowed) {
+        return res.status(429).json({
+          error: 'Quota exceeded',
+          minutesRemaining: quotaCheck.minutesRemaining,
+          minutesRequired: quotaCheck.minutesRequired,
+          message: 'Insufficient quota. Please upgrade your plan or purchase additional credits.',
+          upgradeUrl: '/pricing',
+        });
+      }
+
+      finalApiKey = process.env.OPENAI_API_KEY!;
+      shouldTrackQuota = true;
+      console.log(
+        `[Transcribe] User ${userId} (${subscription.tier}) using platform API with quota tracking`
+      );
+    }
+
+    // Determine processing mode from performance level
+    const mode: ProcessingMode =
+      performanceLevel === 'best_quality' || performanceLevel === 'advanced'
+        ? 'best_quality'
+        : 'balanced';
+
+    // Use Whisper API for all transcription (stable, reliable)
+    const transcriptionModel = 'whisper-1';
+
+    // Handle auto-detection: Convert 'auto' to undefined for Whisper API
+    const transcriptionLanguage = language === 'auto' ? undefined : language;
+
+    console.log(
+      `[Transcribe API] Job configuration: model=${transcriptionModel}, mode=${mode}, language=${transcriptionLanguage || 'auto'}`
+    );
 
     // Create job configuration with Whisper style prompt
     const jobConfig: JobConfiguration = {
-      apiKey,
+      apiKey: finalApiKey,
       mode,
       model: transcriptionModel,
-      language,
+      language: transcriptionLanguage,
       prompt: WHISPER_STYLE_PROMPT, // Use style prompt for clean transcription
+      enableSpeakerDiarization,
+      speakersExpected,
+      userId, // Store userId for ownership validation
+      shouldTrackQuota, // Track mode (with/without quota deduction)
     };
 
     // Create job
     const job = JobManager.createJob(jobConfig, {
       filename: uploadedFilename,
       fileSize: audioBuffer.length,
-      duration: 0, // Will be updated after chunking
+      duration: validation.duration || 0, // Use validated duration
       totalChunks: 0,
     });
 
@@ -160,6 +243,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       JobManager.updateJobStatus(job.jobId, 'failed', error.message);
     });
   } catch (error) {
+    if (error instanceof AuthError) {
+      return res.status(error.statusCode).json({ error: error.message });
+    }
+
+    if (error instanceof RateLimitError) {
+      res.setHeader('Retry-After', error.retryAfter.toString());
+      return res.status(429).json({
+        error: 'Rate limit exceeded',
+        retryAfter: error.retryAfter,
+      });
+    }
+
     const err = error as { message?: string };
     console.error('[Transcribe API] Error:', error);
 
@@ -167,8 +262,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       ? 413
       : err.message?.includes('Invalid file type')
         ? 415
-        : err.message?.includes('API key')
-          ? 401
+        : err.message?.includes('validation')
+          ? 400
           : 500;
 
     return res.status(status).json({
@@ -192,6 +287,54 @@ async function processJobInBackground(
   }
 
   try {
+    // Check if speaker diarization is enabled
+    if (job.config.enableSpeakerDiarization) {
+      // Speaker diarization path: Use AssemblyAI with full audio file (no chunking)
+      console.log(`[Job ${jobId}] Starting speaker diarization transcription...`);
+      JobManager.updateJobStatus(jobId, 'transcribing');
+
+      // Create AssemblyAI provider
+      const provider = TranscriptionProviderFactory.create({
+        provider: 'assemblyai',
+        apiKey: job.config.apiKey,
+        enableSpeakerDiarization: true,
+      });
+
+      // Transcribe with speaker diarization
+      const result = await provider.transcribe({
+        audioFile: audioBuffer,
+        language: job.config.language,
+        enableSpeakerDiarization: true,
+        speakersExpected: job.config.speakersExpected,
+      });
+
+      // Set transcript and utterances
+      JobManager.setJobTranscript(jobId, result.text);
+      if (result.utterances) {
+        JobManager.setJobUtterances(jobId, result.utterances);
+      }
+      if (result.segments) {
+        JobManager.setJobSegments(jobId, result.segments);
+      }
+
+      // Mark job as completed
+      JobManager.updateJobStatus(jobId, 'completed');
+
+      console.log(
+        `[Job ${jobId}] ✅ Completed with speaker diarization (${result.text.length} chars, ${result.utterances?.length || 0} utterances)`
+      );
+
+      // Track usage (after successful completion)
+      if (job.config.userId) {
+        const durationSeconds = job.metadata.duration || 0;
+        const mode = job.config.shouldTrackQuota ? 'with_quota_deduction' : 'analytics_only';
+        await trackUsage(job.config.userId, 'transcription', durationSeconds, mode);
+      }
+
+      return;
+    }
+
+    // Standard transcription path: Chunk and process with OpenAI
     // Update status to chunking
     JobManager.updateJobStatus(jobId, 'chunking');
 
@@ -297,6 +440,13 @@ async function processJobInBackground(
       degradedModeActivations: stats.degradedModeActivations,
       peakConcurrency: stats.peakConcurrency,
     });
+
+    // Step 8: Track usage (after successful completion)
+    if (job.config.userId) {
+      const durationSeconds = updatedJob.metadata.duration || 0;
+      const mode = job.config.shouldTrackQuota ? 'with_quota_deduction' : 'analytics_only';
+      await trackUsage(job.config.userId, 'transcription', durationSeconds, mode);
+    }
   } catch (error) {
     const err = error as { message?: string };
     console.error(`[Job ${jobId}] ❌ Failed:`, error);

@@ -136,6 +136,7 @@ export const ApiKeyInfo: React.FC<ApiKeyInfoProps> = ({ provider }) => {
               <li className="mb-1 text-sm">{t('apiKeyInfo.securityNotes.neverSaved')}</li>
               <li className="mb-1 text-sm">{t('apiKeyInfo.securityNotes.clearedOnClose')}</li>
               <li className="mb-1 text-sm">{t('apiKeyInfo.securityNotes.recommendLimits')}</li>
+              <li className="mb-1 text-sm">{t('apiKeyInfo.securityNotes.transmittedNotStored')}</li>
             </ul>
           </div>
         </div>

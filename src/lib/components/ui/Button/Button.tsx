@@ -77,39 +77,35 @@ export const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
   const baseClasses =
-    "inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg " +
-    "font-medium transition-all relative overflow-hidden whitespace-nowrap " +
-    "cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none";
+    'inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg ' +
+    'font-medium transition-all relative overflow-hidden whitespace-nowrap ' +
+    'cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none';
 
   const variants = {
     primary:
-      "bg-indigo-600 text-white shadow-lg border-2 border-indigo-600 " +
-      "hover:bg-indigo-700 hover:border-indigo-700 hover:-translate-y-0.5 hover:shadow-xl",
+      'bg-indigo-600 text-white shadow-lg border-2 border-indigo-600 ' +
+      'hover:bg-indigo-700 hover:border-indigo-700 hover:-translate-y-0.5 hover:shadow-xl',
     secondary:
-      "bg-slate-100 dark:bg-slate-800 border-2 border-primary/50 " +
-      "text-slate-900 dark:text-white hover:bg-primary/10 dark:hover:bg-primary/20 " +
-      "hover:border-primary shadow-md",
+      'bg-slate-100 dark:bg-slate-800 border-2 border-primary/50 ' +
+      'text-slate-900 dark:text-white hover:bg-primary/10 dark:hover:bg-primary/20 ' +
+      'hover:border-primary shadow-md',
     success:
-      "bg-emerald-600 text-white border-2 border-emerald-700 " +
-      "hover:bg-emerald-700 hover:-translate-y-0.5 shadow-md",
-    danger:
-      "bg-red-600 text-white border-2 border-red-700 hover:bg-red-700 shadow-md",
+      'bg-emerald-600 text-white border-2 border-emerald-700 ' +
+      'hover:bg-emerald-700 hover:-translate-y-0.5 shadow-md',
+    danger: 'bg-red-600 text-white border-2 border-red-700 hover:bg-red-700 shadow-md',
     outline:
-      "bg-slate-50 dark:bg-slate-800/90 border-2 border-slate-400 dark:border-slate-600 " +
-      "text-slate-900 dark:text-white hover:border-primary hover:bg-primary/10 shadow-sm",
+      'bg-slate-50 dark:bg-slate-800/90 border-2 border-border ' +
+      'text-slate-900 dark:text-white hover:border-primary hover:bg-primary/10 shadow-sm',
     ghost:
-      "bg-transparent text-slate-500 dark:text-slate-400 " +
-      "hover:text-primary dark:hover:text-primary p-2 gap-1.5",
-    small:
-      "px-3 py-1 text-sm",
-    large:
-      "px-8 py-4 text-lg",
-    circle:
-      "w-12 h-12 rounded-full p-0",
+      'bg-transparent text-slate-500 dark:text-slate-400 ' +
+      'hover:text-primary dark:hover:text-primary p-2 gap-1.5',
+    small: 'px-3 py-1 text-sm',
+    large: 'px-8 py-4 text-lg',
+    circle: 'w-12 h-12 rounded-full p-0',
     'circle-thick':
-      "w-16 h-16 rounded-full p-0 bg-emerald-600 text-white " +
-      "hover:bg-emerald-700 hover:scale-110 hover:shadow-lg " +
-      "flex-shrink-0 border-2 border-emerald-700",
+      'w-16 h-16 rounded-full p-0 bg-emerald-600 text-white ' +
+      'hover:bg-emerald-700 hover:scale-110 hover:shadow-lg ' +
+      'flex-shrink-0 border-2 border-emerald-700',
   };
 
   /**
@@ -141,11 +137,7 @@ export const Button: React.FC<ButtonProps> = ({
 
   return (
     <button type={type} className={classes} {...props}>
-      {icon && (
-        <span className="flex items-center justify-center w-5 h-5">
-          {icon}
-        </span>
-      )}
+      {icon && <span className="flex items-center justify-center w-5 h-5">{icon}</span>}
       {children && <span>{children}</span>}
     </button>
   );

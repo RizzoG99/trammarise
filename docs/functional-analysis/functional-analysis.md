@@ -10,7 +10,24 @@
 
 ## 2. Core Features & User Flows
 
-### 2.1 API Key Management
+### 2.1 Public Landing Page (Welcome)
+
+**Purpose**: Entry point for unauthenticated users, showcasing the value proposition and team.
+
+**Components**:
+- **Hero Section**: Value proposition and "Get Started" CTA (triggers authentication).
+- **Features Grid**: Quick overview of core capabilities (Transcription, Summaries, Privacy).
+- **Team Section**: Display of 4 key team members with roles and bios.
+- **Authentication Guard**: Automatically displayed for users without an active session.
+
+**Functional Requirements**:
+- Responsive design for mobile and desktop.
+- Access restricted to unauthenticated users (authenticated users redirect to App).
+- Integration with authentication provider (Clerk) for sign-in/sign-up.
+
+---
+
+### 2.2 API Key Management
 
 **Setup Page**
 

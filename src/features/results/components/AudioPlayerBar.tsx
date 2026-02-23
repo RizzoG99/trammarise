@@ -11,9 +11,23 @@ import { formatTime } from '../utils/formatTime';
 interface AudioPlayerBarProps {
   /** Audio file data from session */
   audioFile: AudioFile;
-  /** Optional: External audio player instance (for shared state) */
-  audioPlayer?: ReturnType<typeof useAudioPlayer>;
+  /** Audio player instance (shared state) */
+  audioPlayer: ReturnType<typeof useAudioPlayer>;
+  /** Callback fired whenever WaveSurfer's playback time changes */
+  onTimeUpdate?: (time: number) => void;
 }
+
+/**
+ * Custom memo comparison to prevent re-renders when blob is stable.
+ */
+const arePropsEqual = (prev: AudioPlayerBarProps, next: AudioPlayerBarProps): boolean => {
+  // Compare by blob reference (session-manager will stabilize these)
+  return (
+    prev.audioFile.blob === next.audioFile.blob &&
+    prev.audioPlayer === next.audioPlayer &&
+    prev.onTimeUpdate === next.onTimeUpdate
+  );
+};
 
 /**
  * Sticky audio player bar with waveform visualization and playback controls.
@@ -28,16 +42,14 @@ interface AudioPlayerBarProps {
  * Memoized to prevent unnecessary re-renders.
  *
  * @param audioFile - Audio file from session storage
+ * @param audioPlayer - Audio player instance for playback control
  */
 export const AudioPlayerBar = memo(function AudioPlayerBar({
   audioFile,
-  audioPlayer: externalPlayer,
+  audioPlayer,
+  onTimeUpdate,
 }: AudioPlayerBarProps) {
-  // Use external player if provided, otherwise create internal one
-  const internalPlayer = useAudioPlayer(audioFile);
-  const player = externalPlayer || internalPlayer;
-
-  const { state, togglePlayPause, skipBy, cycleSpeed } = player;
+  const { state, togglePlayPause, skipBy, cycleSpeed } = audioPlayer;
 
   return (
     <div className="w-full bg-[var(--color-surface)] border-b border-[var(--color-border)] shadow-md">
@@ -50,7 +62,7 @@ export const AudioPlayerBar = memo(function AudioPlayerBar({
         {/* Waveform Visualization */}
         <div className="flex-col mb-6 border rounded-xl shadow-lg overflow-hidden">
           <div className="p-6">
-            <WaveformPlayer audioFile={audioFile.blob} />
+            <WaveformPlayer audioFile={audioFile.blob} onTimeUpdate={onTimeUpdate} />
           </div>
         </div>
 
@@ -113,4 +125,4 @@ export const AudioPlayerBar = memo(function AudioPlayerBar({
       </div>
     </div>
   );
-});
+}, arePropsEqual);

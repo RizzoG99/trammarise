@@ -12,6 +12,7 @@ interface ResultPdfDocumentProps {
   transcript: string;
   config: AIConfiguration;
   fileName: string;
+  tier?: 'free' | 'pro' | 'team';
 }
 
 /**

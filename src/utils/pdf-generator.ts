@@ -14,7 +14,8 @@ export async function generatePDF(
   summary: string,
   transcript: string,
   config: AIConfiguration,
-  fileName: string
+  fileName: string,
+  tier: 'free' | 'pro' | 'team' = 'free'
 ): Promise<void> {
   try {
     console.log('📄 Starting PDF generation with @react-pdf/renderer...');
@@ -26,6 +27,7 @@ export async function generatePDF(
         transcript,
         config,
         fileName,
+        tier,
       })
     ).toBlob();
 

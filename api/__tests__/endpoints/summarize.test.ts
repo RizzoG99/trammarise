@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import handler from '../../summarize';
-import { ProviderFactory } from '../../providers/factory';
+import { AIProviderFactory } from '../../providers/ai-factory';
 import { extractPdfText } from '../../utils/pdf-extractor';
 
 interface BusboyMock {
@@ -35,7 +35,60 @@ vi.mock('busboy', () => {
   };
 });
 
-vi.mock('../../providers/factory');
+// Mock authentication and dependencies
+vi.mock('../../middleware/auth', () => ({
+  requireAuth: vi.fn().mockResolvedValue({ userId: 'test-user-123', clerkId: 'clerk_123' }),
+  AuthError: class AuthError extends Error {
+    constructor(
+      message: string,
+      public statusCode: number
+    ) {
+      super(message);
+      this.name = 'AuthError';
+    }
+  },
+}));
+
+vi.mock('../../lib/supabase-admin', () => ({
+  supabaseAdmin: {
+    from: vi.fn().mockReturnValue({
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      single: vi.fn().mockResolvedValue({
+        data: { tier: 'pro' },
+        error: null,
+      }),
+    }),
+    rpc: vi.fn().mockResolvedValue({ error: null }),
+  },
+}));
+
+vi.mock('../../middleware/rate-limit', () => ({
+  rateLimit: vi.fn().mockResolvedValue(undefined),
+  RateLimitError: class RateLimitError extends Error {
+    constructor(
+      message: string,
+      public retryAfter: number
+    ) {
+      super(message);
+      this.name = 'RateLimitError';
+    }
+  },
+  RATE_LIMITS: {
+    SUMMARIZE: { maxRequests: 100, windowMs: 60000 },
+  },
+}));
+
+vi.mock('../../middleware/usage-tracking', () => ({
+  checkQuota: vi.fn().mockResolvedValue({ allowed: true }),
+  trackUsage: vi.fn().mockResolvedValue(undefined),
+}));
+
+vi.mock('../../utils/file-validator', () => ({
+  validatePdfFile: vi.fn().mockReturnValue({ valid: true }),
+}));
+
+vi.mock('../../providers/ai-factory');
 vi.mock('../../utils/pdf-extractor');
 
 describe('Summarize API Endpoint', () => {
@@ -44,7 +97,7 @@ describe('Summarize API Endpoint', () => {
   let mockProvider: { summarize: ReturnType<typeof vi.fn> };
 
   beforeEach(() => {
-    vi.resetAllMocks();
+    vi.clearAllMocks();
 
     req = {
       method: 'POST',
@@ -61,8 +114,8 @@ describe('Summarize API Endpoint', () => {
     mockProvider = {
       summarize: vi.fn().mockResolvedValue('Mock Summary'),
     };
-    vi.mocked(ProviderFactory.getProvider).mockReturnValue(
-      mockProvider as unknown as ReturnType<typeof ProviderFactory.getProvider>
+    vi.mocked(AIProviderFactory.getProvider).mockReturnValue(
+      mockProvider as unknown as ReturnType<typeof AIProviderFactory.getProvider>
     );
   });
 
