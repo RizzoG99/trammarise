@@ -3,9 +3,17 @@ import { render, screen, act } from '@testing-library/react';
 import { ProcessingPage } from './ProcessingPage';
 
 // Mock dependencies
-vi.mock('react-router-dom', () => ({
-  useParams: vi.fn(),
-}));
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual('react-router-dom');
+  return {
+    ...actual,
+    useNavigate: vi.fn(() => vi.fn()),
+    useParams: vi.fn(() => ({ sessionId: 'test-session-id' })),
+    Link: ({ children, to }: { children: React.ReactNode; to: string }) => (
+      <a href={to}>{children}</a>
+    ),
+  };
+});
 
 vi.mock('../../hooks/useSessionStorage', () => ({
   useSessionStorage: vi.fn(),

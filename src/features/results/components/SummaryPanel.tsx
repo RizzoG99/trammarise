@@ -44,7 +44,11 @@ export function SummaryPanel({ summary, structuredSummary }: SummaryPanelProps) 
           </Heading>
           <button
             className="text-sm text-[var(--color-primary)] hover:underline"
-            onClick={() => navigator.clipboard.writeText(summary)}
+            onClick={() => {
+              navigator.clipboard.writeText(summary).catch((err) => {
+                console.warn('Clipboard write failed:', err);
+              });
+            }}
             aria-label={t('results.summary.copyAll')}
           >
             {t('results.summary.copyAll')}

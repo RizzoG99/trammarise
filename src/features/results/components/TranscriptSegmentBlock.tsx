@@ -62,35 +62,46 @@ export const TranscriptSegmentBlock = memo(function TranscriptSegmentBlock({
   return (
     <div
       id={segment.id}
+      onClick={() => onTimestampClick?.(segment.timestampSeconds)}
+      onKeyDown={(e) => {
+        if ((e.key === 'Enter' || e.key === ' ') && onTimestampClick) {
+          e.preventDefault();
+          onTimestampClick(segment.timestampSeconds);
+        }
+      }}
+      tabIndex={onTimestampClick ? 0 : undefined}
+      role={onTimestampClick ? 'button' : undefined}
+      aria-label={onTimestampClick ? `Jump to ${segment.timestamp}` : undefined}
       className={`
         p-4 rounded-lg transition-all
+        ${onTimestampClick ? 'cursor-pointer' : ''}
         ${
           isActive
             ? 'bg-[var(--color-primary)]/10 border-l-4 border-[var(--color-primary)]'
-            : 'hover:bg-[var(--color-surface-hover)]'
+            : 'hover:bg-[var(--color-surface-hover)] hover:shadow-sm'
         }
       `}
     >
       {/* Timestamp & Speaker */}
       <div className="flex items-center gap-3 mb-2">
-        {/* Timestamp Button */}
-        <button
-          onClick={() => onTimestampClick?.(segment.timestampSeconds)}
+        {/* Timestamp Badge (visual only) */}
+        <span
           className="
             px-2 py-1 rounded text-xs font-mono
             bg-[var(--color-primary)]/20 text-[var(--color-primary)]
-            hover:bg-[var(--color-primary)] hover:text-white
-            transition-colors
+            pointer-events-none
           "
-          aria-label={`Seek to ${segment.timestamp}`}
+          aria-hidden="true"
         >
           {segment.timestamp}
-        </button>
+        </span>
 
-        {/* Speaker Label */}
-        <Text variant="caption" className="font-semibold text-[var(--color-text)]">
-          {segment.speaker}
-        </Text>
+        {/* Speaker Label - Only show if speaker exists */}
+        {segment.speaker && (
+          <Text variant="caption" className="font-semibold text-[var(--color-text)]">
+            {segment.speaker}
+          </Text>
+        )}
       </div>
 
       {/* Text Content */}

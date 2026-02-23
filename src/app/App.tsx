@@ -1,8 +1,10 @@
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { lazy, Suspense, useEffect, useState, useCallback } from 'react';
+import { ClerkProvider, useUser } from '@clerk/clerk-react';
 import { AppLayout } from './AppLayout';
 import { ROUTES } from '../types/routing';
-import { LoadingSpinner } from '@/lib';
+import { WelcomePage } from '../pages/WelcomePage';
+
 import { useStorageMonitor, type StorageWarningLevel } from '@/hooks/useStorageMonitor';
 import { StorageWarning } from '@/components/StorageWarning';
 
@@ -34,6 +36,9 @@ const HistoryPage = lazy(() =>
 const DocsPage = lazy(() =>
   import('../pages/DocsPage').then((module) => ({ default: module.DocsPage }))
 );
+const PricingPage = lazy(() =>
+  import('./routes/PricingPage').then((module) => ({ default: module.PricingPage }))
+);
 
 // Placeholder for Configuration page (will be enhanced later)
 import { Heading, Text, GlassCard } from '@/lib';
@@ -55,18 +60,24 @@ function ConfigurationPlaceholder() {
   );
 }
 
-function PageLoader() {
-  return (
-    <div className="flex h-[calc(100vh-200px)] w-full items-center justify-center">
-      <LoadingSpinner size="lg" />
-    </div>
-  );
-}
+import { PageLoader } from '@/lib/components/ui/PageLoader/PageLoader';
 
 import { migrateFromSessionStorage } from '@/utils/session-manager';
 import { HeaderProvider } from '@/context/HeaderContext';
+import { SubscriptionProvider } from '@/context/SubscriptionContext';
+import { OnboardingProvider, useOnboarding } from '@/context/OnboardingContext';
+import { ApiKeyOnboardingModal } from '@/components/modals/ApiKeyOnboardingModal';
 
-function App() {
+// Get Clerk publishable key from environment
+const CLERK_PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || '';
+
+if (!CLERK_PUBLISHABLE_KEY) {
+  console.warn('Missing VITE_CLERK_PUBLISHABLE_KEY. Authentication features will be disabled.');
+}
+
+function AppRoutes() {
+  const { isSignedIn, isLoaded } = useUser();
+  const { needsOnboarding, isCheckingOnboarding, completeOnboarding } = useOnboarding();
   const navigate = useNavigate();
   const [showStorageWarning, setShowStorageWarning] = useState(false);
 
@@ -93,6 +104,27 @@ function App() {
     navigate(ROUTES.HISTORY);
   };
 
+  if (!isLoaded || isCheckingOnboarding) {
+    return <PageLoader />;
+  }
+
+  // If signed in and needs onboarding, block routes except pricing
+  if (isSignedIn && needsOnboarding) {
+    return (
+      <>
+        <ApiKeyOnboardingModal isOpen={true} onComplete={completeOnboarding} />
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            {/* Only allow pricing page during onboarding */}
+            <Route path="/pricing" element={<PricingPage />} />
+            {/* Redirect everything else to home (which will show modal) */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Suspense>
+      </>
+    );
+  }
+
   return (
     <>
       {showStorageWarning && quota && (
@@ -103,47 +135,75 @@ function App() {
           onCleanup={handleCleanup}
         />
       )}
-      <HeaderProvider>
-        <Suspense fallback={<PageLoader />}>
-          <Routes>
-            {/* Dev preview route */}
-            {import.meta.env.DEV && <Route path={ROUTES.PREVIEW} element={<PreviewPage />} />}
-            {/* PDF Debug route */}
-            {import.meta.env.DEV && <Route path="/debug/pdf" element={<PdfPreviewPage />} />}
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
+          {/* Dev preview route */}
+          {import.meta.env.DEV && <Route path={ROUTES.PREVIEW} element={<PreviewPage />} />}
+          {/* PDF Debug route */}
+          {import.meta.env.DEV && <Route path="/debug/pdf" element={<PdfPreviewPage />} />}
 
-            {/* Main app routes with AppLayout wrapper */}
-            <Route element={<AppLayout />}>
-              {/* Home/Upload page with split-screen */}
-              <Route path={ROUTES.HOME} element={<UploadRecordPage />} />
+          {/* Authenticated Routes */}
+          {isSignedIn ? (
+            <>
+              {/* Main app routes with AppLayout wrapper */}
+              <Route element={<AppLayout />}>
+                {/* Home/Upload page with split-screen */}
+                <Route path={ROUTES.HOME} element={<UploadRecordPage />} />
 
-              {/* Audio editing route */}
-              <Route path={ROUTES.AUDIO} element={<AudioEditingPage />} />
+                {/* Audio editing route */}
+                <Route path={ROUTES.AUDIO} element={<AudioEditingPage />} />
 
-              {/* Configuration route */}
-              <Route path={ROUTES.CONFIGURE} element={<ConfigurationPlaceholder />} />
+                {/* Configuration route */}
+                <Route path={ROUTES.CONFIGURE} element={<ConfigurationPlaceholder />} />
 
-              {/* Processing route with step checklist */}
-              <Route path={ROUTES.PROCESSING} element={<ProcessingPage />} />
+                {/* Processing route with step checklist */}
+                <Route path={ROUTES.PROCESSING} element={<ProcessingPage />} />
 
-              {/* Results route */}
-              <Route path={ROUTES.RESULTS} element={<ResultsPage />} />
+                {/* Results route */}
+                <Route path={ROUTES.RESULTS} element={<ResultsPage />} />
 
-              {/* API Key Setup route */}
-              <Route path={ROUTES.SETUP} element={<ApiKeySetupPage />} />
+                {/* API Key Setup route */}
+                <Route path={ROUTES.SETUP} element={<ApiKeySetupPage />} />
 
-              {/* History route */}
-              <Route path={ROUTES.HISTORY} element={<HistoryPage />} />
+                {/* History route */}
+                <Route path={ROUTES.HISTORY} element={<HistoryPage />} />
 
-              {/* Documentation route */}
-              <Route path={ROUTES.DOCS} element={<DocsPage />} />
-            </Route>
+                {/* Documentation route */}
+                <Route path={ROUTES.DOCS} element={<DocsPage />} />
 
-            {/* Redirect unknown routes to home */}
-            <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
-          </Routes>
-        </Suspense>
-      </HeaderProvider>
+                {/* Pricing route */}
+                <Route path="/pricing" element={<PricingPage />} />
+              </Route>
+
+              {/* Redirect unknown routes to home */}
+              <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
+            </>
+          ) : (
+            <>
+              {/* Unauthenticated Routes */}
+              <Route path="/" element={<WelcomePage />} />
+
+              {/* Redirect any other access to Welcome Page */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </>
+          )}
+        </Routes>
+      </Suspense>
     </>
+  );
+}
+
+function App() {
+  return (
+    <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY}>
+      <SubscriptionProvider>
+        <OnboardingProvider>
+          <HeaderProvider>
+            <AppRoutes />
+          </HeaderProvider>
+        </OnboardingProvider>
+      </SubscriptionProvider>
+    </ClerkProvider>
   );
 }
 

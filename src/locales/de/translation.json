@@ -8,7 +8,8 @@
     "cancel": "Abbrechen",
     "back": "Zurück",
     "next": "Weiter",
-    "processing": "Verarbeitung"
+    "processing": "Verarbeitung",
+    "close": "Schließen"
   },
   "nav": {
     "home": "Start",
@@ -16,6 +17,57 @@
     "configure": "Konfigurieren",
     "history": "Verlauf",
     "settings": "Einstellungen"
+  },
+  "userMenu": {
+    "ariaLabel": "Benutzermenü",
+    "menuItems": {
+      "profile": "Profileinstellungen",
+      "apiKeys": "API-Schlüssel",
+      "usage": "Nutzung",
+      "billing": "Nutzung & Abrechnung",
+      "upgrade": "Auf Pro upgraden",
+      "signOut": "Abmelden"
+    },
+    "manageAccount": "Konto verwalten",
+    "tabs": {
+      "profile": "Profil",
+      "apiKeys": "API-Schlüssel",
+      "usage": "Nutzung & Abrechnung"
+    },
+    "profile": {
+      "name": "Vollständiger Name",
+      "email": "E-Mail-Adresse",
+      "memberSince": "Mitglied seit",
+      "managedByClerk": "Profil wird von Clerk-Authentifizierung verwaltet"
+    },
+    "apiKeys": {
+      "openAiKey": "OpenAI API-Schlüssel",
+      "optionalForPaid": "Optional: Verwenden Sie Ihren eigenen API-Schlüssel",
+      "optionalExplanation": "Als zahlender Abonnent können Sie optional Ihren eigenen OpenAI API-Schlüssel bereitstellen, um Kosten zu sparen. Ihre Abonnementminuten werden weiterhin verfolgt.",
+      "showKey": "API-Schlüssel anzeigen",
+      "hideKey": "API-Schlüssel ausblenden",
+      "testConnection": "Verbindung testen",
+      "testing": "Teste...",
+      "connectionSuccess": "✓ Verbindung erfolgreich!",
+      "connectionError": "✗ Verbindung fehlgeschlagen. Bitte überprüfen Sie Ihren API-Schlüssel.",
+      "clear": "Löschen",
+      "securityNotice": "Ihr API-Schlüssel wird sicher in Ihrem Browser gespeichert und niemals an unsere Server gesendet."
+    },
+    "usage": {
+      "freeTier": "Kostenloser Plan",
+      "freeTierDescription": "Sie verwenden den kostenlosen Plan mit BYOK (Bring Your Own Key). Upgraden Sie, um gehostete API und erweiterte Funktionen freizuschalten.",
+      "upgradeTitle": "Mit Pro freischalten:",
+      "benefit1": "Kein API-Schlüssel erforderlich - wir kümmern uns darum",
+      "benefit2": "500 Minuten Transkription pro Monat",
+      "benefit3": "Prioritäts-Verarbeitungswarteschlange",
+      "benefit4": "Erweiterte Funktionen: Sprecher-Diarisierung, Chat",
+      "upgradeToPro": "Auf Pro upgraden",
+      "currentPlan": "Aktueller Plan",
+      "minutesUsed": "Verwendete Minuten",
+      "minutesRemaining": "Minuten verbleiben in diesem Zeitraum",
+      "renewsOn": "Erneuert sich am",
+      "manageSubscription": "Abonnement verwalten"
+    }
   },
   "header": {
     "export": "Exportieren",
@@ -27,6 +79,11 @@
       "editFile": "Dateinamen bearbeiten"
     }
   },
+  "auth": {
+    "signIn": "Anmelden",
+    "signUp": "Registrieren",
+    "signOut": "Abmelden"
+  },
   "home": {
     "title": "Neue Sitzung",
     "subtitle": "Konfigurieren Sie Ihre Transkriptionseinstellungen",
@@ -36,6 +93,8 @@
     "startRecording": "Aufnahme starten",
     "stopRecording": "Stoppen & Speichern",
     "processButton": "Audio verarbeiten",
+    "processingButton": "Verarbeitung...",
+    "processingError": "Fehler beim Speichern der Sitzung. Bitte versuchen Sie es erneut.",
     "audioOnly": "Bitte laden Sie nur Audiodateien hoch",
     "fileTooLarge": "Datei zu groß",
     "maxSize": "Maximale Größe",
@@ -181,6 +240,13 @@
       "outdoor": "Draußen",
       "phone": "Telefon / Digitaler Anruf"
     },
+    "speakerDiarization": {
+      "title": "Sprechererkennung",
+      "description": "Identifizieren und kennzeichnen Sie verschiedene Sprecher im Transkript",
+      "speakersExpected": "Erwartete Anzahl von Sprechern (Optional)",
+      "speakersPlaceholder": "Automatische Erkennung",
+      "speakersHint": "Geben Sie 2-10 Sprecher für bessere Genauigkeit an oder lassen Sie das Feld leer für automatische Erkennung"
+    },
     "meetingType": {
       "title": "Besprechungstyp",
       "options": {
@@ -294,7 +360,8 @@
       "browserOnly": "Schlüssel werden nur in Ihrer Browser-Sitzung gespeichert",
       "neverSaved": "Niemals auf Festplatte oder Cloud gespeichert",
       "clearedOnClose": "Werden gelöscht, wenn Sie die Registerkarte schließen",
-      "recommendLimits": "Wir empfehlen die Verwendung von API-Schlüsseln mit Ausgabenlimits"
+      "recommendLimits": "Wir empfehlen die Verwendung von API-Schlüsseln mit Ausgabenlimits",
+      "transmittedNotStored": "Ihr API-Schlüssel wird über unsere Server übertragen, um Anfragen zu verarbeiten, wird aber niemals gespeichert oder protokolliert"
     }
   },
   "chat": {
@@ -376,7 +443,11 @@
       "title": "Transkript",
       "searchPlaceholder": "Transkript durchsuchen...",
       "noTranscript": "Kein Transkript verfügbar",
-      "matches": "{{current}} von {{total}} Übereinstimmungen"
+      "matches": "{{current}} von {{total}} Übereinstimmungen",
+      "utterances": "Äußerungen",
+      "resultsFound": "Ergebnisse gefunden",
+      "noResults": "Keine Ergebnisse gefunden",
+      "noUtterances": "Keine Äußerungen verfügbar"
     },
     "summary": {
       "title": "Zusammenfassung",
@@ -444,7 +515,15 @@
   },
   "history": {
     "title": "Aufnahmeverlauf",
+    "subtitle": "{{count}} Aufnahmen insgesamt",
     "description": "Verwalten Sie Ihre Aufnahmen und generierten Zusammenfassungen",
+    "searchPlaceholder": "Nach Name oder Inhalt suchen...",
+    "sort": {
+      "newest": "Neueste zuerst",
+      "oldest": "Älteste zuerst",
+      "nameAsc": "Name (A-Z)",
+      "nameDesc": "Name (Z-A)"
+    },
     "dashboard": {
       "totalProcessed": "Gesamt Verarbeitet",
       "topCategory": "Top Kategorie",
@@ -484,6 +563,165 @@
       "selectAll": "Alle auswählen",
       "deselectAll": "Alle abwählen",
       "delete": "Auswahl löschen"
+    },
+    "migration": {
+      "title": "Synchronisieren Sie Ihre Sitzungen",
+      "successTitle": "Sitzungen importiert!",
+      "description": "Importieren Sie Ihre {{count}} lokalen Sitzungen, um sie geräteübergreifend zu synchronisieren und Ihre Arbeit nie zu verlieren.",
+      "successMessage": "Ihre lokalen Sitzungen sind jetzt auf allen Ihren Geräten synchronisiert.",
+      "importButton": "Jetzt importieren",
+      "importing": "Importiere...",
+      "dismissButton": "Vielleicht später"
+    }
+  },
+  "welcome": {
+    "hero": {
+      "newBadge": "✨ Einführung des Liquid Glass Designs",
+      "titlePart1": "Transkribieren & Zusammenfassen",
+      "titlePart2": "In Sekunden",
+      "description": "Verwandeln Sie Ihre Meetings, Vorlesungen und Interviews in umsetzbare Erkenntnisse. Beginnen Sie mit 60 kostenlosen Minuten, upgraden Sie für unbegrenzten Zugang.",
+      "cta": {
+        "primary": "Kostenlose Testversion starten",
+        "secondary": "Preise ansehen",
+        "getStarted": "Kostenlos starten",
+        "viewFeatures": "Funktionen ansehen",
+        "appPreview": "[App-Vorschau-Visualisierung]"
+      },
+      "noCreditCard": "Keine Kreditkarte erforderlich"
+    },
+    "features": {
+      "title": "Leistungsstarke Tools für Audio",
+      "subtitle": "Alles, was Sie brauchen, um Ihre Aufnahmen zu beherrschen.",
+      "cards": {
+        "transcription": {
+          "title": "Kristallklare Transkription",
+          "description": "Laden Sie Dateien hoch oder nehmen Sie direkt auf. Genaue Transkription für zuverlässige Aufzeichnungen mit fortschrittlicher On-Device-Verarbeitung."
+        },
+        "summaries": {
+          "title": "Sofortige KI-Zusammenfassungen",
+          "description": "Erhalten Sie Schlüsselpunkte, Aktionselemente und strukturierte Zusammenfassungen, die automatisch von erstklassigen KI-Modellen generiert werden."
+        },
+        "security": {
+          "title": "Privat & Sicher",
+          "description": "Ihre Daten bleiben Ihre Daten. Client-seitige Verarbeitung gewährleistet maximale Privatsphäre. Kein Audio verlässt Ihr Gerät ohne Erlaubnis."
+        }
+      }
+    },
+    "pricing": {
+      "title": "Einfache, Transparente Preise",
+      "subtitle": "Wählen Sie den Plan, der zu Ihren Bedürfnissen passt",
+      "free": {
+        "name": "Kostenlos",
+        "price": "$0",
+        "interval": "/Monat",
+        "description": "Testen Sie, bevor Sie upgraden",
+        "cta": "Kostenlose Testversion starten"
+      },
+      "pro": {
+        "name": "Pro",
+        "price": "$19",
+        "interval": "/Monat",
+        "badge": "Am beliebtesten",
+        "description": "Für Profis",
+        "cta": "Auf Pro upgraden"
+      },
+      "team": {
+        "name": "Team",
+        "price": "$49",
+        "interval": "/Monat",
+        "description": "Für Teams",
+        "cta": "Vertrieb kontaktieren"
+      },
+      "viewComparison": "Detaillierten Vergleich ansehen"
+    },
+    "cta": {
+      "title": "Bereit, Ihre Produktivität zu steigern?",
+      "description": "Schließen Sie sich Profis an, die jede Woche Stunden mit KI-gestützter Transkription sparen.",
+      "free": "Kostenlose Testversion starten (60 Min)",
+      "pro": "Pro-Funktionen freischalten"
+    },
+    "ctaSection": {
+      "title": "Bereit, Ihren Workflow zu transformieren?",
+      "description": "Treten Sie Tausenden von Benutzern bei, die jede Woche Stunden mit Trammarise sparen.",
+      "button": "Kostenlos starten"
+    },
+    "footer": {
+      "tagline": "KI-gestützte Audio-Transkription und Zusammenfassung",
+      "links": {
+        "docs": "Dokumentation",
+        "pricing": "Preise",
+        "privacy": "Datenschutz",
+        "terms": "Bedingungen",
+        "contact": "Kontakt"
+      },
+      "copyright": "© {{year}} Trammarise. Alle Rechte vorbehalten."
+    }
+  },
+  "pricing": {
+    "title": "Wählen Sie Ihren Plan",
+    "subtitle": "Starten Sie kostenlos mit Ihren eigenen API-Schlüsseln oder upgraden Sie für gehostete KI und Premium-Funktionen",
+    "monthly": "Monatlich",
+    "annual": "Jährlich",
+    "save2Months": "Sparen Sie 2 Monate",
+    "popular": "Am beliebtesten",
+    "loading": "Laden...",
+    "saveAmount": "Sparen Sie ${{amount}}/Jahr",
+    "faq": {
+      "title": "Häufig gestellte Fragen",
+      "freeTrial": {
+        "question": "Wie funktioniert die kostenlose Testversion?",
+        "answer": "Melden Sie sich kostenlos an und erhalten Sie 60 Minuten Transkription pro Monat. Keine Kreditkarte erforderlich. Upgraden Sie jederzeit für mehr Minuten und erweiterte Funktionen."
+      },
+      "byok": {
+        "question": "Was bedeutet BYOK?",
+        "answer": "BYOK (Bring Your Own Key) bedeutet, dass Sie Ihren eigenen OpenAI API-Schlüssel bereitstellen. Dies gibt Ihnen volle Kontrolle und Pay-as-you-go-Preise direkt von OpenAI, ohne monatliche Gebühren."
+      },
+      "cancel": {
+        "question": "Kann ich jederzeit kündigen?",
+        "answer": "Ja! Sie können Ihr Abonnement jederzeit kündigen. Ihr Zugang bleibt bis zum Ende Ihres Abrechnungszeitraums bestehen, und Sie können jederzeit zum kostenlosen BYOK-Tarif wechseln."
+      },
+      "minutes": {
+        "question": "Was passiert, wenn ich meine Minuten überschreite?",
+        "answer": "Sie können jederzeit zusätzliche Credits kaufen. Nicht genutzte Minuten werden nicht übertragen, aber Sie können immer Ihre eigenen API-Schlüssel für unbegrenzte Verarbeitung verwenden."
+      }
+    }
+  },
+  "onboarding": {
+    "modal": {
+      "title": "🔑 Willkommen bei Trammarise",
+      "heading": "Ein weiterer Schritt zum Start",
+      "description": "Um Trammarise zu verwenden, müssen Sie entweder Ihren eigenen OpenAI API-Schlüssel bereitstellen oder auf einen Pro-Plan upgraden.",
+      "option1": {
+        "title": "Option 1: Verwenden Sie Ihren eigenen API-Schlüssel (Kostenlos)",
+        "placeholder": "sk-...",
+        "rememberKey": "Meinen API-Schlüssel merken (verschlüsselt gespeichert)",
+        "continueButton": "Mit API-Schlüssel fortfahren",
+        "saving": "Speichern...",
+        "instructions": {
+          "toggle": "So erhalten Sie einen OpenAI API-Schlüssel",
+          "step1": "Gehen Sie zu platform.openai.com",
+          "step2": "Melden Sie sich an oder erstellen Sie ein Konto",
+          "step3": "Klicken Sie auf \"Neuen geheimen Schlüssel erstellen\"",
+          "step4": "Kopieren Sie den Schlüssel (beginnt mit \"sk-\")",
+          "step5": "Fügen Sie ihn in das obige Feld ein",
+          "note": "💡 Sie zahlen OpenAI direkt für die Nutzung (typischerweise $0.006/Minute für Whisper)"
+        },
+        "errors": {
+          "empty": "Bitte geben Sie Ihren API-Schlüssel ein",
+          "invalidFormat": "Ungültiges API-Schlüssel-Format. OpenAI-Schlüssel beginnen mit \"sk-\"",
+          "saveFailed": "Fehler beim Speichern des API-Schlüssels. Bitte versuchen Sie es erneut."
+        }
+      },
+      "option2": {
+        "title": "Option 2: Auf Pro upgraden",
+        "description": "Erhalten Sie 500 Minuten/Monat mit gehosteter API, Cloud-Sync und Priority-Support.",
+        "button": "Pro-Pläne ansehen →"
+      },
+      "divider": "oder"
+    },
+    "banner": {
+      "message": "Sie sind fast fertig! Schließen Sie das Setup ab, um Trammarise freizuschalten.",
+      "button": "Zurück zum Setup"
     }
   }
 }

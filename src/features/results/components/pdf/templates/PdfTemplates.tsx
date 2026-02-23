@@ -9,7 +9,17 @@ export interface PdfTemplateProps {
   transcript: string;
   config: AIConfiguration;
   fileName: string;
+  tier?: 'free' | 'pro' | 'team';
 }
+
+const Watermark = ({ tier }: { tier?: 'free' | 'pro' | 'team' }) => {
+  if (tier !== 'free') return null;
+  return (
+    <Text style={styles.watermark} fixed>
+      Created with Trammarise Free
+    </Text>
+  );
+};
 
 // Helper to format date
 const formatDate = () =>
@@ -29,9 +39,11 @@ export const DefaultTemplate: React.FC<PdfTemplateProps> = ({
   transcript,
   config,
   fileName,
+  tier,
 }) => (
   <Document>
     <Page size="A4" style={styles.page}>
+      <Watermark tier={tier} />
       <View style={styles.header}>
         <Text style={styles.title}>{fileName || 'Trammarise Summary'}</Text>
         <View style={styles.metadataRow}>
@@ -62,17 +74,17 @@ export const DefaultTemplate: React.FC<PdfTemplateProps> = ({
 
 /**
  * Meeting Template - Emphasizes Action Items and Decisions
- * (In a real app, we might extract action items via regex or separate AI call,
- * here we assume they might be in the summary or we just provide a specific visual structure)
  */
 export const MeetingTemplate: React.FC<PdfTemplateProps> = ({
   summary,
   transcript,
   config,
   fileName,
+  tier,
 }) => (
   <Document>
     <Page size="A4" style={styles.page}>
+      <Watermark tier={tier} />
       <View style={[styles.header, { borderBottomColor: '#2563eb' }]}>
         <Text style={[styles.subtitle, { color: '#2563eb', marginBottom: 0 }]}>MEETING REPORT</Text>
         <Text style={styles.title}>{fileName || 'Meeting Notes'}</Text>
@@ -109,9 +121,11 @@ export const LectureTemplate: React.FC<PdfTemplateProps> = ({
   transcript,
   config,
   fileName,
+  tier,
 }) => (
   <Document>
     <Page size="A4" style={styles.page}>
+      <Watermark tier={tier} />
       <View style={[styles.header, { borderBottomColor: '#7c3aed' }]}>
         <Text style={[styles.subtitle, { color: '#7c3aed' }]}>ACADEMIC NOTE</Text>
         <Text style={styles.title}>{fileName || 'Lecture Notes'}</Text>
@@ -156,9 +170,11 @@ export const InterviewTemplate: React.FC<PdfTemplateProps> = ({
   transcript,
   config,
   fileName,
+  tier,
 }) => (
   <Document>
     <Page size="A4" style={styles.page}>
+      <Watermark tier={tier} />
       <View style={[styles.header, { borderBottomStyle: 'dashed' }]}>
         <Text style={styles.title}>{fileName || 'Interview Transcript'}</Text>
         <Text style={styles.metadata}>

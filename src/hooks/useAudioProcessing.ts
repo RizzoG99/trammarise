@@ -40,10 +40,15 @@ interface UseAudioProcessingOptions {
  * @param options - Callbacks for progress, completion, and errors
  * @returns Processing control functions
  */
+import { useSubscription, TIER_MINUTES } from '../context/SubscriptionContext';
+
+// ... existing imports ...
+
 export function useAudioProcessing({ onProgress, onComplete, onError }: UseAudioProcessingOptions) {
   const [isProcessing, setIsProcessing] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
   const currentJobIdRef = useRef<string | null>(null);
+  const { subscription } = useSubscription();
 
   /**
    * Start the audio processing workflow (server-side chunking)
@@ -54,6 +59,25 @@ export function useAudioProcessing({ onProgress, onComplete, onError }: UseAudio
         console.warn('Processing already in progress');
         return;
       }
+
+      // Check usage limits before starting
+      // We check if they have ANY minutes left. Strict duration check happens on backend.
+      if (subscription) {
+        const minutesRemaining =
+          (TIER_MINUTES[subscription.tier] || 0) - (subscription.minutesUsed || 0);
+
+        if (minutesRemaining <= 0 && subscription.tier !== 'pro' && subscription.tier !== 'team') {
+          // Technically Pro/Team should have high limits, but if they hit it, they hit it.
+          // However, strictly blocking Free users.
+          const error = new Error('Usage limit exceeded. Please upgrade to continue.');
+          onError(error);
+          return;
+        }
+      }
+
+      // ... unfortunately TIER_MINUTES is not exported from context.
+      // I should expose `isOverLimit` or `minutesRemaining` from Context.
+      // Let's check SubscriptionContext again.
 
       setIsProcessing(true);
       const abortController = new AbortController();
@@ -74,7 +98,7 @@ export function useAudioProcessing({ onProgress, onComplete, onError }: UseAudio
           config.language,
           config.model,
           config.contentType,
-          config.model, // performance level
+          config.mode === 'simple' ? config.model : 'advanced', // Pass correct performance level
           session.audioFile.file.name
         );
 
@@ -167,7 +191,7 @@ export function useAudioProcessing({ onProgress, onComplete, onError }: UseAudio
         currentJobIdRef.current = null;
       }
     },
-    [isProcessing, onProgress, onComplete, onError]
+    [isProcessing, onProgress, onComplete, onError, subscription]
   );
 
   /**

@@ -12,21 +12,21 @@ describe('GlassCard', () => {
     it('renders with light variant by default', () => {
       const { container } = render(<GlassCard>Content</GlassCard>);
       const card = container.firstChild as HTMLElement;
-      expect(card).toHaveClass('bg-[var(--glass-bg-light)]');
-      expect(card).toHaveClass('border-[var(--glass-border)]');
+      expect(card).toHaveClass('bg-white/80');
+      expect(card).toHaveClass('border-white/20');
     });
 
     it('renders with dark variant', () => {
       const { container } = render(<GlassCard variant="dark">Content</GlassCard>);
       const card = container.firstChild as HTMLElement;
-      expect(card).toHaveClass('bg-[var(--glass-bg)]');
+      expect(card).toHaveClass('bg-[var(--color-bg-surface)]');
     });
 
     it('renders with primary variant', () => {
       const { container } = render(<GlassCard variant="primary">Content</GlassCard>);
       const card = container.firstChild as HTMLElement;
-      expect(card).toHaveClass('bg-[var(--color-primary-alpha-10)]');
-      expect(card).toHaveClass('border-[var(--color-primary-alpha-20)]');
+      expect(card).toHaveClass('bg-blue-500/10');
+      expect(card).toHaveClass('border-blue-200/50');
     });
 
     it('renders with medium blur by default', () => {
@@ -42,7 +42,7 @@ describe('GlassCard', () => {
     });
 
     it('renders with large blur', () => {
-      const { container} = render(<GlassCard blur="lg">Content</GlassCard>);
+      const { container } = render(<GlassCard blur="lg">Content</GlassCard>);
       const card = container.firstChild as HTMLElement;
       expect(card).toHaveClass('backdrop-blur-lg');
     });
@@ -52,22 +52,22 @@ describe('GlassCard', () => {
     it('applies light variant classes correctly', () => {
       const { container } = render(<GlassCard variant="light">Content</GlassCard>);
       const card = container.firstChild as HTMLElement;
-      expect(card).toHaveClass('bg-[var(--glass-bg-light)]');
-      expect(card).toHaveClass('border-[var(--glass-border)]');
+      expect(card).toHaveClass('bg-white/80');
+      expect(card).toHaveClass('border-white/20');
     });
 
     it('applies dark variant classes correctly', () => {
       const { container } = render(<GlassCard variant="dark">Content</GlassCard>);
       const card = container.firstChild as HTMLElement;
-      expect(card).toHaveClass('bg-[var(--glass-bg)]');
-      expect(card).toHaveClass('border-[var(--glass-border)]');
+      expect(card).toHaveClass('bg-[var(--color-bg-surface)]');
+      expect(card).toHaveClass('border-[var(--color-border)]');
     });
 
     it('applies primary variant classes correctly', () => {
       const { container } = render(<GlassCard variant="primary">Content</GlassCard>);
       const card = container.firstChild as HTMLElement;
-      expect(card).toHaveClass('bg-[var(--color-primary-alpha-10)]');
-      expect(card).toHaveClass('border-[var(--color-primary-alpha-20)]');
+      expect(card).toHaveClass('bg-blue-500/10');
+      expect(card).toHaveClass('border-blue-200/50');
     });
   });
 
@@ -136,17 +136,12 @@ describe('GlassCard', () => {
 
     it('combines className, style, variant, and blur', () => {
       const { container } = render(
-        <GlassCard 
-          variant="primary" 
-          blur="lg" 
-          className="max-w-md" 
-          style={{ margin: '1rem' }}
-        >
+        <GlassCard variant="primary" blur="lg" className="max-w-md" style={{ margin: '1rem' }}>
           Content
         </GlassCard>
       );
       const card = container.firstChild as HTMLElement;
-      expect(card).toHaveClass('bg-[var(--color-primary-alpha-10)]');
+      expect(card).toHaveClass('bg-blue-500/10');
       expect(card).toHaveClass('backdrop-blur-lg');
       expect(card).toHaveClass('max-w-md');
       expect(card).toHaveStyle({ margin: '1rem' });

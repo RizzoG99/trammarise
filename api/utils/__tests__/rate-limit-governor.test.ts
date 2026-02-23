@@ -45,6 +45,7 @@ describe('Rate Limit Governor', () => {
     });
 
     it('should process requests in priority order', async () => {
+      vi.useFakeTimers();
       const executionOrder: number[] = [];
 
       const promises = [

@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import type { LanguageCode } from '../../../types/languages';
 import { LANGUAGE_OPTIONS } from '../../../types/languages';
-import { Text } from '@/lib';
+import { Select } from '@/lib/components/ui';
 
 export interface LanguageSelectorProps {
   value: LanguageCode;
@@ -11,31 +11,17 @@ export interface LanguageSelectorProps {
 export function LanguageSelector({ value, onChange }: LanguageSelectorProps) {
   const { t } = useTranslation();
 
+  const options = LANGUAGE_OPTIONS.map((option) => ({
+    value: option.value,
+    label: t(`configuration.language.options.${option.value}`),
+  }));
+
   return (
-    <div>
-      <label htmlFor="language-select" className="block mb-2">
-        <Text variant="body" color="primary" className="font-medium">
-          {t('configuration.language.title')}
-        </Text>
-      </label>
-      <select
-        id="language-select"
-        value={value}
-        onChange={(e) => onChange(e.target.value as LanguageCode)}
-        className="
-          w-full px-4 py-3 rounded-lg
-          bg-[var(--color-bg-surface)] border border-border
-          text-text-primary
-          focus:outline-none focus:border-primary
-          transition-colors
-        "
-      >
-        {LANGUAGE_OPTIONS.map((option) => (
-          <option key={option.value} value={option.value}>
-            {t(`configuration.language.options.${option.value}`)}
-          </option>
-        ))}
-      </select>
-    </div>
+    <Select
+      label={t('configuration.language.title')}
+      value={value}
+      onChange={(val) => onChange(val as LanguageCode)}
+      options={options}
+    />
   );
 }

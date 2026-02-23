@@ -223,7 +223,7 @@ describe('POST /api/transcribe-job/[jobId]/cancel', () => {
       });
     });
 
-    it('should return 404 for non-existent job ID', async () => {
+    it('should return 403 for non-existent job ID (ownership check)', async () => {
       const req = {
         method: 'POST',
         query: { jobId: 'non-existent-id' },
@@ -233,9 +233,12 @@ describe('POST /api/transcribe-job/[jobId]/cancel', () => {
 
       await handler(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(404);
+      // With auth enabled, validateOwnership returns false for non-existent jobs
+      // causing 403 (Access Denied) instead of 404 (Not Found)
+      expect(res.status).toHaveBeenCalledWith(403);
       expect(res.json).toHaveBeenCalledWith({
-        error: 'Job not found',
+        error: 'Access denied',
+        message: 'You do not have permission to cancel this job',
       });
     });
 

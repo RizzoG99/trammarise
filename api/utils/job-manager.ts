@@ -18,6 +18,7 @@ import type {
   JobStatusResponse,
 } from '../types/job';
 import type { ChunkMetadata } from '../types/chunking';
+import type { Utterance } from '../types/provider';
 import { JOB_SAFEGUARDS } from '../types/job';
 
 /**
@@ -53,12 +54,13 @@ class JobManagerClass {
       totalRetries: 0,
       chunkingSplits: 0,
       lastUpdated: new Date(),
+      userId: config.userId, // Store userId for ownership validation
     };
 
     this.jobs.set(jobId, job);
 
     console.log(
-      `[Job Manager] Created job ${jobId} (mode: ${config.mode}, duration: ${metadata.duration.toFixed(2)}s)`
+      `[Job Manager] Created job ${jobId} (mode: ${config.mode}, duration: ${metadata.duration.toFixed(2)}s, userId: ${config.userId || 'none'})`
     );
 
     return job;
@@ -161,6 +163,35 @@ class JobManagerClass {
   }
 
   /**
+   * Set job utterances (for speaker diarization)
+   */
+  setJobUtterances(jobId: string, utterances: Utterance[]): void {
+    const job = this.jobs.get(jobId);
+    if (!job) {
+      throw new Error(`Job ${jobId} not found`);
+    }
+
+    job.utterances = utterances;
+    job.lastUpdated = new Date();
+  }
+
+  /**
+   * Set job segments (Whisper API segments for accurate syncing)
+   */
+  setJobSegments(
+    jobId: string,
+    segments: Array<{ text: string; start: number; end: number; id: number }>
+  ): void {
+    const job = this.jobs.get(jobId);
+    if (!job) {
+      throw new Error(`Job ${jobId} not found`);
+    }
+
+    job.segments = segments;
+    job.lastUpdated = new Date();
+  }
+
+  /**
    * Delete a job
    */
   deleteJob(jobId: string): void {
@@ -201,6 +232,14 @@ class JobManagerClass {
 
     if (job.transcript) {
       response.transcript = job.transcript;
+    }
+
+    if (job.utterances) {
+      response.utterances = job.utterances;
+    }
+
+    if (job.segments) {
+      response.segments = job.segments;
     }
 
     if (job.error) {
@@ -282,6 +321,27 @@ class JobManagerClass {
    */
   getJobCount(): number {
     return this.jobs.size;
+  }
+
+  /**
+   * Validate that a user owns a job
+   *
+   * @param jobId - Job ID to check
+   * @param userId - User ID to validate
+   * @returns true if user owns the job, false otherwise
+   */
+  validateOwnership(jobId: string, userId: string): boolean {
+    const job = this.jobs.get(jobId);
+    if (!job) {
+      return false;
+    }
+
+    // If job has no userId, allow access (backward compatibility)
+    if (!job.userId) {
+      return true;
+    }
+
+    return job.userId === userId;
   }
 }
 
