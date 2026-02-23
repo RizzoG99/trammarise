@@ -729,5 +729,73 @@
       "message": "¡Ya casi estás! Completa la configuración para desbloquear Trammarise.",
       "button": "Volver a Configuración"
     }
+  },
+  "onboarding": {
+    "title": "Bienvenido a Trammarise",
+    "subtitle": "Configuremos todo en unos pasos",
+    "step1": {
+      "title": "¿Cómo usarás Trammarise?",
+      "subtitle": "Elige tu caso de uso principal para personalizar la experiencia"
+    },
+    "step2": {
+      "title": "Conecta tu clave API",
+      "subtitle": "Tu clave se guarda de forma segura solo en la sesión del navegador"
+    },
+    "step3": {
+      "title": "Elige tu plan",
+      "subtitle": "Empieza gratis, actualiza cuando quieras"
+    },
+    "navigation": {
+      "back": "Atrás",
+      "next": "Siguiente",
+      "skip": "Omitir por ahora",
+      "finish": "Comenzar"
+    },
+    "steps": {
+      "useCase": "Caso de uso",
+      "apiSetup": "Configuración API",
+      "plan": "Plan"
+    }
+  },
+  "account": {
+    "title": "Cuenta y Configuración",
+    "navigation": {
+      "profile": "Perfil",
+      "billing": "Facturación",
+      "apiKeys": "Claves API",
+      "notifications": "Notificaciones"
+    },
+    "profile": {
+      "title": "Perfil",
+      "displayName": "Nombre de visualización",
+      "email": "Correo electrónico",
+      "saveChanges": "Guardar cambios",
+      "saved": "¡Guardado!",
+      "memberSince": "Miembro desde"
+    },
+    "billing": {
+      "title": "Facturación y uso",
+      "currentPlan": "Plan actual",
+      "usage": "Uso este mes",
+      "upgrade": "Mejorar plan",
+      "cancelSubscription": "Cancelar suscripción",
+      "billingHistory": "Historial de facturación",
+      "minutesUsed": "{{used}} / {{limit}} minutos usados"
+    },
+    "apiKeys": {
+      "title": "Claves API",
+      "openai": "Clave API de OpenAI",
+      "openrouter": "Clave API de OpenRouter",
+      "updateKey": "Actualizar clave",
+      "removeKey": "Eliminar clave",
+      "keyStored": "Clave guardada solo en la sesión"
+    },
+    "notifications": {
+      "title": "Notificaciones",
+      "emailUpdates": "Actualizaciones y anuncios del producto",
+      "usageAlerts": "Alertas de límite de uso",
+      "transcriptionComplete": "Notificaciones de transcripción completada",
+      "save": "Guardar preferencias"
+    }
   }
 }

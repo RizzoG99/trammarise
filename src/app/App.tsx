@@ -39,6 +39,12 @@ const DocsPage = lazy(() =>
 const PricingPage = lazy(() =>
   import('./routes/PricingPage').then((module) => ({ default: module.PricingPage }))
 );
+const OnboardingPage = lazy(() =>
+  import('./routes/OnboardingPage').then((module) => ({ default: module.OnboardingPage }))
+);
+const AccountBillingPage = lazy(() =>
+  import('./routes/AccountBillingPage').then((module) => ({ default: module.AccountBillingPage }))
+);
 
 // Placeholder for Configuration page (will be enhanced later)
 import { Heading, Text, GlassCard } from '@/lib';
@@ -66,7 +72,7 @@ import { migrateFromSessionStorage } from '@/utils/session-manager';
 import { HeaderProvider } from '@/context/HeaderContext';
 import { SubscriptionProvider } from '@/context/SubscriptionContext';
 import { OnboardingProvider, useOnboarding } from '@/context/OnboardingContext';
-import { ApiKeyOnboardingModal } from '@/components/modals/ApiKeyOnboardingModal';
+// ApiKeyOnboardingModal replaced by OnboardingPage route redirect
 
 // Get Clerk publishable key from environment
 const CLERK_PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || '';
@@ -77,7 +83,7 @@ if (!CLERK_PUBLISHABLE_KEY) {
 
 function AppRoutes() {
   const { isSignedIn, isLoaded } = useUser();
-  const { needsOnboarding, isCheckingOnboarding, completeOnboarding } = useOnboarding();
+  const { needsOnboarding, isCheckingOnboarding } = useOnboarding();
   const navigate = useNavigate();
   const [showStorageWarning, setShowStorageWarning] = useState(false);
 
@@ -108,20 +114,19 @@ function AppRoutes() {
     return <PageLoader />;
   }
 
-  // If signed in and needs onboarding, block routes except pricing
+  // If signed in and needs onboarding, redirect to onboarding page
   if (isSignedIn && needsOnboarding) {
     return (
-      <>
-        <ApiKeyOnboardingModal isOpen={true} onComplete={completeOnboarding} />
-        <Suspense fallback={<PageLoader />}>
-          <Routes>
-            {/* Only allow pricing page during onboarding */}
-            <Route path="/pricing" element={<PricingPage />} />
-            {/* Redirect everything else to home (which will show modal) */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </Suspense>
-      </>
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
+          {/* Onboarding wizard */}
+          <Route path={ROUTES.ONBOARDING} element={<OnboardingPage />} />
+          {/* Allow pricing page during onboarding */}
+          <Route path="/pricing" element={<PricingPage />} />
+          {/* Redirect everything else to onboarding */}
+          <Route path="*" element={<Navigate to={ROUTES.ONBOARDING} replace />} />
+        </Routes>
+      </Suspense>
     );
   }
 
@@ -173,6 +178,9 @@ function AppRoutes() {
 
                 {/* Pricing route */}
                 <Route path="/pricing" element={<PricingPage />} />
+
+                {/* Account & Billing route */}
+                <Route path={ROUTES.ACCOUNT} element={<AccountBillingPage />} />
               </Route>
 
               {/* Redirect unknown routes to home */}

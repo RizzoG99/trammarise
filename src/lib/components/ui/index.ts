@@ -60,3 +60,19 @@ export type { BadgeProps } from './Badge';
 // Select
 export { Select } from './Select';
 export type { SelectProps, SelectOption, SelectGroup } from './Select';
+
+// NavigationSidebar
+export { NavigationSidebar } from './NavigationSidebar';
+export type { NavigationSidebarProps, NavItem } from './NavigationSidebar';
+
+// StepIndicator
+export { StepIndicator } from './StepIndicator';
+export type { StepIndicatorProps, Step } from './StepIndicator';
+
+// Tooltip
+export { Tooltip } from './Tooltip';
+export type { TooltipProps, TooltipPlacement } from './Tooltip';
+
+// PricingCard
+export { PricingCard } from './PricingCard';
+export type { PricingCardProps, PricingPlan } from './PricingCard';

@@ -729,5 +729,73 @@
       "message": "Sie sind fast fertig! Schließen Sie das Setup ab, um Trammarise freizuschalten.",
       "button": "Zurück zum Setup"
     }
+  },
+  "onboarding": {
+    "title": "Willkommen bei Trammarise",
+    "subtitle": "Richten Sie alles in wenigen Schritten ein",
+    "step1": {
+      "title": "Wie werden Sie Trammarise nutzen?",
+      "subtitle": "Wählen Sie Ihren primären Anwendungsfall"
+    },
+    "step2": {
+      "title": "API-Schlüssel verbinden",
+      "subtitle": "Ihr Schlüssel wird nur in der Browser-Sitzung gespeichert"
+    },
+    "step3": {
+      "title": "Plan wählen",
+      "subtitle": "Kostenlos starten, jederzeit upgraden"
+    },
+    "navigation": {
+      "back": "Zurück",
+      "next": "Weiter",
+      "skip": "Überspringen",
+      "finish": "Loslegen"
+    },
+    "steps": {
+      "useCase": "Anwendungsfall",
+      "apiSetup": "API Setup",
+      "plan": "Plan"
+    }
+  },
+  "account": {
+    "title": "Konto & Einstellungen",
+    "navigation": {
+      "profile": "Profil",
+      "billing": "Abrechnung",
+      "apiKeys": "API-Schlüssel",
+      "notifications": "Benachrichtigungen"
+    },
+    "profile": {
+      "title": "Profil",
+      "displayName": "Anzeigename",
+      "email": "E-Mail",
+      "saveChanges": "Änderungen speichern",
+      "saved": "Gespeichert!",
+      "memberSince": "Mitglied seit"
+    },
+    "billing": {
+      "title": "Abrechnung & Nutzung",
+      "currentPlan": "Aktueller Plan",
+      "usage": "Nutzung diesen Monat",
+      "upgrade": "Plan upgraden",
+      "cancelSubscription": "Abonnement kündigen",
+      "billingHistory": "Abrechnungsverlauf",
+      "minutesUsed": "{{used}} / {{limit}} Minuten genutzt"
+    },
+    "apiKeys": {
+      "title": "API-Schlüssel",
+      "openai": "OpenAI API-Schlüssel",
+      "openrouter": "OpenRouter API-Schlüssel",
+      "updateKey": "Schlüssel aktualisieren",
+      "removeKey": "Schlüssel entfernen",
+      "keyStored": "Schlüssel nur in Sitzung gespeichert"
+    },
+    "notifications": {
+      "title": "Benachrichtigungen",
+      "emailUpdates": "Produkt-Updates & Ankündigungen",
+      "usageAlerts": "Nutzungslimit-Warnungen",
+      "transcriptionComplete": "Transkription abgeschlossen",
+      "save": "Einstellungen speichern"
+    }
   }
 }

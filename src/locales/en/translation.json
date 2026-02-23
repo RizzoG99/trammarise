@@ -728,5 +728,73 @@
       "message": "You're almost there! Complete setup to unlock Trammarise.",
       "button": "Back to Setup"
     }
+  },
+  "onboarding": {
+    "title": "Welcome to Trammarise",
+    "subtitle": "Let's get you set up in a few steps",
+    "step1": {
+      "title": "How will you use Trammarise?",
+      "subtitle": "Choose your primary use case so we can tailor the experience"
+    },
+    "step2": {
+      "title": "Connect your API key",
+      "subtitle": "Your key is stored securely in your browser session only"
+    },
+    "step3": {
+      "title": "Choose your plan",
+      "subtitle": "Start free, upgrade anytime"
+    },
+    "navigation": {
+      "back": "Back",
+      "next": "Next",
+      "skip": "Skip for now",
+      "finish": "Get Started"
+    },
+    "steps": {
+      "useCase": "Use Case",
+      "apiSetup": "API Setup",
+      "plan": "Plan"
+    }
+  },
+  "account": {
+    "title": "Account & Settings",
+    "navigation": {
+      "profile": "Profile",
+      "billing": "Billing",
+      "apiKeys": "API Keys",
+      "notifications": "Notifications"
+    },
+    "profile": {
+      "title": "Profile",
+      "displayName": "Display Name",
+      "email": "Email",
+      "saveChanges": "Save Changes",
+      "saved": "Saved!",
+      "memberSince": "Member since"
+    },
+    "billing": {
+      "title": "Billing & Usage",
+      "currentPlan": "Current Plan",
+      "usage": "Usage this month",
+      "upgrade": "Upgrade Plan",
+      "cancelSubscription": "Cancel Subscription",
+      "billingHistory": "Billing History",
+      "minutesUsed": "{{used}} / {{limit}} minutes used"
+    },
+    "apiKeys": {
+      "title": "API Keys",
+      "openai": "OpenAI API Key",
+      "openrouter": "OpenRouter API Key",
+      "updateKey": "Update Key",
+      "removeKey": "Remove Key",
+      "keyStored": "Key stored in session only"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "emailUpdates": "Product updates & announcements",
+      "usageAlerts": "Usage limit alerts",
+      "transcriptionComplete": "Transcription complete notifications",
+      "save": "Save Preferences"
+    }
   }
 }

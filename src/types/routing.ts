@@ -56,6 +56,8 @@ export const ROUTES = {
   DOCS: '/docs',
   PRICING: '/pricing',
   PREVIEW: '/preview', // Dev only
+  ONBOARDING: '/onboarding',
+  ACCOUNT: '/account',
 } as const;
 
 /**
