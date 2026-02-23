@@ -46,7 +46,8 @@ export const TranscriptSegmentBlock = memo(function TranscriptSegmentBlock({
       return segment.text;
     }
 
-    const parts = segment.text.split(new RegExp(`(${searchQuery})`, 'gi'));
+    const escaped = searchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const parts = segment.text.split(new RegExp(`(${escaped})`, 'gi'));
     return parts.map((part, index) => {
       if (part.toLowerCase() === searchQuery.toLowerCase()) {
         return (
