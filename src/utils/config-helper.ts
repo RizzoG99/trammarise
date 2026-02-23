@@ -27,8 +27,12 @@ export function buildDefaultConfiguration(session: SessionData): AIConfiguration
     .withProvider(provider)
     .withModel(model)
     .withOpenAIKey(openaiKey)
-    .withLanguage(session.language)
     .withContentType(session.contentType);
+
+  // Skip language when 'auto' or empty — Whisper auto-detects in that case
+  if (session.language && (session.language as string) !== 'auto') {
+    builder.withLanguage(session.language);
+  }
 
   // Add context files if they exist
   if (session.contextFiles && session.contextFiles.length > 0) {

@@ -10,6 +10,7 @@ import { SummaryPanel } from '../../features/results/components/SummaryPanel';
 import { SearchableTranscript } from '../../features/results/components/SearchableTranscript';
 import { SpeakerTranscriptView } from '../../features/results/components/SpeakerTranscriptView';
 import { FloatingChatButton } from '../../features/results/components/FloatingChatButton';
+import { ExportPDFDialog } from '../../features/results/components/ExportPDFDialog';
 import { useHeader, useHeaderConfig } from '../../hooks/useHeader';
 import { useAudioPlayer } from '../../features/results/hooks/useAudioPlayer';
 import {
@@ -53,7 +54,9 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
   onUpdateResult,
 }) => {
   const [isLoadingChat, setIsLoadingChat] = useState(false);
+  const [waveformTime, setWaveformTime] = useState(0);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
   const [isPdfGenerating, setIsPdfGenerating] = useState(false);
   const [pdfError, setPdfError] = useState<string | null>(null);
   const [pdfSuccess, setPdfSuccess] = useState(false);
@@ -88,15 +91,15 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
     return parseTranscriptToSegments(result.transcript, hasDiarization);
   }, [result.transcript, result.segments, hasDiarization]);
 
-  // Find active segment based on current audio time
+  // Find active segment based on waveform playback time (driven by WaveSurfer)
   const activeSegmentId = useMemo(() => {
-    const currentTime = audioPlayer.state.currentTime;
+    const currentTime = waveformTime;
     const activeSegment = transcriptSegments.find((seg, index, arr) => {
       const nextTime = arr[index + 1]?.timestampSeconds ?? Infinity;
       return currentTime >= seg.timestampSeconds && currentTime < nextTime;
     });
     return activeSegment?.id;
-  }, [audioPlayer.state.currentTime, transcriptSegments]);
+  }, [waveformTime, transcriptSegments]);
 
   // Handle timestamp click to seek audio
   const handleTimestampClick = (timestampSeconds: number) => {
@@ -175,57 +178,69 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
     }
   };
 
-  const handleDownloadPDF = useCallback(async () => {
-    console.log('📥 Starting PDF generation...');
+  const handleDownloadPDF = useCallback(
+    async (fileNameOverride?: string) => {
+      console.log('📥 Starting PDF generation...');
 
-    setIsPdfGenerating(true);
-    setPdfError(null);
-    setPdfSuccess(false);
+      setIsPdfGenerating(true);
+      setPdfError(null);
+      setPdfSuccess(false);
 
-    try {
-      // Use client-side PDF generation with @react-pdf/renderer
-      // Dynamically import to reduce bundle size (1.6MB+)
-      const { generatePDF } = await import('../../utils/pdf-generator');
-      await generatePDF(
-        result.summary,
-        result.transcript,
-        result.configuration,
-        fileName,
-        userTier
-      );
+      try {
+        // Use client-side PDF generation with @react-pdf/renderer
+        // Dynamically import to reduce bundle size (1.6MB+)
+        const { generatePDF } = await import('../../utils/pdf-generator');
+        const effectiveFileName = fileNameOverride ?? fileName;
+        await generatePDF(
+          result.summary,
+          result.transcript,
+          result.configuration,
+          effectiveFileName,
+          userTier
+        );
 
-      console.log('✅ PDF downloaded successfully');
-      setPdfSuccess(true);
+        console.log('✅ PDF downloaded successfully');
+        setPdfSuccess(true);
 
-      // Auto-dismiss success message after 3 seconds
-      setTimeout(() => setPdfSuccess(false), 3000);
+        // Auto-dismiss success message after 3 seconds
+        setTimeout(() => setPdfSuccess(false), 3000);
 
-      // For free users, show upgrade modal to remove watermark
-      if (userTier === 'free') {
-        setTimeout(() => {
-          setUpgradeTrigger('watermark_remove');
-          setIsUpgradeModalOpen(true);
-        }, 2000);
+        // For free users, show upgrade modal to remove watermark
+        if (userTier === 'free') {
+          setTimeout(() => {
+            setUpgradeTrigger('watermark_remove');
+            setIsUpgradeModalOpen(true);
+          }, 2000);
+        }
+      } catch (error) {
+        console.error('❌ PDF generation error:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+        setPdfError(`Failed to generate PDF: ${errorMessage}`);
+      } finally {
+        setIsPdfGenerating(false);
       }
-    } catch (error) {
-      console.error('❌ PDF generation error:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-      setPdfError(`Failed to generate PDF: ${errorMessage}`);
-    } finally {
-      setIsPdfGenerating(false);
-    }
-  }, [result.summary, result.transcript, result.configuration, fileName, userTier]);
+    },
+    [result.summary, result.transcript, result.configuration, fileName, userTier]
+  );
 
-  // Sync header configuration
+  const handleOpenExportDialog = useCallback(() => setIsExportDialogOpen(true), []);
+
+  // Sync header configuration — Export button opens the dialog
   useHeaderConfig({
     initialFileName: audioName.replace(/\.[^/.]+$/, ''),
-    onExport: handleDownloadPDF,
+    onExport: handleOpenExportDialog,
   });
 
   return (
     <>
       <ResultsLayout
-        audioPlayer={<AudioPlayerBar audioFile={audioFile} audioPlayer={audioPlayer} />}
+        audioPlayer={
+          <AudioPlayerBar
+            audioFile={audioFile}
+            audioPlayer={audioPlayer}
+            onTimeUpdate={setWaveformTime}
+          />
+        }
         summaryPanel={<SummaryPanel summary={result.summary} />}
         transcriptPanel={
           result.utterances && result.utterances.length > 0 ? (
@@ -262,6 +277,21 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
             </Modal>
           )
         }
+      />
+
+      {/* Export PDF Dialog */}
+      <ExportPDFDialog
+        isOpen={isExportDialogOpen}
+        onClose={() => setIsExportDialogOpen(false)}
+        initialFileName={fileName}
+        onExport={(name) => {
+          setIsExportDialogOpen(false);
+          void handleDownloadPDF(name);
+        }}
+        isExporting={isPdfGenerating}
+        summary={result.summary}
+        transcript={result.transcript}
+        config={result.configuration}
       />
 
       {/* Upgrade Modal */}

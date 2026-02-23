@@ -13,6 +13,8 @@ interface AudioPlayerBarProps {
   audioFile: AudioFile;
   /** Audio player instance (shared state) */
   audioPlayer: ReturnType<typeof useAudioPlayer>;
+  /** Callback fired whenever WaveSurfer's playback time changes */
+  onTimeUpdate?: (time: number) => void;
 }
 
 /**
@@ -20,7 +22,11 @@ interface AudioPlayerBarProps {
  */
 const arePropsEqual = (prev: AudioPlayerBarProps, next: AudioPlayerBarProps): boolean => {
   // Compare by blob reference (session-manager will stabilize these)
-  return prev.audioFile.blob === next.audioFile.blob && prev.audioPlayer === next.audioPlayer;
+  return (
+    prev.audioFile.blob === next.audioFile.blob &&
+    prev.audioPlayer === next.audioPlayer &&
+    prev.onTimeUpdate === next.onTimeUpdate
+  );
 };
 
 /**
@@ -41,6 +47,7 @@ const arePropsEqual = (prev: AudioPlayerBarProps, next: AudioPlayerBarProps): bo
 export const AudioPlayerBar = memo(function AudioPlayerBar({
   audioFile,
   audioPlayer,
+  onTimeUpdate,
 }: AudioPlayerBarProps) {
   const { state, togglePlayPause, skipBy, cycleSpeed } = audioPlayer;
 
@@ -55,7 +62,7 @@ export const AudioPlayerBar = memo(function AudioPlayerBar({
         {/* Waveform Visualization */}
         <div className="flex-col mb-6 border rounded-xl shadow-lg overflow-hidden">
           <div className="p-6">
-            <WaveformPlayer audioFile={audioFile.blob} />
+            <WaveformPlayer audioFile={audioFile.blob} onTimeUpdate={onTimeUpdate} />
           </div>
         </div>
 
