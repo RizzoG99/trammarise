@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Transcription Failed | Trammarise</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#067ff9",
+            "background-light": "#f5f7f8",
+            "background-dark": "#101622", // Deep Charcoal
+            "slate-glass": "#1E293B", // Slate for glass cards
+            "error-red": "#EF4444",
+          },
+          fontFamily: {
+            "display": ["Space Grotesk", "sans-serif"]
+          },
+          borderRadius: {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "2xl": "1rem",
+            "full": "9999px"
+          },
+        },
+      },
+    }
+  </script>
+<style>
+    body {
+      background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 0);
+      background-size: 24px 24px;
+    }
+    .glass-effect {
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .error-glow {
+      box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+    }
+  </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
+<!-- Header: Sticky minimal glass bar -->
+<header class="sticky top-0 z-50 w-full glass-effect border-b border-white/10 px-6 py-4">
+<div class="max-w-7xl mx-auto flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="bg-primary p-1.5 rounded-lg">
+<svg class="w-5 h-5 text-white" fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M6 6H42L36 24L42 42H6L12 24L6 6Z" fill="currentColor"></path>
+</svg>
+</div>
+<span class="text-xl font-bold tracking-tight">Trammarise</span>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-white/5 rounded-lg transition-colors">
+<span class="material-symbols-outlined text-slate-400">notifications</span>
+</button>
+<div class="h-8 w-8 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center overflow-hidden">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="User profile avatar icon" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2kou7enKfbABzvsyaLGCzy7FzmBsBI4gQVkj1LPjIvUDjKI4dAJef3K8aR7GjkveVMrmYVxN9lhnt0sTG6iENN8HuQXPMgeZ-N3_bf6qZ3PtBWZO1iOKQhwKlXFSvIeky3gWfswGH1WVZ_U2XapK-drmo5dvI28W3b0G0es2jAYKPrHSFm9GkSM4uo7boosbCBslfz6bhZwIl2GgwOguD7wOhLyMUxMTCQ5CxRAkptC4eWmtp0MnwP1OT51KKQlAupVojePxGOaid"/>
+</div>
+</div>
+</div>
+</header>
+<main class="flex-grow flex flex-col items-center justify-center p-6 gap-6">
+<!-- Centered Error Card -->
+<div class="w-full max-w-lg glass-effect rounded-2xl p-8 flex flex-col items-center text-center shadow-2xl">
+<!-- Pulsing Error Icon -->
+<div class="relative mb-6">
+<div class="absolute inset-0 bg-error-red/20 rounded-full animate-ping scale-150 opacity-20"></div>
+<div class="size-20 bg-error-red rounded-full flex items-center justify-center error-glow relative z-10">
+<span class="material-symbols-outlined text-white text-5xl font-bold">close</span>
+</div>
+</div>
+<h1 class="text-3xl font-bold text-white mb-2 tracking-tight">Transcription Failed</h1>
+<!-- File metadata pill -->
+<div class="inline-flex items-center gap-2 bg-white/5 border border-white/10 px-4 py-1.5 rounded-full mb-8">
+<span class="material-symbols-outlined text-sm text-slate-400">audio_file</span>
+<span class="text-sm font-medium text-slate-300">team-standup-2024-03.mp3 · 48:23</span>
+</div>
+<!-- Error Message Box -->
+<div class="w-full bg-slate-900/50 border-l-2 border-error-red rounded-r-lg p-5 text-left mb-8">
+<div class="flex items-center justify-between mb-2">
+<span class="text-[10px] uppercase tracking-widest font-bold text-error-red bg-error-red/10 px-2 py-0.5 rounded">API Error 401</span>
+</div>
+<p class="text-slate-200 text-sm leading-relaxed">
+          Your OpenAI API key is invalid or expired. Please check your key and credits in the dashboard to resume processing.
+        </p>
+</div>
+<!-- Action Stack -->
+<div class="w-full flex flex-col gap-3">
+<button class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-primary/20">
+          Update API Key
+        </button>
+<button class="w-full bg-white/5 hover:bg-white/10 text-white font-semibold py-3.5 rounded-xl border border-white/10 transition-all">
+          Try Again with Same Key
+        </button>
+<button class="w-full text-slate-400 hover:text-white text-sm font-medium py-2 transition-colors">
+          Contact Support
+        </button>
+</div>
+</div>
+<!-- Common Causes Panel -->
+<div class="w-full max-w-lg glass-effect rounded-2xl p-6">
+<h3 class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-4 text-center">Common Causes</h3>
+<div class="grid grid-cols-3 gap-4">
+<div class="flex flex-col items-center text-center gap-2">
+<div class="size-10 rounded-lg bg-white/5 flex items-center justify-center">
+<span class="material-symbols-outlined text-slate-400 text-xl">event_busy</span>
+</div>
+<span class="text-[10px] text-slate-500 font-medium leading-tight">Expired Key</span>
+</div>
+<div class="flex flex-col items-center text-center gap-2">
+<div class="size-10 rounded-lg bg-white/5 flex items-center justify-center">
+<span class="material-symbols-outlined text-slate-400 text-xl">payments</span>
+</div>
+<span class="text-[10px] text-slate-500 font-medium leading-tight">Low Credits</span>
+</div>
+<div class="flex flex-col items-center text-center gap-2">
+<div class="size-10 rounded-lg bg-white/5 flex items-center justify-center">
+<span class="material-symbols-outlined text-slate-400 text-xl">spellcheck</span>
+</div>
+<span class="text-[10px] text-slate-500 font-medium leading-tight">Wrong Format (sk-)</span>
+</div>
+</div>
+</div>
+<!-- Footer link -->
+<a class="flex items-center gap-2 text-slate-500 hover:text-primary transition-colors text-sm font-medium" href="#">
+<span class="material-symbols-outlined text-base">arrow_back</span>
+      Back to Upload
+    </a>
+</main>
+<footer class="p-8 text-center">
+<p class="text-slate-600 text-xs">© 2024 Trammarise AI. All rights reserved.</p>
+</footer>
+</body></html>

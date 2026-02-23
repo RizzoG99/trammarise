@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Bulk Delete Confirmation | Trammarise</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ef4343",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#101622",
+                        "slate-panel": "rgba(30, 41, 59, 0.7)",
+                        "slate-recessed": "rgba(15, 23, 42, 0.5)",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-blur {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .bg-mesh {
+            background-color: #101622;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(239, 67, 67, 0.05) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(30, 41, 59, 0.2) 0px, transparent 50%);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen overflow-hidden">
+<!-- Background Layer (Blurred History Page) -->
+<div class="fixed inset-0 z-0 overflow-hidden filter blur-sm brightness-[0.3]">
+<div class="max-w-6xl mx-auto px-6 py-8">
+<header class="flex items-center justify-between mb-12 opacity-50">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-3xl">fluid</span>
+<span class="text-xl font-bold tracking-tight">Trammarise</span>
+</div>
+<div class="flex items-center gap-6">
+<div class="h-10 w-64 bg-slate-800 rounded-lg"></div>
+<div class="h-10 w-10 bg-slate-800 rounded-full"></div>
+</div>
+</header>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Session Card 1 (Selected) -->
+<div class="bg-slate-800/40 border-2 border-primary/50 p-5 rounded-xl relative">
+<div class="absolute top-4 right-4 h-6 w-6 bg-blue-500 rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-sm">check</span>
+</div>
+<div class="h-32 bg-slate-700/50 rounded-lg mb-4" data-alt="Abstract waveform visualization on dark background"></div>
+<div class="h-4 w-3/4 bg-slate-600 rounded mb-2"></div>
+<div class="h-3 w-1/4 bg-slate-700 rounded"></div>
+</div>
+<!-- Session Card 2 (Selected) -->
+<div class="bg-slate-800/40 border-2 border-primary/50 p-5 rounded-xl relative">
+<div class="absolute top-4 right-4 h-6 w-6 bg-blue-500 rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-sm">check</span>
+</div>
+<div class="h-32 bg-slate-700/50 rounded-lg mb-4" data-alt="Abstract audio levels pattern"></div>
+<div class="h-4 w-3/4 bg-slate-600 rounded mb-2"></div>
+<div class="h-3 w-1/4 bg-slate-700 rounded"></div>
+</div>
+<!-- Session Card 3 (Selected) -->
+<div class="bg-slate-800/40 border-2 border-primary/50 p-5 rounded-xl relative">
+<div class="absolute top-4 right-4 h-6 w-6 bg-blue-500 rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-sm">check</span>
+</div>
+<div class="h-32 bg-slate-700/50 rounded-lg mb-4" data-alt="Geometric purple and red gradient pattern"></div>
+<div class="h-4 w-3/4 bg-slate-600 rounded mb-2"></div>
+<div class="h-3 w-1/4 bg-slate-700 rounded"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Modal Overlay -->
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[2px] p-4">
+<!-- Glass Confirmation Card -->
+<div class="w-full max-w-[448px] bg-slate-panel glass-blur rounded-xl shadow-2xl border border-white/10 border-t-primary/60 border-t-2 flex flex-col overflow-hidden">
+<div class="p-8 pb-6 flex flex-col items-center text-center">
+<!-- Warning Header -->
+<div class="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mb-6 ring-8 ring-primary/5">
+<span class="material-symbols-outlined text-primary text-4xl" style="font-variation-settings: 'FILL' 1">warning</span>
+</div>
+<h2 class="text-2xl font-bold dark:text-slate-100 mb-2">Delete 3 sessions?</h2>
+<p class="text-slate-400 text-base">This action cannot be undone.</p>
+</div>
+<!-- Recessed Item List -->
+<div class="px-8 mb-6">
+<div class="bg-slate-recessed rounded-lg border border-white/5 divide-y divide-white/5">
+<!-- Row 1 -->
+<div class="flex items-center gap-3 p-3">
+<span class="material-symbols-outlined text-slate-400 text-xl">audio_file</span>
+<span class="text-sm font-medium text-slate-200 flex-1 truncate">team-standup-2024-03.mp3</span>
+<span class="px-2 py-0.5 rounded-full bg-slate-800 text-[10px] font-bold text-slate-400 border border-white/5">45:02</span>
+</div>
+<!-- Row 2 -->
+<div class="flex items-center gap-3 p-3">
+<span class="material-symbols-outlined text-slate-400 text-xl">description</span>
+<span class="text-sm font-medium text-slate-200 flex-1 truncate">client-interview-v2.wav</span>
+<span class="px-2 py-0.5 rounded-full bg-slate-800 text-[10px] font-bold text-slate-400 border border-white/5">12:30</span>
+</div>
+<!-- Row 3 -->
+<div class="flex items-center gap-3 p-3">
+<span class="material-symbols-outlined text-slate-400 text-xl">audio_file</span>
+<span class="text-sm font-medium text-slate-200 flex-1 truncate">sprint-retro.mp3</span>
+<span class="px-2 py-0.5 rounded-full bg-slate-800 text-[10px] font-bold text-slate-400 border border-white/5">32:15</span>
+</div>
+</div>
+<p class="mt-3 text-[12px] text-slate-500 flex items-center gap-1.5 px-1">
+<span class="material-symbols-outlined text-[14px]">info</span>
+                    Also removes AI summaries and transcripts
+                </p>
+</div>
+<!-- Action Stack -->
+<div class="px-8 pb-8 flex flex-col gap-3">
+<button class="w-full h-12 bg-primary hover:bg-primary/90 text-white font-semibold rounded-lg flex items-center justify-center gap-2 transition-colors shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-xl">delete_forever</span>
+                    Delete 3 sessions
+                </button>
+<button class="w-full h-12 bg-transparent hover:bg-white/5 text-slate-300 font-medium rounded-lg transition-colors">
+                    Cancel
+                </button>
+</div>
+<!-- Footer -->
+<div class="bg-black/20 py-3 px-8 text-center">
+<p class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold">
+                    Deleted sessions cannot be recovered
+                </p>
+</div>
+</div>
+</div>
+</body></html>

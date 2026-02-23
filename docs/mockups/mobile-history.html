@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Transcription History - Trammarise</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#256af4",
+                        "background-light": "#f5f6f8",
+                        "background-dark": "#101622",
+                        "slate-glass": "rgba(30, 41, 59, 0.7)",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .glass-blur {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex justify-center">
+<!-- Mobile Container (390px Viewport) -->
+<div class="w-full max-w-[390px] min-h-screen flex flex-col bg-background-light dark:bg-background-dark relative overflow-hidden">
+<!-- Sticky Header -->
+<header class="sticky top-0 z-30 glass-blur bg-white/70 dark:bg-slate-glass border-b border-primary/10 px-4 pt-6 pb-4">
+<div class="flex items-center justify-between mb-4">
+<h2 class="text-2xl font-bold tracking-tight">History</h2>
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-primary/10 text-primary border border-primary/20">
+<span class="material-symbols-outlined text-xl">tune</span>
+</button>
+</div>
+<!-- Search Bar -->
+<div class="relative group">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-slate-400">search</span>
+</div>
+<input class="w-full bg-white/50 dark:bg-background-dark/50 border border-primary/20 rounded-full py-3 pl-10 pr-10 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-sm font-medium" placeholder="Search transcriptions..." type="text" value="team stand"/>
+<button class="absolute inset-y-0 right-0 pr-3 flex items-center">
+<span class="material-symbols-outlined text-slate-400 text-lg">cancel</span>
+</button>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-1 pb-24">
+<!-- Horizontal Filter Pills -->
+<div class="flex gap-2 px-4 py-4 overflow-x-auto no-scrollbar">
+<button class="flex-none px-5 py-2 rounded-full bg-primary text-white text-sm font-semibold transition-all">All</button>
+<button class="flex-none px-5 py-2 rounded-full bg-primary/10 border border-primary/20 text-slate-400 dark:text-slate-300 text-sm font-medium">This week</button>
+<button class="flex-none px-5 py-2 rounded-full bg-primary/10 border border-primary/20 text-slate-400 dark:text-slate-300 text-sm font-medium">Meetings</button>
+<button class="flex-none px-5 py-2 rounded-full bg-primary/10 border border-primary/20 text-slate-400 dark:text-slate-300 text-sm font-medium">Podcasts</button>
+<button class="flex-none px-5 py-2 rounded-full bg-primary/10 border border-primary/20 text-slate-400 dark:text-slate-300 text-sm font-medium">By duration</button>
+</div>
+<!-- Date Group: Today -->
+<section class="mt-2">
+<h3 class="px-6 text-xs font-bold uppercase tracking-widest text-slate-500 mb-3">Today</h3>
+<!-- Card 1 -->
+<div class="px-4 mb-3">
+<div class="bg-white/50 dark:bg-slate-glass border border-primary/5 rounded-2xl p-4 glass-blur relative group active:scale-[0.98] transition-all">
+<div class="flex justify-between items-start mb-2">
+<div class="flex-1 pr-4">
+<h4 class="font-bold text-base leading-tight mb-1">team-standup-2024-03<span class="text-slate-500 font-normal">.mp3</span></h4>
+<p class="text-xs text-slate-500 dark:text-slate-400 font-medium">48:23 • Meeting • 2 hours ago</p>
+</div>
+<span class="material-symbols-outlined text-slate-400 mt-1">chevron_right</span>
+</div>
+<div class="flex flex-wrap gap-2 mt-3">
+<span class="px-3 py-1 bg-primary/20 text-primary text-[10px] font-bold rounded-full uppercase tracking-wider">Action Items</span>
+<span class="px-3 py-1 bg-slate-700/50 text-slate-300 text-[10px] font-bold rounded-full uppercase tracking-wider">Alex Chen</span>
+</div>
+</div>
+</div>
+<!-- Card 2: Swiped State Simulation -->
+<div class="mb-3 relative overflow-hidden h-[100px]">
+<!-- Delete Action Layer (Background) -->
+<div class="absolute inset-0 bg-[#EF4444] flex items-center justify-end px-6">
+<div class="flex flex-col items-center gap-1 text-white">
+<span class="material-symbols-outlined">delete</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter">Delete</span>
+</div>
+</div>
+<!-- Content Card (Shifted Left) -->
+<div class="absolute inset-0 bg-white/50 dark:bg-slate-glass border border-primary/5 rounded-2xl mx-4 p-4 glass-blur -translate-x-20 transition-transform">
+<div class="flex justify-between items-start">
+<div class="flex-1 pr-4">
+<h4 class="font-bold text-base leading-tight mb-1">product-demo-recording<span class="text-slate-500 font-normal">.mp3</span></h4>
+<p class="text-xs text-slate-500 dark:text-slate-400 font-medium">31:07 • Interview • Yesterday</p>
+</div>
+</div>
+<div class="flex flex-wrap gap-2 mt-3">
+<span class="px-3 py-1 bg-emerald-500/20 text-emerald-400 text-[10px] font-bold rounded-full uppercase tracking-wider">High Confidence</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Date Group: This Week -->
+<section class="mt-6">
+<h3 class="px-6 text-xs font-bold uppercase tracking-widest text-slate-500 mb-3">This Week</h3>
+<!-- Card 3 -->
+<div class="px-4 mb-3">
+<div class="bg-white/50 dark:bg-slate-glass border border-primary/5 rounded-2xl p-4 glass-blur relative active:scale-[0.98] transition-all">
+<div class="flex justify-between items-start">
+<div class="flex-1 pr-4">
+<h4 class="font-bold text-base leading-tight mb-1">client-call-onboarding<span class="text-slate-500 font-normal">.m4a</span></h4>
+<p class="text-xs text-slate-500 dark:text-slate-400 font-medium">12:15 • Call • 3 days ago</p>
+</div>
+<span class="material-symbols-outlined text-slate-400 mt-1">chevron_right</span>
+</div>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="px-4 mb-3">
+<div class="bg-white/50 dark:bg-slate-glass border border-primary/5 rounded-2xl p-4 glass-blur relative active:scale-[0.98] transition-all">
+<div class="flex justify-between items-start">
+<div class="flex-1 pr-4">
+<h4 class="font-bold text-base leading-tight mb-1">weekly-planning<span class="text-slate-500 font-normal">.mp3</span></h4>
+<p class="text-xs text-slate-500 dark:text-slate-400 font-medium">55:40 • Planning • 5 days ago</p>
+</div>
+<span class="material-symbols-outlined text-slate-400 mt-1">chevron_right</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Date Group: Last Month -->
+<section class="mt-6">
+<h3 class="px-6 text-xs font-bold uppercase tracking-widest text-slate-500 mb-3">Last Month</h3>
+<!-- Card 5 -->
+<div class="px-4 mb-3">
+<div class="bg-white/50 dark:bg-slate-glass border border-primary/5 rounded-2xl p-4 glass-blur relative active:scale-[0.98] transition-all">
+<div class="flex justify-between items-start">
+<div class="flex-1 pr-4">
+<h4 class="font-bold text-base leading-tight mb-1">podcast-episode-12<span class="text-slate-500 font-normal">.mp3</span></h4>
+<p class="text-xs text-slate-500 dark:text-slate-400 font-medium">01:12:45 • Podcast • April 12</p>
+</div>
+<span class="material-symbols-outlined text-slate-400 mt-1">chevron_right</span>
+</div>
+<div class="flex flex-wrap gap-2 mt-3">
+<span class="px-3 py-1 bg-amber-500/20 text-amber-400 text-[10px] font-bold rounded-full uppercase tracking-wider">Needs Edit</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Fixed Bottom Navigation Bar -->
+<nav class="fixed bottom-0 w-full max-w-[390px] glass-blur bg-white/70 dark:bg-slate-glass border-t border-primary/10 px-6 py-4 pb-8 flex justify-between items-center">
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-medium">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">history</span>
+<span class="text-[10px] font-bold">History</span>
+</a>
+<!-- Center CTA -->
+<div class="relative -top-8">
+<button class="w-14 h-14 bg-primary text-white rounded-full flex items-center justify-center shadow-lg shadow-primary/40 border-4 border-background-light dark:border-background-dark">
+<span class="material-symbols-outlined text-2xl">mic</span>
+</button>
+</div>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">folder</span>
+<span class="text-[10px] font-medium">Library</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px] font-medium">Settings</span>
+</a>
+</nav>
+<!-- Visual iOS Home Indicator -->
+<div class="fixed bottom-1 left-1/2 -translate-x-1/2 w-32 h-1 bg-slate-300 dark:bg-slate-700 rounded-full z-50"></div>
+</div>
+</body></html>

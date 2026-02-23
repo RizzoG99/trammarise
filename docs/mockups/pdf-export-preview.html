@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Desktop PDF Export Preview - Trammarise</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0a47c2",
+                        "background-light": "#f5f6f8",
+                        "background-dark": "#101622",
+                        "glass-slate": "rgba(30, 41, 59, 0.7)",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-effect {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            background-color: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.2);
+            border-radius: 10px;
+        }
+        .document-shadow {
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+        .download-glow:hover {
+            box-shadow: 0 0 15px rgba(10, 71, 194, 0.6);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 h-screen flex flex-col overflow-hidden">
+<!-- Header: 56px sticky glass bar -->
+<header class="h-[56px] sticky top-0 z-50 glass-effect flex items-center justify-between px-6 border-b border-white/5">
+<div class="flex items-center gap-2">
+<div class="size-8 bg-primary rounded flex items-center justify-center text-white">
+<span class="material-symbols-outlined font-bold">text_fields</span>
+</div>
+<h2 class="text-lg font-bold tracking-tight text-white">Trammarise</h2>
+</div>
+<div class="flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-800/50 border border-white/10">
+<div class="size-2 rounded-full bg-primary animate-pulse"></div>
+<span class="text-xs font-medium text-slate-300">Project_Sync_Transcript.pdf</span>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 rounded-full hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined text-slate-300">dark_mode</span>
+</button>
+<div class="size-8 rounded-full bg-slate-700 overflow-hidden border border-white/10">
+<img class="w-full h-full object-cover" data-alt="User avatar profile picture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAsxxIUUC5vycdwblihmEGP6O3zeunwNgBDQoe2DSJX6JSqN4peMkgX8gA4EIr1Co5DmbnsLcZv_Gpv0pXJmq1Hk3UR_UoSYIxjO8RywzDStxbGqqaqjgk27VXcDnQR5bFWuoopi8AexuTF4LliaFLN0NxqtHqR57as5uPDn4-s9z_5eV_8O-6LfCHPcjUucrrEqC6CG3UrO5b0ZuE--Kx8FjmG0x7oLTvN2qTQARr87xJWwMPHE789L79x_rUOUUaO9n-296D6UB7C"/>
+</div>
+</div>
+</header>
+<!-- Context Banner: 40px blue-tinted strip -->
+<div class="h-[40px] bg-primary/10 border-b border-primary/20 flex items-center justify-between px-6">
+<button class="flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary/80 transition-colors">
+<span class="material-symbols-outlined text-sm">arrow_back</span>
+            Back to results
+        </button>
+<div class="flex items-center gap-2 text-xs font-medium text-slate-400">
+<span class="material-symbols-outlined text-sm">visibility</span>
+            Preview before exporting
+        </div>
+</div>
+<!-- Main Split Layout -->
+<main class="flex flex-1 overflow-hidden">
+<!-- Left Panel: Independent scrollable dark document viewer -->
+<section class="w-[65%] bg-slate-950/50 overflow-y-auto custom-scrollbar flex justify-center py-12 px-8">
+<div class="w-full max-w-[800px] bg-white rounded-sm document-shadow p-16 relative min-h-[1100px] text-slate-800">
+<!-- Document Header -->
+<div class="flex justify-between items-start mb-12">
+<div class="flex items-center gap-3">
+<div class="size-10 bg-primary flex items-center justify-center text-white font-bold text-xl rounded-sm">T</div>
+<div>
+<p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Document Report</p>
+<h1 class="text-lg font-bold text-slate-900">Project_Sync_Transcript.pdf</h1>
+</div>
+</div>
+<div class="text-right text-[10px] text-slate-400 uppercase tracking-tighter leading-tight">
+                        Date: Oct 24, 2023<br/>
+                        Ref: TR-992-PX
+                    </div>
+</div>
+<!-- Watermark -->
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
+<span class="text-slate-100 text-7xl font-black uppercase -rotate-45 select-none opacity-40">Trammarise Free</span>
+</div>
+<!-- Document Body -->
+<div class="space-y-8 relative z-10">
+<section>
+<h3 class="text-primary text-xs font-black tracking-[0.2em] uppercase mb-3">Executive Summary</h3>
+<p class="text-sm leading-relaxed text-slate-600">
+                            The meeting focused on the final review of the UI design components and the refinement of the audio processing pipeline. Key stakeholders discussed the implementation of the "Glass-Aesthetic" interface and confirmed the timeline for the Q4 release.
+                        </p>
+</section>
+<section>
+<h3 class="text-primary text-xs font-black tracking-[0.2em] uppercase mb-3">Key Points</h3>
+<ul class="space-y-2">
+<li class="flex items-start gap-3 text-sm text-slate-600">
+<span class="size-1.5 rounded-full bg-primary mt-1.5 shrink-0"></span>
+                                Finalize the export module including the preview functionality.
+                            </li>
+<li class="flex items-start gap-3 text-sm text-slate-600">
+<span class="size-1.5 rounded-full bg-primary mt-1.5 shrink-0"></span>
+                                Improve the background noise reduction algorithm for lecture templates.
+                            </li>
+<li class="flex items-start gap-3 text-sm text-slate-600">
+<span class="size-1.5 rounded-full bg-primary mt-1.5 shrink-0"></span>
+                                Review the user feedback regarding the watermark placement.
+                            </li>
+</ul>
+</section>
+<section>
+<h3 class="text-primary text-xs font-black tracking-[0.2em] uppercase mb-3">Action Items</h3>
+<div class="space-y-2">
+<div class="flex items-center gap-3 text-sm text-slate-600 border-l-2 border-slate-100 pl-4 py-1">
+<span class="material-symbols-outlined text-primary text-base">check_box_outline_blank</span>
+                                Update Export Preview UI components.
+                            </div>
+<div class="flex items-center gap-3 text-sm text-slate-600 border-l-2 border-slate-100 pl-4 py-1">
+<span class="material-symbols-outlined text-primary text-base">check_box_outline_blank</span>
+                                Refine Glass Aesthetic CSS properties.
+                            </div>
+</div>
+</section>
+<section>
+<h3 class="text-primary text-xs font-black tracking-[0.2em] uppercase mb-4">Transcript</h3>
+<div class="space-y-4">
+<div class="flex gap-4">
+<span class="text-[10px] font-mono text-primary font-bold w-12 pt-1">[00:12]</span>
+<div class="flex-1">
+<p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Speaker: Sarah Connor</p>
+<p class="text-sm leading-relaxed text-slate-700">"Let's start the review of the current audio processing stack. We need to ensure that the latency remains below 200ms for real-time transcription."</p>
+</div>
+</div>
+<div class="flex gap-4">
+<span class="text-[10px] font-mono text-primary font-bold w-12 pt-1">[01:45]</span>
+<div class="flex-1">
+<p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Speaker: John Doe</p>
+<p class="text-sm leading-relaxed text-slate-700">"Agreed. I've also implemented the new glass-morphism panels in the export sidebar. It looks much cleaner than the previous iteration."</p>
+</div>
+</div>
+</div>
+</section>
+</div>
+<div class="mt-24 pt-8 border-t border-slate-100 flex justify-between items-center opacity-50">
+<p class="text-[10px] text-slate-400">Generated by Trammarise AI Transcription Service</p>
+<p class="text-[10px] text-slate-400">Page 1 of 12</p>
+</div>
+</div>
+</section>
+<!-- Right Panel: Glass sidebar -->
+<aside class="w-[35%] max-w-[320px] flex flex-col glass-effect border-l border-white/5 h-full">
+<!-- Scrollable Settings Zone -->
+<div class="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-8">
+<div>
+<h3 class="text-lg font-bold text-white mb-4">Export PDF</h3>
+<p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Select Template</p>
+<div class="grid grid-cols-2 gap-3">
+<button class="flex flex-col items-center justify-center p-4 rounded-lg bg-primary text-white border border-primary transition-all">
+<span class="material-symbols-outlined mb-2">article</span>
+<span class="text-xs font-medium">Default</span>
+</button>
+<button class="flex flex-col items-center justify-center p-4 rounded-lg bg-slate-800/50 text-slate-400 border border-white/5 hover:bg-slate-700/50 transition-all">
+<span class="material-symbols-outlined mb-2">groups</span>
+<span class="text-xs font-medium">Meeting</span>
+</button>
+<button class="flex flex-col items-center justify-center p-4 rounded-lg bg-slate-800/50 text-slate-400 border border-white/5 hover:bg-slate-700/50 transition-all">
+<span class="material-symbols-outlined mb-2">mic_external_on</span>
+<span class="text-xs font-medium">Interview</span>
+</button>
+<button class="flex flex-col items-center justify-center p-4 rounded-lg bg-slate-800/50 text-slate-400 border border-white/5 hover:bg-slate-700/50 transition-all">
+<span class="material-symbols-outlined mb-2">school</span>
+<span class="text-xs font-medium">Lecture</span>
+</button>
+</div>
+</div>
+<!-- Amber warning card -->
+<div class="bg-amber-900/20 border border-amber-500/30 rounded-lg p-4 flex gap-3">
+<span class="material-symbols-outlined text-amber-500 shrink-0">warning</span>
+<div>
+<p class="text-xs text-amber-200/90 leading-tight">Your export includes the 'Trammarise Free' watermark.</p>
+<a class="text-xs font-bold text-amber-500 hover:text-amber-400 transition-colors mt-1 block" href="#">Upgrade to remove</a>
+</div>
+</div>
+<!-- FILE NAME section -->
+<div class="space-y-2">
+<p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">File Name</p>
+<div class="relative">
+<input class="w-full bg-slate-900 border-white/10 rounded-lg py-3 pl-4 pr-12 text-sm text-white focus:ring-primary focus:border-primary" type="text" value="Project_Sync_Transcript"/>
+<span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 text-xs font-medium">.pdf</span>
+</div>
+</div>
+<!-- Settings placeholder -->
+<div class="pt-4 border-t border-white/5">
+<div class="flex items-center justify-between mb-4">
+<span class="text-sm text-slate-300">Include timestamps</span>
+<div class="w-10 h-5 bg-primary rounded-full relative">
+<div class="absolute right-0.5 top-0.5 size-4 bg-white rounded-full"></div>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-sm text-slate-300">Speaker labels</span>
+<div class="w-10 h-5 bg-primary rounded-full relative">
+<div class="absolute right-0.5 top-0.5 size-4 bg-white rounded-full"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Sidebar Footer: Sticky full-width -->
+<div class="p-6 border-t border-white/5 bg-slate-900/40 space-y-3">
+<button class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-3.5 rounded-lg flex items-center justify-center gap-2 transition-all download-glow">
+<span class="material-symbols-outlined text-xl">download</span>
+                    Download PDF
+                </button>
+<button class="w-full bg-transparent hover:bg-white/5 text-slate-400 text-sm font-medium py-2 rounded-lg transition-colors">
+                    Cancel
+                </button>
+</div>
+</aside>
+</main>
+</body></html>

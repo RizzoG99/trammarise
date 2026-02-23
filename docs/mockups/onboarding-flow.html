@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Account &amp; Billing - Trammarise</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#256af4",
+                        "background-light": "#f5f6f8",
+                        "background-dark": "#101622",
+                        "glass-slate": "rgba(30, 41, 59, 0.6)",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-panel {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased selection:bg-primary/30">
+<!-- Sticky Glass Header -->
+<header class="sticky top-0 z-50 w-full glass-panel bg-white/70 dark:bg-background-dark/70 border-b border-slate-200 dark:border-white/10">
+<div class="max-w-[1440px] mx-auto px-6 h-16 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="bg-primary p-1.5 rounded-lg shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-white block">waves</span>
+</div>
+<h1 class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Trammarise</h1>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden md:flex items-center gap-1 bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
+<span class="material-symbols-outlined text-primary text-sm">verified</span>
+<span class="text-primary text-xs font-bold uppercase tracking-wider">Pro Plan</span>
+</div>
+<div class="relative group cursor-pointer">
+<div class="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center border-2 border-primary/40 ring-2 ring-transparent group-hover:ring-primary/20 transition-all overflow-hidden">
+<span class="text-sm font-bold text-slate-700 dark:text-slate-300">GR</span>
+</div>
+<div class="absolute -bottom-1 -right-1 bg-primary text-white text-[8px] font-black px-1 rounded-sm shadow-sm">PRO</div>
+</div>
+</div>
+</div>
+</header>
+<main class="max-w-[1440px] mx-auto px-6 py-8 flex gap-8">
+<!-- Left Sidebar Navigation -->
+<aside class="w-64 flex-shrink-0 hidden lg:block">
+<nav class="space-y-1 sticky top-24">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg transition-colors group" href="#">
+<span class="material-symbols-outlined text-[22px]">person</span>
+<span class="text-sm font-medium">Profile</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-primary/10 text-primary rounded-lg transition-colors border-l-4 border-primary" href="#">
+<span class="material-symbols-outlined text-[22px]">payments</span>
+<span class="text-sm font-bold">Billing &amp; Plan</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">key</span>
+<span class="text-sm font-medium">API Keys</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">notifications</span>
+<span class="text-sm font-medium">Notifications</span>
+</a>
+<div class="pt-4 mt-4 border-t border-slate-200 dark:border-white/5">
+<a class="flex items-center gap-3 px-4 py-3 text-rose-500 hover:bg-rose-500/10 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">report</span>
+<span class="text-sm font-medium">Danger Zone</span>
+</a>
+</div>
+</nav>
+</aside>
+<!-- Right Content Area -->
+<section class="flex-1 space-y-6">
+<div class="mb-8">
+<h2 class="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">Billing &amp; Plan</h2>
+<p class="text-slate-500 dark:text-slate-400 mt-1">Manage your subscription, view usage, and download invoices.</p>
+</div>
+<div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+<!-- Current Plan Card -->
+<div class="glass-panel dark:bg-glass-slate bg-white p-6 rounded-xl flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-6">
+<div>
+<p class="text-xs font-bold text-primary uppercase tracking-widest mb-1">Your current plan</p>
+<h3 class="text-2xl font-bold text-slate-900 dark:text-white">Pro Plan</h3>
+</div>
+<span class="bg-emerald-500/10 text-emerald-500 text-[10px] font-bold px-2 py-1 rounded flex items-center gap-1 border border-emerald-500/20">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                ACTIVE
+                            </span>
+</div>
+<div class="space-y-1">
+<p class="text-3xl font-bold text-slate-900 dark:text-white">$12<span class="text-sm font-normal text-slate-400">/month</span></p>
+<p class="text-sm text-slate-500 dark:text-slate-400">Renews automatically on Oct 12, 2023</p>
+</div>
+</div>
+<div class="mt-8 flex gap-3">
+<button class="flex-1 bg-primary hover:bg-primary/90 text-white font-bold py-2.5 px-4 rounded-lg transition-all shadow-lg shadow-primary/20 text-sm">
+                            Manage Plan
+                        </button>
+<button class="px-4 py-2.5 border border-rose-500/20 text-rose-500 font-medium hover:bg-rose-500/10 rounded-lg transition-all text-sm">
+                            Cancel
+                        </button>
+</div>
+</div>
+<!-- Payment Method Card -->
+<div class="glass-panel dark:bg-glass-slate bg-white p-6 rounded-xl flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-center mb-6">
+<p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Payment Method</p>
+<button class="text-primary text-xs font-bold hover:underline">Update</button>
+</div>
+<div class="flex items-center gap-4 bg-slate-900/5 dark:bg-white/5 p-4 rounded-lg border border-slate-200 dark:border-white/5">
+<div class="w-12 h-8 bg-slate-800 rounded flex items-center justify-center p-1 overflow-hidden">
+<img class="h-4" data-alt="Visa credit card logo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-F9t4VgDePl1LP8uSX0p6ySUiK1In_Dr24CHlSyXkQam25N6rKXB1F41s1ZB1JLFHeJapFyj85RO1rsfgyA8V7UNKWGH2xzYetGY8QS1BXDlOQVCwwm51ONgTQ9K5fLkEmGHGj4-teYmn2GSTCZ4KZYWD6VRxNjJ3MjjtMkGWaEtu24LldCbRVCXkQTzOrBiRRUOdbbTUbr044r6t0StB48uHbrhgrZ6Z5hEQIdXnIjzcQ1MqMV1KDXSvtE8VLqCrKxKtREvkf4Oe"/>
+</div>
+<div>
+<p class="text-sm font-bold text-slate-900 dark:text-white">Visa •••• 1234</p>
+<p class="text-xs text-slate-500 dark:text-slate-400">Expires 12/26</p>
+</div>
+</div>
+</div>
+<div class="mt-6">
+<p class="text-[11px] text-slate-400 leading-relaxed italic">
+                            Your payment is secured with industry-standard encryption. Payments are processed via Stripe.
+                        </p>
+</div>
+</div>
+</div>
+<!-- Usage Card -->
+<div class="glass-panel dark:bg-glass-slate bg-white p-8 rounded-xl">
+<div class="flex items-center justify-between mb-8">
+<h3 class="text-lg font-bold text-slate-900 dark:text-white">Usage this month</h3>
+<span class="text-xs text-slate-500 dark:text-slate-400">Cycle ends in 14 days</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+<!-- Transcription hours -->
+<div class="space-y-3">
+<div class="flex justify-between items-end">
+<span class="text-sm font-medium text-slate-400">Transcription</span>
+<span class="text-sm font-bold text-slate-900 dark:text-white">4.2h <span class="text-slate-400 font-normal">/ Unlimited</span></span>
+</div>
+<div class="h-2 w-full bg-slate-200 dark:bg-white/10 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[42%] rounded-full shadow-[0_0_12px_rgba(37,106,244,0.4)]"></div>
+</div>
+</div>
+<!-- Sessions -->
+<div class="space-y-3">
+<div class="flex justify-between items-end">
+<span class="text-sm font-medium text-slate-400">Sessions</span>
+<span class="text-sm font-bold text-slate-900 dark:text-white">17 <span class="text-slate-400 font-normal">/ 100</span></span>
+</div>
+<div class="h-2 w-full bg-slate-200 dark:bg-white/10 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[17%] rounded-full shadow-[0_0_12px_rgba(37,106,244,0.4)]"></div>
+</div>
+</div>
+<!-- Storage -->
+<div class="space-y-3">
+<div class="flex justify-between items-end">
+<span class="text-sm font-medium text-slate-400">Storage</span>
+<span class="text-sm font-bold text-slate-900 dark:text-white">2.4GB <span class="text-slate-400 font-normal">/ 10GB</span></span>
+</div>
+<div class="h-2 w-full bg-slate-200 dark:bg-white/10 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[24%] rounded-full shadow-[0_0_12px_rgba(37,106,244,0.4)]"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Billing History Table -->
+<div class="glass-panel dark:bg-glass-slate bg-white rounded-xl overflow-hidden">
+<div class="p-6 border-b border-slate-200 dark:border-white/10">
+<h3 class="text-lg font-bold text-slate-900 dark:text-white">Billing History</h3>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="bg-slate-50 dark:bg-white/5 text-slate-400 text-[10px] font-bold uppercase tracking-widest">
+<th class="px-6 py-4">Date</th>
+<th class="px-6 py-4">Description</th>
+<th class="px-6 py-4">Amount</th>
+<th class="px-6 py-4">Status</th>
+<th class="px-6 py-4 text-right">Invoice</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-200 dark:divide-white/5">
+<tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors group">
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-300">Sep 12, 2023</td>
+<td class="px-6 py-4 text-sm font-medium text-slate-900 dark:text-white">Pro Plan Subscription - Monthly</td>
+<td class="px-6 py-4 text-sm text-slate-900 dark:text-white">$12.00</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 text-[10px] font-bold rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 uppercase tracking-tighter">Paid</span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg">download</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors group">
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-300">Aug 12, 2023</td>
+<td class="px-6 py-4 text-sm font-medium text-slate-900 dark:text-white">Pro Plan Subscription - Monthly</td>
+<td class="px-6 py-4 text-sm text-slate-900 dark:text-white">$12.00</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 text-[10px] font-bold rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 uppercase tracking-tighter">Paid</span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg">download</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors group">
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-300">Jul 12, 2023</td>
+<td class="px-6 py-4 text-sm font-medium text-slate-900 dark:text-white">Pro Plan Subscription - Monthly</td>
+<td class="px-6 py-4 text-sm text-slate-900 dark:text-white">$12.00</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 text-[10px] font-bold rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 uppercase tracking-tighter">Paid</span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg">download</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-4 bg-slate-50 dark:bg-white/5 text-center">
+<button class="text-xs font-bold text-slate-400 hover:text-primary transition-colors uppercase tracking-widest">Load More</button>
+</div>
+</div>
+</section>
+</main>
+<!-- Global Glass Background Decoration -->
+<div class="fixed top-0 left-0 w-full h-full pointer-events-none -z-10 overflow-hidden">
+<div class="absolute -top-[20%] -right-[10%] w-[50%] h-[50%] bg-primary/10 rounded-full blur-[120px]"></div>
+<div class="absolute -bottom-[20%] -left-[10%] w-[40%] h-[40%] bg-blue-600/5 rounded-full blur-[100px]"></div>
+</div>
+</body></html>

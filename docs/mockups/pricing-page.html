@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Trammarise - Simple, Transparent Pricing</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#3c83f6",
+                        "background-light": "#f5f7f8",
+                        "background-dark": "#0f172a",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .mesh-gradient {
+            background-color: #0f172a;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(60, 131, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 50% 50%, rgba(15, 23, 42, 1) 0px, transparent 100%);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .glass-nav {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .pro-glow {
+            border: 2px solid #3c83f6;
+            box-shadow: 0 0 20px rgba(60, 131, 246, 0.3);
+        }
+        .text-glow {
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen mesh-gradient selection:bg-primary/30">
+<!-- Global Navigation -->
+<nav class="fixed top-0 left-0 right-0 z-50 glass-nav h-20 flex items-center">
+<div class="max-w-7xl mx-auto px-6 w-full flex justify-between items-center">
+<div class="flex items-center space-x-2">
+<div class="w-8 h-8 bg-primary rounded flex items-center justify-center">
+<span class="material-icons text-white text-xl">Graphic_eq</span>
+</div>
+<span class="text-xl font-bold tracking-tight text-white">Trammarise</span>
+</div>
+<div class="hidden md:flex items-center space-x-8 text-sm font-medium text-slate-300">
+<a class="hover:text-primary transition-colors" href="#">Features</a>
+<a class="text-white" href="#">Pricing</a>
+<a class="hover:text-primary transition-colors" href="#">Solutions</a>
+<a class="hover:text-primary transition-colors" href="#">Resources</a>
+</div>
+<div class="flex items-center space-x-4">
+<a class="text-sm font-medium text-slate-300 hover:text-white px-4 py-2" href="#">Log in</a>
+<a class="bg-primary hover:bg-primary/90 text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition-all shadow-lg shadow-primary/20" href="#">Get Started</a>
+</div>
+</div>
+</nav>
+<!-- Main Content -->
+<main class="pt-40 pb-20 px-6">
+<div class="max-w-7xl mx-auto">
+<!-- Headline Section -->
+<div class="text-center mb-20">
+<h1 class="text-5xl md:text-6xl font-bold text-white mb-6 tracking-tight text-glow">
+                    Simple, Transparent Pricing
+                </h1>
+<p class="text-lg text-slate-400 max-w-2xl mx-auto">
+                    Transform your audio into intelligence. Choose the plan that scales with your creative or professional needs. No hidden fees.
+                </p>
+</div>
+<!-- Pricing Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch max-w-6xl mx-auto">
+<!-- Tier 1: Free -->
+<div class="glass-card rounded-xl p-8 flex flex-col transition-transform hover:-translate-y-1">
+<div class="mb-8">
+<h3 class="text-xl font-semibold text-white mb-2">Free</h3>
+<div class="flex items-baseline">
+<span class="text-4xl font-bold text-white">$0</span>
+<span class="text-slate-400 ml-2">/mo</span>
+</div>
+<p class="mt-4 text-sm text-slate-400 leading-relaxed">
+                            For individuals getting started with basic transcription needs.
+                        </p>
+</div>
+<div class="space-y-4 mb-10 flex-grow">
+<div class="flex items-start space-x-3">
+<span class="material-icons text-primary text-xl">check_circle</span>
+<span class="text-sm text-slate-300">60 minutes transcription/mo</span>
+</div>
+<div class="flex items-start space-x-3">
+<span class="material-icons text-primary text-xl">check_circle</span>
+<span class="text-sm text-slate-300">Standard AI summaries</span>
+</div>
+<div class="flex items-start space-x-3">
+<span class="material-icons text-primary text-xl">check_circle</span>
+<span class="text-sm text-slate-300">MP3 &amp; WAV support</span>
+</div>
+<div class="flex items-start space-x-3">
+<span class="material-icons text-slate-600 text-xl">remove_circle_outline</span>
+<span class="text-sm text-slate-500">No speaker identification</span>
+</div>
+</div>
+<button class="w-full py-3 px-6 rounded-lg border border-white/10 bg-white/5 text-slate-300 font-semibold text-sm hover:bg-white/10 transition-all">
+                        Current Plan
+                    </button>
+</div>
+<!-- Tier 2: Pro (Featured) -->
+<div class="glass-card rounded-xl p-8 flex flex-col pro-glow relative transform scale-105 shadow-2xl transition-transform hover:-translate-y-1">
+<div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-white text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full shadow-lg">
+                        Most Popular
+                    </div>
+<div class="mb-8">
+<h3 class="text-xl font-semibold text-white mb-2">Pro</h3>
+<div class="flex items-baseline">
+<span class="text-4xl font-bold text-white">$15</span>
+<span class="text-slate-400 ml-2">/mo</span>
+</div>
+<p class="mt-4 text-sm text-slate-300 leading-relaxed">
+                            Unlimited transcription and advanced AI insights for professionals.
+                        </p>
+</div>
+<div class="space-y-4 mb-10 flex-grow">
+<div class="flex items-start space-x-3">
+<span class="material-icons text-primary text-xl">check_circle</span>
+<span class="text-sm text-slate-200">Unlimited transcription</span>
+</div>
+<div class="flex items-start space-x-3">
+<span class="material-icons text-primary text-xl">check_circle</span>
+<span class="text-sm text-slate-200">Advanced AI action items</span>
+</div>
+<div class="flex items-start space-x-3">
+<span class="material-icons text-primary text-xl">check_circle</span>
+<span class="text-sm text-slate-200">Speaker identification</span>
+</div>
+<div class="flex items-start space-x-3">
+<span class="material-icons text-primary text-xl">check_circle</span>
+<span class="text-sm text-slate-200">Priority processing queue</span>
+</div>
+<div class="flex items-start space-x-3">
+<span class="material-icons text-primary text-xl">check_circle</span>
+<span class="text-sm text-slate-200">Multi-language support (50+)</span>
+</div>
+</div>
+<button class="w-full py-4 px-6 rounded-lg bg-gradient-to-r from-primary to-blue-600 text-white font-bold text-sm shadow-xl shadow-primary/40 hover:brightness-110 transition-all">
+                        Upgrade to Pro
+                    </button>
+</div>
+<!-- Tier 3: Enterprise -->
+<div class="glass-card rounded-xl p-8 flex flex-col transition-transform hover:-translate-y-1">
+<div class="mb-8">
+<h3 class="text-xl font-semibold text-white mb-2">Enterprise</h3>
+<div class="flex items-baseline">
+<span class="text-4xl font-bold text-white">Custom</span>
+</div>
+<p class="mt-4 text-sm text-slate-400 leading-relaxed">
+                            Custom solutions for organizations requiring security and scale.
+                        </p>
+</div>
+<div class="space-y-4 mb-10 flex-grow">
+<div class="flex items-start space-x-3">
+<span class="material-icons text-primary text-xl">check_circle</span>
+<span class="text-sm text-slate-300">Centralized billing &amp; SSO</span>
+</div>
+<div class="flex items-start space-x-3">
+<span class="material-icons text-primary text-xl">check_circle</span>
+<span class="text-sm text-slate-300">Custom API integration</span>
+</div>
+<div class="flex items-start space-x-3">
+<span class="material-icons text-primary text-xl">check_circle</span>
+<span class="text-sm text-slate-300">Dedicated Success Manager</span>
+</div>
+<div class="flex items-start space-x-3">
+<span class="material-icons text-primary text-xl">check_circle</span>
+<span class="text-sm text-slate-300">Custom data retention policies</span>
+</div>
+</div>
+<button class="w-full py-3 px-6 rounded-lg border-2 border-white/20 text-white font-semibold text-sm hover:bg-white/10 transition-all">
+                        Contact Sales
+                    </button>
+</div>
+</div>
+<!-- Trust / FAQ Section -->
+<div class="mt-32 max-w-4xl mx-auto">
+<div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-20 opacity-40">
+<div class="flex items-center justify-center grayscale hover:grayscale-0 transition-all">
+<span class="text-xl font-bold text-white">TRUSTED BY</span>
+</div>
+<div class="flex items-center justify-center">
+<img class="h-8 object-contain" data-alt="Corporate logo of a tech partner" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDwicme8pcDW-Sdzna_3Ytyy5MacauFUeZxbs-FKH0LBEIfB6xlBqAQutBeqkEItKwVj0ESszCMmem7qM2tqwr2xheyhdTKyq3T4vIOXb6jml36Y5TfSk16p7L9ub0Sjsi6oWdMEeSi-HEo90nqQZQYk-Cov7-D8_Mp0y3RG1kEotfH1JqmVl74cm98FRbQ_FA9UTvQvyKianaBssHvodcaxcpQyiesRFnZbDbQwEKfVr6RK8naXb96quZEeo9GzSzpDyuXqU-31pJ-"/>
+</div>
+<div class="flex items-center justify-center">
+<img class="h-8 object-contain" data-alt="Corporate logo of a tech partner" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAVKDD-mc875LvlP7uWNahCF44mXNrWlOZ0T9izACuZht7YkfJxqDwQi58GrZMqLyt5JRHOzQx4zj16kW2s4GDnMEgv-ITJemGsKRQoJ0bglGVmbuk0taF5R-tR8iQvAk1e5R3V5v_UVAgV9BRNx0mFPhoxb8tefqppEV2TmM1LYwWz7KlJS3Fjwz1r-O8jlOW-BsnpcvukIFd5Rb8nyT1Q4afY41krCj4KI9DDvgnwK3TyL5VuPTkCnugcxO6Zr61UTduHkU-iKFnU"/>
+</div>
+<div class="flex items-center justify-center">
+<img class="h-8 object-contain" data-alt="Corporate logo of a tech partner" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBUIVOE9m5-mGbJxCBX96YuB9kujXyWNzK6_6fU-yfC9FC1osyjDpc56bitZJxm1kpV1ZJecwt48aQqUG-Cp-57tiOSsSh3-4DXz7_FgT5ltYQdRuAO8iesghf73eXooYCA3xrU7i5589YkRNnC86y6OiCIOfMGwDMT4J4vJpHtjCjp1r1UOqg_XF66izASZyZv1CT0p0sIV_o6LfXhpB6SC3p1IlUi1f0TBeNXp61HVPrYyiwkG_b8UFo9guSnx3z22YYnpmj6LpZh"/>
+</div>
+</div>
+<div class="text-center">
+<p class="text-slate-500 text-sm flex items-center justify-center space-x-2">
+<span class="material-icons text-base">lock</span>
+<span>Secure 256-bit encrypted payments powered by Stripe</span>
+</p>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="py-12 px-6 border-t border-white/5 mt-20">
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center space-y-6 md:space-y-0">
+<div class="flex items-center space-x-2 opacity-60">
+<span class="material-icons text-white text-lg">Graphic_eq</span>
+<span class="text-lg font-bold tracking-tight text-white">Trammarise</span>
+</div>
+<div class="flex space-x-8 text-sm text-slate-500">
+<a class="hover:text-white transition-colors" href="#">Privacy Policy</a>
+<a class="hover:text-white transition-colors" href="#">Terms of Service</a>
+<a class="hover:text-white transition-colors" href="#">Contact</a>
+</div>
+<div class="text-sm text-slate-600">
+                © 2024 Trammarise Inc. All rights reserved.
+            </div>
+</div>
+</footer>
+</body></html>

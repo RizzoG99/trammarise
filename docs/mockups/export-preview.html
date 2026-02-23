@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PDF Export Preview — Trammarise Mockup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── Design tokens (mirrors app's index.css) ─── */
+    :root {
+      --color-bg-primary:    #f8fafc;
+      --color-bg-secondary:  #ffffff;
+      --color-bg-tertiary:   #f1f5f9;
+      --color-border:        #cbd5e1;
+      --color-text-primary:  #0f172a;
+      --color-text-secondary:#475569;
+      --color-text-tertiary: #94a3b8;
+      --color-primary:       #3b82f6;
+      --color-primary-hover: #2563eb;
+      --color-primary-a10:   rgba(59,130,246,0.10);
+      --color-warning:       #f59e0b;
+      --color-warning-a10:   rgba(245,158,11,0.08);
+      --color-warning-border:rgba(245,158,11,0.30);
+      --glass-bg:            rgba(255,255,255,0.80);
+      --glass-border:        rgba(0,0,0,0.10);
+      --glass-blur:          24px;
+      --glass-shadow:        0 8px 32px rgba(0,0,0,0.10);
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --transition: 150ms ease;
+    }
+    .dark {
+      --color-bg-primary:    #0f172a;
+      --color-bg-secondary:  #020617;
+      --color-bg-tertiary:   #1e293b;
+      --color-border:        rgba(255,255,255,0.12);
+      --color-text-primary:  #f8fafc;
+      --color-text-secondary:#cbd5e1;
+      --color-text-tertiary: #64748b;
+      --color-primary-a10:   rgba(59,130,246,0.15);
+      --color-warning-a10:   rgba(245,158,11,0.10);
+      --color-warning-border:rgba(245,158,11,0.25);
+      --glass-bg:            rgba(15,23,42,0.70);
+      --glass-border:        rgba(255,255,255,0.08);
+      --glass-shadow:        0 8px 32px rgba(0,0,0,0.45);
+    }
+
+    /* ─── Reset ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--color-bg-primary);
+      color: var(--color-text-primary);
+      height: 100dvh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    /* ─── App Header ─── */
+    .app-header {
+      height: 56px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      gap: 16px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(var(--glass-blur));
+      -webkit-backdrop-filter: blur(var(--glass-blur));
+      border-bottom: 1px solid var(--glass-border);
+      z-index: 20;
+    }
+    .header-logo {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--color-primary);
+      letter-spacing: -0.02em;
+    }
+    .header-filename-area {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+    }
+    .header-filename-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--color-text-secondary);
+      background: var(--color-bg-tertiary);
+      border: 1px solid var(--color-border);
+      border-radius: 20px;
+      padding: 4px 12px;
+    }
+    .header-filename-pill .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--color-primary);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%,100% { opacity: 1; }
+      50%      { opacity: 0.4; }
+    }
+    .header-actions { display: flex; gap: 8px; align-items: center; }
+    .icon-btn {
+      width: 32px; height: 32px;
+      border-radius: var(--radius-sm);
+      background: transparent;
+      border: 1px solid var(--color-border);
+      color: var(--color-text-secondary);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+      transition: all var(--transition);
+    }
+    .icon-btn:hover {
+      background: var(--color-bg-tertiary);
+      color: var(--color-text-primary);
+    }
+
+    /* ─── Export banner (top context strip) ─── */
+    .export-banner {
+      height: 40px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      gap: 12px;
+      background: var(--color-primary-a10);
+      border-bottom: 1px solid var(--color-border);
+      animation: slideDown 0.2s ease-out;
+    }
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .banner-back-btn {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 12px; font-weight: 500;
+      color: var(--color-primary);
+      background: none; border: none;
+      cursor: pointer;
+      padding: 4px 8px; border-radius: 6px;
+      transition: background var(--transition);
+    }
+    .banner-back-btn:hover { background: var(--color-primary-a10); }
+    .banner-sep { width: 1px; height: 16px; background: var(--color-border); }
+    .banner-label {
+      font-size: 12px; font-weight: 600;
+      color: var(--color-text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+    }
+
+    /* ─── Main split layout ─── */
+    .export-layout {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+      animation: fadeIn 0.25s ease-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    /* ─── LEFT: PDF viewer ─── */
+    .pdf-panel {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: color-mix(in srgb, var(--color-bg-primary) 80%, #000 5%);
+      position: relative;
+    }
+    .pdf-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 36px 24px 48px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+    .pdf-scroll::-webkit-scrollbar { width: 5px; }
+    .pdf-scroll::-webkit-scrollbar-track { background: transparent; }
+    .pdf-scroll::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 4px; }
+
+    /* The actual document */
+    .pdf-doc {
+      background: #fff;
+      width: 100%;
+      max-width: 620px;
+      border-radius: 6px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.06), 0 8px 32px rgba(0,0,0,0.18), 0 1px 2px rgba(0,0,0,0.08);
+      padding: 52px 52px 64px;
+      color: #1a1a2e;
+      position: relative;
+      overflow: hidden;
+    }
+    /* Watermark inside doc */
+    .pdf-wm {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .pdf-wm-text {
+      font-size: 52px; font-weight: 800;
+      color: rgba(59,130,246,0.055);
+      transform: rotate(-28deg);
+      white-space: nowrap;
+      letter-spacing: 0.04em;
+      user-select: none;
+    }
+    .pdf-content { position: relative; z-index: 1; }
+
+    /* PDF typography */
+    .pdf-header-row {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding-bottom: 20px;
+      border-bottom: 2.5px solid #3b82f6;
+      margin-bottom: 28px;
+    }
+    .pdf-logomark {
+      width: 36px; height: 36px;
+      border-radius: 9px;
+      background: #3b82f6;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; font-weight: 800; color: #fff;
+      flex-shrink: 0;
+    }
+    .pdf-doctitle {
+      font-size: 20px; font-weight: 700;
+      color: #0f172a; letter-spacing: -0.02em;
+      line-height: 1.3;
+    }
+    .pdf-docmeta {
+      font-size: 11px; color: #94a3b8;
+      margin-top: 3px; font-weight: 400;
+    }
+    .pdf-section {
+      font-size: 10.5px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.09em;
+      color: #3b82f6; margin: 22px 0 8px;
+    }
+    .pdf-p {
+      font-size: 12.5px; line-height: 1.7; color: #334155;
+    }
+    .pdf-ul { margin: 6px 0; }
+    .pdf-li {
+      display: flex; gap: 8px;
+      font-size: 12.5px; line-height: 1.6; color: #334155;
+      margin: 5px 0;
+    }
+    .pdf-li::before {
+      content: '·'; color: #3b82f6; font-size: 16px;
+      line-height: 1.3; flex-shrink: 0; font-weight: 900;
+    }
+    .pdf-ts-row {
+      display: flex; gap: 12px; margin: 7px 0;
+      font-size: 11.5px;
+    }
+    .pdf-ts { color: #3b82f6; font-weight: 600; min-width: 50px; }
+    .pdf-ts-text { color: #475569; line-height: 1.5; }
+    .pdf-divider {
+      height: 1px; background: #e2e8f0;
+      margin: 24px 0;
+    }
+
+    /* ─── RIGHT: Controls ─── */
+    .controls-panel {
+      width: 300px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--glass-bg);
+      backdrop-filter: blur(var(--glass-blur));
+      -webkit-backdrop-filter: blur(var(--glass-blur));
+      border-left: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
+    }
+    .controls-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .controls-body::-webkit-scrollbar { width: 4px; }
+    .controls-body::-webkit-scrollbar-track { background: transparent; }
+    .controls-body::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 4px; }
+
+    /* Panel title */
+    .panel-title {
+      font-size: 17px; font-weight: 700;
+      color: var(--color-text-primary);
+      letter-spacing: -0.02em;
+    }
+    .panel-subtitle {
+      font-size: 12px; color: var(--color-text-tertiary);
+      margin-top: 3px;
+    }
+
+    /* Section label */
+    .ctrl-label {
+      font-size: 10.5px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.09em;
+      color: var(--color-text-tertiary);
+      margin-bottom: 8px;
+    }
+
+    /* Template selector */
+    .tmpl-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+    .tmpl-btn {
+      padding: 9px 8px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--color-border);
+      background: transparent;
+      color: var(--color-text-secondary);
+      font-size: 12px; font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      text-align: center;
+      transition: all var(--transition);
+      display: flex; align-items: center; justify-content: center; gap: 5px;
+    }
+    .tmpl-btn:hover:not(.active) {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+      background: var(--color-primary-a10);
+    }
+    .tmpl-btn.active {
+      border-color: var(--color-primary);
+      background: var(--color-primary);
+      color: #fff;
+      font-weight: 600;
+    }
+    .tmpl-btn .tmpl-icon { font-size: 13px; }
+
+    /* Watermark notice */
+    .wm-notice {
+      background: var(--color-warning-a10);
+      border: 1px solid var(--color-warning-border);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      display: flex; gap: 10px;
+    }
+    .wm-icon { font-size: 15px; flex-shrink: 0; line-height: 1.4; }
+    .wm-body { font-size: 12px; line-height: 1.55; color: var(--color-text-secondary); }
+    .wm-link {
+      color: var(--color-warning);
+      font-weight: 600; cursor: pointer;
+      background: none; border: none;
+      padding: 0; font-size: 12px; font-family: inherit;
+      text-decoration: underline; text-decoration-color: transparent;
+      transition: text-decoration-color var(--transition);
+    }
+    .wm-link:hover { text-decoration-color: var(--color-warning); }
+
+    /* Filename field */
+    .filename-row {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .filename-input {
+      flex: 1;
+      padding: 9px 11px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--color-border);
+      background: var(--color-bg-tertiary);
+      color: var(--color-text-primary);
+      font-size: 13px; font-family: inherit;
+      outline: none;
+      transition: border-color var(--transition), box-shadow var(--transition);
+    }
+    .filename-input::placeholder { color: var(--color-text-tertiary); }
+    .filename-input:focus {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
+    }
+    .filename-ext {
+      font-size: 13px; font-weight: 500;
+      color: var(--color-text-tertiary);
+      flex-shrink: 0;
+    }
+
+    /* Spacer */
+    .ctrl-spacer { flex: 1; }
+
+    /* Controls footer */
+    .controls-footer {
+      padding: 16px 20px;
+      border-top: 1px solid var(--glass-border);
+      display: flex; flex-direction: column; gap: 8px;
+      background: var(--glass-bg);
+    }
+
+    /* Buttons */
+    .btn {
+      width: 100%;
+      padding: 10px 16px;
+      border-radius: var(--radius-md);
+      font-size: 13px; font-weight: 600; font-family: inherit;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      border: none;
+      transition: all var(--transition);
+    }
+    .btn-primary {
+      background: var(--color-primary);
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: var(--color-primary-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(59,130,246,0.35);
+    }
+    .btn-primary:active { transform: translateY(0); box-shadow: none; }
+    .btn-ghost {
+      background: transparent;
+      border: 1.5px solid var(--color-border);
+      color: var(--color-text-secondary);
+    }
+    .btn-ghost:hover {
+      background: var(--color-bg-tertiary);
+      color: var(--color-text-primary);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── App Header (unchanged from results page) ── -->
+  <header class="app-header">
+    <span class="header-logo">Trammarise</span>
+
+    <div class="header-filename-area">
+      <div class="header-filename-pill">
+        <span class="dot"></span>
+        <span id="header-filename-display">Team Sync — Q4 Review</span>
+        <span style="color:var(--color-text-tertiary)">.pdf</span>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <button class="icon-btn" onclick="toggleTheme()" title="Toggle theme" id="theme-btn">☀️</button>
+    </div>
+  </header>
+
+  <!-- ── Contextual export banner ── -->
+  <div class="export-banner">
+    <button class="banner-back-btn" onclick="alert('← Returns to results view')">
+      ← Back to results
+    </button>
+    <div class="banner-sep"></div>
+    <span class="banner-label">Preview before exporting</span>
+  </div>
+
+  <!-- ── Main split layout ── -->
+  <div class="export-layout">
+
+    <!-- LEFT: PDF Preview -->
+    <div class="pdf-panel">
+      <div class="pdf-scroll">
+        <div class="pdf-doc" id="pdf-doc">
+          <div class="pdf-wm"><span class="pdf-wm-text" id="wm-text">Trammarise Free</span></div>
+
+          <div class="pdf-content">
+            <!-- Document header -->
+            <div class="pdf-header-row">
+              <div class="pdf-logomark">T</div>
+              <div>
+                <div class="pdf-doctitle" id="pdf-doc-title">Team Sync — Q4 Review</div>
+                <div class="pdf-docmeta" id="pdf-doc-meta">Meeting · Feb 22, 2026 · Generated by Trammarise</div>
+              </div>
+            </div>
+
+            <!-- Summary -->
+            <div class="pdf-section">Executive Summary</div>
+            <p class="pdf-p">
+              The Q4 review meeting covered sales performance, product roadmap updates, and team capacity
+              planning for the upcoming quarter. Key decisions were made around launch timeline and resource allocation.
+            </p>
+
+            <div class="pdf-section">Key Points</div>
+            <div class="pdf-ul">
+              <div class="pdf-li">Sales exceeded targets by 18% for Q4, driven by enterprise accounts.</div>
+              <div class="pdf-li">Product roadmap updated: PDF export and speaker diarization shipping in February.</div>
+              <div class="pdf-li">Two new engineering hires approved, onboarding in March.</div>
+              <div class="pdf-li">Customer NPS improved from 42 → 61 following the redesign launch.</div>
+            </div>
+
+            <div class="pdf-section">Action Items</div>
+            <div class="pdf-ul">
+              <div class="pdf-li">Gabriel: Finalize Q1 roadmap doc by Feb 28.</div>
+              <div class="pdf-li">Sarah: Share onboarding plan with HR by March 3.</div>
+              <div class="pdf-li">Marcus: Schedule follow-up calls with enterprise accounts.</div>
+            </div>
+
+            <div class="pdf-divider"></div>
+
+            <!-- Transcript excerpt -->
+            <div class="pdf-section">Transcript</div>
+            <div class="pdf-ts-row"><span class="pdf-ts">[00:00]</span><span class="pdf-ts-text">Gabriel: Welcome everyone. Let's start with the Q4 numbers.</span></div>
+            <div class="pdf-ts-row"><span class="pdf-ts">[00:45]</span><span class="pdf-ts-text">Sarah: We hit 118% of target. The enterprise push really paid off this quarter.</span></div>
+            <div class="pdf-ts-row"><span class="pdf-ts">[01:20]</span><span class="pdf-ts-text">Marcus: Great result. What's driving the NPS improvement?</span></div>
+            <div class="pdf-ts-row"><span class="pdf-ts">[01:55]</span><span class="pdf-ts-text">Sarah: Mostly the redesign — users love the new export and search features.</span></div>
+            <div class="pdf-ts-row"><span class="pdf-ts">[02:30]</span><span class="pdf-ts-text">Gabriel: Good. Let's talk roadmap for Q1. We have a few big bets to consider…</span></div>
+            <div class="pdf-ts-row"><span class="pdf-ts">[03:10]</span><span class="pdf-ts-text">Marcus: I'd prioritize mobile — that's what prospects keep asking about.</span></div>
+            <div class="pdf-ts-row"><span class="pdf-ts">[03:48]</span><span class="pdf-ts-text">Sarah: Agreed. Mobile + API access would open a lot of doors.</span></div>
+            <div class="pdf-ts-row"><span class="pdf-ts">[04:25]</span><span class="pdf-ts-text">Gabriel: Let's lock that in for Q1. Anything else before we close?</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Controls panel -->
+    <div class="controls-panel">
+      <div class="controls-body">
+
+        <!-- Title -->
+        <div>
+          <div class="panel-title">Export PDF</div>
+          <div class="panel-subtitle">Review your document, then download.</div>
+        </div>
+
+        <!-- Template selector -->
+        <div>
+          <div class="ctrl-label">Template</div>
+          <div class="tmpl-grid">
+            <button class="tmpl-btn" onclick="selectTemplate(this,'General')">
+              <span class="tmpl-icon">📄</span> Default
+            </button>
+            <button class="tmpl-btn active" onclick="selectTemplate(this,'Meeting')">
+              <span class="tmpl-icon">🤝</span> Meeting
+            </button>
+            <button class="tmpl-btn" onclick="selectTemplate(this,'Interview')">
+              <span class="tmpl-icon">🎙️</span> Interview
+            </button>
+            <button class="tmpl-btn" onclick="selectTemplate(this,'Lecture')">
+              <span class="tmpl-icon">🎓</span> Lecture
+            </button>
+          </div>
+        </div>
+
+        <!-- Watermark notice (free tier) -->
+        <div class="wm-notice" id="wm-notice">
+          <span class="wm-icon">⚠️</span>
+          <div class="wm-body">
+            Your PDF will include a <strong>Trammarise Free</strong> watermark.
+            <br />
+            <button class="wm-link" onclick="alert('→ Opens upgrade / pricing page')">Upgrade to remove →</button>
+          </div>
+        </div>
+
+        <!-- Filename -->
+        <div>
+          <div class="ctrl-label">File name</div>
+          <div class="filename-row">
+            <input
+              id="filename-input"
+              class="filename-input"
+              type="text"
+              value="Team Sync — Q4 Review"
+              placeholder="Enter file name…"
+              oninput="onFilenameInput(this.value)"
+            />
+            <span class="filename-ext">.pdf</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Sticky footer -->
+      <div class="controls-footer">
+        <button class="btn btn-primary" onclick="alert('Downloading: ' + document.getElementById('filename-input').value + '.pdf')">
+          ↓&nbsp; Download PDF
+        </button>
+        <button class="btn btn-ghost" onclick="alert('← Back to results')">
+          Cancel
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // ─── Theme toggle ───
+    function toggleTheme() {
+      const html = document.documentElement;
+      html.classList.toggle('dark');
+      document.getElementById('theme-btn').textContent =
+        html.classList.contains('dark') ? '☀️' : '🌙';
+    }
+
+    // ─── Filename debounce → live update in header pill & PDF title ───
+    let filenameTimer = null;
+    function onFilenameInput(val) {
+      clearTimeout(filenameTimer);
+      filenameTimer = setTimeout(() => {
+        const trimmed = val.trim() || 'Untitled';
+        document.getElementById('header-filename-display').textContent = trimmed;
+        document.getElementById('pdf-doc-title').textContent = trimmed;
+      }, 400);
+    }
+
+    // ─── Template selector ───
+    const templateMeta = {
+      'General':   'General · Feb 22, 2026 · Generated by Trammarise',
+      'Meeting':   'Meeting · Feb 22, 2026 · Generated by Trammarise',
+      'Interview': 'Interview · Feb 22, 2026 · Generated by Trammarise',
+      'Lecture':   'Lecture · Feb 22, 2026 · Generated by Trammarise',
+    };
+    function selectTemplate(btn, label) {
+      document.querySelectorAll('.tmpl-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      // After debounce, simulate a layout change on the PDF preview
+      setTimeout(() => {
+        document.getElementById('pdf-doc-meta').textContent = templateMeta[label];
+      }, 400);
+    }
+  </script>
+
+</body>
+</html>

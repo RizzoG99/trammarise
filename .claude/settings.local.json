@@ -57,7 +57,13 @@
       "Bash(for file in src/locales/*/translation.json)",
       "Bash(do echo \"Validating $file...\")",
       "Bash(node -e:*)",
-      "Bash(done)"
+      "Bash(done)",
+      "Skill(enhance-prompt)",
+      "Skill(stitch-loop)",
+      "mcp__stitch__generate_screen_from_text",
+      "mcp__stitch__list_screens",
+      "WebFetch(domain:contribution.usercontent.google.com)",
+      "mcp__stitch__get_screen"
     ],
     "deny": [],
     "ask": []
