@@ -21,6 +21,12 @@
     "export": "Exportieren",
     "notifications": "Benachrichtigungen",
     "userMenu": "Benutzermenü",
+    "exportDialogTitle": "PDF exportieren",
+    "exportFileName": "Dateiname",
+    "exportFileNamePlaceholder": "Dateinamen eingeben...",
+    "exportFileNameError": "Dateiname ist erforderlich",
+    "downloadPDF": "PDF herunterladen",
+    "exporting": "Wird exportiert...",
     "aria": {
       "saveFile": "Dateinamen speichern",
       "cancelEdit": "Bearbeitung abbrechen",

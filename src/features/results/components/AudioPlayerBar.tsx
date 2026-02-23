@@ -61,10 +61,7 @@ export const AudioPlayerBar = memo(function AudioPlayerBar({
         {/* Waveform Visualization */}
         <div className="flex-col mb-6 border rounded-xl shadow-lg overflow-hidden">
           <div className="p-6">
-            <WaveformPlayer
-              audioFile={audioFile.blob}
-              onTimeUpdate={onTimeUpdate ? (time) => onTimeUpdate(time) : undefined}
-            />
+            <WaveformPlayer audioFile={audioFile.blob} onTimeUpdate={onTimeUpdate} />
           </div>
         </div>
 

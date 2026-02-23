@@ -21,6 +21,12 @@
     "export": "Exportar",
     "notifications": "Notificaciones",
     "userMenu": "Menú de usuario",
+    "exportDialogTitle": "Exportar PDF",
+    "exportFileName": "Nombre de archivo",
+    "exportFileNamePlaceholder": "Ingresa el nombre del archivo...",
+    "exportFileNameError": "El nombre del archivo es obligatorio",
+    "downloadPDF": "Descargar PDF",
+    "exporting": "Exportando...",
     "aria": {
       "saveFile": "Guardar nombre de archivo",
       "cancelEdit": "Cancelar edición",

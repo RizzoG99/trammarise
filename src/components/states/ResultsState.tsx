@@ -233,7 +233,6 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
         summary={result.summary}
         transcript={result.transcript}
         config={result.configuration}
-        tier="free"
       />
 
       {/* PDF Generation Loading Modal */}

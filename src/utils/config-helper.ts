@@ -30,7 +30,7 @@ export function buildDefaultConfiguration(session: SessionData): AIConfiguration
     .withContentType(session.contentType);
 
   // Skip language when 'auto' or empty — Whisper auto-detects in that case
-  if (session.language && session.language !== 'auto') {
+  if (session.language && (session.language as string) !== 'auto') {
     builder.withLanguage(session.language);
   }
 

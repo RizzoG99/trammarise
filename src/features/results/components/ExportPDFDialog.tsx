@@ -15,7 +15,6 @@ interface ExportPDFDialogProps {
   summary: string;
   transcript: string;
   config: AIConfiguration;
-  tier: 'free' | 'pro' | 'team';
 }
 
 /**
@@ -33,7 +32,6 @@ export function ExportPDFDialog({
   summary,
   transcript,
   config,
-  tier,
 }: ExportPDFDialogProps) {
   const { t } = useTranslation();
   // Modal unmounts children when closed, so useState always initializes fresh on open
@@ -42,8 +40,8 @@ export function ExportPDFDialog({
   const [previewFileName, setPreviewFileName] = useState(initialFileName);
 
   useEffect(() => {
-    const t = setTimeout(() => setPreviewFileName(fileName), 400);
-    return () => clearTimeout(t);
+    const timerId = setTimeout(() => setPreviewFileName(fileName), 400);
+    return () => clearTimeout(timerId);
   }, [fileName]);
 
   const isValid = fileName.trim().length > 0;
@@ -68,7 +66,6 @@ export function ExportPDFDialog({
               transcript={transcript}
               config={config}
               fileName={previewFileName}
-              tier={tier}
             />
           </PDFViewer>
         </div>
