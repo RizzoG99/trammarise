@@ -37,6 +37,8 @@ export interface ModalProps extends Omit<
   disableBackdropClick?: boolean;
   /** Hide the close button in header */
   hideCloseButton?: boolean;
+  /** Hide the entire header (useful for custom title blocks) */
+  hideHeader?: boolean;
   /** Additional CSS classes for modal content */
   className?: string;
 }
@@ -53,6 +55,7 @@ export const Modal: React.FC<ModalProps> = ({
   actions,
   disableBackdropClick = false,
   hideCloseButton = false,
+  hideHeader = false,
   className = '',
   ...rest
 }) => {
@@ -97,7 +100,8 @@ export const Modal: React.FC<ModalProps> = ({
       onClick={handleBackdropClick}
       role="dialog"
       aria-modal="true"
-      aria-labelledby="modal-title"
+      aria-labelledby={!hideHeader ? 'modal-title' : undefined}
+      aria-label={hideHeader ? title : undefined}
       {...rest}
     >
       <div
@@ -105,21 +109,23 @@ export const Modal: React.FC<ModalProps> = ({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex justify-between items-center p-6 border-b border-gray-200 dark:border-[#333]">
-          <h2 id="modal-title" className="m-0 text-2xl text-[#333] dark:text-white">
-            {title}
-          </h2>
-          {!hideCloseButton && (
-            <button
-              className="bg-transparent border-none text-[2rem] text-[#999] cursor-pointer p-0 w-8 h-8 flex items-center justify-center rounded transition-all hover:bg-gray-100 hover:text-[#333] dark:hover:bg-[#333] dark:hover:text-white"
-              onClick={onClose}
-              aria-label="Close modal"
-              type="button"
-            >
-              ×
-            </button>
-          )}
-        </div>
+        {!hideHeader && (
+          <div className="flex justify-between items-center p-6 border-b border-gray-200 dark:border-[#333]">
+            <h2 id="modal-title" className="m-0 text-2xl text-[#333] dark:text-white">
+              {title}
+            </h2>
+            {!hideCloseButton && (
+              <button
+                className="bg-transparent border-none text-[2rem] text-[#999] cursor-pointer p-0 w-8 h-8 flex items-center justify-center rounded transition-all hover:bg-gray-100 hover:text-[#333] dark:hover:bg-[#333] dark:hover:text-white"
+                onClick={onClose}
+                aria-label="Close modal"
+                type="button"
+              >
+                ×
+              </button>
+            )}
+          </div>
+        )}
 
         {/* Body */}
         <div className="p-6 text-[#555] dark:text-[#ccc] leading-relaxed">{children}</div>

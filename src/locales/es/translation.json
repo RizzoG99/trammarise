@@ -120,7 +120,18 @@
       "summarizing": "Generando Resumen"
     },
     "estimatedTime": "Tiempo estimado",
-    "almostDone": "Casi listo"
+    "almostDone": "Casi listo",
+    "error": {
+      "title": "Error de Transcripción",
+      "explanation": "No pudimos transcribir tu archivo de audio. Esto puede ocurrir por varias razones.",
+      "possibleReasons": "Posibles razones:",
+      "reasonFormat": "El formato de audio no es compatible o está dañado.",
+      "reasonSilence": "La grabación contiene principalmente silencio o ruido de fondo.",
+      "reasonNetwork": "Un error de red momentáneo interrumpió la conexión.",
+      "fixApiKey": "Corregir Clave API",
+      "tryAgain": "Intentar de nuevo",
+      "closeAndRetry": "Cerrar e intentar de nuevo"
+    }
   },
   "languages": {
     "en": "Inglés",
@@ -466,6 +477,34 @@
     "emptyState": "Pregúntame cualquier cosa sobre tu transcripción o resumen",
     "disclaimer": "La IA puede cometer errores. Verifica la información importante.",
     "tokenLimit": "Límite de tokens alcanzado"
+  },
+  "pdfModal": {
+    "generating": "Generando PDF",
+    "description": "Creando tu documento PDF profesional...",
+    "success": "¡PDF descargado con éxito!",
+    "error": "Error al generar el PDF: {{message}}"
+  },
+  "deleteConfirmModal": {
+    "titleSingle": "¿Eliminar Grabación?",
+    "titleBulk": "¿Eliminar {{count}} Grabaciones?",
+    "messageSingle": "¿Estás seguro de que deseas eliminar esta grabación? Esta acción no se puede deshacer.",
+    "messageBulk": "¿Estás seguro de que deseas eliminar {{count}} grabaciones? Esta acción no se puede deshacer.",
+    "recordingLabel": "Grabación:",
+    "createdLabel": "Creado:",
+    "confirmButton": "Sí, Eliminar",
+    "confirmingButton": "Eliminando...",
+    "cancelButton": "Cancelar",
+    "typeToConfirm": "Escribe DELETE para confirmar",
+    "typeToConfirmPlaceholder": "Escribe DELETE aquí",
+    "affectedItems": "Grabaciones a eliminar:"
+  },
+  "export": {
+    "templates": {
+      "meeting": "Reunión",
+      "lecture": "Académico",
+      "interview": "Preguntas y Respuestas",
+      "generic": "Estándar"
+    }
   },
   "tokenUsage": {
     "label": "Uso de Tokens",

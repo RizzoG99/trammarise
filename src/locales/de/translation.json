@@ -120,7 +120,18 @@
       "summarizing": "Zusammenfassung erstellen"
     },
     "estimatedTime": "Geschätzte Zeit",
-    "almostDone": "Fast fertig"
+    "almostDone": "Fast fertig",
+    "error": {
+      "title": "Transkriptionsfehler",
+      "explanation": "Wir konnten Ihre Audiodatei nicht transkribieren. Dies kann aus einigen Gründen passieren.",
+      "possibleReasons": "Mögliche Gründe:",
+      "reasonFormat": "Das Audioformat wird nicht unterstützt oder ist beschädigt.",
+      "reasonSilence": "Die Aufnahme enthält hauptsächlich Stille oder Hintergrundgeräusche.",
+      "reasonNetwork": "Ein kurzer Netzwerkfehler hat die Verbindung unterbrochen.",
+      "fixApiKey": "API-Schlüssel korrigieren",
+      "tryAgain": "Erneut versuchen",
+      "closeAndRetry": "Schließen und erneut versuchen"
+    }
   },
   "languages": {
     "en": "Englisch",
@@ -466,6 +477,34 @@
     "emptyState": "Fragen Sie mich alles über Ihr Transkript oder Ihre Zusammenfassung",
     "disclaimer": "KI kann Fehler machen. Überprüfen Sie wichtige Informationen.",
     "tokenLimit": "Token-Limit erreicht"
+  },
+  "pdfModal": {
+    "generating": "PDF wird generiert",
+    "description": "Ihr professionelles PDF-Dokument wird erstellt...",
+    "success": "PDF erfolgreich heruntergeladen!",
+    "error": "PDF-Generierung fehlgeschlagen: {{message}}"
+  },
+  "deleteConfirmModal": {
+    "titleSingle": "Aufnahme löschen?",
+    "titleBulk": "{{count}} Aufnahmen löschen?",
+    "messageSingle": "Möchten Sie diese Aufnahme wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+    "messageBulk": "Möchten Sie wirklich {{count}} Aufnahmen löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+    "recordingLabel": "Aufnahme:",
+    "createdLabel": "Erstellt:",
+    "confirmButton": "Ja, Löschen",
+    "confirmingButton": "Wird gelöscht...",
+    "cancelButton": "Abbrechen",
+    "typeToConfirm": "Geben Sie DELETE ein, um zu bestätigen",
+    "typeToConfirmPlaceholder": "Geben Sie DELETE hier ein",
+    "affectedItems": "Zu löschende Aufnahmen:"
+  },
+  "export": {
+    "templates": {
+      "meeting": "Besprechung",
+      "lecture": "Akademisch",
+      "interview": "Fragen & Antworten",
+      "generic": "Standard"
+    }
   },
   "tokenUsage": {
     "label": "Token-Nutzung",

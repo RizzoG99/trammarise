@@ -120,7 +120,18 @@
       "summarizing": "Creazione Riassunto"
     },
     "estimatedTime": "Tempo stimato",
-    "almostDone": "Quasi finito"
+    "almostDone": "Quasi finito",
+    "error": {
+      "title": "Errore di Trascrizione",
+      "explanation": "Non è stato possibile trascrivere il file audio. Questo può accadere per alcune ragioni.",
+      "possibleReasons": "Possibili ragioni:",
+      "reasonFormat": "Il formato audio non è supportato o è corrotto.",
+      "reasonSilence": "La registrazione contiene principalmente silenzio o rumore di fondo.",
+      "reasonNetwork": "Un errore di rete momentaneo ha interrotto la connessione.",
+      "fixApiKey": "Correggi Chiave API",
+      "tryAgain": "Riprova",
+      "closeAndRetry": "Chiudi e Riprova"
+    }
   },
   "languages": {
     "en": "Inglese",
@@ -466,6 +477,34 @@
     "emptyState": "Chiedimi qualsiasi cosa sulla tua trascrizione o riassunto",
     "disclaimer": "L'AI può commettere errori. Verifica le informazioni importanti.",
     "tokenLimit": "Limite di token raggiunto"
+  },
+  "pdfModal": {
+    "generating": "Generazione PDF",
+    "description": "Creazione del documento PDF professionale...",
+    "success": "PDF scaricato con successo!",
+    "error": "Impossibile generare il PDF: {{message}}"
+  },
+  "deleteConfirmModal": {
+    "titleSingle": "Eliminare la Registrazione?",
+    "titleBulk": "Eliminare {{count}} Registrazioni?",
+    "messageSingle": "Sei sicuro di voler eliminare questa registrazione? Questa azione non può essere annullata.",
+    "messageBulk": "Sei sicuro di voler eliminare {{count}} registrazioni? Questa azione non può essere annullata.",
+    "recordingLabel": "Registrazione:",
+    "createdLabel": "Creato:",
+    "confirmButton": "Sì, Elimina",
+    "confirmingButton": "Eliminazione...",
+    "cancelButton": "Annulla",
+    "typeToConfirm": "Digita DELETE per confermare",
+    "typeToConfirmPlaceholder": "Digita DELETE qui",
+    "affectedItems": "Registrazioni da eliminare:"
+  },
+  "export": {
+    "templates": {
+      "meeting": "Riunione",
+      "lecture": "Accademico",
+      "interview": "Domande e Risposte",
+      "generic": "Standard"
+    }
   },
   "tokenUsage": {
     "label": "Utilizzo Token",

@@ -2,6 +2,7 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { Modal, ChatInterface, Snackbar, AILoadingOrb, Text } from '@/lib';
 import { chatWithAI } from '../../utils/api';
 import { useAuth } from '@clerk/clerk-react';
+import { useTranslation } from 'react-i18next';
 
 import type { ProcessingResult, ChatMessage, AudioFile, AIConfiguration } from '../../types/audio';
 import { ResultsLayout } from '../../features/results/components/ResultsLayout';
@@ -10,7 +11,10 @@ import { SummaryPanel } from '../../features/results/components/SummaryPanel';
 import { SearchableTranscript } from '../../features/results/components/SearchableTranscript';
 import { SpeakerTranscriptView } from '../../features/results/components/SpeakerTranscriptView';
 import { FloatingChatButton } from '../../features/results/components/FloatingChatButton';
-import { ExportPDFDialog } from '../../features/results/components/ExportPDFDialog';
+import {
+  ExportPDFDialog,
+  type ExportOptions,
+} from '../../features/results/components/ExportPDFDialog';
 import { useHeader, useHeaderConfig } from '../../hooks/useHeader';
 import { useAudioPlayer } from '../../features/results/hooks/useAudioPlayer';
 import {
@@ -53,6 +57,7 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
   language,
   onUpdateResult,
 }) => {
+  const { t } = useTranslation();
   const [isLoadingChat, setIsLoadingChat] = useState(false);
   const [waveformTime, setWaveformTime] = useState(0);
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -179,9 +184,7 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
   };
 
   const handleDownloadPDF = useCallback(
-    async (fileNameOverride?: string) => {
-      console.log('📥 Starting PDF generation...');
-
+    async (fileNameOverride?: string, options?: ExportOptions) => {
       setIsPdfGenerating(true);
       setPdfError(null);
       setPdfSuccess(false);
@@ -196,10 +199,10 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
           result.transcript,
           result.configuration,
           effectiveFileName,
-          userTier
+          userTier,
+          options
         );
 
-        console.log('✅ PDF downloaded successfully');
         setPdfSuccess(true);
 
         // Auto-dismiss success message after 3 seconds
@@ -213,14 +216,15 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
           }, 2000);
         }
       } catch (error) {
-        console.error('❌ PDF generation error:', error);
         const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-        setPdfError(`Failed to generate PDF: ${errorMessage}`);
+        setPdfError(
+          t('pdfModal.error', 'Failed to generate PDF: {{message}}', { message: errorMessage })
+        );
       } finally {
         setIsPdfGenerating(false);
       }
     },
-    [result.summary, result.transcript, result.configuration, fileName, userTier]
+    [result.summary, result.transcript, result.configuration, fileName, userTier, t]
   );
 
   const handleOpenExportDialog = useCallback(() => setIsExportDialogOpen(true), []);
@@ -265,7 +269,7 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
             <Modal
               isOpen={isChatOpen}
               onClose={() => setIsChatOpen(false)}
-              title="Refine with Chat"
+              title={t('chatModal.title', 'Refine with Chat')}
             >
               <div className="h-[600px]">
                 <ChatInterface
@@ -284,9 +288,9 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
         isOpen={isExportDialogOpen}
         onClose={() => setIsExportDialogOpen(false)}
         initialFileName={fileName}
-        onExport={(name) => {
+        onExport={(name, options) => {
           setIsExportDialogOpen(false);
-          void handleDownloadPDF(name);
+          void handleDownloadPDF(name, options);
         }}
         isExporting={isPdfGenerating}
         summary={result.summary}
@@ -305,7 +309,7 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
       <Modal
         isOpen={isPdfGenerating}
         onClose={() => {}}
-        title="Generating PDF"
+        title={t('pdfModal.generating', 'Generating PDF')}
         disableBackdropClick={true}
         role="status"
         aria-busy="true"
@@ -313,7 +317,7 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
         <div className="flex flex-col items-center justify-center py-8 gap-6">
           <AILoadingOrb size={120} />
           <Text variant="body" className="text-center text-text-secondary">
-            Creating your professional PDF document...
+            {t('pdfModal.description', 'Creating your professional PDF document...')}
           </Text>
         </div>
       </Modal>
@@ -322,7 +326,7 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
       <Snackbar
         isOpen={pdfSuccess}
         onClose={() => setPdfSuccess(false)}
-        message="PDF downloaded successfully!"
+        message={t('pdfModal.success', 'PDF downloaded successfully!')}
         variant="success"
         duration={3000}
       />

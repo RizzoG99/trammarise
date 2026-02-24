@@ -15,19 +15,30 @@ export async function generatePDF(
   transcript: string,
   config: AIConfiguration,
   fileName: string,
-  tier: 'free' | 'pro' | 'team' = 'free'
+  tier: 'free' | 'pro' | 'team' = 'free',
+  options?: {
+    includeSummary?: boolean;
+    includeTranscript?: boolean;
+    includeMetadata?: boolean;
+    template?: AIConfiguration['contentType'];
+  }
 ): Promise<void> {
   try {
-    console.log('📄 Starting PDF generation with @react-pdf/renderer...');
+    const effectiveSummary = options?.includeSummary === false ? '' : summary;
+    const effectiveTranscript = options?.includeTranscript === false ? '' : transcript;
+    const effectiveConfig = options?.template
+      ? { ...config, contentType: options.template }
+      : config;
 
     // Generate PDF blob from Document component
     const blob = await pdf(
       ResultPdfDocument({
-        summary,
-        transcript,
-        config,
+        summary: effectiveSummary,
+        transcript: effectiveTranscript,
+        config: effectiveConfig,
         fileName,
         tier,
+        includeMetadata: options?.includeMetadata ?? true,
       })
     ).toBlob();
 
@@ -50,10 +61,7 @@ export async function generatePDF(
 
     // Clean up after a short delay to ensure the download has started
     setTimeout(() => URL.revokeObjectURL(url), 1000);
-
-    console.log('✅ PDF generation completed successfully');
   } catch (error) {
-    console.error('❌ Error generating PDF:', error);
     throw new Error(
       `Failed to generate PDF: ${error instanceof Error ? error.message : 'Unknown error'}`
     );

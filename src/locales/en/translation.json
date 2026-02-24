@@ -119,7 +119,18 @@
       "summarizing": "Summarizing Key Points"
     },
     "estimatedTime": "Estimated time",
-    "almostDone": "Almost done"
+    "almostDone": "Almost done",
+    "error": {
+      "title": "Transcription Error",
+      "explanation": "We couldn't transcribe your audio file. This can happen for a few reasons.",
+      "possibleReasons": "Possible reasons:",
+      "reasonFormat": "The audio format is unsupported or corrupted.",
+      "reasonSilence": "The recording contains mostly silence or background noise.",
+      "reasonNetwork": "A momentary network error interrupted the connection.",
+      "fixApiKey": "Fix API Key",
+      "tryAgain": "Try Again",
+      "closeAndRetry": "Close & Try Again"
+    }
   },
   "languages": {
     "en": "English",
@@ -465,6 +476,34 @@
     "emptyState": "Ask me anything about your transcript or summary",
     "disclaimer": "AI can make mistakes. Verify important information.",
     "tokenLimit": "Token limit reached"
+  },
+  "pdfModal": {
+    "generating": "Generating PDF",
+    "description": "Creating your professional PDF document...",
+    "success": "PDF downloaded successfully!",
+    "error": "Failed to generate PDF: {{message}}"
+  },
+  "deleteConfirmModal": {
+    "titleSingle": "Delete Recording?",
+    "titleBulk": "Delete {{count}} Recordings?",
+    "messageSingle": "Are you sure you want to delete this recording? This action cannot be undone.",
+    "messageBulk": "Are you sure you want to delete {{count}} recordings? This action cannot be undone.",
+    "recordingLabel": "Recording:",
+    "createdLabel": "Created:",
+    "confirmButton": "Yes, Delete",
+    "confirmingButton": "Deleting...",
+    "cancelButton": "Cancel",
+    "typeToConfirm": "Type DELETE to confirm",
+    "typeToConfirmPlaceholder": "Type DELETE here",
+    "affectedItems": "Recordings to be deleted:"
+  },
+  "export": {
+    "templates": {
+      "meeting": "Meeting",
+      "lecture": "Academic",
+      "interview": "Q&A",
+      "generic": "Standard"
+    }
   },
   "tokenUsage": {
     "label": "Token Usage",
