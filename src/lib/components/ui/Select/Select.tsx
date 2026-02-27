@@ -22,7 +22,7 @@ export interface SelectProps {
   /** Array of options or groups to display */
   options: SelectOption[] | SelectGroup[];
   /** Label for the select input */
-  label?: string;
+  label?: React.ReactNode;
   /** Placeholder text when nothing is selected */
   placeholder?: string;
   /** Whether the select is disabled */

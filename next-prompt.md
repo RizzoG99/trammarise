@@ -1,10 +1,10 @@
 ---
-page: results-diarization-v2
+page: results-standard-v2
 ---
 
-A refreshed results page with speaker diarization enabled — the Pro-tier "gold standard" view.
+A refreshed results page for standard (free) users — the clean, accessible baseline view without speaker diarization.
 
-This is the next evolution of speaker-diarization-results.html, updated to match the new design system.
+This is the counterpart to results-diarization-v2.html. Free-tier users see a streamlined transcript + summary layout without speaker pills, but with a clear upgrade nudge for the Pro diarization feature.
 
 **DESIGN SYSTEM (REQUIRED):**
 
@@ -26,21 +26,25 @@ This is the next evolution of speaker-diarization-results.html, updated to match
 1. Sticky glass header (56px) — logo, filename pill, theme toggle, user avatar
 2. Sticky audio player bar (72px, below header) — waveform progress, play/pause, speed (0.5×–2×), volume, timestamp
 3. Main split layout (full remaining height):
-   - Left panel (40%): Summary card with collapsible sections (Executive Summary, Key Decisions, Action Items), each showing speaker attribution inline
-   - Right panel (60%): Full transcript scroll with speaker-colored segments. Show 3 distinct speakers: "Alex Chen" (blue pill), "Maria Santos" (purple pill), "David Kim" (green pill). Active segment highlighted during playback (lighter bg + left border). Timestamps shown on hover.
-4. Speaker legend row (above transcript) — avatar initials + color badge + total speaking time %
+   - Left panel (40%): Summary card with collapsible sections (Executive Summary, Key Topics, Action Items). Clean, single-color text — no speaker attribution. Each section shows a chevron toggle.
+   - Right panel (60%): Full transcript scroll — plain paragraphs with timestamps shown on hover, no speaker coloring. Active word/sentence lightly highlighted during playback.
+4. Upgrade nudge banner (between player bar and main layout, amber/amber-10 bg): "🎙️ Enable speaker labels — see who said what. Upgrade to Pro" with a CTA button and an "x" dismiss.
 5. Floating "Chat with AI" FAB button (bottom-right, primary blue, glowing shadow)
-6. Export button in header (ghost style) — unlocked for Pro users
+6. Export button in header (ghost style) — shows "Export PDF" text but disabled with lock icon for free tier
 
 **Content to use:**
 
-- File: "Product_Roadmap_Q2_2025.mp3" (47:23 duration)
-- Alex Chen: "The key priority for Q2 is completing the speaker diarization feature before the June release window..."
-- Maria Santos: "I agree. From the engineering side, we're estimating 3 weeks for the Whisper integration and another week for testing..."
-- David Kim: "Sales is seeing strong demand for the feature — three enterprise prospects specifically asked about multi-speaker support..."
+- File: "Team_Standup_Feb_26.mp3" (12:47 duration)
+- Transcript excerpt: "Good morning everyone. Today we'll cover the sprint status, blocker from the API team, and then review the design feedback from yesterday's session. The backend is on track for the Monday release window. There's one blocker on the authentication service that needs attention before we can close the sprint."
+- Summary sections:
+  - Executive Summary: "Daily standup covering sprint status, one critical blocker on the authentication service, and design feedback review."
+  - Key Topics: API blocker, sprint status, Monday release, design feedback
+  - Action Items (2 items): "Resolve auth service blocker (owner: backend team)" and "Share design feedback doc with product team"
 
 **States to show:**
 
-- Segment 3 (David's quote) actively highlighted (playhead at 08:42)
-- "Action Items" section in summary expanded with 2 checkboxes
-- Chat FAB pulsing subtly
+- Playhead at 04:18, second paragraph highlighted (lighter bg)
+- "Key Topics" section expanded with 4 tags
+- "Action Items" collapsed (showing chevron)
+- Upgrade nudge banner visible (not dismissed)
+- Export button showing lock icon (disabled state)

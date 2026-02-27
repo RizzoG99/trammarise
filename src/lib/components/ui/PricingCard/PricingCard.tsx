@@ -51,7 +51,7 @@ export function PricingCard({
     >
       {plan.badge && (
         <div className="mb-4">
-          <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-[var(--color-primary)] to-indigo-600 px-3 py-1 text-sm font-semibold text-white">
+          <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-hover)] px-3 py-1 text-sm font-semibold text-white">
             <Zap className="w-4 h-4" aria-hidden="true" />
             {plan.badge}
           </span>
@@ -59,18 +59,18 @@ export function PricingCard({
       )}
 
       <div className="mb-4">
-        <Heading level="h3" className="text-2xl font-bold text-white mb-2">
+        <Heading level="h3" className="text-2xl font-bold text-text-primary mb-2">
           {plan.name}
         </Heading>
-        <Text variant="body" className="text-slate-400">
+        <Text variant="body" className="text-text-secondary">
           {plan.description}
         </Text>
       </div>
 
       <div className="mb-6">
         <div className="flex items-baseline gap-2">
-          <span className="text-5xl font-bold text-white">{price}</span>
-          <span className="text-slate-400">{interval}</span>
+          <span className="text-5xl font-bold text-text-primary">{price}</span>
+          <span className="text-text-secondary">{interval}</span>
         </div>
       </div>
 
@@ -89,13 +89,13 @@ export function PricingCard({
       )}
 
       <ul className="space-y-3">
-        {plan.features.map((feature, index) => (
-          <li key={index} className="flex items-start gap-3">
+        {plan.features.map((feature) => (
+          <li key={feature} className="flex items-start gap-3">
             <Check
               className="w-5 h-5 text-[var(--color-accent-success)] flex-shrink-0 mt-0.5"
               aria-hidden="true"
             />
-            <span className="text-sm text-slate-300">{feature}</span>
+            <span className="text-sm text-text-secondary">{feature}</span>
           </li>
         ))}
       </ul>

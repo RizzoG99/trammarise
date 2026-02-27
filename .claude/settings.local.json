@@ -67,5 +67,9 @@
     ],
     "deny": [],
     "ask": []
+  },
+  "enabledPlugins": {
+    "supabase@claude-plugins-official": true,
+    "everything-claude-code@everything-claude-code": false
   }
 }

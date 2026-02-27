@@ -133,6 +133,26 @@
       "closeAndRetry": "Schließen und erneut versuchen"
     }
   },
+  "processingState": {
+    "messages": {
+      "loading": "Audio-Prozessor wird geladen...",
+      "compressing": "Audio wird optimiert...",
+      "transcribing": "Audio wird mit Whisper transkribiert...",
+      "configuring": "KI-Einstellungen werden konfiguriert...",
+      "summarizing": "KI-Zusammenfassung wird generiert...",
+      "complete": "Verarbeitung abgeschlossen!",
+      "default": "Wird verarbeitet..."
+    },
+    "steps": {
+      "preparing": "Vorbereitung",
+      "optimizing": "Optimierung",
+      "step1of2": "1/2",
+      "step2of2": "2/2"
+    },
+    "stepLabel": "Schritt {{step}}",
+    "hint": "Dies kann einen Moment dauern. Bitte schließen Sie dieses Fenster nicht.",
+    "cancel": "Verarbeitung abbrechen"
+  },
   "languages": {
     "en": "Englisch",
     "it": "Italienisch",
@@ -224,7 +244,9 @@
     "uploadSuccess": "Datei erfolgreich hochgeladen",
     "recordingSaved": "Aufnahme gespeichert",
     "replaceFile": "Datei ersetzen",
+    "replaceAriaLabel": "Audiodatei ersetzen",
     "remove": "Entfernen",
+    "removeAriaLabel": "Audiodatei entfernen",
     "unknownFormat": "Unbekanntes Format"
   },
   "configuration": {
@@ -464,13 +486,25 @@
       "utterances": "Äußerungen",
       "resultsFound": "Ergebnisse gefunden",
       "noResults": "Keine Ergebnisse gefunden",
-      "noUtterances": "Keine Äußerungen verfügbar"
+      "noUtterances": "Keine Äußerungen verfügbar",
+      "jumpTo": "Zu {{timestamp}} springen",
+      "clearSearch": "Suche löschen"
     },
     "summary": {
       "title": "Zusammenfassung",
       "copyAll": "Alles Kopieren",
       "phase4Placeholder": "Strukturierte Zusammenfassungen kommen in Phase 4"
+    },
+    "chat": {
+      "floatingButtonTooltip": "Mit Chat verfeinern"
     }
+  },
+  "audioPlayer": {
+    "skipBack": "10 Sekunden zurückspringen",
+    "play": "Abspielen",
+    "pause": "Pause",
+    "skipForward": "10 Sekunden vorspringen",
+    "playbackSpeed": "Wiedergabegeschwindigkeit: {{speed}}x"
   },
   "chatModal": {
     "title": "Mit KI Verfeinern",
@@ -575,6 +609,11 @@
       "activity": "Aktivität (Letzte 7 Tage)",
       "sessions": "{{count}} Sitzung",
       "sessions_plural": "{{count}} Sitzungen"
+    },
+    "quickActions": {
+      "play": "Vorschau abspielen",
+      "copy": "Zusammenfassung kopieren",
+      "download": "Herunterladen"
     },
     "stats": {
       "recordingCount": "{{count}} Aufnahme",
@@ -729,44 +768,6 @@
         "question": "Was passiert, wenn ich meine Minuten überschreite?",
         "answer": "Sie können jederzeit zusätzliche Credits kaufen. Nicht genutzte Minuten werden nicht übertragen, aber Sie können immer Ihre eigenen API-Schlüssel für unbegrenzte Verarbeitung verwenden."
       }
-    }
-  },
-  "onboarding": {
-    "modal": {
-      "title": "🔑 Willkommen bei Trammarise",
-      "heading": "Ein weiterer Schritt zum Start",
-      "description": "Um Trammarise zu verwenden, müssen Sie entweder Ihren eigenen OpenAI API-Schlüssel bereitstellen oder auf einen Pro-Plan upgraden.",
-      "option1": {
-        "title": "Option 1: Verwenden Sie Ihren eigenen API-Schlüssel (Kostenlos)",
-        "placeholder": "sk-...",
-        "rememberKey": "Meinen API-Schlüssel merken (verschlüsselt gespeichert)",
-        "continueButton": "Mit API-Schlüssel fortfahren",
-        "saving": "Speichern...",
-        "instructions": {
-          "toggle": "So erhalten Sie einen OpenAI API-Schlüssel",
-          "step1": "Gehen Sie zu platform.openai.com",
-          "step2": "Melden Sie sich an oder erstellen Sie ein Konto",
-          "step3": "Klicken Sie auf \"Neuen geheimen Schlüssel erstellen\"",
-          "step4": "Kopieren Sie den Schlüssel (beginnt mit \"sk-\")",
-          "step5": "Fügen Sie ihn in das obige Feld ein",
-          "note": "💡 Sie zahlen OpenAI direkt für die Nutzung (typischerweise $0.006/Minute für Whisper)"
-        },
-        "errors": {
-          "empty": "Bitte geben Sie Ihren API-Schlüssel ein",
-          "invalidFormat": "Ungültiges API-Schlüssel-Format. OpenAI-Schlüssel beginnen mit \"sk-\"",
-          "saveFailed": "Fehler beim Speichern des API-Schlüssels. Bitte versuchen Sie es erneut."
-        }
-      },
-      "option2": {
-        "title": "Option 2: Auf Pro upgraden",
-        "description": "Erhalten Sie 500 Minuten/Monat mit gehosteter API, Cloud-Sync und Priority-Support.",
-        "button": "Pro-Pläne ansehen →"
-      },
-      "divider": "oder"
-    },
-    "banner": {
-      "message": "Sie sind fast fertig! Schließen Sie das Setup ab, um Trammarise freizuschalten.",
-      "button": "Zurück zum Setup"
     }
   },
   "onboarding": {

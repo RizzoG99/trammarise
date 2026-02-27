@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useCallback } from 'react';
-import { Modal, ChatInterface, Snackbar, AILoadingOrb, Text } from '@/lib';
+import { Modal, Snackbar, AILoadingOrb, Text } from '@/lib';
 import { chatWithAI } from '../../utils/api';
 import { useAuth } from '@clerk/clerk-react';
 import { useTranslation } from 'react-i18next';
@@ -10,6 +10,11 @@ import { AudioPlayerBar } from '../../features/results/components/AudioPlayerBar
 import { SummaryPanel } from '../../features/results/components/SummaryPanel';
 import { SearchableTranscript } from '../../features/results/components/SearchableTranscript';
 import { SpeakerTranscriptView } from '../../features/results/components/SpeakerTranscriptView';
+import {
+  TranscriptTabBar,
+  type TranscriptTab,
+} from '../../features/results/components/TranscriptTabBar';
+import { ChatSidePanel } from '../../features/results/components/ChatSidePanel';
 import { FloatingChatButton } from '../../features/results/components/FloatingChatButton';
 import {
   ExportPDFDialog,
@@ -65,6 +70,7 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
   const [isPdfGenerating, setIsPdfGenerating] = useState(false);
   const [pdfError, setPdfError] = useState<string | null>(null);
   const [pdfSuccess, setPdfSuccess] = useState(false);
+  const [activeTab, setActiveTab] = useState<TranscriptTab>('transcript');
 
   // Upgrade Modal State
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
@@ -247,39 +253,41 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
         }
         summaryPanel={<SummaryPanel summary={result.summary} />}
         transcriptPanel={
-          result.utterances && result.utterances.length > 0 ? (
-            <SpeakerTranscriptView
-              utterances={result.utterances}
-              currentTime={audioPlayer.state.currentTime}
-              onTimestampClick={handleTimestampClick}
-            />
-          ) : (
-            <SearchableTranscript
-              transcript={result.transcript}
-              activeSegmentId={activeSegmentId}
-              onTimestampClick={handleTimestampClick}
-            />
-          )
+          <div className="flex flex-col h-full">
+            {hasDiarization && (
+              <TranscriptTabBar
+                activeTab={activeTab}
+                onTabChange={setActiveTab}
+                hasDiarization={hasDiarization}
+              />
+            )}
+            {activeTab === 'diarization' && result.utterances && result.utterances.length > 0 ? (
+              <SpeakerTranscriptView
+                utterances={result.utterances}
+                currentTime={waveformTime}
+                onTimestampClick={handleTimestampClick}
+              />
+            ) : (
+              <SearchableTranscript
+                transcript={result.transcript}
+                activeSegmentId={activeSegmentId}
+                onTimestampClick={handleTimestampClick}
+              />
+            )}
+          </div>
         }
         floatingChatButton={
           <FloatingChatButton onClick={handleChatOpen} isOpen={isChatOpen} hasNewMessages={false} />
         }
-        chatModal={
-          isChatOpen && (
-            <Modal
-              isOpen={isChatOpen}
-              onClose={() => setIsChatOpen(false)}
-              title={t('chatModal.title', 'Refine with Chat')}
-            >
-              <div className="h-[600px]">
-                <ChatInterface
-                  onSendMessage={handleSendMessage}
-                  isLoading={isLoadingChat}
-                  chatHistory={result.chatHistory}
-                />
-              </div>
-            </Modal>
-          )
+        isChatOpen={isChatOpen}
+        chatPanel={
+          <ChatSidePanel
+            isOpen={isChatOpen}
+            onClose={() => setIsChatOpen(false)}
+            isLoading={isLoadingChat}
+            chatHistory={result.chatHistory}
+            onSendMessage={handleSendMessage}
+          />
         }
       />
 

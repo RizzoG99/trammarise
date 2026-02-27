@@ -8,6 +8,7 @@ import { Heading, Text, GlassCard, SEO } from '@/lib';
 import { PageLayout } from '../../components/layout/PageLayout';
 import { UploadPanel } from '../../features/upload/components/UploadPanel';
 import { RecordPanel, type RecordPanelRef } from '../../features/upload/components/RecordPanel';
+import { UploadRecordTabs } from '../../features/upload/components/UploadRecordTabs';
 import { ContextUploadArea } from '../../features/upload/components/ContextUploadArea';
 import { EnhancedLanguageSelector } from '../../features/configuration/components/EnhancedLanguageSelector';
 import { ContentTypeSelector } from '../../features/configuration/components/ContentTypeSelector';
@@ -124,24 +125,34 @@ export function UploadRecordPage() {
         canonical="https://trammarise.app/"
       />
       {/* Page Title */}
-      <div className="mb-8">
-        <Heading level="h1">{t('home.title')}</Heading>
-        <Text variant="body" color="secondary">
+      <div className="mb-8 animate-fade-up">
+        <Heading level="hero">{t('home.title')}</Heading>
+        <Text
+          variant="body"
+          color="secondary"
+          className="font-light mt-1 animate-fade-up [animation-delay:80ms]"
+        >
           {t('home.subtitle')}
         </Text>
       </div>
 
-      {/* Upload/Record Split Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <UploadPanel
-          onFileUpload={handleFileUpload}
-          uploadedFile={audioFile}
-          onFileRemove={handleFileRemove}
-        />
-        <RecordPanel
-          ref={recordPanelRef}
-          onRecordingComplete={handleRecordingComplete}
-          onRecordingStart={handleRecordingStart}
+      {/* Upload/Record Tabs (Mobile) & Split Grid (Desktop) */}
+      <div className="mb-8">
+        <UploadRecordTabs
+          uploadPanel={
+            <UploadPanel
+              onFileUpload={handleFileUpload}
+              uploadedFile={audioFile}
+              onFileRemove={handleFileRemove}
+            />
+          }
+          recordPanel={
+            <RecordPanel
+              ref={recordPanelRef}
+              onRecordingComplete={handleRecordingComplete}
+              onRecordingStart={handleRecordingStart}
+            />
+          }
         />
       </div>
 
@@ -177,21 +188,23 @@ export function UploadRecordPage() {
             />
           </div>
         </div>
+
+        {/* Error Display */}
+        {processingError && (
+          <div className="mt-6 p-3 rounded-lg bg-red-500/10 border border-red-500/30">
+            <Text className="text-red-600 dark:text-red-400 text-sm">{processingError}</Text>
+          </div>
+        )}
       </GlassCard>
 
-      {/* Error Display */}
-      {processingError && (
-        <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/30">
-          <Text className="text-red-600 dark:text-red-400 text-sm">{processingError}</Text>
-        </div>
-      )}
-
-      {/* Process Audio Button */}
-      <ProcessAudioButton
-        disabled={!audioFile || isProcessing}
-        onProcess={handleProcessAudio}
-        isLoading={isProcessing}
-      />
+      {/* Process Audio Button — elevated, full-width, outside config card */}
+      <div className="mb-8">
+        <ProcessAudioButton
+          disabled={!audioFile || isProcessing}
+          onProcess={handleProcessAudio}
+          isLoading={isProcessing}
+        />
+      </div>
     </PageLayout>
   );
 }

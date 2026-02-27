@@ -5,12 +5,21 @@
   :root {
     /* Base Configuration (Light Mode Default) */
     font-family:
-      'Inter',
+      'Plus Jakarta Sans',
       system-ui,
       -apple-system,
       sans-serif;
     line-height: 1.5;
     font-weight: 400;
+
+    /* Font stack */
+    --font-display: 'Plus Jakarta Sans', system-ui, sans-serif;
+    --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
+
+    /* Letter spacing — geometric fonts breathe at tighter tracking */
+    --tracking-tight: -0.03em;
+    --tracking-normal: -0.01em;
+    --tracking-wide: 0.05em;
 
     /* Colors - Light Mode */
     /* Colors - Light Mode (Updated to match V8.0 base but kept usable) */
@@ -30,11 +39,12 @@
     --color-text-tertiary: #94a3b8;
 
     /* Brand Primary - Ocean Gloss Blue */
-    --color-primary: #3b82f6;
-    --color-primary-light: #60a5fa;
-    --color-primary-hover: #2563eb;
-    --color-primary-alpha-10: rgba(59, 130, 246, 0.1);
-    --color-primary-alpha-20: rgba(59, 130, 246, 0.2);
+    --color-primary: oklch(54% 0.21 260);
+    --color-primary-light: oklch(72% 0.14 260);
+    --color-primary-hover: oklch(47% 0.21 260);
+    --color-primary-alpha-5: color-mix(in oklch, var(--color-primary) 5%, transparent);
+    --color-primary-alpha-10: color-mix(in oklch, var(--color-primary) 10%, transparent);
+    --color-primary-alpha-20: color-mix(in oklch, var(--color-primary) 20%, transparent);
 
     /* Accents */
     --color-accent-success: #10b981;
@@ -89,6 +99,11 @@
     --transition-fast: 150ms ease;
     --transition-normal: 250ms ease;
     --transition-slow: 350ms ease;
+
+    /* Easing Functions */
+    --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
   }
 
   /* Dark Mode - Liquid Glass V8.0 */
@@ -110,11 +125,12 @@
     --color-text-tertiary: #94a3b8;
 
     /* Brand Primary - Ocean Gloss Blue */
-    --color-primary: #3b82f6;
-    --color-primary-light: #60a5fa;
-    --color-primary-hover: #2563eb;
-    --color-primary-alpha-10: rgba(59, 130, 246, 0.15);
-    --color-primary-alpha-20: rgba(59, 130, 246, 0.25);
+    --color-primary: oklch(54% 0.21 260);
+    --color-primary-light: oklch(72% 0.14 260);
+    --color-primary-hover: oklch(47% 0.21 260);
+    --color-primary-alpha-5: color-mix(in oklch, var(--color-primary) 5%, transparent);
+    --color-primary-alpha-10: color-mix(in oklch, var(--color-primary) 15%, transparent);
+    --color-primary-alpha-20: color-mix(in oklch, var(--color-primary) 25%, transparent);
 
     /* Glassmorphism for Dark Mode - 5% opacity, 24px blur */
     --glass-bg: rgba(15, 23, 42, 0.5); /* Slightly more opaque for legibility */
@@ -127,6 +143,11 @@
     min-width: 320px;
     min-height: 100vh;
     background-color: var(--color-bg-primary);
+    background-image: radial-gradient(
+      ellipse 80% 60% at 50% -10%,
+      color-mix(in oklch, var(--color-primary) 6%, transparent),
+      transparent 70%
+    );
     color: var(--color-text-primary);
     transition:
       background-color 0.3s ease,
@@ -170,5 +191,40 @@
 
   .pulse-ring {
     animation: pulse-ring 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  /* Pulsing shadow for drag and drop area */
+  @keyframes drag-pulse {
+    0% {
+      box-shadow: 0 0 0 0 var(--color-primary-alpha-20);
+    }
+    70% {
+      box-shadow: 0 0 0 15px transparent;
+    }
+    100% {
+      box-shadow: 0 0 0 0 transparent;
+    }
+  }
+
+  .drag-active {
+    animation: drag-pulse 1.5s infinite;
+    border-color: var(--color-primary);
+    background-color: var(--color-primary-alpha-10);
+  }
+
+  /* Page entry animation */
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-up {
+    animation: fade-up 0.45s var(--ease-out-quart) both;
   }
 }

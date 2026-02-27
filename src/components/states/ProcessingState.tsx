@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { AILoadingOrb, Button } from '@/lib';
 import type { ProcessingStateData } from '../../types/audio';
 
@@ -8,68 +9,65 @@ interface ProcessingStateProps {
 }
 
 export const ProcessingState: React.FC<ProcessingStateProps> = ({ processingData, onCancel }) => {
+  const { t } = useTranslation();
   const { step, progress } = processingData;
 
   const getMessage = () => {
     switch (step) {
       case 'loading':
-        return 'Loading audio processor...';
+        return t('processingState.messages.loading');
       case 'compressing':
-        return 'Optimizing audio for processing...';
+        return t('processingState.messages.compressing');
       case 'transcribing':
-        return 'Transcribing audio with Whisper...';
+        return t('processingState.messages.transcribing');
       case 'configuring':
-        return 'Configuring AI settings...';
+        return t('processingState.messages.configuring');
       case 'summarizing':
-        return 'Generating AI summary...';
+        return t('processingState.messages.summarizing');
       case 'complete':
-        return 'Processing complete!';
+        return t('processingState.messages.complete');
       default:
-        return 'Processing...';
+        return t('processingState.messages.default');
     }
   };
 
-  const getStepNumber = () => {
+  const getStepLabel = () => {
     switch (step) {
       case 'loading':
-        return 'Preparing';
+        return t('processingState.steps.preparing');
       case 'compressing':
-        return 'Optimizing';
+        return t('processingState.steps.optimizing');
       case 'transcribing':
-        return '1/2';
+        return t('processingState.steps.step1of2');
       case 'configuring':
-        return '1/2';
+        return t('processingState.steps.step1of2');
       case 'summarizing':
-        return '2/2';
+        return t('processingState.steps.step2of2');
       case 'complete':
-        return '2/2';
+        return t('processingState.steps.step2of2');
       default:
-        return '1/2';
+        return t('processingState.steps.step1of2');
     }
   };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[400px] w-full max-w-[600px] mx-auto text-center animate-[fadeIn_0.3s_ease-out]">
-      <div className="w-full p-8 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-md">
+      <div className="w-full p-8 bg-bg-surface border border-border rounded-xl shadow-md">
         <AILoadingOrb size={120} />
-        <h2 className="mt-6 mb-2 text-2xl font-semibold text-slate-900 dark:text-white">{getMessage()}</h2>
-        <p className="mb-8 text-base text-slate-600 dark:text-slate-300">Step {getStepNumber()}</p>
-        <div className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden mb-6">
+        <h2 className="mt-6 mb-2 text-2xl font-semibold text-text-primary">{getMessage()}</h2>
+        <p className="mb-8 text-base text-text-secondary">
+          {t('processingState.stepLabel', { step: getStepLabel() })}
+        </p>
+        <div className="w-full h-2 bg-bg-tertiary rounded-full overflow-hidden mb-6">
           <div
-            className="h-full bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full transition-[width] duration-300 ease-out"
+            className="h-full bg-primary rounded-full transition-[width] duration-300 ease-out"
             style={{ width: `${progress}%` }}
           />
         </div>
-        <p className="text-sm text-slate-600 dark:text-slate-400 mb-6">
-          This may take a moment. Please don't close this window.
-        </p>
+        <p className="text-sm text-text-secondary mb-6">{t('processingState.hint')}</p>
         {onCancel && (
-          <Button
-            variant="outline"
-            onClick={onCancel}
-            className="mt-4"
-          >
-            Cancel Processing
+          <Button variant="outline" onClick={onCancel} className="mt-4">
+            {t('processingState.cancel')}
           </Button>
         )}
       </div>

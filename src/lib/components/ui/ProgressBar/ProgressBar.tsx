@@ -8,30 +8,32 @@ export function ProgressBar({ value, max, warning = false }: ProgressBarProps) {
   const percentage = Math.min(100, (value / max) * 100);
   const isOverLimit = value >= max;
 
+  const barColor = isOverLimit
+    ? 'var(--color-accent-error)'
+    : warning
+      ? 'var(--color-accent-warning)'
+      : 'var(--color-primary)';
+
+  const labelColor = isOverLimit
+    ? 'var(--color-accent-error)'
+    : warning
+      ? 'var(--color-accent-warning)'
+      : 'var(--color-primary)';
+
   return (
     <div className="w-full">
       <div className="flex justify-between text-sm mb-2">
-        <span className="text-gray-700 dark:text-gray-300">
+        <span className="text-text-secondary">
           {value.toFixed(1)} / {max} minutes
         </span>
-        <span
-          className={`font-medium ${
-            isOverLimit
-              ? 'text-red-600 dark:text-red-400'
-              : warning
-                ? 'text-yellow-600 dark:text-yellow-400'
-                : 'text-indigo-600 dark:text-indigo-400'
-          }`}
-        >
+        <span className="font-medium" style={{ color: labelColor }}>
           {percentage.toFixed(0)}%
         </span>
       </div>
-      <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+      <div className="h-3 bg-bg-tertiary rounded-full overflow-hidden">
         <div
-          className={`h-full transition-all duration-500 ease-out ${
-            isOverLimit ? 'bg-red-500' : warning ? 'bg-yellow-500' : 'bg-indigo-500'
-          }`}
-          style={{ width: `${percentage}%` }}
+          className="h-full transition-all duration-500 ease-out rounded-full"
+          style={{ width: `${percentage}%`, backgroundColor: barColor }}
           role="progressbar"
           aria-valuenow={value}
           aria-valuemin={0}

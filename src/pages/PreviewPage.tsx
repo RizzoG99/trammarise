@@ -22,9 +22,9 @@ export const PreviewPage: React.FC = () => {
   // Component states for interactive demos
   const [modalOpen, setModalOpen] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarVariant, setSnackbarVariant] = useState<
-    'success' | 'error' | 'warning' | 'info'
-  >('success');
+  const [snackbarVariant, setSnackbarVariant] = useState<'success' | 'error' | 'warning' | 'info'>(
+    'success'
+  );
   const [toggleChecked, setToggleChecked] = useState(false);
   const [radioSelected, setRadioSelected] = useState('option1');
   const [selectSelected, setSelectSelected] = useState('video');
@@ -42,9 +42,7 @@ export const PreviewPage: React.FC = () => {
       <div className="max-w-7xl mx-auto p-8">
         {/* Page Header */}
         <header className="mb-12">
-          <h1 className="text-5xl font-bold mb-3 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-            Component Preview
-          </h1>
+          <h1 className="text-5xl font-bold mb-3 text-text-primary">Component Preview</h1>
           <p className="text-lg text-slate-600 dark:text-slate-400">
             Development-only page for testing and showcasing all library components.
             <br />
@@ -128,10 +126,7 @@ export const PreviewPage: React.FC = () => {
                 <Button variant="circle" onClick={() => alert('Circle clicked')}>
                   +
                 </Button>
-                <Button
-                  variant="circle-thick"
-                  onClick={() => alert('Circle-thick clicked')}
-                >
+                <Button variant="circle-thick" onClick={() => alert('Circle-thick clicked')}>
                   ✓
                 </Button>
               </div>
@@ -188,12 +183,7 @@ export const PreviewPage: React.FC = () => {
               onChange={(e) => setInputValue(e.target.value)}
               hint="Enter your username"
             />
-            <Input
-              label="Email"
-              type="email"
-              required
-              hint="We'll never share your email"
-            />
+            <Input label="Email" type="email" required hint="We'll never share your email" />
             <Input
               label="Password"
               type="password"
@@ -277,8 +267,8 @@ export const PreviewPage: React.FC = () => {
           </div>
           <div className="mt-6 p-4 bg-slate-100 dark:bg-slate-800 rounded-lg">
             <p className="text-sm text-slate-600 dark:text-slate-400">
-              <strong>Features:</strong> Multi-layer morphing ellipses, animated gradients,
-              floating particles, glow effects, and reduced-motion support.
+              <strong>Features:</strong> Multi-layer morphing ellipses, animated gradients, floating
+              particles, glow effects, and reduced-motion support.
             </p>
           </div>
         </ComponentSection>
@@ -348,8 +338,7 @@ export const PreviewPage: React.FC = () => {
               ]}
             >
               <p>
-                This is a modal with actions. Click outside, press ESC, or use the
-                buttons to close.
+                This is a modal with actions. Click outside, press ESC, or use the buttons to close.
               </p>
             </Modal>
           </div>
@@ -393,18 +382,13 @@ export const PreviewPage: React.FC = () => {
           ]}
         >
           <div className="flex flex-wrap gap-2">
-            <Button
-              variant="success"
-              onClick={() => handleShowSnackbar('success')}
-            >
+            <Button variant="success" onClick={() => handleShowSnackbar('success')}>
               Success Snackbar
             </Button>
             <Button variant="danger" onClick={() => handleShowSnackbar('error')}>
               Error Snackbar
             </Button>
-            <Button onClick={() => handleShowSnackbar('warning')}>
-              Warning Snackbar
-            </Button>
+            <Button onClick={() => handleShowSnackbar('warning')}>Warning Snackbar</Button>
             <Button variant="secondary" onClick={() => handleShowSnackbar('info')}>
               Info Snackbar
             </Button>
@@ -663,10 +647,7 @@ export const PreviewPage: React.FC = () => {
         <footer className="mt-16 pt-8 border-t border-slate-200 dark:border-slate-700 text-center text-sm text-slate-500">
           <p>
             Component Library v1.0.0 • 10 Components •{' '}
-            <a
-              href="/"
-              className="text-indigo-600 dark:text-indigo-400 hover:underline"
-            >
+            <a href="/" className="text-primary hover:underline">
               Back to App
             </a>
           </p>

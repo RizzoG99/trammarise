@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import '@testing-library/jest-dom/vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ExportPDFDialog } from './ExportPDFDialog';
 import type { AIConfiguration } from '../../../types/audio';
@@ -97,7 +98,12 @@ describe('ExportPDFDialog', () => {
       const input = screen.getByDisplayValue('my-transcript');
       fireEvent.change(input, { target: { value: '  report  ' } });
       fireEvent.click(screen.getByRole('button', { name: /download pdf/i }));
-      expect(onExport).toHaveBeenCalledWith('report');
+      expect(onExport).toHaveBeenCalledWith('report', {
+        includeSummary: true,
+        includeTranscript: true,
+        includeMetadata: true,
+        template: 'meeting',
+      });
     });
 
     it('calls onExport with Enter key in the filename input', () => {
@@ -105,13 +111,19 @@ describe('ExportPDFDialog', () => {
       render(<ExportPDFDialog {...defaultProps} onExport={onExport} />);
       const input = screen.getByDisplayValue('my-transcript');
       fireEvent.keyDown(input, { key: 'Enter' });
-      expect(onExport).toHaveBeenCalledWith('my-transcript');
+      expect(onExport).toHaveBeenCalledWith('my-transcript', {
+        includeSummary: true,
+        includeTranscript: true,
+        includeMetadata: true,
+        template: 'meeting',
+      });
     });
 
     it('does not call onExport on Enter when filename is empty', () => {
       const onExport = vi.fn();
       render(<ExportPDFDialog {...defaultProps} initialFileName="" onExport={onExport} />);
-      const input = screen.getByRole('textbox');
+      const inputs = screen.getAllByRole('textbox');
+      const input = inputs.find((el) => (el as HTMLInputElement).value === '') || inputs[0];
       fireEvent.keyDown(input, { key: 'Enter' });
       expect(onExport).not.toHaveBeenCalled();
     });

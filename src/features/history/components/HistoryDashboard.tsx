@@ -20,7 +20,7 @@ export function HistoryDashboard({ sessions }: HistoryDashboardProps) {
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-8">
       {/* Total Time Card */}
       <GlassCard variant="light" className="p-4 flex items-center gap-4">
-        <div className="p-3 rounded-full bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400">
+        <div className="p-3 rounded-full bg-primary/10 text-primary">
           <Clock className="w-5 h-5" />
         </div>
         <div>
@@ -36,7 +36,7 @@ export function HistoryDashboard({ sessions }: HistoryDashboardProps) {
 
       {/* Top Category Card */}
       <GlassCard variant="light" className="p-4 flex items-center gap-4">
-        <div className="p-3 rounded-full bg-purple-100 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400">
+        <div className="p-3 rounded-full bg-primary/10 text-primary">
           <FileAudio className="w-5 h-5" />
         </div>
         <div className="min-w-0">

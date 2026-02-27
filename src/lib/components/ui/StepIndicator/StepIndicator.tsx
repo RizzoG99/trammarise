@@ -49,7 +49,7 @@ export function StepIndicator({ steps, currentStep, className = '' }: StepIndica
                       ? 'bg-[var(--color-accent-success)] border-[var(--color-accent-success)] text-white'
                       : status === 'active'
                         ? 'bg-[var(--color-primary)] border-[var(--color-primary)] text-white'
-                        : 'bg-transparent border-[var(--color-border)] text-[var(--color-text-muted)]',
+                        : 'bg-transparent border-[var(--color-border)] text-text-tertiary',
                   ].join(' ')}
                 >
                   {status === 'completed' ? <Check className="w-4 h-4" /> : <span>{step.id}</span>}
@@ -61,7 +61,7 @@ export function StepIndicator({ steps, currentStep, className = '' }: StepIndica
                       ? 'text-[var(--color-primary)]'
                       : status === 'completed'
                         ? 'text-[var(--color-text-secondary)]'
-                        : 'text-[var(--color-text-muted)]',
+                        : 'text-text-tertiary',
                   ].join(' ')}
                 >
                   {step.label}

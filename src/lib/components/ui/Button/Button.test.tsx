@@ -30,13 +30,13 @@ describe('Button', () => {
     it('applies primary variant by default', () => {
       render(<Button>Primary</Button>);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-indigo-600');
+      expect(button).toHaveClass('bg-[var(--color-primary)]');
     });
 
     it('applies secondary variant classes', () => {
       render(<Button variant="secondary">Secondary</Button>);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-slate-100');
+      expect(button).toHaveClass('bg-bg-surface');
     });
 
     it('applies success variant classes', () => {
@@ -54,7 +54,7 @@ describe('Button', () => {
     it('applies outline variant classes', () => {
       render(<Button variant="outline">Outline</Button>);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-slate-50');
+      expect(button).toHaveClass('bg-bg-surface');
     });
 
     it('applies small variant classes', () => {
@@ -101,7 +101,11 @@ describe('Button', () => {
 
     it('does not call onClick when disabled', () => {
       const handleClick = vi.fn();
-      render(<Button onClick={handleClick} disabled>Disabled</Button>);
+      render(
+        <Button onClick={handleClick} disabled>
+          Disabled
+        </Button>
+      );
 
       fireEvent.click(screen.getByText('Disabled'));
       expect(handleClick).not.toHaveBeenCalled();
@@ -123,7 +127,7 @@ describe('Button', () => {
       const button = screen.getByRole('button');
 
       expect(button).toHaveClass('custom-class');
-      expect(button).toHaveClass('bg-indigo-600'); // Primary variant
+      expect(button).toHaveClass('bg-[var(--color-primary)]'); // Primary variant
     });
 
     it('forwards standard button attributes', () => {
@@ -156,7 +160,7 @@ describe('Button', () => {
     it('handles undefined variant (uses default)', () => {
       render(<Button variant={undefined}>Default</Button>);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-indigo-600');
+      expect(button).toHaveClass('bg-[var(--color-primary)]');
     });
 
     it('renders correctly with both icon and children', () => {

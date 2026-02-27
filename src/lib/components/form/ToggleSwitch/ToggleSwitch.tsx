@@ -97,10 +97,8 @@ export const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
 
   const trackClasses = `
     relative w-11 h-6 rounded-full transition-colors border
-    ${checked
-      ? 'bg-indigo-600 border-indigo-600'
-      : 'bg-slate-200 dark:bg-slate-700 border-slate-300 dark:border-slate-600'}
-    ${!disabled && !checked ? 'group-hover:border-slate-400 dark:group-hover:border-slate-500' : ''}
+    ${checked ? 'bg-primary border-primary' : 'bg-bg-tertiary border-border'}
+    ${!disabled && !checked ? 'group-hover:border-primary/50' : ''}
   `.trim();
 
   const thumbClasses = `
@@ -124,14 +122,8 @@ export const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
         <div className={thumbClasses} />
       </div>
       <div className="flex-1">
-        <span className="text-sm font-medium text-slate-900 dark:text-white">
-          {label}
-        </span>
-        {description && (
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            {description}
-          </p>
-        )}
+        <span className="text-sm font-medium text-text-primary">{label}</span>
+        {description && <p className="text-xs text-text-secondary mt-0.5">{description}</p>}
       </div>
     </div>
   );

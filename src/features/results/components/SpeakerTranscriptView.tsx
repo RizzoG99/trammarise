@@ -111,7 +111,7 @@ export const SpeakerTranscriptView = memo(function SpeakerTranscriptView({
             <button
               onClick={handleClearSearch}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-text-tertiary hover:text-text-primary"
-              aria-label="Clear search"
+              aria-label={t('results.transcript.clearSearch')}
             >
               <X className="w-4 h-4" />
             </button>
@@ -155,7 +155,11 @@ export const SpeakerTranscriptView = memo(function SpeakerTranscriptView({
                 tabIndex={onTimestampClick ? 0 : undefined}
                 role={onTimestampClick ? 'button' : undefined}
                 aria-label={
-                  onTimestampClick ? `Jump to ${formatTimestamp(utterance.start)}` : undefined
+                  onTimestampClick
+                    ? t('results.transcript.jumpTo', {
+                        timestamp: formatTimestamp(utterance.start),
+                      })
+                    : undefined
                 }
                 className={`
                   p-4 rounded-lg border transition-all

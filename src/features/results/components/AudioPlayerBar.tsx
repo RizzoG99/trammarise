@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Play, Pause, SkipBack, SkipForward, Gauge } from 'lucide-react';
 import { Button, WaveformPlayer } from '../../../lib';
 import type { AudioFile } from '../../../types/audio';
@@ -49,6 +50,7 @@ export const AudioPlayerBar = memo(function AudioPlayerBar({
   audioPlayer,
   onTimeUpdate,
 }: AudioPlayerBarProps) {
+  const { t } = useTranslation();
   const { state, togglePlayPause, skipBy, cycleSpeed } = audioPlayer;
 
   return (
@@ -80,7 +82,7 @@ export const AudioPlayerBar = memo(function AudioPlayerBar({
               variant="circle"
               onClick={() => skipBy(-10)}
               className="p-2"
-              aria-label="Skip back 10 seconds"
+              aria-label={t('audioPlayer.skipBack')}
             >
               <SkipBack className="w-5 h-5" />
             </Button>
@@ -91,7 +93,7 @@ export const AudioPlayerBar = memo(function AudioPlayerBar({
               onClick={togglePlayPause}
               className="w-12 h-12 rounded-full p-0"
               disabled={state.isLoading}
-              aria-label={state.isPlaying ? 'Pause' : 'Play'}
+              aria-label={state.isPlaying ? t('audioPlayer.pause') : t('audioPlayer.play')}
             >
               {state.isPlaying ? (
                 <Pause className="w-6 h-6" />
@@ -105,7 +107,7 @@ export const AudioPlayerBar = memo(function AudioPlayerBar({
               variant="circle"
               onClick={() => skipBy(10)}
               className="p-2"
-              aria-label="Skip forward 10 seconds"
+              aria-label={t('audioPlayer.skipForward')}
             >
               <SkipForward className="w-5 h-5" />
             </Button>
@@ -116,7 +118,7 @@ export const AudioPlayerBar = memo(function AudioPlayerBar({
             variant="circle"
             onClick={cycleSpeed}
             className="p-2 min-w-[80px] flex items-center gap-2"
-            aria-label={`Playback speed: ${state.playbackRate}x`}
+            aria-label={t('audioPlayer.playbackSpeed', { speed: state.playbackRate })}
           >
             <Gauge className="w-4 h-4" />
             <span className="text-sm font-medium">{state.playbackRate}x</span>

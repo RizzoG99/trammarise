@@ -83,26 +83,27 @@ export const RadioCard: React.FC<RadioCardProps> = ({
   disabled = false,
 }) => {
   const baseClasses = `
-    block relative rounded-xl bg-white dark:bg-slate-800
-    border-2 border-slate-200 dark:border-slate-700
+    block relative rounded-xl bg-bg-surface
+    border-2 border-border
     transition-all duration-200 overflow-hidden
   `.trim();
 
   const interactiveClasses = disabled
     ? 'cursor-not-allowed opacity-50'
-    : 'cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 hover:border-indigo-300 dark:hover:border-indigo-600';
+    : 'cursor-pointer hover:bg-bg-surface-hover hover:border-primary/50';
 
   const checkedClasses = checked
-    ? 'bg-indigo-50 dark:bg-indigo-900/20 border-indigo-600 shadow-[0_0_0_1px_rgba(79,70,229,1)]'
+    ? 'bg-primary/10 border-primary shadow-[0_0_0_1px_var(--color-primary)]'
     : '';
 
   const labelClasses = `${baseClasses} ${interactiveClasses} ${checkedClasses} ${className}`.trim();
 
   const radioIndicatorClasses = `
     w-5 h-5 rounded-full border-2 relative transition-all duration-200
-    ${checked
-      ? 'border-indigo-600 bg-indigo-600 after:content-[""] after:absolute after:top-1/2 after:left-1/2 after:-translate-x-1/2 after:-translate-y-1/2 after:w-2 after:h-2 after:rounded-full after:bg-white'
-      : 'border-slate-400 dark:border-slate-500'
+    ${
+      checked
+        ? 'border-primary bg-primary after:content-[""] after:absolute after:top-1/2 after:left-1/2 after:-translate-x-1/2 after:-translate-y-1/2 after:w-2 after:h-2 after:rounded-full after:bg-white'
+        : 'border-border'
     }
   `.trim();
 
@@ -120,15 +121,11 @@ export const RadioCard: React.FC<RadioCardProps> = ({
       />
       <div className="p-4">
         <div className="flex justify-between items-center mb-1">
-          <div className="font-semibold text-base text-slate-900 dark:text-white">
-            {title}
-          </div>
+          <div className="font-semibold text-base text-text-primary">{title}</div>
           <div className={radioIndicatorClasses} aria-hidden="true" />
         </div>
         {description && (
-          <div className="text-sm text-slate-600 dark:text-slate-400 leading-snug">
-            {description}
-          </div>
+          <div className="text-sm text-text-secondary leading-snug">{description}</div>
         )}
       </div>
     </label>

@@ -59,13 +59,13 @@ describe('SelectCard', () => {
 
     it('shows selection indicator when selected', () => {
       render(<SelectCard {...defaultProps} selected={true} />);
-      const indicator = document.querySelector('.w-2.h-2.rounded-full.bg-indigo-600');
+      const indicator = document.querySelector('.w-2.h-2.rounded-full.bg-primary');
       expect(indicator).toBeInTheDocument();
     });
 
     it('hides selection indicator when not selected', () => {
       render(<SelectCard {...defaultProps} selected={false} />);
-      const indicator = document.querySelector('.w-2.h-2.rounded-full.bg-indigo-600');
+      const indicator = document.querySelector('.w-2.h-2.rounded-full.bg-primary');
       expect(indicator).not.toBeInTheDocument();
     });
   });
@@ -99,7 +99,7 @@ describe('SelectCard', () => {
 
     it('hides selection indicator when disabled and selected', () => {
       render(<SelectCard {...defaultProps} selected={true} disabled={true} />);
-      const indicator = document.querySelector('.w-2.h-2.rounded-full.bg-indigo-600');
+      const indicator = document.querySelector('.w-2.h-2.rounded-full.bg-primary');
       expect(indicator).not.toBeInTheDocument();
     });
   });

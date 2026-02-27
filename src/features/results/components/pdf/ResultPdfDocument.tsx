@@ -13,6 +13,7 @@ interface ResultPdfDocumentProps {
   config: AIConfiguration;
   fileName: string;
   tier?: 'free' | 'pro' | 'team';
+  includeMetadata?: boolean;
 }
 
 /**
@@ -24,8 +25,10 @@ export function ResultPdfDocument({
   transcript,
   config,
   fileName,
+  tier,
+  includeMetadata,
 }: ResultPdfDocumentProps) {
-  const props: PdfTemplateProps = { summary, transcript, config, fileName };
+  const props: PdfTemplateProps = { summary, transcript, config, fileName, tier, includeMetadata };
 
   switch (config.contentType) {
     case 'meeting':

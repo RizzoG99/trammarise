@@ -1,4 +1,6 @@
 import { useTranslation } from 'react-i18next';
+import { Tooltip } from '@/lib/components/ui/Tooltip/Tooltip';
+import { Info } from 'lucide-react';
 
 export type ProcessingMode = 'balanced' | 'quality';
 
@@ -15,22 +17,33 @@ export function ProcessingModeSelector({ value, onChange, disabled }: Processing
 
   return (
     <div className="space-y-3">
-      <label
-        className="block text-sm font-semibold mb-1"
-        style={{ color: 'var(--color-text-primary)' }}
-      >
-        {t('configuration.processingMode.title')}
-      </label>
+      <div className="flex items-center gap-2 mb-2">
+        <label
+          className="block text-sm font-semibold"
+          style={{ color: 'var(--color-text-primary)' }}
+        >
+          {t('configuration.processingMode.title')}
+        </label>
+        <Tooltip
+          content={t(
+            'configuration.processingMode.tooltip',
+            'Select how your audio will be processed for optimal results'
+          )}
+          placement="top"
+        >
+          <Info className="w-4 h-4 text-text-tertiary" />
+        </Tooltip>
+      </div>
 
       <div className="flex flex-col gap-3">
         {/* Balanced Mode */}
         <label
           className={`relative flex items-center p-3 rounded-lg border cursor-pointer transition-colors ${
             disabled
-              ? 'opacity-50 cursor-not-allowed bg-gray-100/10'
+              ? 'opacity-50 cursor-not-allowed bg-bg-tertiary/30'
               : value === 'balanced'
                 ? 'bg-primary/5'
-                : 'hover:bg-gray-100/30'
+                : 'hover:bg-bg-tertiary/50'
           }`}
           style={{
             borderColor:
@@ -44,7 +57,7 @@ export function ProcessingModeSelector({ value, onChange, disabled }: Processing
             checked={value === 'balanced'}
             onChange={(e) => !disabled && onChange(e.target.value as ProcessingMode)}
             disabled={disabled}
-            className="h-4 w-4 border-gray-300 focus:ring-2 focus:ring-offset-0 disabled:cursor-not-allowed"
+            className="h-4 w-4 border-border focus:ring-2 focus:ring-offset-0 disabled:cursor-not-allowed"
             style={{
               accentColor: 'var(--color-primary)',
             }}
@@ -52,7 +65,7 @@ export function ProcessingModeSelector({ value, onChange, disabled }: Processing
           <div className="ml-3 flex-1">
             <div className="flex justify-between">
               <span
-                className={`block text-sm font-medium ${disabled ? 'text-gray-400' : 'text-[var(--color-text-primary)]'}`}
+                className={`block text-sm font-medium ${disabled ? 'text-text-tertiary' : 'text-[var(--color-text-primary)]'}`}
               >
                 {t('configuration.processingMode.balanced.title')}
               </span>
@@ -67,7 +80,7 @@ export function ProcessingModeSelector({ value, onChange, disabled }: Processing
               </span>
             </div>
             <span
-              className={`block text-xs ${disabled ? 'text-gray-400' : 'text-[var(--color-text-secondary)]'}`}
+              className={`block text-xs ${disabled ? 'text-text-tertiary' : 'text-[var(--color-text-secondary)]'}`}
             >
               {t('configuration.processingMode.balanced.description')}
             </span>
@@ -78,10 +91,10 @@ export function ProcessingModeSelector({ value, onChange, disabled }: Processing
         <label
           className={`relative flex items-center p-3 rounded-lg border cursor-pointer transition-colors ${
             disabled
-              ? 'opacity-50 cursor-not-allowed bg-gray-100/10'
+              ? 'opacity-50 cursor-not-allowed bg-bg-tertiary/30'
               : value === 'quality'
                 ? 'bg-primary/5'
-                : 'hover:bg-gray-100/30'
+                : 'hover:bg-bg-tertiary/50'
           }`}
           style={{
             borderColor:
@@ -95,7 +108,7 @@ export function ProcessingModeSelector({ value, onChange, disabled }: Processing
             checked={value === 'quality'}
             onChange={(e) => !disabled && onChange(e.target.value as ProcessingMode)}
             disabled={disabled}
-            className="h-4 w-4 border-gray-300 focus:ring-2 focus:ring-offset-0 disabled:cursor-not-allowed"
+            className="h-4 w-4 border-border focus:ring-2 focus:ring-offset-0 disabled:cursor-not-allowed"
             style={{
               accentColor: 'var(--color-primary)',
             }}
@@ -103,19 +116,22 @@ export function ProcessingModeSelector({ value, onChange, disabled }: Processing
           <div className="ml-3 flex-1">
             <div className="flex justify-between">
               <span
-                className={`block text-sm font-medium ${disabled ? 'text-gray-400' : 'text-[var(--color-text-primary)]'}`}
+                className={`block text-sm font-medium ${disabled ? 'text-text-tertiary' : 'text-[var(--color-text-primary)]'}`}
               >
                 {t('configuration.processingMode.quality.title')}
               </span>
               <span
                 className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
-                style={{ backgroundColor: 'rgba(168, 85, 247, 0.1)', color: '#a855f7' }}
+                style={{
+                  backgroundColor: 'var(--color-primary-alpha-10)',
+                  color: 'var(--color-primary)',
+                }}
               >
                 {t('configuration.processingMode.quality.credits')}
               </span>
             </div>
             <span
-              className={`block text-xs ${disabled ? 'text-gray-400' : 'text-[var(--color-text-secondary)]'}`}
+              className={`block text-xs ${disabled ? 'text-text-tertiary' : 'text-[var(--color-text-secondary)]'}`}
             >
               {t('configuration.processingMode.quality.description')}
             </span>

@@ -133,6 +133,26 @@
       "closeAndRetry": "Chiudi e Riprova"
     }
   },
+  "processingState": {
+    "messages": {
+      "loading": "Caricamento processore audio...",
+      "compressing": "Ottimizzazione audio in corso...",
+      "transcribing": "Trascrizione audio con Whisper...",
+      "configuring": "Configurazione impostazioni AI...",
+      "summarizing": "Generazione riassunto AI...",
+      "complete": "Elaborazione completata!",
+      "default": "Elaborazione..."
+    },
+    "steps": {
+      "preparing": "Preparazione",
+      "optimizing": "Ottimizzazione",
+      "step1of2": "1/2",
+      "step2of2": "2/2"
+    },
+    "stepLabel": "Passo {{step}}",
+    "hint": "Potrebbe richiedere alcuni minuti. Non chiudere questa finestra.",
+    "cancel": "Annulla Elaborazione"
+  },
   "languages": {
     "en": "Inglese",
     "it": "Italiano",
@@ -224,7 +244,9 @@
     "uploadSuccess": "File caricato con successo",
     "recordingSaved": "Registrazione salvata",
     "replaceFile": "Sostituisci File",
+    "replaceAriaLabel": "Sostituisci file audio",
     "remove": "Rimuovi",
+    "removeAriaLabel": "Rimuovi file audio",
     "unknownFormat": "Formato sconosciuto"
   },
   "configuration": {
@@ -464,13 +486,25 @@
       "utterances": "interventi",
       "resultsFound": "risultati trovati",
       "noResults": "Nessun risultato trovato",
-      "noUtterances": "Nessun intervento disponibile"
+      "noUtterances": "Nessun intervento disponibile",
+      "jumpTo": "Vai a {{timestamp}}",
+      "clearSearch": "Cancella ricerca"
     },
     "summary": {
       "title": "Riassunto",
       "copyAll": "Copia Tutto",
       "phase4Placeholder": "Riassunti strutturati in arrivo nella Fase 4"
+    },
+    "chat": {
+      "floatingButtonTooltip": "Migliora con la Chat"
     }
+  },
+  "audioPlayer": {
+    "skipBack": "Torna indietro di 10 secondi",
+    "play": "Riproduci",
+    "pause": "Pausa",
+    "skipForward": "Vai avanti di 10 secondi",
+    "playbackSpeed": "Velocità di riproduzione: {{speed}}x"
   },
   "chatModal": {
     "title": "Perfeziona con AI",
@@ -565,6 +599,11 @@
       "activity": "Attività (Ultimi 7 Giorni)",
       "sessions": "{{count}} sessione",
       "sessions_plural": "{{count}} sessioni"
+    },
+    "quickActions": {
+      "play": "Anteprima",
+      "copy": "Copia Riassunto",
+      "download": "Scarica"
     },
     "title": "Cronologia Registrazioni",
     "subtitle": "{{count}} registrazioni totali",
@@ -729,44 +768,6 @@
         "question": "Cosa succede se supero i miei minuti?",
         "answer": "Puoi acquistare crediti aggiuntivi in qualsiasi momento. I minuti inutilizzati non vengono trasferiti, ma puoi sempre usare le tue chiavi API per elaborazioni illimitate."
       }
-    }
-  },
-  "onboarding": {
-    "modal": {
-      "title": "🔑 Benvenuto in Trammarise",
-      "heading": "Un Altro Passo per Iniziare",
-      "description": "Per utilizzare Trammarise, devi fornire la tua chiave API OpenAI o aggiornare a un piano Pro.",
-      "option1": {
-        "title": "Opzione 1: Usa la Tua Chiave API (Gratuito)",
-        "placeholder": "sk-...",
-        "rememberKey": "Ricorda la mia chiave API (memorizzata crittografata)",
-        "continueButton": "Continua con la Chiave API",
-        "saving": "Salvataggio...",
-        "instructions": {
-          "toggle": "Come ottenere una chiave API OpenAI",
-          "step1": "Vai su platform.openai.com",
-          "step2": "Accedi o crea un account",
-          "step3": "Clicca \"Crea nuova chiave segreta\"",
-          "step4": "Copia la chiave (inizia con \"sk-\")",
-          "step5": "Incollala nel campo sopra",
-          "note": "💡 Pagherai OpenAI direttamente per l'utilizzo (tipicamente $0.006/minuto per Whisper)"
-        },
-        "errors": {
-          "empty": "Inserisci la tua chiave API",
-          "invalidFormat": "Formato chiave API non valido. Le chiavi OpenAI iniziano con \"sk-\"",
-          "saveFailed": "Impossibile salvare la chiave API. Riprova."
-        }
-      },
-      "option2": {
-        "title": "Opzione 2: Aggiorna a Pro",
-        "description": "Ottieni 500 minuti/mese con API ospitata, sincronizzazione cloud e supporto prioritario.",
-        "button": "Vedi Piani Pro →"
-      },
-      "divider": "oppure"
-    },
-    "banner": {
-      "message": "Ci sei quasi! Completa la configurazione per sbloccare Trammarise.",
-      "button": "Torna alla Configurazione"
     }
   },
   "onboarding": {

@@ -22,8 +22,8 @@ export function ProcessAudioButton({
         onClick={onProcess}
         disabled={isDisabled}
         className="w-full sm:w-auto flex items-center justify-center gap-2
-                   text-white font-bold py-4 px-10 rounded-xl shadow-lg
-                   hover:shadow-xl transition-all disabled:opacity-50
+                   text-white font-medium py-3 px-8 rounded-xl shadow-lg
+                   transition-all disabled:opacity-50
                    disabled:cursor-not-allowed cursor-pointer group"
         style={{
           backgroundColor: isDisabled ? 'var(--color-text-tertiary)' : 'var(--color-primary)',
@@ -47,7 +47,7 @@ export function ProcessAudioButton({
         ) : (
           <>
             {t('home.processButton')}
-            <Sparkles className="group-hover:animate-bounce" size={20} />
+            <Sparkles size={18} />
           </>
         )}
       </button>

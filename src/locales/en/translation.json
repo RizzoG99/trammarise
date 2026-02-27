@@ -132,6 +132,26 @@
       "closeAndRetry": "Close & Try Again"
     }
   },
+  "processingState": {
+    "messages": {
+      "loading": "Loading audio processor...",
+      "compressing": "Optimizing audio for processing...",
+      "transcribing": "Transcribing audio with Whisper...",
+      "configuring": "Configuring AI settings...",
+      "summarizing": "Generating AI summary...",
+      "complete": "Processing complete!",
+      "default": "Processing..."
+    },
+    "steps": {
+      "preparing": "Preparing",
+      "optimizing": "Optimizing",
+      "step1of2": "1/2",
+      "step2of2": "2/2"
+    },
+    "stepLabel": "Step {{step}}",
+    "hint": "This may take a moment. Please don't close this window.",
+    "cancel": "Cancel Processing"
+  },
   "languages": {
     "en": "English",
     "it": "Italian",
@@ -223,7 +243,9 @@
     "uploadSuccess": "File uploaded successfully",
     "recordingSaved": "Recording saved",
     "replaceFile": "Replace File",
+    "replaceAriaLabel": "Replace audio file",
     "remove": "Remove",
+    "removeAriaLabel": "Remove audio file",
     "unknownFormat": "Unknown format"
   },
   "configuration": {
@@ -463,13 +485,25 @@
       "utterances": "utterances",
       "resultsFound": "results found",
       "noResults": "No results found",
-      "noUtterances": "No utterances available"
+      "noUtterances": "No utterances available",
+      "jumpTo": "Jump to {{timestamp}}",
+      "clearSearch": "Clear search"
     },
     "summary": {
       "title": "Summary",
       "copyAll": "Copy All",
       "phase4Placeholder": "Structured summaries coming in Phase 4"
+    },
+    "chat": {
+      "floatingButtonTooltip": "Refine with Chat"
     }
+  },
+  "audioPlayer": {
+    "skipBack": "Skip back 10 seconds",
+    "play": "Play",
+    "pause": "Pause",
+    "skipForward": "Skip forward 10 seconds",
+    "playbackSpeed": "Playback speed: {{speed}}x"
   },
   "chatModal": {
     "title": "Refine with AI",
@@ -564,6 +598,11 @@
       "activity": "Activity (Last 7 Days)",
       "sessions": "{{count}} session",
       "sessions_plural": "{{count}} sessions"
+    },
+    "quickActions": {
+      "play": "Play Preview",
+      "copy": "Copy Summary",
+      "download": "Download"
     },
     "title": "Recording History",
     "subtitle": "{{count}} total recordings",
@@ -728,44 +767,6 @@
         "question": "What happens if I exceed my minutes?",
         "answer": "You can purchase additional credits at any time. Unused minutes don't roll over, so choose a plan that fits your needs."
       }
-    }
-  },
-  "onboarding": {
-    "modal": {
-      "title": "🔑 Welcome to Trammarise",
-      "heading": "One More Step to Get Started",
-      "description": "To use Trammarise, you need to either provide your own OpenAI API key or upgrade to a Pro plan.",
-      "option1": {
-        "title": "Option 1: Use Your Own API Key (Free)",
-        "placeholder": "sk-...",
-        "rememberKey": "Remember my API key (stored encrypted)",
-        "continueButton": "Continue with API Key",
-        "saving": "Saving...",
-        "instructions": {
-          "toggle": "How to get an OpenAI API key",
-          "step1": "Go to platform.openai.com",
-          "step2": "Sign in or create an account",
-          "step3": "Click \"Create new secret key\"",
-          "step4": "Copy the key (starts with \"sk-\")",
-          "step5": "Paste it in the field above",
-          "note": "💡 You'll pay OpenAI directly for usage (typically $0.006/minute for Whisper)"
-        },
-        "errors": {
-          "empty": "Please enter your API key",
-          "invalidFormat": "Invalid API key format. OpenAI keys start with \"sk-\"",
-          "saveFailed": "Failed to save API key. Please try again."
-        }
-      },
-      "option2": {
-        "title": "Option 2: Upgrade to Pro",
-        "description": "Get 500 minutes/month with hosted API, cloud sync, and priority support.",
-        "button": "View Pro Plans →"
-      },
-      "divider": "or"
-    },
-    "banner": {
-      "message": "You're almost there! Complete setup to unlock Trammarise.",
-      "button": "Back to Setup"
     }
   },
   "onboarding": {

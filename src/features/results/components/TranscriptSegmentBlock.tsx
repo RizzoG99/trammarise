@@ -1,4 +1,5 @@
 import { memo, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Text } from '../../../lib';
 import type { TranscriptSegment } from '../utils/transcriptParser';
 
@@ -40,6 +41,7 @@ export const TranscriptSegmentBlock = memo(function TranscriptSegmentBlock({
   searchQuery,
   onTimestampClick,
 }: TranscriptSegmentBlockProps) {
+  const { t } = useTranslation();
   // Memoize highlighted text - only recompute when text or query changes
   const highlightedText = useMemo(() => {
     if (!searchQuery || searchQuery.trim().length === 0) {
@@ -72,7 +74,11 @@ export const TranscriptSegmentBlock = memo(function TranscriptSegmentBlock({
       }}
       tabIndex={onTimestampClick ? 0 : undefined}
       role={onTimestampClick ? 'button' : undefined}
-      aria-label={onTimestampClick ? `Jump to ${segment.timestamp}` : undefined}
+      aria-label={
+        onTimestampClick
+          ? t('results.transcript.jumpTo', { timestamp: segment.timestamp })
+          : undefined
+      }
       className={`
         p-4 rounded-lg transition-all
         ${onTimestampClick ? 'cursor-pointer' : ''}

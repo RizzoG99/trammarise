@@ -113,3 +113,60 @@ See detailed workflow in comments (removed for brevity).
 - Chain commands: `npm test && npx tsc --noEmit | tail -10`
 - Trust Edit/Write tools (don't re-read to verify)
 - Use Serena symbol tools (`find_symbol`, `rename_symbol`) for refactoring
+
+## Design Context
+
+### Users
+
+Mixed audience of knowledge workers: professionals capturing meetings, academics transcribing lectures,
+journalists and researchers conducting interviews, podcasters, and students. Often time-pressured —
+they need a tool that gets out of the way and delivers reliable results without friction or surprise.
+The job to be done: **turn spoken audio into organized, usable text and insights as fast as possible.**
+Familiarity with AI tools varies widely; the UI must earn trust from non-technical users while feeling
+sharp and capable to power users.
+
+### Brand Personality
+
+**Precise · Elegant · Intelligent**
+
+- **Precise**: No visual noise. Information hierarchy is exact. Spacing, alignment, and sizing signal
+  care and competence.
+- **Elegant**: Glassmorphism is restrained and purposeful — refinement, not decoration. Generous
+  whitespace over crowded density.
+- **Intelligent**: Progressive disclosure, smart defaults, contextual UI states. The interface
+  anticipates needs without overwhelming.
+
+Emotional goal: **Calm confidence.** Every interaction should communicate "this will work reliably —
+I can trust this tool." Trust is earned through processing transparency, clear feedback, and the
+visible quality of the craft itself.
+
+### Aesthetic Direction
+
+Dark mode is the primary canvas (`#101622` midnight background). Both modes supported. The visual
+language is AI-forward and developer-adjacent — drawing from **Perplexity / Cursor** (crisp
+typography, focused dark UI, minimal chrome) and **Otter.ai / Descript** (clean transcript layout,
+practical audio controls, professional feel).
+
+- **Glass layering**: bg → surface → elevated → overlay — each layer uses `backdrop-blur` and
+  subtle borders, never hard fills
+- **Typography**: Inter for body/UI, Space Grotesk for display headings — crisp, modern, legible
+- **Color**: Ocean Gloss Blue (`#3b82f6`) as the single accent; use sparingly for interactive
+  elements and CTAs. Avoid rainbow palettes.
+- **Radius**: `rounded-xl` / `rounded-2xl` for cards and surfaces; `rounded-lg` for inputs/buttons
+- **Motion**: Subtle only — waveform animations, loading pulses. No decorative motion.
+- **Anti-references**: Avoid anything that feels enterprise SaaS (heavy blue fills, tables
+  everywhere), consumer-app playful (bright gradients, rounded-full bubbles), or complex (multiple
+  competing accent colors, dense sidebars).
+
+### Design Principles
+
+1. **Calm through clarity** — Every screen communicates "you are in control." Visible progress,
+   unambiguous states, no mystery loading.
+2. **Precision as personality** — The quality of spacing, alignment, and sizing IS the brand.
+   Sloppy pixels break trust as fast as bugs do.
+3. **Elegance over decoration** — Glass effects and accent color are purposeful. If it doesn't
+   serve user focus, remove it.
+4. **Intelligence shown, not told** — Smart defaults, contextual hints, and progressive disclosure
+   reveal capability without adding complexity.
+5. **Dark-first consistency** — Maintain the glass hierarchy across every component. Never
+   introduce flat fills or light-mode assumptions into the dark canvas.

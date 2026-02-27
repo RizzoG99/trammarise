@@ -1,4 +1,5 @@
 import { MessageSquare } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export interface FloatingChatButtonProps {
   onClick: () => void;
@@ -6,7 +7,12 @@ export interface FloatingChatButtonProps {
   isOpen?: boolean;
 }
 
-export function FloatingChatButton({ onClick, hasNewMessages = false, isOpen = false }: FloatingChatButtonProps) {
+export function FloatingChatButton({
+  onClick,
+  hasNewMessages = false,
+  isOpen = false,
+}: FloatingChatButtonProps) {
+  const { t } = useTranslation();
   // Hide button when chat is open
   if (isOpen) {
     return null;
@@ -36,7 +42,8 @@ export function FloatingChatButton({ onClick, hasNewMessages = false, isOpen = f
         )}
 
         {/* Tooltip */}
-        <span className="
+        <span
+          className="
           absolute bottom-full right-0 mb-2
           px-3 py-1 rounded-lg
           bg-[var(--color-bg-secondary)] border border-border
@@ -44,8 +51,9 @@ export function FloatingChatButton({ onClick, hasNewMessages = false, isOpen = f
           opacity-0 group-hover:opacity-100
           transition-opacity duration-[var(--transition-fast)]
           pointer-events-none
-        ">
-          Refine with Chat
+        "
+        >
+          {t('results.chat.floatingButtonTooltip')}
         </span>
       </button>
     </div>

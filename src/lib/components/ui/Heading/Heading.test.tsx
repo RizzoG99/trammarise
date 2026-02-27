@@ -36,16 +36,24 @@ describe('Heading', () => {
   });
 
   describe('Base Classes', () => {
-    it('always includes font-semibold class', () => {
-      render(<Heading level="h1">Content</Heading>);
-      const heading = screen.getByRole('heading');
-      expect(heading).toHaveClass('font-semibold');
-    });
-
     it('always includes text-text-primary class', () => {
       render(<Heading level="h2">Content</Heading>);
       const heading = screen.getByRole('heading');
       expect(heading).toHaveClass('text-text-primary');
+    });
+
+    it('applies level-specific font weights', () => {
+      const { rerender } = render(<Heading level="hero">Content</Heading>);
+      expect(screen.getByRole('heading')).toHaveClass('font-semibold');
+
+      rerender(<Heading level="h1">Content</Heading>);
+      expect(screen.getByRole('heading')).toHaveClass('font-semibold');
+
+      rerender(<Heading level="h2">Content</Heading>);
+      expect(screen.getByRole('heading')).toHaveClass('font-medium');
+
+      rerender(<Heading level="h3">Content</Heading>);
+      expect(screen.getByRole('heading')).toHaveClass('font-normal');
     });
   });
 
@@ -81,20 +89,32 @@ describe('Heading', () => {
 
   describe('Custom Styling', () => {
     it('merges custom className with default classes', () => {
-      render(<Heading level="h1" className="custom-class">Content</Heading>);
+      render(
+        <Heading level="h1" className="custom-class">
+          Content
+        </Heading>
+      );
       const heading = screen.getByRole('heading');
       expect(heading).toHaveClass('custom-class');
-      expect(heading).toHaveClass('font-semibold'); // Still has default classes
+      expect(heading).toHaveClass('font-semibold'); // h1 default weight
     });
 
     it('allows color override via className', () => {
-      render(<Heading level="h2" className="text-blue-600">Content</Heading>);
+      render(
+        <Heading level="h2" className="text-blue-600">
+          Content
+        </Heading>
+      );
       const heading = screen.getByRole('heading');
       expect(heading).toHaveClass('text-blue-600');
     });
 
     it('allows size override via className', () => {
-      render(<Heading level="h3" className="text-5xl">Content</Heading>);
+      render(
+        <Heading level="h3" className="text-5xl">
+          Content
+        </Heading>
+      );
       const heading = screen.getByRole('heading');
       expect(heading).toHaveClass('text-5xl');
     });
@@ -136,7 +156,7 @@ describe('Heading', () => {
           <Heading level="h3">Subsection</Heading>
         </div>
       );
-      
+
       expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Main Title');
       expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('Section');
       expect(screen.getByRole('heading', { level: 3 })).toHaveTextContent('Subsection');
@@ -158,16 +178,24 @@ describe('Heading', () => {
     });
 
     it('handles undefined className', () => {
-      render(<Heading level="h2" className={undefined}>Content</Heading>);
+      render(
+        <Heading level="h2" className={undefined}>
+          Content
+        </Heading>
+      );
       const heading = screen.getByRole('heading');
       expect(heading).toBeInTheDocument();
     });
 
     it('handles empty className string', () => {
-      render(<Heading level="h3" className="">Content</Heading>);
+      render(
+        <Heading level="h3" className="">
+          Content
+        </Heading>
+      );
       const heading = screen.getByRole('heading');
       expect(heading).toBeInTheDocument();
-      expect(heading).toHaveClass('font-semibold'); // Still has default classes
+      expect(heading).toHaveClass('font-normal'); // h3 default weight
     });
 
     it('handles very long content', () => {

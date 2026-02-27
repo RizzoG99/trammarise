@@ -26,30 +26,24 @@ export function WelcomePage() {
     <div className="min-h-screen bg-bg-primary text-text-primary overflow-x-hidden selection:bg-primary/30">
       {/* Decorative Orbs & Mesh Gradients */}
       <div className="fixed top-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full bg-primary/20 blur-[120px] pointer-events-none animate-[pulse_8s_ease-in-out_infinite]" />
-      <div className="fixed bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-purple-500/20 blur-[100px] pointer-events-none animate-[pulse_10s_ease-in-out_infinite_reverse]" />
-      <div className="fixed top-[40%] left-[30%] w-[30%] h-[30%] rounded-full bg-blue-400/10 blur-[80px] pointer-events-none" />
+      <div className="fixed bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-primary/10 blur-[100px] pointer-events-none animate-[pulse_10s_ease-in-out_infinite_reverse]" />
+      <div className="fixed top-[40%] left-[30%] w-[30%] h-[30%] rounded-full bg-primary/5 blur-[80px] pointer-events-none" />
 
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 px-4">
         <div className="container mx-auto max-w-5xl text-center relative z-10">
           <div className="flex flex-col items-center">
             <GlassCard variant="glow" className="mb-8 rounded-full px-4 py-1.5 border-primary/30">
-              <span className="text-sm font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
-                {t('welcome.hero.newBadge')}
-              </span>
+              <span className="text-sm font-medium text-primary">{t('welcome.hero.newBadge')}</span>
             </GlassCard>
 
             <Heading
               level="h1"
               className="text-5xl md:text-7xl lg:text-8xl font-bold mb-8 tracking-tight"
             >
-              <span className="bg-clip-text text-transparent bg-gradient-to-b from-white to-white/70">
-                {t('welcome.hero.titlePart1')}
-              </span>
+              <span className="text-text-primary">{t('welcome.hero.titlePart1')}</span>
               <br />
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400 animate-gradient-x">
-                {t('welcome.hero.titlePart2')}
-              </span>
+              <span className="text-primary">{t('welcome.hero.titlePart2')}</span>
             </Heading>
 
             <Text
@@ -67,7 +61,7 @@ export function WelcomePage() {
               <Button
                 variant="large"
                 onClick={handleGetStarted}
-                className="group bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white shadow-lg shadow-blue-500/25 min-w-[200px] border-0 hover:-translate-y-0.5 hover:shadow-xl"
+                className="group bg-primary hover:bg-primary-hover text-white shadow-lg shadow-primary/25 min-w-[200px] border-0 hover:-translate-y-0.5 hover:shadow-xl"
               >
                 <span className="flex items-center justify-center">
                   {t('welcome.hero.cta.primary', 'Start Free Trial')}
@@ -90,8 +84,8 @@ export function WelcomePage() {
 
             {/* Floating UI Mockup/Preview could go here */}
             <div className="mt-20 w-full max-w-4xl mx-auto opacity-90 hover:opacity-100 transition-opacity duration-700 delay-200">
-              <div className="relative rounded-xl overflow-hidden border border-white/10 shadow-2xl shadow-blue-900/20 bg-slate-900/50 backdrop-blur-sm aspect-video group">
-                <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/10 to-purple-500/10" />
+              <div className="relative rounded-xl overflow-hidden border border-white/10 shadow-2xl shadow-primary/20 bg-bg-surface/50 backdrop-blur-sm aspect-video group">
+                <div className="absolute inset-0 bg-primary/5" />
                 <div className="absolute inset-0 flex items-center justify-center">
                   <span className="text-slate-500 font-mono text-sm">
                     {t('welcome.hero.cta.appPreview')}
@@ -200,7 +194,7 @@ export function WelcomePage() {
           <div className="text-center mt-12">
             <button
               onClick={handleViewPricing}
-              className="text-blue-400 hover:text-blue-300 transition-colors text-lg font-medium inline-flex items-center gap-2"
+              className="text-primary hover:text-primary-hover transition-colors text-lg font-medium inline-flex items-center gap-2"
             >
               {t('welcome.pricing.viewComparison', 'View detailed comparison')}
               <ArrowRight className="w-5 h-5" />
@@ -214,7 +208,7 @@ export function WelcomePage() {
 
       {/* CTA Section */}
       <section className="py-32 px-4 text-center relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-blue-900/20 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-primary/5 pointer-events-none" />
         <div className="container mx-auto max-w-3xl relative z-10">
           <GlassCard variant="glow" className="p-12 md:p-16 border-white/10">
             <Heading level="h2" className="mb-6 text-4xl font-bold text-white">
@@ -250,12 +244,12 @@ export function WelcomePage() {
       </section>
 
       {/* API Key Setup CTA */}
-      <section className="py-20 px-4 bg-gradient-to-b from-transparent to-blue-900/10">
+      <section className="py-20 px-4">
         <div className="container mx-auto max-w-4xl">
           <GlassCard variant="glow" className="p-8">
             <div className="flex items-start gap-6">
-              <div className="p-4 bg-blue-500/10 rounded-full shrink-0">
-                <Key className="w-8 h-8 text-blue-400" />
+              <div className="p-4 bg-primary/10 rounded-full shrink-0">
+                <Key className="w-8 h-8 text-primary" />
               </div>
               <div className="flex-1">
                 <Heading level="h3" className="mb-3 text-white">
@@ -271,7 +265,7 @@ export function WelcomePage() {
                   <Button
                     variant="primary"
                     onClick={handleGetStarted}
-                    className="bg-blue-600 hover:bg-blue-500 text-white border-0"
+                    className="bg-primary hover:bg-primary-hover text-white border-0"
                   >
                     {t('welcome.byok.cta.setup', 'Get Started Free')}
                   </Button>
@@ -392,7 +386,7 @@ function PricingCard({
     >
       {badge && (
         <div className="mb-4">
-          <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-primary to-indigo-600 px-3 py-1 text-sm font-semibold text-white">
+          <span className="inline-flex items-center gap-1 rounded-full bg-primary px-3 py-1 text-sm font-semibold text-white">
             <Zap className="w-4 h-4" />
             {badge}
           </span>
@@ -424,8 +418,8 @@ function PricingCard({
       </Button>
 
       <ul className="space-y-3">
-        {features.map((feature, index) => (
-          <li key={index} className="flex items-start gap-3">
+        {features.map((feature) => (
+          <li key={feature} className="flex items-start gap-3">
             <Check className="w-5 h-5 text-accent-success flex-shrink-0 mt-0.5" />
             <span className="text-sm text-slate-300">{feature}</span>
           </li>
