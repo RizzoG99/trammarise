@@ -74,10 +74,12 @@ export function CollapsibleSection({
       >
         <div className="flex items-center gap-3">
           {icon && <span className="flex-shrink-0">{icon}</span>}
-          <span className={`
+          <span
+            className={`
             font-semibold text-left
             ${isExpanded ? 'text-primary' : 'text-text-primary'}
-          `}>
+          `}
+          >
             {title}
           </span>
         </div>
@@ -92,17 +94,24 @@ export function CollapsibleSection({
         />
       </button>
 
-      {/* Content */}
+      {/* Content — CSS Grid trick: animates to unlimited natural height.
+          NOTE: overflow is intentionally NOT set on the inner grid item.
+          When overflow:hidden is on the grid item, browsers compute its max-content
+          contribution as 0 (since the grid area block size is not definite during
+          track sizing), making 1fr resolve to less than full content height.
+          The outer root div's overflow-hidden handles clipping during collapse. */}
       <div
         id={contentId}
-        className={`
-          overflow-hidden transition-all duration-300 ease-in-out
-          ${isExpanded ? 'max-h-[5000px] opacity-100' : 'max-h-0 opacity-0'}
-        `}
+        style={{
+          display: 'grid',
+          gridTemplateRows: isExpanded ? '1fr' : '0fr',
+          opacity: isExpanded ? 1 : 0,
+          transition: 'grid-template-rows 300ms ease-in-out, opacity 300ms ease-in-out',
+        }}
         aria-hidden={!isExpanded}
       >
-        <div className="p-4 bg-surface">
-          {children}
+        <div style={{ minHeight: 0, overflow: 'hidden' }}>
+          <div className="p-4">{children}</div>
         </div>
       </div>
     </div>
