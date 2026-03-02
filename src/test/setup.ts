@@ -1,4 +1,20 @@
 import { expect, afterEach, vi } from 'vitest';
+
+// jsdom doesn't implement ResizeObserver — provide a minimal class-based mock
+Object.defineProperty(window, 'ResizeObserver', {
+  writable: true,
+  value: class ResizeObserver {
+    private cb: ResizeObserverCallback;
+    constructor(cb: ResizeObserverCallback) {
+      this.cb = cb;
+    }
+    observe(el: Element) {
+      this.cb([{ target: el } as ResizeObserverEntry], this as unknown as ResizeObserver);
+    }
+    unobserve() {}
+    disconnect() {}
+  },
+});
 import { cleanup } from '@testing-library/react';
 import * as matchers from '@testing-library/jest-dom/matchers';
 
