@@ -48,6 +48,7 @@ export function OnboardingPage() {
   const [selectedUseCase, setSelectedUseCase] = useState<string>('');
   const [apiKey, setApiKey] = useState('');
   const [apiKeyError, setApiKeyError] = useState('');
+  const [rememberKey, setRememberKey] = useState(false);
   const [billingPeriod] = useState<'monthly' | 'annual'>('monthly');
 
   const steps = [
@@ -62,7 +63,7 @@ export function OnboardingPage() {
         setApiKeyError('API key must start with "sk-"');
         return;
       }
-      saveApiConfig('openai', apiKey, apiKey);
+      saveApiConfig('openai', apiKey, apiKey, rememberKey);
     }
     setStep((s) => s + 1);
   };
@@ -104,10 +105,12 @@ export function OnboardingPage() {
             <ApiKeyStep
               apiKey={apiKey}
               error={apiKeyError}
+              rememberKey={rememberKey}
               onChange={(v) => {
                 setApiKey(v);
                 if (apiKeyError) setApiKeyError('');
               }}
+              onRememberKeyChange={setRememberKey}
             />
           )}
 
@@ -160,10 +163,10 @@ function UseCaseStep({
           type="button"
           onClick={() => onSelect(id)}
           className={[
-            'flex flex-col items-center gap-2 p-4 rounded-xl border transition-all duration-200 text-left',
+            'flex flex-col items-center gap-2 p-4 rounded-xl border transition-all duration-200 text-left cursor-pointer',
             selectedUseCase === id
               ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-text-primary)]'
-              : 'border-[var(--color-border)] bg-white/[0.02] text-[var(--color-text-secondary)] hover:border-white/20 hover:bg-white/[0.05]',
+              : 'border-[var(--color-border)] bg-white/[0.02] text-[var(--color-text-secondary)] hover:border-[var(--color-primary)]/40 hover:bg-[var(--color-primary)]/5 hover:text-[var(--color-text-primary)]',
           ].join(' ')}
         >
           <span className="text-2xl">{icon}</span>
@@ -177,12 +180,17 @@ function UseCaseStep({
 function ApiKeyStep({
   apiKey,
   error,
+  rememberKey,
   onChange,
+  onRememberKeyChange,
 }: {
   apiKey: string;
   error: string;
+  rememberKey: boolean;
   onChange: (v: string) => void;
+  onRememberKeyChange: (v: boolean) => void;
 }) {
+  const { t } = useTranslation();
   return (
     <div className="flex flex-col gap-3">
       <input
@@ -201,6 +209,15 @@ function ApiKeyStep({
           {error}
         </p>
       )}
+      <label className="flex items-center gap-2 cursor-pointer select-none text-sm text-[var(--color-text-secondary)]">
+        <input
+          type="checkbox"
+          checked={rememberKey}
+          onChange={(e) => onRememberKeyChange(e.target.checked)}
+          className="w-4 h-4 rounded accent-[var(--color-primary)] cursor-pointer"
+        />
+        {t('onboarding.step2.rememberKey')}
+      </label>
     </div>
   );
 }

@@ -778,7 +778,8 @@
     },
     "step2": {
       "title": "Connect your API key",
-      "subtitle": "Your key is stored securely in your browser session only"
+      "subtitle": "Your key is stored securely in your browser session only",
+      "rememberKey": "Remember my key across sessions"
     },
     "step3": {
       "title": "Choose your plan",

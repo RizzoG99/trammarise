@@ -24,6 +24,7 @@ vi.mock('react-i18next', () => ({
         'onboarding.steps.useCase': 'Use Case',
         'onboarding.steps.apiSetup': 'API Setup',
         'onboarding.steps.plan': 'Plan',
+        'onboarding.step2.rememberKey': 'Remember my key across sessions',
       };
       return map[key] ?? key;
     },
@@ -203,12 +204,41 @@ describe('OnboardingPage', () => {
       expect(screen.getByText('Connect your API key')).toBeInTheDocument();
     });
 
-    it('saves valid key and advances to step 3', () => {
+    it('saves valid key without persistence when checkbox is unchecked', () => {
       goToStep2();
       fireEvent.change(screen.getByRole('textbox'), { target: { value: 'sk-validkey123' } });
       fireEvent.click(screen.getByText('Next'));
-      expect(mockSaveApiConfig).toHaveBeenCalledWith('openai', 'sk-validkey123', 'sk-validkey123');
+      expect(mockSaveApiConfig).toHaveBeenCalledWith(
+        'openai',
+        'sk-validkey123',
+        'sk-validkey123',
+        false
+      );
       expect(screen.getByText('Choose your plan')).toBeInTheDocument();
+    });
+
+    it('shows "Remember my key" checkbox', () => {
+      goToStep2();
+      expect(screen.getByRole('checkbox')).toBeInTheDocument();
+      expect(screen.getByText('Remember my key across sessions')).toBeInTheDocument();
+    });
+
+    it('checkbox is unchecked by default', () => {
+      goToStep2();
+      expect(screen.getByRole('checkbox')).not.toBeChecked();
+    });
+
+    it('saves with persist=true when checkbox is checked', () => {
+      goToStep2();
+      fireEvent.click(screen.getByRole('checkbox'));
+      fireEvent.change(screen.getByRole('textbox'), { target: { value: 'sk-validkey123' } });
+      fireEvent.click(screen.getByText('Next'));
+      expect(mockSaveApiConfig).toHaveBeenCalledWith(
+        'openai',
+        'sk-validkey123',
+        'sk-validkey123',
+        true
+      );
     });
 
     it('Skip on step 2 calls completeOnboarding', () => {

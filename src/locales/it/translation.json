@@ -779,7 +779,8 @@
     },
     "step2": {
       "title": "Connetti la tua chiave API",
-      "subtitle": "La chiave viene salvata in modo sicuro solo nella sessione del browser"
+      "subtitle": "La chiave viene salvata in modo sicuro solo nella sessione del browser",
+      "rememberKey": "Ricorda la mia chiave tra le sessioni"
     },
     "step3": {
       "title": "Scegli il tuo piano",

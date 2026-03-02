@@ -779,7 +779,8 @@
     },
     "step2": {
       "title": "API-Schlüssel verbinden",
-      "subtitle": "Ihr Schlüssel wird nur in der Browser-Sitzung gespeichert"
+      "subtitle": "Ihr Schlüssel wird nur in der Browser-Sitzung gespeichert",
+      "rememberKey": "Schlüssel sitzungsübergreifend merken"
     },
     "step3": {
       "title": "Plan wählen",
