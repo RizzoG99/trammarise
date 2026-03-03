@@ -36,7 +36,7 @@ export function AccountBillingPage() {
           <button
             type="button"
             onClick={() => navigate(-1)}
-            className="inline-flex items-center gap-2 text-sm text-text-secondary hover:text-text-primary transition-colors"
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-text-secondary hover:text-text-primary hover:bg-bg-surface transition-all cursor-pointer"
             aria-label={t('account.back')}
           >
             <ArrowLeft className="w-4 h-4" />
@@ -60,7 +60,7 @@ export function AccountBillingPage() {
                     onClick={() => setActiveSection(id)}
                     className={`
                       w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium
-                      transition-colors text-left
+                      transition-all text-left cursor-pointer
                       ${
                         activeSection === id
                           ? 'bg-primary/10 text-primary'
