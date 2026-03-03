@@ -3,12 +3,15 @@ import { describe, it, expect } from 'vitest';
 import { SpeakerTranscriptPreview } from './SpeakerTranscriptPreview';
 
 describe('SpeakerTranscriptPreview', () => {
-  it('renders all 4 mock utterance rows', () => {
+  it('renders all 7 mock utterance rows', () => {
     render(<SpeakerTranscriptPreview />);
     expect(screen.getByText(/Thanks everyone for joining/)).toBeInTheDocument();
     expect(screen.getByText(/Should we start with the roadmap/)).toBeInTheDocument();
     expect(screen.getByText(/walk through Q2 milestones/)).toBeInTheDocument();
     expect(screen.getByText(/Engineering pushed the API deadline/)).toBeInTheDocument();
+    expect(screen.getByText(/Does that affect the mobile release/)).toBeInTheDocument();
+    expect(screen.getByText(/Mobile depends on that endpoint/)).toBeInTheDocument();
+    expect(screen.getByText(/lock down the new timeline/)).toBeInTheDocument();
   });
 
   it('renders all 3 speaker chips', () => {
@@ -26,6 +29,9 @@ describe('SpeakerTranscriptPreview', () => {
     expect(screen.getByText('00:28')).toBeInTheDocument();
     expect(screen.getByText('00:45')).toBeInTheDocument();
     expect(screen.getByText('01:02')).toBeInTheDocument();
+    expect(screen.getByText('01:18')).toBeInTheDocument();
+    expect(screen.getByText('01:35')).toBeInTheDocument();
+    expect(screen.getByText('01:52')).toBeInTheDocument();
   });
 
   it('renders the preview heading', () => {

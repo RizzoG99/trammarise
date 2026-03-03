@@ -123,6 +123,15 @@ describe('UpgradeModal', () => {
       renderModal({ trigger: 'speaker_diarization' });
       expect(screen.getByText(/or pay annually and save 2 months/i)).toBeInTheDocument();
     });
+
+    it('navigates to /pricing with annual billing when annual hint is clicked', () => {
+      renderModal({ trigger: 'speaker_diarization' });
+      fireEvent.click(screen.getByText(/or pay annually and save 2 months/i));
+      expect(defaultProps.onClose).toHaveBeenCalled();
+      expect(mockNavigate).toHaveBeenCalledWith('/pricing', {
+        state: { from: 'speaker_diarization', billingInterval: 'year' },
+      });
+    });
   });
 
   it('renders different content based on trigger', () => {

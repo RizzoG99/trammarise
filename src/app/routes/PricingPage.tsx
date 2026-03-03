@@ -90,7 +90,9 @@ export function PricingPage() {
   const { getToken } = useAuth();
   const { needsOnboarding, isViewingPricing, setIsViewingPricing } = useOnboarding();
   const { subscription } = useSubscription();
-  const [billingInterval, setBillingInterval] = useState<BillingInterval>('month');
+  const [billingInterval, setBillingInterval] = useState<BillingInterval>(
+    location.state?.billingInterval === 'year' ? 'year' : 'month'
+  );
   const [loadingTier, setLoadingTier] = useState<string | null>(null);
 
   const showBanner = needsOnboarding && isViewingPricing;

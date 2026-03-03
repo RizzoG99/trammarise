@@ -42,7 +42,7 @@ export function PricingCard({
     <GlassCard
       variant={plan.popular ? 'glow' : 'dark'}
       className={[
-        'p-8 h-full transition-all duration-300 hover:-translate-y-1',
+        'p-8 h-full transition-all duration-300',
         plan.popular
           ? 'border-[var(--color-primary)]/50 scale-105 shadow-2xl shadow-[var(--color-primary)]/20'
           : 'border-white/5 hover:border-white/10',

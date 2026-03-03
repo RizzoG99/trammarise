@@ -38,6 +38,11 @@ function SpeakerDiarizationUpgradeModal({ isOpen, onClose }: SpeakerDiarizationU
     navigate('/pricing', { state: { from: 'speaker_diarization' } });
   };
 
+  const handleUpgradeAnnual = () => {
+    onClose();
+    navigate('/pricing', { state: { from: 'speaker_diarization', billingInterval: 'year' } });
+  };
+
   const speakerPlan: PricingPlan = {
     id: 'pro',
     name: t('pricing.pro.name', 'Pro'),
@@ -89,8 +94,8 @@ function SpeakerDiarizationUpgradeModal({ isOpen, onClose }: SpeakerDiarizationU
             <div className="mt-3 text-center space-y-2">
               <button
                 type="button"
-                onClick={handleUpgrade}
-                className="text-xs text-text-tertiary hover:text-text-secondary underline underline-offset-2 transition-colors"
+                onClick={handleUpgradeAnnual}
+                className="text-xs text-primary/80 hover:text-primary underline underline-offset-2 transition-colors cursor-pointer"
               >
                 {t('upgrade.speakerDiarization.annualHint', 'or pay annually and save 2 months')}
               </button>

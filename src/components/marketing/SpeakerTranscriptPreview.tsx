@@ -17,6 +17,13 @@ const MOCK_UTTERANCES = [
     text: "Absolutely. Let's walk through Q2 milestones first.",
   },
   { speaker: 'Speaker 3', time: '01:02', text: 'Engineering pushed the API deadline by a week.' },
+  { speaker: 'Speaker 2', time: '01:18', text: 'Does that affect the mobile release date?' },
+  { speaker: 'Speaker 3', time: '01:35', text: 'It does. Mobile depends on that endpoint.' },
+  {
+    speaker: 'Speaker 1',
+    time: '01:52',
+    text: "Let's sync tomorrow and lock down the new timeline.",
+  },
 ] as const;
 
 // Speaker index → solid color tokens for border, chip, and row background
