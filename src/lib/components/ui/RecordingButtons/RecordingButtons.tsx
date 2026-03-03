@@ -46,39 +46,46 @@ export function RecordButton({
   const defaultAriaLabel = ariaLabel || t('upload.aria.startRecording');
 
   return (
-    <button
-      onClick={onClick}
-      disabled={disabled || isRecording}
-      className={`relative rounded-full transition-all group ${
-        disabled || isRecording
-          ? 'cursor-not-allowed opacity-50 p-3'
-          : 'shadow-lg hover:shadow-xl p-6'
-      } ${className}`}
-      style={{
-        backgroundColor: disabled || isRecording ? 'transparent' : 'var(--color-primary)',
-        color: disabled || isRecording ? 'var(--color-text-tertiary)' : 'white',
-      }}
-      onMouseEnter={(e) => {
-        if (!disabled && !isRecording) {
-          e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)';
-        }
-      }}
-      onMouseLeave={(e) => {
-        if (!disabled && !isRecording) {
-          e.currentTarget.style.backgroundColor = 'var(--color-primary)';
-        }
-      }}
-      aria-label={defaultAriaLabel}
-    >
-      <Mic className={disabled || isRecording ? 'w-7 h-7' : 'w-8 h-8'} />
-
+    <div className="relative inline-flex items-center justify-center">
       {!disabled && !isRecording && (
-        <span
-          className="absolute inset-0 rounded-full opacity-20 pulse-ring"
-          style={{ backgroundColor: 'var(--color-primary)' }}
-        />
+        <>
+          <span
+            className="absolute inset-0 rounded-full pulse-ring pointer-events-none"
+            style={{ backgroundColor: 'var(--color-primary)' }}
+          />
+          <span
+            className="absolute inset-0 rounded-full pulse-ring pointer-events-none"
+            style={{ backgroundColor: 'var(--color-primary)', animationDelay: '0.9s' }}
+          />
+        </>
       )}
-    </button>
+      <button
+        onClick={onClick}
+        disabled={disabled || isRecording}
+        className={`relative z-10 rounded-full transition-all group ${
+          disabled || isRecording
+            ? 'cursor-not-allowed opacity-50 p-3'
+            : 'shadow-lg hover:shadow-xl p-6 cursor-pointer'
+        } ${className}`}
+        style={{
+          backgroundColor: disabled || isRecording ? 'transparent' : 'var(--color-primary)',
+          color: disabled || isRecording ? 'var(--color-text-tertiary)' : 'white',
+        }}
+        onMouseEnter={(e) => {
+          if (!disabled && !isRecording) {
+            e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)';
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (!disabled && !isRecording) {
+            e.currentTarget.style.backgroundColor = 'var(--color-primary)';
+          }
+        }}
+        aria-label={defaultAriaLabel}
+      >
+        <Mic className={disabled || isRecording ? 'w-7 h-7' : 'w-8 h-8'} />
+      </button>
+    </div>
   );
 }
 
