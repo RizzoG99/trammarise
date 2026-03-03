@@ -285,7 +285,9 @@
       "description": "Identify and label different speakers in the transcript",
       "speakersExpected": "Expected Number of Speakers (Optional)",
       "speakersPlaceholder": "Auto-detect",
-      "speakersHint": "Specify 2-10 speakers for better accuracy, or leave blank for auto-detection"
+      "speakersHint": "Specify 2-10 speakers for better accuracy, or leave blank for auto-detection",
+      "proBadge": "Pro",
+      "proUpgradeHint": "Upgrade to Pro to identify speakers"
     },
     "meetingType": {
       "title": "Meeting Type",
@@ -852,6 +854,15 @@
       "usageAlerts": "Usage limit alerts",
       "transcriptionComplete": "Transcription complete notifications",
       "save": "Save Preferences"
+    }
+  },
+  "upgrade": {
+    "speakerDiarization": {
+      "title": "Identify every voice",
+      "desc": "Speaker Identification labels who said what — color-coded, timestamped, up to 10 speakers.",
+      "feature1": "Color-coded speaker labels",
+      "feature2": "Up to 10 speakers",
+      "feature3": "Timestamped per utterance"
     }
   }
 }

@@ -286,7 +286,9 @@
       "description": "Identifica y etiqueta diferentes oradores en la transcripción",
       "speakersExpected": "Número de Oradores Esperados (Opcional)",
       "speakersPlaceholder": "Auto-detectar",
-      "speakersHint": "Especifica 2-10 oradores para mayor precisión, o deja en blanco para detección automática"
+      "speakersHint": "Especifica 2-10 oradores para mayor precisión, o deja en blanco para detección automática",
+      "proBadge": "Pro",
+      "proUpgradeHint": "Actualiza a Pro para identificar hablantes"
     },
     "meetingType": {
       "title": "Tipo de Reunión",
@@ -853,6 +855,15 @@
       "usageAlerts": "Alertas de límite de uso",
       "transcriptionComplete": "Notificaciones de transcripción completada",
       "save": "Guardar preferencias"
+    }
+  },
+  "upgrade": {
+    "speakerDiarization": {
+      "title": "Identifica cada voz",
+      "desc": "La identificación de hablantes etiqueta quién dijo qué — con colores, marcas de tiempo, hasta 10 hablantes.",
+      "feature1": "Etiquetas de hablantes con colores",
+      "feature2": "Hasta 10 hablantes",
+      "feature3": "Marcas de tiempo por intervención"
     }
   }
 }

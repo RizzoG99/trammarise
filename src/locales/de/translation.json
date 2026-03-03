@@ -286,7 +286,9 @@
       "description": "Identifizieren und kennzeichnen Sie verschiedene Sprecher im Transkript",
       "speakersExpected": "Erwartete Anzahl von Sprechern (Optional)",
       "speakersPlaceholder": "Automatische Erkennung",
-      "speakersHint": "Geben Sie 2-10 Sprecher für bessere Genauigkeit an oder lassen Sie das Feld leer für automatische Erkennung"
+      "speakersHint": "Geben Sie 2-10 Sprecher für bessere Genauigkeit an oder lassen Sie das Feld leer für automatische Erkennung",
+      "proBadge": "Pro",
+      "proUpgradeHint": "Upgrade auf Pro um Sprecher zu identifizieren"
     },
     "meetingType": {
       "title": "Besprechungstyp",
@@ -853,6 +855,15 @@
       "usageAlerts": "Nutzungslimit-Warnungen",
       "transcriptionComplete": "Transkription abgeschlossen",
       "save": "Einstellungen speichern"
+    }
+  },
+  "upgrade": {
+    "speakerDiarization": {
+      "title": "Jede Stimme identifizieren",
+      "desc": "Sprecher-Identifikation beschriftet, wer was gesagt hat — farbcodiert, mit Zeitstempeln, bis zu 10 Sprecher.",
+      "feature1": "Farbcodierte Sprecher-Labels",
+      "feature2": "Bis zu 10 Sprecher",
+      "feature3": "Zeitstempel pro Äußerung"
     }
   }
 }

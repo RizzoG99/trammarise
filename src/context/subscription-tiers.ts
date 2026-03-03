@@ -16,6 +16,7 @@ export const TIER_FEATURES: Record<SubscriptionTier, string[]> = {
     'chat',
     'custom-models',
     'email-support',
+    'speaker-diarization',
   ],
   team: [
     'basic-editing',
@@ -28,6 +29,7 @@ export const TIER_FEATURES: Record<SubscriptionTier, string[]> = {
     'chat',
     'custom-models',
     'email-support',
+    'speaker-diarization',
     'team-collaboration',
     'shared-workspaces',
     'admin-controls',

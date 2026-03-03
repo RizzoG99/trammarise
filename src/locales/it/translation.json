@@ -286,7 +286,9 @@
       "description": "Identifica ed etichetta i diversi relatori nella trascrizione",
       "speakersExpected": "Numero di Relatori Previsti (Opzionale)",
       "speakersPlaceholder": "Rilevamento automatico",
-      "speakersHint": "Specifica 2-10 relatori per una maggiore precisione, oppure lascia vuoto per il rilevamento automatico"
+      "speakersHint": "Specifica 2-10 relatori per una maggiore precisione, oppure lascia vuoto per il rilevamento automatico",
+      "proBadge": "Pro",
+      "proUpgradeHint": "Passa a Pro per identificare i relatori"
     },
     "meetingType": {
       "title": "Tipo di Riunione",
@@ -853,6 +855,15 @@
       "usageAlerts": "Avvisi limite utilizzo",
       "transcriptionComplete": "Notifiche trascrizione completata",
       "save": "Salva preferenze"
+    }
+  },
+  "upgrade": {
+    "speakerDiarization": {
+      "title": "Identifica ogni voce",
+      "desc": "L'identificazione dei relatori etichetta chi ha detto cosa — con colori, timestamp, fino a 10 relatori.",
+      "feature1": "Etichette relatori con colori",
+      "feature2": "Fino a 10 relatori",
+      "feature3": "Timestamp per ogni intervento"
     }
   }
 }

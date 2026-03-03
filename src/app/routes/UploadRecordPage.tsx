@@ -18,14 +18,18 @@ import { SpeakerDiarizationToggle } from '../../features/configuration/component
 import type { NoiseProfile } from '../../types/noise-profiles';
 import { ProcessAudioButton } from '../../features/upload/components/ProcessAudioButton';
 import { ApiKeySetupBanner } from '../../features/onboarding/ApiKeySetupBanner';
+import { UpgradeModal } from '../../components/marketing/UpgradeModal';
 import { generateSessionId, saveSession } from '../../utils/session-manager';
 import { buildRoutePath, ROUTES } from '../../types/routing';
 import { useSubscription } from '../../context/SubscriptionContext';
+import { useFeatureGate } from '../../hooks/useFeatureGate';
 
 export function UploadRecordPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { subscription } = useSubscription();
+  const { hasAccess: isSpeakerIdPro } = useFeatureGate('speaker-diarization');
+  const [showSpeakerUpgradeModal, setShowSpeakerUpgradeModal] = useState(false);
   const recordPanelRef = useRef<RecordPanelRef>(null);
   const [audioFile, setAudioFile] = useState<File | Blob | null>(null);
   const [contextFiles, setContextFiles] = useState<File[]>([]);
@@ -188,6 +192,8 @@ export function UploadRecordPage() {
               speakersExpected={speakersExpected}
               onEnabledChange={setEnableSpeakerDiarization}
               onSpeakersExpectedChange={setSpeakersExpected}
+              isProUser={isSpeakerIdPro}
+              onUpgradeClick={() => setShowSpeakerUpgradeModal(true)}
             />
           </div>
         </div>
@@ -208,6 +214,12 @@ export function UploadRecordPage() {
           isLoading={isProcessing}
         />
       </div>
+
+      <UpgradeModal
+        isOpen={showSpeakerUpgradeModal}
+        onClose={() => setShowSpeakerUpgradeModal(false)}
+        trigger="speaker_diarization"
+      />
     </PageLayout>
   );
 }

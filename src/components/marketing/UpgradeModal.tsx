@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Modal, Button, Text } from '@/lib';
-import { Zap, Check } from 'lucide-react';
+import { Zap, Check, Users } from 'lucide-react';
 import { PricingCard } from '@/lib/components/ui/PricingCard/PricingCard';
 import type { PricingPlan } from '@/lib/components/ui/PricingCard/PricingCard';
 import { ToggleSwitch } from '@/lib/components/form/ToggleSwitch/ToggleSwitch';
@@ -12,6 +12,7 @@ export type UpgradeTrigger =
   | 'chat_gate'
   | 'watermark_remove'
   | 'history_limit'
+  | 'speaker_diarization'
   | 'generic';
 
 interface UpgradeModalProps {
@@ -89,6 +90,20 @@ export function UpgradeModal({
             t('upgrade.features.unlimitedHistory', 'Unlimited History'),
             t('upgrade.features.cloudBackup', 'Cloud Backup'),
             t('upgrade.features.sync', 'Cross-Device Sync'),
+          ],
+        };
+      case 'speaker_diarization':
+        return {
+          title: t('upgrade.speakerDiarization.title', 'Identify every voice'),
+          description: t(
+            'upgrade.speakerDiarization.desc',
+            'Speaker Identification labels who said what — color-coded, timestamped, up to 10 speakers.'
+          ),
+          icon: <Users className="w-12 h-12 mb-4 text-[var(--color-primary)]" />,
+          features: [
+            t('upgrade.speakerDiarization.feature1', 'Color-coded speaker labels'),
+            t('upgrade.speakerDiarization.feature2', 'Up to 10 speakers'),
+            t('upgrade.speakerDiarization.feature3', 'Timestamped per utterance'),
           ],
         };
       default:
