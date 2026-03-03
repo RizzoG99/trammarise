@@ -86,6 +86,45 @@ describe('UpgradeModal', () => {
     expect(toggleSwitch).toHaveAttribute('aria-checked', 'true'); // now annual
   });
 
+  describe('speaker_diarization trigger', () => {
+    it('renders the transcript preview layout', () => {
+      renderModal({ trigger: 'speaker_diarization' });
+      // Preview utterances visible
+      expect(screen.getByText(/Thanks everyone for joining/)).toBeInTheDocument();
+      expect(screen.getByText(/Should we start with the roadmap/)).toBeInTheDocument();
+    });
+
+    it('does not render a billing toggle', () => {
+      renderModal({ trigger: 'speaker_diarization' });
+      expect(screen.queryByRole('switch', { name: /Annual Billing/i })).not.toBeInTheDocument();
+    });
+
+    it('renders "Unlock Speaker ID" CTA button', () => {
+      renderModal({ trigger: 'speaker_diarization' });
+      expect(screen.getByRole('button', { name: /Unlock Speaker ID/i })).toBeInTheDocument();
+    });
+
+    it('navigates to /pricing when CTA is clicked', () => {
+      renderModal({ trigger: 'speaker_diarization' });
+      fireEvent.click(screen.getByRole('button', { name: /Unlock Speaker ID/i }));
+      expect(defaultProps.onClose).toHaveBeenCalled();
+      expect(mockNavigate).toHaveBeenCalledWith('/pricing', {
+        state: { from: 'speaker_diarization' },
+      });
+    });
+
+    it('calls onClose when Maybe Later is clicked', () => {
+      renderModal({ trigger: 'speaker_diarization' });
+      fireEvent.click(screen.getByRole('button', { name: /Maybe Later/i }));
+      expect(defaultProps.onClose).toHaveBeenCalledTimes(1);
+    });
+
+    it('renders the annual hint link', () => {
+      renderModal({ trigger: 'speaker_diarization' });
+      expect(screen.getByText(/or pay annually and save 2 months/i)).toBeInTheDocument();
+    });
+  });
+
   it('renders different content based on trigger', () => {
     const { rerender } = render(
       <BrowserRouter>

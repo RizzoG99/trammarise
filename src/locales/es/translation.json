@@ -863,7 +863,10 @@
       "desc": "La identificación de hablantes etiqueta quién dijo qué — con colores, marcas de tiempo, hasta 10 hablantes.",
       "feature1": "Etiquetas de hablantes con colores",
       "feature2": "Hasta 10 hablantes",
-      "feature3": "Marcas de tiempo por intervención"
+      "feature3": "Marcas de tiempo por intervención",
+      "cta": "Desbloquear ID de voz",
+      "annualHint": "o paga anualmente y ahorra 2 meses",
+      "previewSubtitle": "Ve quién dijo qué y cuándo"
     }
   }
 }

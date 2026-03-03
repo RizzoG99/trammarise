@@ -2,10 +2,11 @@ import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Modal, Button, Text } from '@/lib';
-import { Zap, Check, Users } from 'lucide-react';
+import { Zap, Check, X } from 'lucide-react';
 import { PricingCard } from '@/lib/components/ui/PricingCard/PricingCard';
 import type { PricingPlan } from '@/lib/components/ui/PricingCard/PricingCard';
 import { ToggleSwitch } from '@/lib/components/form/ToggleSwitch/ToggleSwitch';
+import { SpeakerTranscriptPreview } from './SpeakerTranscriptPreview';
 
 export type UpgradeTrigger =
   | 'limit_reached'
@@ -23,6 +24,93 @@ interface UpgradeModalProps {
   description?: string;
 }
 
+interface SpeakerDiarizationUpgradeModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+function SpeakerDiarizationUpgradeModal({ isOpen, onClose }: SpeakerDiarizationUpgradeModalProps) {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+
+  const handleUpgrade = () => {
+    onClose();
+    navigate('/pricing', { state: { from: 'speaker_diarization' } });
+  };
+
+  const speakerPlan: PricingPlan = {
+    id: 'pro',
+    name: t('pricing.pro.name', 'Pro'),
+    description: t('pricing.pro.desc', 'Best for individuals and professionals'),
+    monthlyPrice: '$19',
+    annualPrice: '$190',
+    features: [
+      t('upgrade.speakerDiarization.feature1', 'Color-coded speaker labels'),
+      t('upgrade.speakerDiarization.feature2', 'Up to 10 speakers'),
+      t('upgrade.speakerDiarization.feature3', 'Timestamped per utterance'),
+    ],
+    cta: t('upgrade.speakerDiarization.cta', 'Unlock Speaker ID'),
+    popular: true,
+    badge: t('pricing.popular', 'Most Popular'),
+  };
+
+  return (
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={t('upgrade.speakerDiarization.title')}
+      hideHeader={true}
+      className="max-w-3xl"
+    >
+      {/* Custom close button */}
+      <div className="relative">
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label={t('common.cancel', 'Close')}
+          className="absolute -top-2 right-0 w-8 h-8 flex items-center justify-center rounded-lg text-text-tertiary hover:text-text-primary hover:bg-bg-tertiary transition-colors"
+        >
+          <X size={18} />
+        </button>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-2 pb-6">
+          {/* Left: Live transcript preview */}
+          <SpeakerTranscriptPreview />
+
+          {/* Right: Focused pricing card */}
+          <div className="flex flex-col">
+            <PricingCard
+              plan={speakerPlan}
+              isCurrentPlan={false}
+              billingPeriod="monthly"
+              onSelect={handleUpgrade}
+              className="flex-grow"
+            />
+            <div className="mt-3 text-center space-y-2">
+              <button
+                type="button"
+                onClick={handleUpgrade}
+                className="text-xs text-text-tertiary hover:text-text-secondary underline underline-offset-2 transition-colors"
+              >
+                {t('upgrade.speakerDiarization.annualHint', 'or pay annually and save 2 months')}
+              </button>
+              <div>
+                <Button
+                  variant="ghost"
+                  onClick={onClose}
+                  className="text-text-tertiary hover:text-text-primary text-sm"
+                >
+                  {t('common.maybeLater', 'Maybe Later')}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Modal>
+  );
+}
+
 export function UpgradeModal({
   isOpen,
   onClose,
@@ -33,6 +121,31 @@ export function UpgradeModal({
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'annual'>('monthly');
+
+  const proPlan: PricingPlan = useMemo(
+    () => ({
+      id: 'pro',
+      name: t('pricing.pro.name', 'Pro'),
+      description: t('pricing.pro.desc', 'Best for individuals and professionals'),
+      monthlyPrice: '$19',
+      annualPrice: '$190',
+      features: [
+        t('pricing.pro.features.minutes', '500 minutes/month included'),
+        t('pricing.pro.features.noKeys', 'No API keys needed'),
+        t('pricing.pro.features.sync', 'Cross-device sync'),
+        t('pricing.pro.features.chat', 'Chat with transcripts'),
+        t('pricing.pro.features.support', 'Priority processing & support'),
+      ],
+      cta: t('upgrade.cta', 'View Plans & Upgrade'),
+      popular: true,
+      badge: t('pricing.popular', 'Most Popular'),
+    }),
+    [t]
+  );
+
+  if (trigger === 'speaker_diarization') {
+    return <SpeakerDiarizationUpgradeModal isOpen={isOpen} onClose={onClose} />;
+  }
 
   const getContent = () => {
     switch (trigger) {
@@ -92,20 +205,6 @@ export function UpgradeModal({
             t('upgrade.features.sync', 'Cross-Device Sync'),
           ],
         };
-      case 'speaker_diarization':
-        return {
-          title: t('upgrade.speakerDiarization.title', 'Identify every voice'),
-          description: t(
-            'upgrade.speakerDiarization.desc',
-            'Speaker Identification labels who said what — color-coded, timestamped, up to 10 speakers.'
-          ),
-          icon: <Users className="w-12 h-12 mb-4 text-[var(--color-primary)]" />,
-          features: [
-            t('upgrade.speakerDiarization.feature1', 'Color-coded speaker labels'),
-            t('upgrade.speakerDiarization.feature2', 'Up to 10 speakers'),
-            t('upgrade.speakerDiarization.feature3', 'Timestamped per utterance'),
-          ],
-        };
       default:
         return {
           title: customTitle || t('upgrade.generic.title', 'Upgrade to Pro'),
@@ -131,27 +230,6 @@ export function UpgradeModal({
     onClose();
     navigate('/pricing', { state: { from: 'results' } });
   };
-
-  const proPlan: PricingPlan = useMemo(
-    () => ({
-      id: 'pro',
-      name: t('pricing.pro.name', 'Pro'),
-      description: t('pricing.pro.desc', 'Best for individuals and professionals'),
-      monthlyPrice: '$19',
-      annualPrice: '$190',
-      features: [
-        t('pricing.pro.features.minutes', '500 minutes/month included'),
-        t('pricing.pro.features.noKeys', 'No API keys needed'),
-        t('pricing.pro.features.sync', 'Cross-device sync'),
-        t('pricing.pro.features.chat', 'Chat with transcripts'),
-        t('pricing.pro.features.support', 'Priority processing & support'),
-      ],
-      cta: t('upgrade.cta', 'View Plans & Upgrade'),
-      popular: true,
-      badge: t('pricing.popular', 'Most Popular'),
-    }),
-    [t]
-  );
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={content.title} className="max-w-4xl">

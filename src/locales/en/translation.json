@@ -862,7 +862,10 @@
       "desc": "Speaker Identification labels who said what — color-coded, timestamped, up to 10 speakers.",
       "feature1": "Color-coded speaker labels",
       "feature2": "Up to 10 speakers",
-      "feature3": "Timestamped per utterance"
+      "feature3": "Timestamped per utterance",
+      "cta": "Unlock Speaker ID",
+      "annualHint": "or pay annually and save 2 months",
+      "previewSubtitle": "See who said what, when"
     }
   }
 }

@@ -863,7 +863,10 @@
       "desc": "Sprecher-Identifikation beschriftet, wer was gesagt hat — farbcodiert, mit Zeitstempeln, bis zu 10 Sprecher.",
       "feature1": "Farbcodierte Sprecher-Labels",
       "feature2": "Bis zu 10 Sprecher",
-      "feature3": "Zeitstempel pro Äußerung"
+      "feature3": "Zeitstempel pro Äußerung",
+      "cta": "Speaker-ID freischalten",
+      "annualHint": "oder jährlich zahlen und 2 Monate sparen",
+      "previewSubtitle": "Sehen Sie, wer was gesagt hat und wann"
     }
   }
 }
