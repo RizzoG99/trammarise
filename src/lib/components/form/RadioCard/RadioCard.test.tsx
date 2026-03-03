@@ -34,10 +34,7 @@ describe('RadioCard', () => {
 
     it('renders with ReactNode title', () => {
       render(
-        <RadioCard
-          {...defaultProps}
-          title={<span data-testid="custom-title">Custom Title</span>}
-        />
+        <RadioCard {...defaultProps} title={<span data-testid="custom-title">Custom Title</span>} />
       );
       expect(screen.getByTestId('custom-title')).toBeInTheDocument();
     });
@@ -148,12 +145,7 @@ describe('RadioCard', () => {
     });
 
     it('does not have aria-label when title is ReactNode', () => {
-      render(
-        <RadioCard
-          {...defaultProps}
-          title={<span>React Node Title</span>}
-        />
-      );
+      render(<RadioCard {...defaultProps} title={<span>React Node Title</span>} />);
       const radio = screen.getByRole('radio', { hidden: true });
       expect(radio).not.toHaveAttribute('aria-label');
     });
@@ -191,13 +183,7 @@ describe('RadioCard', () => {
             onChange={mockOnChange}
             title="Basic"
           />
-          <RadioCard
-            name="plan"
-            value="pro"
-            checked={false}
-            onChange={mockOnChange}
-            title="Pro"
-          />
+          <RadioCard name="plan" value="pro" checked={false} onChange={mockOnChange} title="Pro" />
         </div>
       );
 
@@ -234,6 +220,37 @@ describe('RadioCard', () => {
       render(<RadioCard {...defaultProps} value="option-1_test@value" />);
       const radio = screen.getByRole('radio', { hidden: true });
       expect(radio).toHaveAttribute('value', 'option-1_test@value');
+    });
+  });
+
+  describe('Badge', () => {
+    it('renders badge when provided', () => {
+      render(<RadioCard {...defaultProps} badge={<span data-testid="badge">1 credit</span>} />);
+      expect(screen.getByTestId('badge')).toBeInTheDocument();
+      expect(screen.getByText('1 credit')).toBeInTheDocument();
+    });
+
+    it('does not render badge slot when not provided', () => {
+      render(<RadioCard {...defaultProps} />);
+      expect(screen.queryByTestId('badge')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('Size', () => {
+    it('applies sm padding class when size is sm', () => {
+      const { container } = render(<RadioCard {...defaultProps} size="sm" />);
+      expect(container.querySelector('.p-3')).toBeInTheDocument();
+    });
+
+    it('applies md padding class by default', () => {
+      const { container } = render(<RadioCard {...defaultProps} />);
+      expect(container.querySelector('.p-4')).toBeInTheDocument();
+    });
+
+    it('applies sm title classes when size is sm', () => {
+      render(<RadioCard {...defaultProps} size="sm" title="Small Title" />);
+      const titleEl = screen.getByText('Small Title');
+      expect(titleEl.className).toContain('text-sm');
     });
   });
 

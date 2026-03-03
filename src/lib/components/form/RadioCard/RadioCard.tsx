@@ -16,6 +16,10 @@ export interface RadioCardProps {
   title: React.ReactNode;
   /** Optional description text below title */
   description?: string;
+  /** Optional badge element shown between title and radio indicator (e.g. a credits tag) */
+  badge?: React.ReactNode;
+  /** Size variant — 'md' (default) for standard cards, 'sm' for compact/inline usage */
+  size?: 'sm' | 'md';
   /** Additional CSS classes */
   className?: string;
   /** Disable this radio option */
@@ -26,7 +30,7 @@ export interface RadioCardProps {
  * A card-style radio button for selecting from multiple options.
  *
  * Features:
- * - **Card layout** with title and optional description
+ * - **Card layout** with title, optional description, and optional badge
  * - **Visual selection indicator** with colored border and background
  * - **Radio button dot** that appears when selected
  * - **Hover effects** for better interactivity
@@ -37,40 +41,30 @@ export interface RadioCardProps {
  *
  * @example
  * ```tsx
- * // Radio group for selecting plan
+ * // Basic radio group
  * const [plan, setPlan] = useState('basic');
  *
- * <div>
- *   <RadioCard
- *     name="plan"
- *     value="basic"
- *     checked={plan === 'basic'}
- *     onChange={setPlan}
- *     title="Basic Plan"
- *     description="Perfect for individuals"
- *   />
- *   <RadioCard
- *     name="plan"
- *     value="pro"
- *     checked={plan === 'pro'}
- *     onChange={setPlan}
- *     title="Pro Plan"
- *     description="Best for teams"
- *   />
- * </div>
+ * <RadioCard
+ *   name="plan"
+ *   value="basic"
+ *   checked={plan === 'basic'}
+ *   onChange={setPlan}
+ *   title="Basic Plan"
+ *   description="Perfect for individuals"
+ * />
+ *
+ * // Compact with badge (e.g. processing mode selector)
+ * <RadioCard
+ *   size="sm"
+ *   name="mode"
+ *   value="balanced"
+ *   checked={mode === 'balanced'}
+ *   onChange={setMode}
+ *   title="Balanced"
+ *   description="Faster processing"
+ *   badge={<span className="...">1 credit</span>}
+ * />
  * ```
- *
- * @param props - RadioCard properties
- * @param props.name - Radio group name (all options in group share this)
- * @param props.value - Unique value identifying this option
- * @param props.checked - Whether this option is currently selected
- * @param props.onChange - Callback invoked with value when selected
- * @param props.title - Title text or React element displayed prominently
- * @param props.description - Optional description text shown below title
- * @param props.className - Additional CSS classes to apply
- * @param props.disabled - If true, prevents selection and applies disabled styling
- *
- * @returns RadioCard label element with hidden radio input
  */
 export const RadioCard: React.FC<RadioCardProps> = ({
   name,
@@ -79,9 +73,14 @@ export const RadioCard: React.FC<RadioCardProps> = ({
   onChange,
   title,
   description,
+  badge,
+  size = 'md',
   className = '',
   disabled = false,
 }) => {
+  const padding = size === 'sm' ? 'p-3' : 'p-4';
+  const titleSize = size === 'sm' ? 'text-sm font-medium' : 'text-base font-semibold';
+
   const baseClasses = `
     block relative rounded-xl bg-bg-surface
     border-2 border-border
@@ -90,7 +89,7 @@ export const RadioCard: React.FC<RadioCardProps> = ({
 
   const interactiveClasses = disabled
     ? 'cursor-not-allowed opacity-50'
-    : 'cursor-pointer hover:bg-bg-surface-hover hover:border-primary/50';
+    : 'cursor-pointer hover:bg-bg-surface-hover hover:border-primary';
 
   const checkedClasses = checked
     ? 'bg-primary/10 border-primary shadow-[0_0_0_1px_var(--color-primary)]'
@@ -99,7 +98,7 @@ export const RadioCard: React.FC<RadioCardProps> = ({
   const labelClasses = `${baseClasses} ${interactiveClasses} ${checkedClasses} ${className}`.trim();
 
   const radioIndicatorClasses = `
-    w-5 h-5 rounded-full border-2 relative transition-all duration-200
+    w-5 h-5 rounded-full border-2 relative transition-all duration-200 flex-shrink-0
     ${
       checked
         ? 'border-primary bg-primary after:content-[""] after:absolute after:top-1/2 after:left-1/2 after:-translate-x-1/2 after:-translate-y-1/2 after:w-2 after:h-2 after:rounded-full after:bg-white'
@@ -119,9 +118,12 @@ export const RadioCard: React.FC<RadioCardProps> = ({
         disabled={disabled}
         aria-label={typeof title === 'string' ? title : undefined}
       />
-      <div className="p-4">
+      <div className={padding}>
         <div className="flex justify-between items-center mb-1">
-          <div className="font-semibold text-base text-text-primary">{title}</div>
+          <div className={`flex items-center gap-2 ${titleSize} text-text-primary`}>
+            {title}
+            {badge}
+          </div>
           <div className={radioIndicatorClasses} aria-hidden="true" />
         </div>
         {description && (
