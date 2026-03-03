@@ -10,10 +10,29 @@ export interface ProcessingModeSelectorProps {
   disabled?: boolean; // Disable mode selection
 }
 
+function modeStyle(selected: boolean, disabled: boolean) {
+  return {
+    borderColor: selected && !disabled ? 'var(--color-primary)' : 'var(--color-border)',
+    backgroundColor: selected && !disabled ? 'var(--color-primary-alpha-5)' : 'transparent',
+  };
+}
+
 export function ProcessingModeSelector({ value, onChange, disabled }: ProcessingModeSelectorProps) {
   const { t } = useTranslation();
   // Note: Both modes support audio up to ~23 minutes (1400s) per chunk
   // Audio files longer than this will be automatically chunked during processing
+
+  const handleMouseEnter = (mode: ProcessingMode) => (e: React.MouseEvent<HTMLLabelElement>) => {
+    if (disabled || value === mode) return;
+    e.currentTarget.style.backgroundColor = 'var(--color-bg-surface-hover)';
+    e.currentTarget.style.borderColor = 'var(--color-border)';
+  };
+
+  const handleMouseLeave = (mode: ProcessingMode) => (e: React.MouseEvent<HTMLLabelElement>) => {
+    if (disabled || value === mode) return;
+    e.currentTarget.style.backgroundColor = 'transparent';
+    e.currentTarget.style.borderColor = 'var(--color-border)';
+  };
 
   return (
     <div className="space-y-3">
@@ -38,17 +57,12 @@ export function ProcessingModeSelector({ value, onChange, disabled }: Processing
       <div className="flex flex-col gap-3">
         {/* Balanced Mode */}
         <label
-          className={`relative flex items-center p-3 rounded-lg border cursor-pointer transition-colors ${
-            disabled
-              ? 'opacity-50 cursor-not-allowed bg-bg-tertiary'
-              : value === 'balanced'
-                ? 'bg-primary/5'
-                : 'hover:bg-bg-surface'
+          className={`relative flex items-center p-3 rounded-lg border cursor-pointer transition-all ${
+            disabled ? 'opacity-50 cursor-not-allowed' : ''
           }`}
-          style={{
-            borderColor:
-              value === 'balanced' && !disabled ? 'var(--color-primary)' : 'var(--color-border)',
-          }}
+          style={modeStyle(value === 'balanced', disabled ?? false)}
+          onMouseEnter={handleMouseEnter('balanced')}
+          onMouseLeave={handleMouseLeave('balanced')}
         >
           <input
             type="radio"
@@ -58,9 +72,7 @@ export function ProcessingModeSelector({ value, onChange, disabled }: Processing
             onChange={(e) => !disabled && onChange(e.target.value as ProcessingMode)}
             disabled={disabled}
             className="h-4 w-4 border-border focus:ring-2 focus:ring-offset-0 disabled:cursor-not-allowed"
-            style={{
-              accentColor: 'var(--color-primary)',
-            }}
+            style={{ accentColor: 'var(--color-primary)' }}
           />
           <div className="ml-3 flex-1">
             <div className="flex justify-between">
@@ -89,17 +101,12 @@ export function ProcessingModeSelector({ value, onChange, disabled }: Processing
 
         {/* Quality Mode */}
         <label
-          className={`relative flex items-center p-3 rounded-lg border cursor-pointer transition-colors ${
-            disabled
-              ? 'opacity-50 cursor-not-allowed bg-bg-tertiary'
-              : value === 'quality'
-                ? 'bg-primary/5'
-                : 'hover:bg-bg-surface'
+          className={`relative flex items-center p-3 rounded-lg border cursor-pointer transition-all ${
+            disabled ? 'opacity-50 cursor-not-allowed' : ''
           }`}
-          style={{
-            borderColor:
-              value === 'quality' && !disabled ? 'var(--color-primary)' : 'var(--color-border)',
-          }}
+          style={modeStyle(value === 'quality', disabled ?? false)}
+          onMouseEnter={handleMouseEnter('quality')}
+          onMouseLeave={handleMouseLeave('quality')}
         >
           <input
             type="radio"
@@ -109,9 +116,7 @@ export function ProcessingModeSelector({ value, onChange, disabled }: Processing
             onChange={(e) => !disabled && onChange(e.target.value as ProcessingMode)}
             disabled={disabled}
             className="h-4 w-4 border-border focus:ring-2 focus:ring-offset-0 disabled:cursor-not-allowed"
-            style={{
-              accentColor: 'var(--color-primary)',
-            }}
+            style={{ accentColor: 'var(--color-primary)' }}
           />
           <div className="ml-3 flex-1">
             <div className="flex justify-between">
