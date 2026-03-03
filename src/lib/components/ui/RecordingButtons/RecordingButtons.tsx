@@ -132,7 +132,7 @@ export function PauseButton({
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`p-3 rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+      className={`p-3 rounded-full transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
       style={{
         backgroundColor: !disabled ? 'var(--color-text-secondary)' : 'transparent',
         color: !disabled ? 'white' : 'var(--color-text-tertiary)',
@@ -178,7 +178,7 @@ export function StopButton({
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`p-3 rounded-full transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+      className={`p-3 rounded-full transition-all shadow-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
       style={{
         backgroundColor: !disabled ? 'var(--color-accent-error)' : 'transparent',
         color: !disabled ? 'white' : 'var(--color-text-tertiary)',
