@@ -50,6 +50,8 @@
       "testing": "Test in corso...",
       "connectionSuccess": "✓ Connessione riuscita!",
       "connectionError": "✗ Connessione fallita. Controlla la tua chiave API.",
+      "saveKey": "Salva chiave",
+      "updateKey": "Aggiorna chiave",
       "clear": "Cancella",
       "securityNotice": "La tua chiave API è memorizzata in modo sicuro nel tuo browser e non viene mai inviata ai nostri server."
     },
@@ -778,13 +780,16 @@
       "subtitle": "Scegli il tuo caso d'uso principale per personalizzare l'esperienza"
     },
     "step2": {
-      "title": "Connetti la tua chiave API",
-      "subtitle": "La chiave viene salvata in modo sicuro solo nella sessione del browser",
-      "rememberKey": "Ricorda la mia chiave tra le sessioni"
-    },
-    "step3": {
       "title": "Scegli il tuo piano",
       "subtitle": "Inizia gratuitamente, aggiorna in qualsiasi momento"
+    },
+    "step3": {
+      "title": "Connetti la tua chiave API",
+      "subtitle": "La chiave viene salvata in modo sicuro solo nella sessione del browser",
+      "rememberKey": "Ricorda la mia chiave tra le sessioni",
+      "errorFormat": "La chiave API deve iniziare con \"sk-\"",
+      "errorInvalid": "Chiave API non valida. Controlla e riprova.",
+      "validating": "Verifica in corso…"
     },
     "navigation": {
       "back": "Indietro",
@@ -796,10 +801,21 @@
       "useCase": "Caso d'uso",
       "apiSetup": "API Setup",
       "plan": "Piano"
+    },
+    "setupBanner": {
+      "message": "Nessuna chiave API configurata — aggiungila per iniziare a trascrivere",
+      "cta": "Configura chiave API",
+      "dismiss": "Chiudi"
     }
   },
   "account": {
-    "title": "Account e Impostazioni",
+    "title": "Impostazioni Account",
+    "back": "Torna all'app",
+    "nav": {
+      "profile": "Profilo",
+      "apiKeys": "Chiavi API",
+      "plan": "Piano e Utilizzo"
+    },
     "navigation": {
       "profile": "Profilo",
       "billing": "Fatturazione",

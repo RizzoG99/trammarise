@@ -21,8 +21,8 @@ export function TierBadge({ tier, className = '' }: TierBadgeProps) {
   return (
     <span
       className={`
-        absolute -bottom-0.5 -right-0.5 px-1 py-0.5 text-[8px] font-bold
-        rounded-full border border-current
+        inline-flex items-center px-1.5 py-0.5 text-[9px] font-semibold
+        rounded-full border border-current flex-shrink-0
         ${TIER_STYLES[tier]} ${className}
       `}
       aria-label={`Subscription tier: ${TIER_LABELS[tier]}`}

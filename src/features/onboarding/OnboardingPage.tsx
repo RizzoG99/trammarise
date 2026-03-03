@@ -1,9 +1,12 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { GlassCard, Heading, Text, Button, StepIndicator, PricingCard } from '@/lib';
 import type { PricingPlan } from '@/lib';
 import { useOnboarding } from '@/context/OnboardingContext';
 import { saveApiConfig } from '@/utils/session-storage';
+import { validateApiKey } from '@/utils/api';
+import { ROUTES } from '@/types/routing';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -43,32 +46,51 @@ const PRO_PLAN: PricingPlan = {
 export function OnboardingPage() {
   const { t } = useTranslation();
   const { completeOnboarding } = useOnboarding();
+  const navigate = useNavigate();
 
   const [step, setStep] = useState(1);
   const [selectedUseCase, setSelectedUseCase] = useState<string>('');
   const [apiKey, setApiKey] = useState('');
   const [apiKeyError, setApiKeyError] = useState('');
+  const [isValidatingKey, setIsValidatingKey] = useState(false);
   const [rememberKey, setRememberKey] = useState(false);
   const [billingPeriod] = useState<'monthly' | 'annual'>('monthly');
 
   const steps = [
     { id: 1, label: t('onboarding.steps.useCase') },
-    { id: 2, label: t('onboarding.steps.apiSetup') },
-    { id: 3, label: t('onboarding.steps.plan') },
+    { id: 2, label: t('onboarding.steps.plan') },
+    { id: 3, label: t('onboarding.steps.apiSetup') },
   ];
 
-  const handleNext = () => {
-    if (step === 2) {
-      if (!apiKey.startsWith('sk-')) {
-        setApiKeyError('API key must start with "sk-"');
-        return;
-      }
-      saveApiConfig('openai', apiKey, apiKey, rememberKey);
-    }
-    setStep((s) => s + 1);
-  };
+  const handleNext = () => setStep((s) => s + 1);
 
   const handleBack = () => setStep((s) => s - 1);
+
+  const handleSelectPlan = (planId: 'free' | 'pro') => {
+    if (planId === 'pro') {
+      completeOnboarding();
+      navigate(ROUTES.ACCOUNT);
+    } else {
+      setStep(3);
+    }
+  };
+
+  const handleFinish = async () => {
+    if (!apiKey.startsWith('sk-')) {
+      setApiKeyError(t('onboarding.step3.errorFormat'));
+      return;
+    }
+    setIsValidatingKey(true);
+    setApiKeyError('');
+    const isValid = await validateApiKey('openai', apiKey);
+    setIsValidatingKey(false);
+    if (!isValid) {
+      setApiKeyError(t('onboarding.step3.errorInvalid'));
+      return;
+    }
+    saveApiConfig('openai', apiKey, apiKey, rememberKey);
+    completeOnboarding();
+  };
 
   const stepTitle = t(`onboarding.step${step}.title`);
   const stepSubtitle = t(`onboarding.step${step}.subtitle`);
@@ -101,7 +123,9 @@ export function OnboardingPage() {
             <UseCaseStep selectedUseCase={selectedUseCase} onSelect={setSelectedUseCase} />
           )}
 
-          {step === 2 && (
+          {step === 2 && <PlanStep billingPeriod={billingPeriod} onSelectPlan={handleSelectPlan} />}
+
+          {step === 3 && (
             <ApiKeyStep
               apiKey={apiKey}
               error={apiKeyError}
@@ -113,8 +137,6 @@ export function OnboardingPage() {
               onRememberKeyChange={setRememberKey}
             />
           )}
-
-          {step === 3 && <PlanStep billingPeriod={billingPeriod} />}
 
           {/* Navigation */}
           <div className="flex items-center justify-between pt-2">
@@ -129,13 +151,16 @@ export function OnboardingPage() {
               <Button variant="ghost" onClick={completeOnboarding}>
                 {t('onboarding.navigation.skip')}
               </Button>
-              {step < 3 ? (
+              {step === 1 && (
                 <Button variant="primary" onClick={handleNext}>
                   {t('onboarding.navigation.next')}
                 </Button>
-              ) : (
-                <Button variant="primary" onClick={completeOnboarding}>
-                  {t('onboarding.navigation.finish')}
+              )}
+              {step === 3 && (
+                <Button variant="primary" onClick={handleFinish} disabled={isValidatingKey}>
+                  {isValidatingKey
+                    ? t('onboarding.step3.validating')
+                    : t('onboarding.navigation.finish')}
                 </Button>
               )}
             </div>
@@ -216,26 +241,32 @@ function ApiKeyStep({
           onChange={(e) => onRememberKeyChange(e.target.checked)}
           className="w-4 h-4 rounded accent-[var(--color-primary)] cursor-pointer"
         />
-        {t('onboarding.step2.rememberKey')}
+        {t('onboarding.step3.rememberKey')}
       </label>
     </div>
   );
 }
 
-function PlanStep({ billingPeriod }: { billingPeriod: 'monthly' | 'annual' }) {
+function PlanStep({
+  billingPeriod,
+  onSelectPlan,
+}: {
+  billingPeriod: 'monthly' | 'annual';
+  onSelectPlan: (plan: 'free' | 'pro') => void;
+}) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <PricingCard
         plan={FREE_PLAN}
         isCurrentPlan={false}
         billingPeriod={billingPeriod}
-        onSelect={() => {}}
+        onSelect={() => onSelectPlan('free')}
       />
       <PricingCard
         plan={PRO_PLAN}
         isCurrentPlan={false}
         billingPeriod={billingPeriod}
-        onSelect={() => {}}
+        onSelect={() => onSelectPlan('pro')}
       />
     </div>
   );

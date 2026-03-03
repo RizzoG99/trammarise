@@ -49,6 +49,8 @@
       "testing": "Testing...",
       "connectionSuccess": "✓ Connection successful!",
       "connectionError": "✗ Connection failed. Please check your API key.",
+      "saveKey": "Save Key",
+      "updateKey": "Update Key",
       "clear": "Clear",
       "securityNotice": "Your API key is stored securely in your browser and never sent to our servers."
     },
@@ -777,13 +779,16 @@
       "subtitle": "Choose your primary use case so we can tailor the experience"
     },
     "step2": {
-      "title": "Connect your API key",
-      "subtitle": "Your key is stored securely in your browser session only",
-      "rememberKey": "Remember my key across sessions"
-    },
-    "step3": {
       "title": "Choose your plan",
       "subtitle": "Start free, upgrade anytime"
+    },
+    "step3": {
+      "title": "Connect your API key",
+      "subtitle": "Your key is stored securely in your browser session only",
+      "rememberKey": "Remember my key across sessions",
+      "errorFormat": "API key must start with \"sk-\"",
+      "errorInvalid": "Invalid API key. Please check and try again.",
+      "validating": "Verifying…"
     },
     "navigation": {
       "back": "Back",
@@ -795,10 +800,21 @@
       "useCase": "Use Case",
       "apiSetup": "API Setup",
       "plan": "Plan"
+    },
+    "setupBanner": {
+      "message": "No API key configured — add yours to start transcribing",
+      "cta": "Set up API key",
+      "dismiss": "Dismiss"
     }
   },
   "account": {
-    "title": "Account & Settings",
+    "title": "Account Settings",
+    "back": "Back to app",
+    "nav": {
+      "profile": "Profile",
+      "apiKeys": "API Keys",
+      "plan": "Plan & Usage"
+    },
     "navigation": {
       "profile": "Profile",
       "billing": "Billing",

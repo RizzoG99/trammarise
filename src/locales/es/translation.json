@@ -50,6 +50,8 @@
       "testing": "Probando...",
       "connectionSuccess": "✓ ¡Conexión exitosa!",
       "connectionError": "✗ Conexión fallida. Por favor verifica tu clave API.",
+      "saveKey": "Guardar clave",
+      "updateKey": "Actualizar clave",
       "clear": "Limpiar",
       "securityNotice": "Tu clave API se almacena de forma segura en tu navegador y nunca se envía a nuestros servidores."
     },
@@ -778,13 +780,16 @@
       "subtitle": "Elige tu caso de uso principal para personalizar la experiencia"
     },
     "step2": {
-      "title": "Conecta tu clave API",
-      "subtitle": "Tu clave se guarda de forma segura solo en la sesión del navegador",
-      "rememberKey": "Recordar mi clave entre sesiones"
-    },
-    "step3": {
       "title": "Elige tu plan",
       "subtitle": "Empieza gratis, actualiza cuando quieras"
+    },
+    "step3": {
+      "title": "Conecta tu clave API",
+      "subtitle": "Tu clave se guarda de forma segura solo en la sesión del navegador",
+      "rememberKey": "Recordar mi clave entre sesiones",
+      "errorFormat": "La clave API debe comenzar con \"sk-\"",
+      "errorInvalid": "Clave API no válida. Por favor verifica e intenta de nuevo.",
+      "validating": "Verificando…"
     },
     "navigation": {
       "back": "Atrás",
@@ -796,10 +801,21 @@
       "useCase": "Caso de uso",
       "apiSetup": "Configuración API",
       "plan": "Plan"
+    },
+    "setupBanner": {
+      "message": "No hay clave API configurada — añade la tuya para empezar a transcribir",
+      "cta": "Configurar clave API",
+      "dismiss": "Descartar"
     }
   },
   "account": {
-    "title": "Cuenta y Configuración",
+    "title": "Configuración de Cuenta",
+    "back": "Volver a la app",
+    "nav": {
+      "profile": "Perfil",
+      "apiKeys": "Claves API",
+      "plan": "Plan y Uso"
+    },
     "navigation": {
       "profile": "Perfil",
       "billing": "Facturación",

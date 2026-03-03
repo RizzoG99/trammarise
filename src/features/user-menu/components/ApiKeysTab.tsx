@@ -4,13 +4,16 @@ import { useApiKey } from '@/context/ApiKeyContext';
 import { useSubscription } from '@/context/SubscriptionContext';
 import { Button, Input } from '@/lib';
 import { Eye, EyeOff, Key, CheckCircle, XCircle, Info } from 'lucide-react';
+import { getApiConfig } from '@/utils/session-storage';
 
 export function ApiKeysTab() {
   const { t } = useTranslation();
   const { apiKey, setApiKey, clearApiKey, testConnection } = useApiKey();
   const { isSubscribed } = useSubscription();
 
-  const [inputValue, setInputValue] = useState(apiKey || '');
+  // Pre-fill from whichever storage was used (onboarding uses saveApiConfig,
+  // ApiKeyContext uses its own sessionStorage key)
+  const [inputValue, setInputValue] = useState(() => getApiConfig()?.openaiKey || apiKey || '');
   const [showKey, setShowKey] = useState(false);
   const [testStatus, setTestStatus] = useState<'idle' | 'testing' | 'success' | 'error'>('idle');
 
@@ -97,7 +100,9 @@ export function ApiKeysTab() {
           >
             {testStatus === 'testing'
               ? t('userMenu.apiKeys.testing')
-              : t('userMenu.apiKeys.testConnection')}
+              : apiKey || getApiConfig()?.openaiKey
+                ? t('userMenu.apiKeys.updateKey', 'Update Key')
+                : t('userMenu.apiKeys.saveKey', 'Save Key')}
           </Button>
           {apiKey && (
             <Button variant="outline" onClick={handleClear}>

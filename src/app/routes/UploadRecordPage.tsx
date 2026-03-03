@@ -17,6 +17,7 @@ import { NoiseProfileSelector } from '../../features/configuration/components/No
 import { SpeakerDiarizationToggle } from '../../features/configuration/components/SpeakerDiarizationToggle';
 import type { NoiseProfile } from '../../types/noise-profiles';
 import { ProcessAudioButton } from '../../features/upload/components/ProcessAudioButton';
+import { ApiKeySetupBanner } from '../../features/onboarding/ApiKeySetupBanner';
 import { generateSessionId, saveSession } from '../../utils/session-manager';
 import { buildRoutePath, ROUTES } from '../../types/routing';
 import { useSubscription } from '../../context/SubscriptionContext';
@@ -124,6 +125,8 @@ export function UploadRecordPage() {
         description="Transform your audio recordings into accurate transcripts and intelligent summaries. Upload or record audio, get AI-powered transcription with OpenAI Whisper, and generate comprehensive summaries."
         canonical="https://trammarise.app/"
       />
+      <ApiKeySetupBanner />
+
       {/* Page Title */}
       <div className="mb-8 animate-fade-up">
         <Heading level="hero">{t('home.title')}</Heading>

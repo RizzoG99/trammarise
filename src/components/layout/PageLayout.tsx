@@ -13,12 +13,14 @@ interface PageLayoutProps {
  * - Consistent background colors for light/dark mode
  */
 export function PageLayout({ children, maxWidth = '1400px', className = '' }: PageLayoutProps) {
-  const maxWidthClass = maxWidth === 'full' ? 'max-w-full' : `max-w-[${maxWidth}]`;
+  const maxWidthClass =
+    maxWidth === 'full' ? 'max-w-full' : maxWidth === '1200px' ? 'max-w-5xl' : 'max-w-7xl';
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--color-bg-primary)' }}>
-      {/* AppHeader is now rendered in AppLayout for persistence */}
-      <main className={`mx-auto px-6 py-6 ${maxWidthClass} ${className}`}>{children}</main>
+      <main className={`mx-auto px-4 sm:px-6 lg:px-8 py-6 ${maxWidthClass} ${className}`}>
+        {children}
+      </main>
     </div>
   );
 }

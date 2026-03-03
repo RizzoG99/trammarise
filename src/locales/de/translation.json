@@ -50,6 +50,8 @@
       "testing": "Teste...",
       "connectionSuccess": "✓ Verbindung erfolgreich!",
       "connectionError": "✗ Verbindung fehlgeschlagen. Bitte überprüfen Sie Ihren API-Schlüssel.",
+      "saveKey": "Schlüssel speichern",
+      "updateKey": "Schlüssel aktualisieren",
       "clear": "Löschen",
       "securityNotice": "Ihr API-Schlüssel wird sicher in Ihrem Browser gespeichert und niemals an unsere Server gesendet."
     },
@@ -778,13 +780,16 @@
       "subtitle": "Wählen Sie Ihren primären Anwendungsfall"
     },
     "step2": {
-      "title": "API-Schlüssel verbinden",
-      "subtitle": "Ihr Schlüssel wird nur in der Browser-Sitzung gespeichert",
-      "rememberKey": "Schlüssel sitzungsübergreifend merken"
-    },
-    "step3": {
       "title": "Plan wählen",
       "subtitle": "Kostenlos starten, jederzeit upgraden"
+    },
+    "step3": {
+      "title": "API-Schlüssel verbinden",
+      "subtitle": "Ihr Schlüssel wird nur in der Browser-Sitzung gespeichert",
+      "rememberKey": "Schlüssel sitzungsübergreifend merken",
+      "errorFormat": "Der API-Schlüssel muss mit \"sk-\" beginnen",
+      "errorInvalid": "Ungültiger API-Schlüssel. Bitte prüfen und erneut versuchen.",
+      "validating": "Wird geprüft…"
     },
     "navigation": {
       "back": "Zurück",
@@ -796,10 +801,21 @@
       "useCase": "Anwendungsfall",
       "apiSetup": "API Setup",
       "plan": "Plan"
+    },
+    "setupBanner": {
+      "message": "Kein API-Schlüssel konfiguriert — füge deinen hinzu, um mit der Transkription zu beginnen",
+      "cta": "API-Schlüssel einrichten",
+      "dismiss": "Schließen"
     }
   },
   "account": {
-    "title": "Konto & Einstellungen",
+    "title": "Kontoeinstellungen",
+    "back": "Zurück zur App",
+    "nav": {
+      "profile": "Profil",
+      "apiKeys": "API-Schlüssel",
+      "plan": "Plan & Nutzung"
+    },
     "navigation": {
       "profile": "Profil",
       "billing": "Abrechnung",
