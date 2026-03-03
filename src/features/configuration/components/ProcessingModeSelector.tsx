@@ -40,10 +40,10 @@ export function ProcessingModeSelector({ value, onChange, disabled }: Processing
         <label
           className={`relative flex items-center p-3 rounded-lg border cursor-pointer transition-colors ${
             disabled
-              ? 'opacity-50 cursor-not-allowed bg-bg-tertiary/30'
+              ? 'opacity-50 cursor-not-allowed bg-bg-tertiary'
               : value === 'balanced'
                 ? 'bg-primary/5'
-                : 'hover:bg-bg-tertiary/50'
+                : 'hover:bg-bg-surface'
           }`}
           style={{
             borderColor:
@@ -91,10 +91,10 @@ export function ProcessingModeSelector({ value, onChange, disabled }: Processing
         <label
           className={`relative flex items-center p-3 rounded-lg border cursor-pointer transition-colors ${
             disabled
-              ? 'opacity-50 cursor-not-allowed bg-bg-tertiary/30'
+              ? 'opacity-50 cursor-not-allowed bg-bg-tertiary'
               : value === 'quality'
                 ? 'bg-primary/5'
-                : 'hover:bg-bg-tertiary/50'
+                : 'hover:bg-bg-surface'
           }`}
           style={{
             borderColor:
