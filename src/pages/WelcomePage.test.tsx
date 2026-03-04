@@ -46,6 +46,12 @@ vi.mock('react-i18next', () => ({
         'welcome.footer.links.privacy': 'Privacy',
         'welcome.footer.links.terms': 'Terms',
         'welcome.footer.links.contact': 'Contact',
+        'footer.links.privacy': 'Privacy',
+        'footer.links.terms': 'Terms of Service',
+        'footer.social.github': 'GitHub',
+        'footer.social.linkedin': 'LinkedIn',
+        'footer.social.twitter': 'Twitter',
+        'footer.social.contact': 'Contact us',
       };
 
       // If defaultValueOrOptions is a string, return it as the default value
@@ -54,7 +60,7 @@ vi.mock('react-i18next', () => ({
       }
 
       // Handle interpolation for footer copyright
-      if (key === 'welcome.footer.copyright') {
+      if (key === 'welcome.footer.copyright' || key === 'footer.copyright') {
         return `© ${defaultValueOrOptions?.year || 2024} Trammarise. All rights reserved.`;
       }
 
@@ -67,14 +73,16 @@ vi.mock('react-i18next', () => ({
 // Mock Lucide icons to avoid ESM issues in tests if any
 vi.mock('lucide-react', () => ({
   ArrowRight: () => <div data-testid="arrow-right" />,
-  Mic: () => <div data-testid="mic" />,
-  Zap: () => <div data-testid="zap" />,
-  Shield: () => <div data-testid="shield" />,
+  AudioWaveform: () => <div data-testid="audio-waveform" />,
   Check: () => <div data-testid="check-icon" />,
-  Key: () => <div data-testid="key-icon" />,
   Github: () => <div data-testid="github" />,
+  Key: () => <div data-testid="key-icon" />,
   Linkedin: () => <div data-testid="linkedin" />,
+  Mail: () => <div data-testid="mail" />,
+  Mic: () => <div data-testid="mic" />,
+  Shield: () => <div data-testid="shield" />,
   Twitter: () => <div data-testid="twitter" />,
+  Zap: () => <div data-testid="zap" />,
 }));
 
 describe('WelcomePage', () => {
@@ -141,7 +149,7 @@ describe('WelcomePage', () => {
     );
 
     expect(screen.getByText('Privacy')).toBeInTheDocument();
-    expect(screen.getByText('Terms')).toBeInTheDocument();
-    expect(screen.getByText('Contact')).toBeInTheDocument();
+    expect(screen.getByText('Terms of Service')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Contact us' })).toBeInTheDocument();
   });
 });

@@ -425,7 +425,17 @@
     }
   },
   "footer": {
-    "copyright": "Trammarise © 2025 - Audio Transcription & Summarization"
+    "copyright": "© {{year}} Trammarise. All rights reserved.",
+    "links": {
+      "privacy": "Privacy",
+      "terms": "Terms of Service"
+    },
+    "social": {
+      "github": "GitHub",
+      "linkedin": "LinkedIn",
+      "twitter": "Twitter",
+      "contact": "Contact us"
+    }
   },
   "layout": {
     "loading": "Loading session...",

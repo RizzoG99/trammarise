@@ -426,7 +426,17 @@
     }
   },
   "footer": {
-    "copyright": "Trammarise © 2025 - Trascrizione e Riassunto Audio"
+    "copyright": "© {{year}} Trammarise. Tutti i diritti riservati.",
+    "links": {
+      "privacy": "Privacy",
+      "terms": "Termini di servizio"
+    },
+    "social": {
+      "github": "GitHub",
+      "linkedin": "LinkedIn",
+      "twitter": "Twitter",
+      "contact": "Contattaci"
+    }
   },
   "layout": {
     "loading": "Caricamento sessione...",

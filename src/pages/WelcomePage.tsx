@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Heading, Text, Button, GlassCard } from '@/lib';
 import { ArrowRight, Mic, Zap, Shield, Check, Key } from 'lucide-react';
 import { TeamSection } from '@/components/sections/TeamSection';
+import { AppFooter } from '@/components/layout/AppFooter';
 
 export function WelcomePage() {
   const { openSignIn } = useClerk();
@@ -283,40 +284,7 @@ export function WelcomePage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-12 border-t border-white/5 bg-slate-950/30 backdrop-blur-lg">
-        <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-6">
-          <p className="text-slate-500 text-sm">
-            {t('welcome.footer.copyright', { year: new Date().getFullYear() })}
-          </p>
-          <div className="flex gap-8">
-            <button
-              onClick={handleViewPricing}
-              className="text-slate-400 hover:text-white transition-colors text-sm font-medium"
-            >
-              {t('welcome.footer.links.pricing', 'Pricing')}
-            </button>
-            <a
-              href="#"
-              className="text-slate-400 hover:text-white transition-colors text-sm font-medium"
-            >
-              {t('welcome.footer.links.privacy')}
-            </a>
-            <a
-              href="#"
-              className="text-slate-400 hover:text-white transition-colors text-sm font-medium"
-            >
-              {t('welcome.footer.links.terms')}
-            </a>
-            <a
-              href="#"
-              className="text-slate-400 hover:text-white transition-colors text-sm font-medium"
-            >
-              {t('welcome.footer.links.contact')}
-            </a>
-          </div>
-        </div>
-      </footer>
+      <AppFooter />
     </div>
   );
 }
