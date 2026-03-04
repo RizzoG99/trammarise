@@ -56,7 +56,7 @@ export function AppFooter({ className = '' }: AppFooterProps) {
 
             {/* Social icons */}
             <a
-              href="#"
+              href="https://github.com/RizzoG99"
               aria-label={t('footer.social.github')}
               target="_blank"
               rel="noopener noreferrer"
@@ -65,7 +65,7 @@ export function AppFooter({ className = '' }: AppFooterProps) {
               <Github className="w-4 h-4" />
             </a>
             <a
-              href="#"
+              href="https://www.linkedin.com/in/rizzog99"
               aria-label={t('footer.social.linkedin')}
               target="_blank"
               rel="noopener noreferrer"
@@ -83,7 +83,7 @@ export function AppFooter({ className = '' }: AppFooterProps) {
               <Twitter className="w-4 h-4" />
             </a>
             <a
-              href="mailto:hello@trammarise.com"
+              href="mailto:gabriele.rizzo.ph@gmail.com"
               aria-label={t('footer.social.contact')}
               className={iconClass}
             >
