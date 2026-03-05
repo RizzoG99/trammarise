@@ -423,7 +423,8 @@
     "aria": {
       "startRecording": "Avvia registrazione",
       "pauseRecording": "Metti in pausa la registrazione",
-      "resumeRecording": "Riprendi registrazione"
+      "resumeRecording": "Riprendi registrazione",
+      "stopRecording": "Interrompi registrazione"
     }
   },
   "footer": {

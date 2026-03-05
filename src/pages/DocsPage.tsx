@@ -20,7 +20,7 @@ export function DocsPage() {
   const { t } = useTranslation();
 
   return (
-    <div className="min-h-screen bg-bg-primary flex flex-col font-sans text-text-primary">
+    <div className="bg-bg-primary flex flex-col font-sans text-text-primary">
       <Suspense fallback={null}>
         <SEO
           title={t('docs.title')}

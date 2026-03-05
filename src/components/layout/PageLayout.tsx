@@ -17,7 +17,7 @@ export function PageLayout({ children, maxWidth = '1400px', className = '' }: Pa
     maxWidth === 'full' ? 'max-w-full' : maxWidth === '1200px' ? 'max-w-5xl' : 'max-w-7xl';
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: 'var(--color-bg-primary)' }}>
+    <div style={{ backgroundColor: 'var(--color-bg-primary)' }}>
       <main className={`mx-auto px-4 sm:px-6 lg:px-8 py-6 ${maxWidthClass} ${className}`}>
         {children}
       </main>

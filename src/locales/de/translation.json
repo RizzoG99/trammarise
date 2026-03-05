@@ -423,7 +423,8 @@
     "aria": {
       "startRecording": "Aufnahme starten",
       "pauseRecording": "Aufnahme pausieren",
-      "resumeRecording": "Aufnahme fortsetzen"
+      "resumeRecording": "Aufnahme fortsetzen",
+      "stopRecording": "Aufnahme stoppen"
     }
   },
   "footer": {

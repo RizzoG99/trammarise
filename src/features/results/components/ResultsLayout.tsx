@@ -40,7 +40,7 @@ export function ResultsLayout({
   isChatOpen = false,
 }: ResultsLayoutProps) {
   return (
-    <div className="min-h-screen flex flex-col bg-bg-primary overflow-x-hidden">
+    <div className="flex flex-col bg-bg-primary overflow-x-hidden">
       {/* Header is now handled by AppLayout/HeaderContext */}
 
       {/* Audio Player Bar */}

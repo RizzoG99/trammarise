@@ -14,6 +14,8 @@ interface RecordingButtonProps {
 export interface RecordButtonProps extends RecordingButtonProps {
   /** Whether recording is currently active */
   isRecording?: boolean;
+  /** Called when the button is clicked while isRecording=true (Stop action) */
+  onStop?: () => void;
 }
 
 /**
@@ -39,51 +41,108 @@ export function RecordButton({
   onClick,
   disabled = false,
   isRecording = false,
+  onStop,
   className = '',
   'aria-label': ariaLabel,
 }: RecordButtonProps) {
   const { t } = useTranslation();
-  const defaultAriaLabel = ariaLabel || t('upload.aria.startRecording');
+  const reducedMotion =
+    typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+      ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      : false;
+  const dur = reducedMotion ? '0ms' : undefined;
+
+  const defaultAriaLabel =
+    ariaLabel || (isRecording ? t('upload.aria.stopRecording') : t('upload.aria.startRecording'));
+
+  const handleClick = () => {
+    if (disabled) return;
+    if (isRecording && onStop) {
+      onStop();
+    } else if (!isRecording) {
+      onClick();
+    }
+  };
 
   return (
     <div className="relative inline-flex items-center justify-center">
-      {!disabled && !isRecording && (
+      {/* Pulse rings — fade out when recording starts */}
+      {!disabled && (
         <>
           <span
             className="absolute inset-0 rounded-full pulse-ring pointer-events-none"
-            style={{ backgroundColor: 'var(--color-primary)' }}
+            style={{
+              backgroundColor: 'var(--color-primary)',
+              opacity: isRecording ? 0 : 1,
+              transition: dur ?? 'opacity 150ms ease',
+            }}
           />
           <span
             className="absolute inset-0 rounded-full pulse-ring pointer-events-none"
-            style={{ backgroundColor: 'var(--color-primary)', animationDelay: '0.9s' }}
+            style={{
+              backgroundColor: 'var(--color-primary)',
+              animationDelay: '0.9s',
+              opacity: isRecording ? 0 : 1,
+              transition: dur ?? 'opacity 150ms ease',
+            }}
           />
         </>
       )}
+
       <button
-        onClick={onClick}
-        disabled={disabled || isRecording}
-        className={`relative z-10 rounded-full transition-all group ${
-          disabled || isRecording
-            ? 'cursor-not-allowed opacity-50 p-3'
-            : 'shadow-lg hover:shadow-xl p-6 cursor-pointer'
+        onClick={handleClick}
+        disabled={disabled}
+        aria-label={defaultAriaLabel}
+        className={`relative z-10 rounded-full p-5 ${
+          disabled ? 'opacity-50 cursor-not-allowed' : 'shadow-lg cursor-pointer'
         } ${className}`}
         style={{
-          backgroundColor: disabled || isRecording ? 'transparent' : 'var(--color-primary)',
-          color: disabled || isRecording ? 'var(--color-text-tertiary)' : 'white',
+          backgroundColor: disabled
+            ? 'transparent'
+            : isRecording
+              ? 'var(--color-accent-error)'
+              : 'var(--color-primary)',
+          color: disabled ? 'var(--color-text-tertiary)' : 'white',
+          transition: dur ?? 'background-color 250ms ease',
         }}
         onMouseEnter={(e) => {
-          if (!disabled && !isRecording) {
-            e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)';
-          }
+          if (!disabled)
+            e.currentTarget.style.backgroundColor = isRecording
+              ? 'var(--color-accent-error-hover)'
+              : 'var(--color-primary-hover)';
         }}
         onMouseLeave={(e) => {
-          if (!disabled && !isRecording) {
-            e.currentTarget.style.backgroundColor = 'var(--color-primary)';
-          }
+          if (!disabled)
+            e.currentTarget.style.backgroundColor = isRecording
+              ? 'var(--color-accent-error)'
+              : 'var(--color-primary)';
         }}
-        aria-label={defaultAriaLabel}
       >
-        <Mic className={disabled || isRecording ? 'w-7 h-7' : 'w-8 h-8'} />
+        {/* Stacked icon container — Mic ↔ Square crossfade */}
+        <div className="relative w-8 h-8">
+          <span
+            className="absolute inset-0 flex items-center justify-center"
+            aria-hidden="true"
+            style={{
+              opacity: isRecording ? 0 : 1,
+              transform: isRecording ? 'scale(0.5)' : 'scale(1)',
+              transition: dur ?? 'opacity 200ms ease, transform 200ms ease',
+            }}
+          >
+            <Mic className="w-8 h-8" />
+          </span>
+          <span
+            className="absolute inset-0 flex items-center justify-center"
+            aria-hidden="true"
+            style={{
+              opacity: isRecording ? 1 : 0,
+              transform: isRecording ? 'scale(1)' : 'scale(0.5)',
+              transition: dur ?? 'opacity 200ms ease, transform 200ms ease',
+            }}
+          >
+            <Square className="w-8 h-8" />
+          </span>
+        </div>
       </button>
     </div>
   );

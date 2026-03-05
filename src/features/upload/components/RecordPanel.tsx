@@ -1,6 +1,6 @@
 import { useEffect, useImperativeHandle, forwardRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Heading, RecordButton, PauseButton, StopButton } from '@/lib';
+import { GlassCard, Heading, RecordButton, PauseButton } from '@/lib';
 import { WaveformVisualization } from './WaveformVisualization';
 import { useAudioRecorder } from '../../../hooks/useAudioRecorder';
 
@@ -16,6 +16,10 @@ export interface RecordPanelRef {
 export const RecordPanel = forwardRef<RecordPanelRef, RecordPanelProps>(
   ({ onRecordingComplete, onRecordingStart }, ref) => {
     const { t } = useTranslation();
+    const reducedMotion =
+      typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+        ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        : false;
     const {
       startRecording,
       pauseRecording,
@@ -111,21 +115,52 @@ export const RecordPanel = forwardRef<RecordPanelRef, RecordPanelProps>(
             {formatDuration(duration)}
           </div>
 
-          {/* Controls */}
-          <div className="flex items-center gap-4">
-            <PauseButton
-              onClick={isPaused ? handleResumeRecording : handlePauseRecording}
-              disabled={!isRecording}
-              isPaused={isPaused}
-            />
+          {/* Controls — symmetric 3-slot layout, all slots 72×72px for perfect alignment */}
+          <div className="flex items-center justify-center gap-4">
+            {/* Left slot: Pause — same container size as RecordButton, slides in from right */}
+            <div
+              style={{
+                width: '72px',
+                height: '72px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+                opacity: isRecording ? 1 : 0,
+                transform: isRecording ? 'translateX(0) scale(1)' : 'translateX(72px) scale(0.85)',
+                pointerEvents: isRecording ? 'auto' : 'none',
+                transition: reducedMotion
+                  ? 'none'
+                  : `opacity 250ms ease-out ${isRecording ? '50ms' : '0ms'}, transform 250ms ease-out ${isRecording ? '50ms' : '0ms'}`,
+              }}
+            >
+              <PauseButton
+                onClick={isPaused ? handleResumeRecording : handlePauseRecording}
+                isPaused={isPaused}
+              />
+            </div>
 
+            {/* Center slot: Record/Stop — always visible, morphs between states */}
             <RecordButton
               onClick={handleStartRecording}
-              disabled={isRecording}
+              onStop={handleStopRecording}
               isRecording={isRecording}
             />
 
-            <StopButton onClick={handleStopRecording} disabled={!isRecording} />
+            {/* Right slot: mirror spacer — collapses when recording to center the Pause+Stop pair */}
+            <div
+              style={{
+                width: isRecording ? '0px' : '72px',
+                marginLeft: isRecording ? '-16px' : '0px',
+                height: '72px',
+                flexShrink: 0,
+                overflow: 'hidden',
+                transition: reducedMotion
+                  ? 'none'
+                  : 'width 250ms ease-out, margin-left 250ms ease-out',
+              }}
+              aria-hidden="true"
+            />
           </div>
         </div>
       </GlassCard>

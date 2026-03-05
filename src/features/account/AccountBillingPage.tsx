@@ -29,7 +29,7 @@ export function AccountBillingPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-bg-primary">
+    <div className="bg-bg-primary">
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Back button */}
         <div className="mb-8">

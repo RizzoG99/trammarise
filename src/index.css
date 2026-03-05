@@ -212,6 +212,17 @@
     background-color: var(--color-primary-alpha-10);
   }
 
+  /* Cursor blink for mockups */
+  @keyframes blink {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
+  }
+
   /* Page entry animation */
   @keyframes fade-up {
     from {
@@ -226,6 +237,12 @@
 
   .animate-fade-up {
     animation: fade-up 0.45s var(--ease-out-quart) both;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-fade-up {
+      animation: none;
+    }
   }
 
   @keyframes dropdown-enter {
