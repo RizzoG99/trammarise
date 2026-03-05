@@ -1,6 +1,16 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import {
+  Users,
+  GraduationCap,
+  Mic,
+  Headphones,
+  FileText,
+  MessageSquare,
+  Check,
+} from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { GlassCard, Heading, Text, Button, StepIndicator, PricingCard } from '@/lib';
 import type { PricingPlan } from '@/lib';
 import { useOnboarding } from '@/context/OnboardingContext';
@@ -10,14 +20,16 @@ import { ROUTES } from '@/types/routing';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
-const USE_CASES = [
-  { id: 'meeting', icon: '🤝', labelKey: 'Meeting' },
-  { id: 'lecture', icon: '🎓', labelKey: 'Lecture' },
-  { id: 'interview', icon: '🎙️', labelKey: 'Interview' },
-  { id: 'podcast', icon: '🎧', labelKey: 'Podcast' },
-  { id: 'voice-memo', icon: '📝', labelKey: 'Voice Memo' },
-  { id: 'other', icon: '💬', labelKey: 'Other' },
-] as const;
+type UseCase = { id: string; Icon: LucideIcon; labelKey: string };
+
+const USE_CASES: UseCase[] = [
+  { id: 'meeting', Icon: Users, labelKey: 'Meeting' },
+  { id: 'lecture', Icon: GraduationCap, labelKey: 'Lecture' },
+  { id: 'interview', Icon: Mic, labelKey: 'Interview' },
+  { id: 'podcast', Icon: Headphones, labelKey: 'Podcast' },
+  { id: 'voice-memo', Icon: FileText, labelKey: 'Voice Memo' },
+  { id: 'other', Icon: MessageSquare, labelKey: 'Other' },
+];
 
 const FREE_PLAN: PricingPlan = {
   id: 'free',
@@ -69,7 +81,7 @@ export function OnboardingPage() {
   const handleSelectPlan = (planId: 'free' | 'pro') => {
     if (planId === 'pro') {
       completeOnboarding();
-      navigate(ROUTES.ACCOUNT);
+      navigate(ROUTES.PRICING);
     } else {
       setStep(3);
     }
@@ -97,11 +109,13 @@ export function OnboardingPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6 bg-bg-primary">
-      <div className="w-full max-w-2xl flex flex-col gap-8">
+      <div className="w-full max-w-2xl flex flex-col gap-10">
         {/* Header */}
         <div className="text-center">
-          <Heading level="h1">{t('onboarding.title')}</Heading>
-          <Text variant="body" color="secondary">
+          <Heading level="h1" className="text-3xl md:text-4xl font-bold tracking-tight mb-2">
+            {t('onboarding.title')}
+          </Heading>
+          <Text variant="body" color="secondary" className="text-base leading-relaxed">
             {t('onboarding.subtitle')}
           </Text>
         </div>
@@ -110,54 +124,65 @@ export function OnboardingPage() {
         <StepIndicator steps={steps} currentStep={step} />
 
         {/* Card */}
-        <GlassCard variant="dark" className="p-8 flex flex-col gap-6">
-          <div>
-            <Heading level="h2">{stepTitle}</Heading>
-            <Text variant="body" color="secondary">
-              {stepSubtitle}
-            </Text>
+        <GlassCard variant="dark" className="p-8">
+          {/* Step content — keyed so fade-up runs on each step change */}
+          <div key={step} className="animate-fade-up flex flex-col gap-6">
+            <div>
+              <Heading level="h2" className="mb-1">
+                {stepTitle}
+              </Heading>
+              <Text variant="body" color="secondary" className="text-sm leading-relaxed">
+                {stepSubtitle}
+              </Text>
+            </div>
+
+            {step === 1 && (
+              <UseCaseStep selectedUseCase={selectedUseCase} onSelect={setSelectedUseCase} />
+            )}
+
+            {step === 2 && (
+              <PlanStep billingPeriod={billingPeriod} onSelectPlan={handleSelectPlan} />
+            )}
+
+            {step === 3 && (
+              <ApiKeyStep
+                apiKey={apiKey}
+                error={apiKeyError}
+                rememberKey={rememberKey}
+                onChange={(v) => {
+                  setApiKey(v);
+                  if (apiKeyError) setApiKeyError('');
+                }}
+                onRememberKeyChange={setRememberKey}
+              />
+            )}
           </div>
 
-          {/* Step content */}
-          {step === 1 && (
-            <UseCaseStep selectedUseCase={selectedUseCase} onSelect={setSelectedUseCase} />
-          )}
-
-          {step === 2 && <PlanStep billingPeriod={billingPeriod} onSelectPlan={handleSelectPlan} />}
-
-          {step === 3 && (
-            <ApiKeyStep
-              apiKey={apiKey}
-              error={apiKeyError}
-              rememberKey={rememberKey}
-              onChange={(v) => {
-                setApiKey(v);
-                if (apiKeyError) setApiKeyError('');
-              }}
-              onRememberKeyChange={setRememberKey}
-            />
-          )}
-
-          {/* Navigation */}
-          <div className="flex items-center justify-between pt-2">
+          {/* Navigation — outside animated area for stability */}
+          <div className="flex items-center justify-between pt-6 mt-4 border-t border-border/30">
             <div>
               {step > 1 && (
-                <Button variant="ghost" onClick={handleBack}>
+                <Button variant="ghost" onClick={handleBack} className="cursor-pointer">
                   {t('onboarding.navigation.back')}
                 </Button>
               )}
             </div>
             <div className="flex items-center gap-3">
-              <Button variant="ghost" onClick={completeOnboarding}>
+              <Button variant="ghost" onClick={completeOnboarding} className="cursor-pointer">
                 {t('onboarding.navigation.skip')}
               </Button>
               {step === 1 && (
-                <Button variant="primary" onClick={handleNext}>
+                <Button variant="primary" onClick={handleNext} className="cursor-pointer">
                   {t('onboarding.navigation.next')}
                 </Button>
               )}
               {step === 3 && (
-                <Button variant="primary" onClick={handleFinish} disabled={isValidatingKey}>
+                <Button
+                  variant="primary"
+                  onClick={handleFinish}
+                  disabled={isValidatingKey}
+                  className="cursor-pointer"
+                >
                   {isValidatingKey
                     ? t('onboarding.step3.validating')
                     : t('onboarding.navigation.finish')}
@@ -182,22 +207,57 @@ function UseCaseStep({
 }) {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-      {USE_CASES.map(({ id, icon, labelKey }) => (
-        <button
-          key={id}
-          type="button"
-          onClick={() => onSelect(id)}
-          className={[
-            'flex flex-col items-center gap-2 p-4 rounded-xl border transition-all duration-200 text-left cursor-pointer',
-            selectedUseCase === id
-              ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-text-primary)]'
-              : 'border-[var(--color-border)] bg-white/[0.02] text-[var(--color-text-secondary)] hover:border-[var(--color-primary)]/40 hover:bg-[var(--color-primary)]/5 hover:text-[var(--color-text-primary)]',
-          ].join(' ')}
-        >
-          <span className="text-2xl">{icon}</span>
-          <span className="text-sm font-medium">{labelKey}</span>
-        </button>
-      ))}
+      {USE_CASES.map(({ id, Icon, labelKey }) => {
+        const isSelected = selectedUseCase === id;
+        return (
+          <button
+            key={id}
+            type="button"
+            aria-pressed={isSelected}
+            onClick={() => onSelect(id)}
+            className={[
+              'relative flex flex-col items-center gap-2.5 p-4 rounded-xl border transition-colors duration-200 cursor-pointer text-left',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-surface',
+              isSelected
+                ? 'border-primary bg-primary/10'
+                : 'border-border bg-bg-surface/30 hover:border-primary/40 hover:bg-primary/5',
+            ].join(' ')}
+          >
+            {/* Icon in tinted container */}
+            <span
+              className={[
+                'p-2 rounded-lg transition-colors duration-200',
+                isSelected ? 'bg-primary/15' : 'bg-bg-surface/60',
+              ].join(' ')}
+            >
+              <Icon
+                className={[
+                  'w-5 h-5 transition-colors duration-200',
+                  isSelected ? 'text-primary' : 'text-text-tertiary',
+                ].join(' ')}
+                aria-hidden="true"
+              />
+            </span>
+
+            {/* Label */}
+            <span
+              className={[
+                'text-sm font-medium transition-colors duration-200',
+                isSelected ? 'text-text-primary' : 'text-text-secondary',
+              ].join(' ')}
+            >
+              {labelKey}
+            </span>
+
+            {/* Selected check */}
+            {isSelected && (
+              <span className="absolute top-2 right-2" aria-hidden="true">
+                <Check className="w-3 h-3 text-primary" />
+              </span>
+            )}
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -218,23 +278,29 @@ function ApiKeyStep({
   const { t } = useTranslation();
   return (
     <div className="flex flex-col gap-3">
-      <input
-        type="text"
-        value={apiKey}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder="sk-..."
-        className={[
-          'w-full px-4 py-3 rounded-xl bg-white/[0.05] border text-[var(--color-text-primary)] placeholder-text-tertiary',
-          'focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 transition-all',
-          error ? 'border-red-500/70' : 'border-[var(--color-border)]',
-        ].join(' ')}
-      />
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="api-key-input" className="text-sm font-medium text-text-secondary">
+          OpenAI API Key
+        </label>
+        <input
+          id="api-key-input"
+          type="text"
+          value={apiKey}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="sk-..."
+          className={[
+            'w-full px-4 py-3 rounded-xl bg-bg-surface/40 border font-mono text-sm text-text-primary placeholder-text-tertiary',
+            'focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors duration-200',
+            error ? 'border-accent-error/70' : 'border-border',
+          ].join(' ')}
+        />
+      </div>
       {error && (
-        <p role="alert" className="text-red-400 text-sm">
+        <p role="alert" className="text-accent-error text-sm">
           {error}
         </p>
       )}
-      <label className="flex items-center gap-2 cursor-pointer select-none text-sm text-[var(--color-text-secondary)]">
+      <label className="flex items-center gap-2 cursor-pointer select-none text-sm text-text-secondary">
         <input
           type="checkbox"
           checked={rememberKey}

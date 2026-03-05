@@ -216,11 +216,11 @@ describe('OnboardingPage', () => {
       expect(screen.getByText('Connect your API key')).toBeInTheDocument();
     });
 
-    it('selecting Pro plan calls completeOnboarding and navigates to account', () => {
+    it('selecting Pro plan completes onboarding and navigates to pricing page', () => {
       goToStep2();
       fireEvent.click(screen.getByText('Select Pro'));
       expect(mockCompleteOnboarding).toHaveBeenCalledTimes(1);
-      expect(mockNavigate).toHaveBeenCalledWith('/account');
+      expect(mockNavigate).toHaveBeenCalledWith('/pricing');
     });
 
     it('Skip on step 2 calls completeOnboarding', () => {
