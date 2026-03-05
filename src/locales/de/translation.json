@@ -26,6 +26,7 @@
       "usage": "Nutzung",
       "billing": "Nutzung & Abrechnung",
       "upgrade": "Auf Pro upgraden",
+      "pricing": "Preise",
       "signOut": "Abmelden"
     },
     "manageAccount": "Konto verwalten",
@@ -674,85 +675,45 @@
   },
   "welcome": {
     "hero": {
-      "newBadge": "✨ Einführung des Liquid Glass Designs",
       "titlePart1": "Transkribieren & Zusammenfassen",
-      "titlePart2": "In Sekunden",
-      "description": "Verwandeln Sie Ihre Meetings, Vorlesungen und Interviews in umsetzbare Erkenntnisse. Beginnen Sie mit 60 kostenlosen Minuten, upgraden Sie für unbegrenzten Zugang.",
-      "cta": {
-        "primary": "Kostenlose Testversion starten",
-        "secondary": "Preise ansehen",
-        "getStarted": "Kostenlos starten",
-        "viewFeatures": "Funktionen ansehen",
-        "appPreview": "[App-Vorschau-Visualisierung]"
-      },
-      "noCreditCard": "Keine Kreditkarte erforderlich"
+      "titlePart2": "In Sekunden.",
+      "description": "Verwandeln Sie Meetings, Vorlesungen und Interviews in Transkripte und Zusammenfassungen — mit Ihrem eigenen API-Schlüssel.",
+      "cta": "Kostenlos starten",
+      "proof": "· 60 Minuten kostenlos  · Kein Abonnement  · Ihr API-Schlüssel",
+      "mockup": {
+        "speaker": "Sprecher 1",
+        "summaryLabel": "Schlüsselpunkte · 3 Punkte",
+        "bullet1": "Design-Team zu Mockup-Änderungen kontaktieren",
+        "bullet2": "Nächsten Sprint für Donnerstag planen"
+      }
     },
     "features": {
-      "title": "Leistungsstarke Tools für Audio",
-      "subtitle": "Alles, was Sie brauchen, um Ihre Aufnahmen zu beherrschen.",
+      "title": "Alles, was Sie brauchen",
+      "subtitle": "Genaue Transkription, KI-Zusammenfassungen, vollständige Privatsphäre.",
       "cards": {
         "transcription": {
           "title": "Kristallklare Transkription",
-          "description": "Laden Sie Dateien hoch oder nehmen Sie direkt auf. Genaue Transkription für zuverlässige Aufzeichnungen mit fortschrittlicher On-Device-Verarbeitung."
+          "description": "Datei hochladen oder live aufnehmen. Whisper-genaue Transkription jedes Mal."
         },
         "summaries": {
           "title": "Sofortige KI-Zusammenfassungen",
-          "description": "Erhalten Sie Schlüsselpunkte, Aktionselemente und strukturierte Zusammenfassungen, die automatisch von erstklassigen KI-Modellen generiert werden."
+          "description": "Schlüsselpunkte, Aktionselemente, strukturierte Zusammenfassungen — sofort generiert."
         },
         "security": {
           "title": "Privat & Sicher",
-          "description": "Ihre Daten bleiben Ihre Daten. Client-seitige Verarbeitung gewährleistet maximale Privatsphäre. Kein Audio verlässt Ihr Gerät ohne Erlaubnis."
+          "description": "Client-seitige Verarbeitung. Ihr Audio verlässt das Gerät nicht ohne Erlaubnis."
         }
       }
     },
-    "pricing": {
-      "title": "Einfache, Transparente Preise",
-      "subtitle": "Wählen Sie den Plan, der zu Ihren Bedürfnissen passt",
-      "free": {
-        "name": "Kostenlos",
-        "price": "$0",
-        "interval": "/Monat",
-        "description": "Testen Sie, bevor Sie upgraden",
-        "cta": "Kostenlose Testversion starten"
-      },
-      "pro": {
-        "name": "Pro",
-        "price": "$19",
-        "interval": "/Monat",
-        "badge": "Am beliebtesten",
-        "description": "Für Profis",
-        "cta": "Auf Pro upgraden"
-      },
-      "team": {
-        "name": "Team",
-        "price": "$49",
-        "interval": "/Monat",
-        "description": "Für Teams",
-        "cta": "Vertrieb kontaktieren"
-      },
-      "viewComparison": "Detaillierten Vergleich ansehen"
-    },
-    "cta": {
-      "title": "Bereit, Ihre Produktivität zu steigern?",
-      "description": "Schließen Sie sich Profis an, die jede Woche Stunden mit KI-gestützter Transkription sparen.",
-      "free": "Kostenlose Testversion starten (60 Min)",
-      "pro": "Pro-Funktionen freischalten"
-    },
-    "ctaSection": {
-      "title": "Bereit, Ihren Workflow zu transformieren?",
-      "description": "Treten Sie Tausenden von Benutzern bei, die jede Woche Stunden mit Trammarise sparen.",
-      "button": "Kostenlos starten"
-    },
-    "footer": {
-      "tagline": "KI-gestützte Audio-Transkription und Zusammenfassung",
-      "links": {
-        "docs": "Dokumentation",
-        "pricing": "Preise",
-        "privacy": "Datenschutz",
-        "terms": "Bedingungen",
-        "contact": "Kontakt"
-      },
-      "copyright": "© {{year}} Trammarise. Alle Rechte vorbehalten."
+    "byok": {
+      "label": "Kostenlose Stufe",
+      "title": "Nutzen Sie Ihren eigenen OpenAI-Schlüssel. Zahlen Sie uns nichts.",
+      "description": "Verbinden Sie Ihren OpenAI API-Schlüssel und beginnen Sie sofort zu transkribieren. Sie zahlen OpenAI direkt für das, was Sie nutzen — kein Trammarise-Abonnement erforderlich.",
+      "cta": "Kostenlos starten",
+      "mockup": {
+        "placeholder": "sk-••••••••••••••••",
+        "connected": "Verbunden ✓"
+      }
     }
   },
   "pricing": {

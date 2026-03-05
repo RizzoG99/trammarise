@@ -26,6 +26,7 @@
       "usage": "Uso",
       "billing": "Uso y Facturación",
       "upgrade": "Actualizar a Pro",
+      "pricing": "Precios",
       "signOut": "Cerrar Sesión"
     },
     "manageAccount": "Administrar Cuenta",
@@ -674,85 +675,45 @@
   },
   "welcome": {
     "hero": {
-      "newBadge": "✨ Presentamos el Diseño Liquid Glass",
       "titlePart1": "Transcribe y Resume",
-      "titlePart2": "En Segundos",
-      "description": "Transforma tus reuniones, conferencias y entrevistas en información útil. Comienza con 60 minutos gratis, actualiza para acceso ilimitado.",
-      "cta": {
-        "primary": "Iniciar Prueba Gratuita",
-        "secondary": "Ver Precios",
-        "getStarted": "Comenzar Gratis",
-        "viewFeatures": "Ver Características",
-        "appPreview": "[Visualización de Vista Previa de la App]"
-      },
-      "noCreditCard": "No se requiere tarjeta de crédito"
+      "titlePart2": "En Segundos.",
+      "description": "Convierte reuniones, conferencias y entrevistas en transcripciones y resúmenes — usando tu propia clave API.",
+      "cta": "Comenzar Gratis",
+      "proof": "· 60 minutos gratis  · Sin suscripción  · Tu clave API",
+      "mockup": {
+        "speaker": "Hablante 1",
+        "summaryLabel": "Puntos clave · 3 elementos",
+        "bullet1": "Hacer seguimiento con el equipo de diseño sobre las revisiones del mockup",
+        "bullet2": "Programar la próxima planificación del sprint para el jueves"
+      }
     },
     "features": {
-      "title": "Herramientas Potentes para Audio",
-      "subtitle": "Todo lo que necesitas para dominar tus grabaciones.",
+      "title": "Todo lo que necesitas",
+      "subtitle": "Transcripción precisa, resúmenes IA, privacidad total.",
       "cards": {
         "transcription": {
           "title": "Transcripción Cristalina",
-          "description": "Sube archivos o graba directamente. Transcripción precisa para registros confiables utilizando procesamiento avanzado en el dispositivo."
+          "description": "Sube un archivo o graba en vivo. Transcripción precisa como Whisper, siempre."
         },
         "summaries": {
-          "title": "Resúmenes AI Instantáneos",
-          "description": "Obtén puntos clave, elementos de acción y resúmenes estructurados generados automáticamente por modelos AI de primera categoría."
+          "title": "Resúmenes IA Instantáneos",
+          "description": "Puntos clave, elementos de acción, resúmenes estructurados — generados al instante."
         },
         "security": {
           "title": "Privado y Seguro",
-          "description": "Tus datos siguen siendo tuyos. El procesamiento del lado del cliente garantiza la máxima privacidad. Ningún audio sale de tu dispositivo sin permiso."
+          "description": "Procesamiento en el cliente. Tu audio nunca sale sin tu permiso."
         }
       }
     },
-    "pricing": {
-      "title": "Precios Simples y Transparentes",
-      "subtitle": "Elige el plan que se adapte a tus necesidades",
-      "free": {
-        "name": "Gratis",
-        "price": "$0",
-        "interval": "/mes",
-        "description": "Prueba antes de actualizar",
-        "cta": "Iniciar Prueba Gratuita"
-      },
-      "pro": {
-        "name": "Pro",
-        "price": "$19",
-        "interval": "/mes",
-        "badge": "Más Popular",
-        "description": "Para profesionales",
-        "cta": "Actualizar a Pro"
-      },
-      "team": {
-        "name": "Equipo",
-        "price": "$49",
-        "interval": "/mes",
-        "description": "Para equipos",
-        "cta": "Contactar Ventas"
-      },
-      "viewComparison": "Ver comparación detallada"
-    },
-    "cta": {
-      "title": "¿Listo para aumentar tu productividad?",
-      "description": "Únete a profesionales que ahorran horas cada semana con transcripción impulsada por IA.",
-      "free": "Iniciar Prueba Gratuita (60 min)",
-      "pro": "Desbloquear Características Pro"
-    },
-    "ctaSection": {
-      "title": "¿Listo para transformar tu flujo de trabajo?",
-      "description": "Únete a miles de usuarios que ahorran horas cada semana con Trammarise.",
-      "button": "Comenzar Gratis"
-    },
-    "footer": {
-      "tagline": "Transcripción y resumen de audio con IA",
-      "links": {
-        "docs": "Documentación",
-        "pricing": "Precios",
-        "privacy": "Privacidad",
-        "terms": "Términos",
-        "contact": "Contacto"
-      },
-      "copyright": "© {{year}} Trammarise. Todos los derechos reservados."
+    "byok": {
+      "label": "Nivel gratuito",
+      "title": "Usa tu propia clave OpenAI. No nos pagas nada.",
+      "description": "Conecta tu clave API de OpenAI y comienza a transcribir de inmediato. Pagas directamente a OpenAI por lo que usas — sin suscripción a Trammarise.",
+      "cta": "Comenzar Gratis",
+      "mockup": {
+        "placeholder": "sk-••••••••••••••••",
+        "connected": "Conectado ✓"
+      }
     }
   },
   "pricing": {

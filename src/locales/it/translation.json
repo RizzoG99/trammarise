@@ -26,6 +26,7 @@
       "usage": "Utilizzo",
       "billing": "Utilizzo e Fatturazione",
       "upgrade": "Aggiorna a Pro",
+      "pricing": "Prezzi",
       "signOut": "Esci"
     },
     "manageAccount": "Gestisci Account",
@@ -674,85 +675,45 @@
   },
   "welcome": {
     "hero": {
-      "newBadge": "✨ Introduzione al Liquid Glass Design",
       "titlePart1": "Trascrivi e Riassumi",
-      "titlePart2": "In Secondi",
-      "description": "Trasforma le tue riunioni, lezioni e interviste in informazioni utili. Inizia con 60 minuti gratuiti, aggiorna per accesso illimitato.",
-      "cta": {
-        "primary": "Inizia la Prova Gratuita",
-        "secondary": "Vedi Prezzi",
-        "getStarted": "Inizia Gratis",
-        "viewFeatures": "Vedi Funzionalità",
-        "appPreview": "[Visualizzazione Anteprima App]"
-      },
-      "noCreditCard": "Nessuna carta di credito richiesta"
+      "titlePart2": "In Secondi.",
+      "description": "Trasforma riunioni, lezioni e interviste in trascrizioni e riassunti — usando la tua chiave API.",
+      "cta": "Inizia Gratis",
+      "proof": "· 60 minuti gratuiti  · Nessun abbonamento  · La tua chiave API",
+      "mockup": {
+        "speaker": "Relatore 1",
+        "summaryLabel": "Punti chiave · 3 elementi",
+        "bullet1": "Aggiornare il team di design sui mockup",
+        "bullet2": "Pianificare il prossimo sprint per giovedì"
+      }
     },
     "features": {
-      "title": "Strumenti Potenti per l'Audio",
-      "subtitle": "Tutto ciò di cui hai bisogno per gestire le tue registrazioni.",
+      "title": "Tutto ciò di cui hai bisogno",
+      "subtitle": "Trascrizione accurata, riassunti AI, privacy totale.",
       "cards": {
         "transcription": {
           "title": "Trascrizione Cristallina",
-          "description": "Carica file o registra direttamente. Trascrizione accurata per record affidabili utilizzando l'elaborazione avanzata sul dispositivo."
+          "description": "Carica un file o registra dal vivo. Trascrizione Whisper-accurata ogni volta."
         },
         "summaries": {
           "title": "Riassunti AI Istantanei",
-          "description": "Ottieni punti chiave, azioni e riassunti strutturati generati automaticamente dai migliori modelli AI."
+          "description": "Punti chiave, azioni, riassunti strutturati — generati immediatamente."
         },
         "security": {
           "title": "Privato e Sicuro",
-          "description": "I tuoi dati rimangono tuoi. L'elaborazione lato client garantisce la massima privacy. Nessun audio lascia il tuo dispositivo senza permesso."
+          "description": "Elaborazione lato client. Il tuo audio non lascia il dispositivo senza permesso."
         }
       }
     },
-    "pricing": {
-      "title": "Prezzi Semplici e Trasparenti",
-      "subtitle": "Scegli il piano che si adatta alle tue esigenze",
-      "free": {
-        "name": "Gratuito",
-        "price": "$0",
-        "interval": "/mese",
-        "description": "Prova prima di aggiornare",
-        "cta": "Inizia la Prova Gratuita"
-      },
-      "pro": {
-        "name": "Pro",
-        "price": "$19",
-        "interval": "/mese",
-        "badge": "Più Popolare",
-        "description": "Per professionisti",
-        "cta": "Aggiorna a Pro"
-      },
-      "team": {
-        "name": "Team",
-        "price": "$49",
-        "interval": "/mese",
-        "description": "Per team",
-        "cta": "Contatta Vendite"
-      },
-      "viewComparison": "Vedi confronto dettagliato"
-    },
-    "cta": {
-      "title": "Pronto a aumentare la tua produttività?",
-      "description": "Unisciti ai professionisti che risparmiano ore ogni settimana con la trascrizione basata su IA.",
-      "free": "Inizia la Prova Gratuita (60 min)",
-      "pro": "Sblocca Funzionalità Pro"
-    },
-    "ctaSection": {
-      "title": "Pronto a trasformare il tuo flusso di lavoro?",
-      "description": "Unisciti a migliaia di utenti che risparmiano ore ogni settimana con Trammarise.",
-      "button": "Inizia Gratis"
-    },
-    "footer": {
-      "tagline": "Trascrizione e riassunto audio basati su IA",
-      "links": {
-        "docs": "Documentazione",
-        "pricing": "Prezzi",
-        "privacy": "Privacy",
-        "terms": "Termini",
-        "contact": "Contatti"
-      },
-      "copyright": "© {{year}} Trammarise. Tutti i diritti riservati."
+    "byok": {
+      "label": "Livello gratuito",
+      "title": "Usa la tua chiave OpenAI. Non ci paghi nulla.",
+      "description": "Collega la tua chiave API OpenAI e inizia subito a trascrivere. Paghi OpenAI direttamente per ciò che usi — nessun abbonamento Trammarise richiesto.",
+      "cta": "Inizia Gratis",
+      "mockup": {
+        "placeholder": "sk-••••••••••••••••",
+        "connected": "Connesso ✓"
+      }
     }
   },
   "pricing": {

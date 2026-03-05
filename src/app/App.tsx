@@ -121,8 +121,6 @@ function AppRoutes() {
         <Routes>
           {/* Onboarding wizard */}
           <Route path={ROUTES.ONBOARDING} element={<OnboardingPage />} />
-          {/* Allow pricing page during onboarding */}
-          <Route path="/pricing" element={<PricingPage />} />
           {/* Redirect everything else to onboarding */}
           <Route path="*" element={<Navigate to={ROUTES.ONBOARDING} replace />} />
         </Routes>

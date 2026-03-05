@@ -59,8 +59,11 @@ export function UserMenuDropdown({ isSubscribed, onClose }: UserMenuDropdownProp
   if (!isSubscribed) {
     menuItems.push({
       icon: Sparkles,
-      label: t('userMenu.menuItems.upgrade', 'Upgrade to Pro'),
-      action: () => navigateTo('plan'),
+      label: t('userMenu.menuItems.pricing', 'Pricing'),
+      action: () => {
+        navigate(ROUTES.PRICING);
+        onClose();
+      },
     });
   }
 
