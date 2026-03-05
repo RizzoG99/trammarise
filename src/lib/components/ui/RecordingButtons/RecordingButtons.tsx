@@ -73,7 +73,8 @@ export function RecordButton({
             className="absolute inset-0 rounded-full pulse-ring pointer-events-none"
             style={{
               backgroundColor: 'var(--color-primary)',
-              opacity: isRecording ? 0 : 1,
+              animationName: isRecording ? 'none' : undefined,
+              opacity: isRecording ? 0 : undefined,
               transition: dur ?? 'opacity 150ms ease',
             }}
           />
@@ -82,7 +83,8 @@ export function RecordButton({
             style={{
               backgroundColor: 'var(--color-primary)',
               animationDelay: '0.9s',
-              opacity: isRecording ? 0 : 1,
+              animationName: isRecording ? 'none' : undefined,
+              opacity: isRecording ? 0 : undefined,
               transition: dur ?? 'opacity 150ms ease',
             }}
           />
