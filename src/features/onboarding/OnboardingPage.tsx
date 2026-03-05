@@ -23,12 +23,12 @@ import { ROUTES } from '@/types/routing';
 type UseCase = { id: string; Icon: LucideIcon; labelKey: string };
 
 const USE_CASES: UseCase[] = [
-  { id: 'meeting', Icon: Users, labelKey: 'Meeting' },
-  { id: 'lecture', Icon: GraduationCap, labelKey: 'Lecture' },
-  { id: 'interview', Icon: Mic, labelKey: 'Interview' },
-  { id: 'podcast', Icon: Headphones, labelKey: 'Podcast' },
-  { id: 'voice-memo', Icon: FileText, labelKey: 'Voice Memo' },
-  { id: 'other', Icon: MessageSquare, labelKey: 'Other' },
+  { id: 'meeting', Icon: Users, labelKey: 'onboarding.step1.useCases.meeting' },
+  { id: 'lecture', Icon: GraduationCap, labelKey: 'onboarding.step1.useCases.lecture' },
+  { id: 'interview', Icon: Mic, labelKey: 'onboarding.step1.useCases.interview' },
+  { id: 'podcast', Icon: Headphones, labelKey: 'onboarding.step1.useCases.podcast' },
+  { id: 'voice-memo', Icon: FileText, labelKey: 'onboarding.step1.useCases.voiceMemo' },
+  { id: 'other', Icon: MessageSquare, labelKey: 'onboarding.step1.useCases.other' },
 ];
 
 const FREE_PLAN: PricingPlan = {
@@ -205,6 +205,7 @@ function UseCaseStep({
   selectedUseCase: string;
   onSelect: (id: string) => void;
 }) {
+  const { t } = useTranslation();
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
       {USE_CASES.map(({ id, Icon, labelKey }) => {
@@ -246,7 +247,7 @@ function UseCaseStep({
                 isSelected ? 'text-text-primary' : 'text-text-secondary',
               ].join(' ')}
             >
-              {labelKey}
+              {t(labelKey)}
             </span>
 
             {/* Selected check */}

@@ -750,7 +750,15 @@
     "subtitle": "Configuriamo tutto in pochi passaggi",
     "step1": {
       "title": "Come utilizzerai Trammarise?",
-      "subtitle": "Scegli il tuo caso d'uso principale per personalizzare l'esperienza"
+      "subtitle": "Scegli il tuo caso d'uso principale per personalizzare l'esperienza",
+      "useCases": {
+        "meeting": "Riunione",
+        "lecture": "Lezione",
+        "interview": "Intervista",
+        "podcast": "Podcast",
+        "voiceMemo": "Nota vocale",
+        "other": "Altro"
+      }
     },
     "step2": {
       "title": "Scegli il tuo piano",

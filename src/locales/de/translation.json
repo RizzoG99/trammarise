@@ -750,7 +750,15 @@
     "subtitle": "Richten Sie alles in wenigen Schritten ein",
     "step1": {
       "title": "Wie werden Sie Trammarise nutzen?",
-      "subtitle": "Wählen Sie Ihren primären Anwendungsfall"
+      "subtitle": "Wählen Sie Ihren primären Anwendungsfall",
+      "useCases": {
+        "meeting": "Meeting",
+        "lecture": "Vorlesung",
+        "interview": "Interview",
+        "podcast": "Podcast",
+        "voiceMemo": "Sprachnotiz",
+        "other": "Sonstiges"
+      }
     },
     "step2": {
       "title": "Plan wählen",

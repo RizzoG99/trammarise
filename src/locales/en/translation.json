@@ -749,7 +749,15 @@
     "subtitle": "Let's get you set up in a few steps",
     "step1": {
       "title": "How will you use Trammarise?",
-      "subtitle": "Choose your primary use case so we can tailor the experience"
+      "subtitle": "Choose your primary use case so we can tailor the experience",
+      "useCases": {
+        "meeting": "Meeting",
+        "lecture": "Lecture",
+        "interview": "Interview",
+        "podcast": "Podcast",
+        "voiceMemo": "Voice Memo",
+        "other": "Other"
+      }
     },
     "step2": {
       "title": "Choose your plan",
