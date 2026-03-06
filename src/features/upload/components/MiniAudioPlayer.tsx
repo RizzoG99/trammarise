@@ -17,40 +17,66 @@ function formatTime(seconds: number): string {
 export function MiniAudioPlayer({ file, className = '' }: MiniAudioPlayerProps) {
   const { t } = useTranslation();
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const objectUrlRef = useRef<string | null>(null);
+  const sliderRef = useRef<HTMLInputElement | null>(null);
+  const rafRef = useRef<number | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0); // for time display only
   const [duration, setDuration] = useState(NaN);
 
-  // Create object URL once per file
   useEffect(() => {
     const url = URL.createObjectURL(file);
-    objectUrlRef.current = url;
     const audio = new Audio(url);
     audioRef.current = audio;
 
+    // rAF loop: update slider thumb + fill directly at 60fps
+    const tick = () => {
+      const slider = sliderRef.current;
+      if (!slider) return;
+      const ct = audio.currentTime;
+      const dur = audio.duration;
+      const pct = isFinite(dur) && dur > 0 ? (ct / dur) * 100 : 0;
+      slider.value = String(ct);
+      slider.style.setProperty('--audio-fill-pct', `${pct.toFixed(3)}%`);
+      rafRef.current = requestAnimationFrame(tick);
+    };
+
+    const stopRaf = () => {
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+    };
+
+    const onPlay = () => {
+      setIsPlaying(true);
+      rafRef.current = requestAnimationFrame(tick);
+    };
+    const onPause = () => {
+      setIsPlaying(false);
+      stopRaf();
+    };
     const onTimeUpdate = () => setCurrentTime(audio.currentTime);
     const onDurationChange = () => setDuration(audio.duration);
     const onEnded = () => {
       setIsPlaying(false);
       setCurrentTime(0);
+      stopRaf();
     };
-    const onPlay = () => setIsPlaying(true);
-    const onPause = () => setIsPlaying(false);
 
+    audio.addEventListener('play', onPlay);
+    audio.addEventListener('pause', onPause);
     audio.addEventListener('timeupdate', onTimeUpdate);
     audio.addEventListener('durationchange', onDurationChange);
     audio.addEventListener('ended', onEnded);
-    audio.addEventListener('play', onPlay);
-    audio.addEventListener('pause', onPause);
 
     return () => {
+      audio.removeEventListener('play', onPlay);
+      audio.removeEventListener('pause', onPause);
       audio.removeEventListener('timeupdate', onTimeUpdate);
       audio.removeEventListener('durationchange', onDurationChange);
       audio.removeEventListener('ended', onEnded);
-      audio.removeEventListener('play', onPlay);
-      audio.removeEventListener('pause', onPause);
       audio.pause();
+      stopRaf();
       URL.revokeObjectURL(url);
     };
   }, [file]);
@@ -71,13 +97,17 @@ export function MiniAudioPlayer({ file, className = '' }: MiniAudioPlayerProps) 
     const value = Number(e.target.value);
     audio.currentTime = value;
     setCurrentTime(value);
+    // Update fill immediately on seek
+    const dur = audio.duration;
+    const pct = isFinite(dur) && dur > 0 ? (value / dur) * 100 : 0;
+    if (sliderRef.current) {
+      sliderRef.current.style.setProperty('--audio-fill-pct', `${pct.toFixed(3)}%`);
+    }
   };
-
-  const pct = isFinite(duration) && duration > 0 ? (currentTime / duration) * 100 : 0;
 
   return (
     <div className={`flex items-center gap-2 ${className}`}>
-      {/* Play / Pause button — 44px touch target, 32px visual */}
+      {/* Play / Pause button — 44px touch target */}
       <button
         onClick={handlePlayPause}
         aria-label={isPlaying ? t('audioPreview.pauseAriaLabel') : t('audioPreview.playAriaLabel')}
@@ -99,25 +129,27 @@ export function MiniAudioPlayer({ file, className = '' }: MiniAudioPlayerProps) 
         </span>
       </button>
 
-      {/* Seek bar */}
+      {/* Seek bar — uncontrolled, driven by rAF for smooth thumb + fill */}
       <input
+        ref={sliderRef}
         type="range"
         role="slider"
         min={0}
         max={isFinite(duration) ? duration : 0}
         step={0.1}
-        value={currentTime}
+        defaultValue={0}
         onChange={handleSeek}
         aria-label={t('audioPreview.seekAriaLabel')}
         aria-valuemin={0}
         aria-valuemax={isFinite(duration) ? duration : 0}
         aria-valuenow={currentTime}
-        className="flex-1 h-1 rounded-full appearance-none cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-primary"
-        style={{
-          background: `linear-gradient(to right, var(--color-primary) ${pct}%, var(--color-bg-tertiary) ${pct}%)`,
-          // Custom thumb via CSS
-          accentColor: 'var(--color-primary)',
-        }}
+        className="mini-audio-range flex-1"
+        style={
+          {
+            '--audio-fill-pct': '0%',
+            background: `linear-gradient(to right, var(--color-primary) var(--audio-fill-pct), var(--color-border) var(--audio-fill-pct))`,
+          } as React.CSSProperties
+        }
       />
 
       {/* Time display */}

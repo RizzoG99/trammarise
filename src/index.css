@@ -260,4 +260,76 @@
     animation: dropdown-enter 0.18s ease-out both;
     transform-origin: top right;
   }
+
+  /* Animatable CSS custom property for seek bar fill */
+  @property --audio-fill-pct {
+    syntax: '<percentage>';
+    inherits: false;
+    initial-value: 0%;
+  }
+
+  /* Mini audio player seek bar */
+  .mini-audio-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 4px;
+    border-radius: 9999px;
+    cursor: pointer;
+    outline: none;
+  }
+
+  .mini-audio-range:focus-visible {
+    ring: 2px solid var(--color-primary);
+    ring-offset: 2px;
+  }
+
+  .mini-audio-range::-webkit-slider-runnable-track {
+    height: 4px;
+    border-radius: 9999px;
+  }
+
+  .mini-audio-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    border: 2px solid var(--color-bg-surface);
+    box-shadow: 0 0 0 1.5px var(--color-primary);
+    margin-top: -5px;
+    cursor: pointer;
+    transition:
+      transform 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+
+  .mini-audio-range:hover::-webkit-slider-thumb {
+    transform: scale(1.2);
+    box-shadow: 0 0 0 2px var(--color-primary);
+  }
+
+  .mini-audio-range::-moz-range-track {
+    height: 4px;
+    border-radius: 9999px;
+    background: transparent;
+  }
+
+  .mini-audio-range::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    border: 2px solid var(--color-bg-surface);
+    box-shadow: 0 0 0 1.5px var(--color-primary);
+    cursor: pointer;
+    transition:
+      transform 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+
+  .mini-audio-range:hover::-moz-range-thumb {
+    transform: scale(1.2);
+    box-shadow: 0 0 0 2px var(--color-primary);
+  }
 }
