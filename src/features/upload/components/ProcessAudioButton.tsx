@@ -1,6 +1,5 @@
 import { Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { LoadingSpinner } from '@/lib';
 
 export interface ProcessAudioButtonProps {
   disabled: boolean;
@@ -42,7 +41,29 @@ export function ProcessAudioButton({
         {isLoading ? (
           <>
             {t('home.processingButton', 'Processing...')}
-            <LoadingSpinner size="sm" className="p-0" />
+            <svg
+              className="animate-spin"
+              width={18}
+              height={18}
+              viewBox="0 0 18 18"
+              fill="none"
+              aria-hidden="true"
+            >
+              <circle
+                cx="9"
+                cy="9"
+                r="7"
+                stroke="currentColor"
+                strokeOpacity="0.25"
+                strokeWidth="2"
+              />
+              <path
+                d="M16 9a7 7 0 0 0-7-7"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+            </svg>
           </>
         ) : (
           <>
