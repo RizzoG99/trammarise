@@ -17,6 +17,7 @@ import { NoiseProfileSelector } from '../../features/configuration/components/No
 import { SpeakerDiarizationToggle } from '../../features/configuration/components/SpeakerDiarizationToggle';
 import type { NoiseProfile } from '../../types/noise-profiles';
 import { ProcessAudioButton } from '../../features/upload/components/ProcessAudioButton';
+import { AudioPreviewBar } from '../../features/upload/components/AudioPreviewBar';
 import { ApiKeySetupBanner } from '../../features/onboarding/ApiKeySetupBanner';
 import { UpgradeModal } from '../../components/marketing/UpgradeModal';
 import { generateSessionId, saveSession } from '../../utils/session-manager';
@@ -142,6 +143,9 @@ export function UploadRecordPage() {
           {t('home.subtitle')}
         </Text>
       </div>
+
+      {/* Mobile audio preview — shown above tabs when audio is ready */}
+      {audioFile && <AudioPreviewBar file={audioFile} />}
 
       {/* Upload/Record Tabs (Mobile) & Split Grid (Desktop) */}
       <div className="mb-8">

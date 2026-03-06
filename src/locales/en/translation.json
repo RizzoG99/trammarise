@@ -847,5 +847,11 @@
       "annualHint": "or pay annually and save 2 months",
       "previewSubtitle": "See who said what, when"
     }
+  },
+  "audioPreview": {
+    "playAriaLabel": "Play audio",
+    "pauseAriaLabel": "Pause audio",
+    "seekAriaLabel": "Seek audio position",
+    "previewLabel": "Audio preview"
   }
 }

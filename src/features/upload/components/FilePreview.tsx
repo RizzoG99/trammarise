@@ -1,6 +1,7 @@
 import { CheckCircle, Music, Trash2, RefreshCw } from 'lucide-react';
 import { Text } from '@/lib';
 import { useTranslation } from 'react-i18next';
+import { MiniAudioPlayer } from './MiniAudioPlayer';
 
 export interface FilePreviewProps {
   file: File | Blob;
@@ -76,8 +77,11 @@ export function FilePreview({ file, onRemove, onReplace }: FilePreviewProps) {
         </div>
       </div>
 
+      {/* Audio Preview Player */}
+      <MiniAudioPlayer file={file} className="mt-3" />
+
       {/* Action Buttons */}
-      <div className="flex gap-3">
+      <div className="flex gap-3 mt-3">
         <button
           onClick={onReplace}
           aria-label={t('filePreview.replaceAriaLabel')}

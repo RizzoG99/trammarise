@@ -848,5 +848,11 @@
       "annualHint": "o paga annualmente e risparmia 2 mesi",
       "previewSubtitle": "Scopri chi ha detto cosa, e quando"
     }
+  },
+  "audioPreview": {
+    "playAriaLabel": "Riproduci audio",
+    "pauseAriaLabel": "Metti in pausa",
+    "seekAriaLabel": "Scorri la posizione audio",
+    "previewLabel": "Anteprima audio"
   }
 }
