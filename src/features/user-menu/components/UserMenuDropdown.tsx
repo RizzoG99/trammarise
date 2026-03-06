@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { useClerk } from '@clerk/clerk-react';
+import { useClerk } from '@clerk/react';
 import { User, Key, CreditCard, LogOut, Sparkles, History } from 'lucide-react';
 import { clearApiConfig } from '@/utils/session-storage';
 import { deleteSavedApiKey } from '@/utils/api';

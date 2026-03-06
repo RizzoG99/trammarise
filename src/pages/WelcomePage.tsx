@@ -1,4 +1,4 @@
-import { useClerk } from '@clerk/clerk-react';
+import { useClerk } from '@clerk/react';
 import { useTranslation } from 'react-i18next';
 import { Heading, Text, Button, GlassCard } from '@/lib';
 import { ArrowRight, Mic, Zap, Shield, Check } from 'lucide-react';

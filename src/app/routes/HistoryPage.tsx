@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useUser } from '@clerk/clerk-react';
+import { useUser } from '@clerk/react';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { HistoryList } from '@/features/history/components/HistoryList';
 import { HistoryEmptyState } from '@/features/history/components/HistoryEmptyState';

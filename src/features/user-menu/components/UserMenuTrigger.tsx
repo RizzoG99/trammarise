@@ -1,5 +1,5 @@
 import { ChevronDown } from 'lucide-react';
-import { useUser } from '@clerk/clerk-react';
+import { useUser } from '@clerk/react';
 import { TierBadge } from './TierBadge';
 import type { SubscriptionTier } from '@/context/subscription-types';
 

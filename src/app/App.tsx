@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { lazy, Suspense, useEffect, useState, useCallback } from 'react';
-import { ClerkProvider, useUser } from '@clerk/clerk-react';
+import { ClerkProvider, useUser } from '@clerk/react';
 import { AppLayout } from './AppLayout';
 import { ROUTES } from '../types/routing';
 import { WelcomePage } from '../pages/WelcomePage';
@@ -86,6 +86,15 @@ function AppRoutes() {
   const { needsOnboarding, isCheckingOnboarding } = useOnboarding();
   const navigate = useNavigate();
   const [showStorageWarning, setShowStorageWarning] = useState(false);
+  const [clerkTimedOut, setClerkTimedOut] = useState(false);
+
+  // If Clerk's script fails to load (e.g. 530 network error), isLoaded never
+  // becomes true. After 10 s we stop showing the spinner and surface an error.
+  useEffect(() => {
+    if (isLoaded) return;
+    const timer = setTimeout(() => setClerkTimedOut(true), 10_000);
+    return () => clearTimeout(timer);
+  }, [isLoaded]);
 
   const handleStorageWarning = useCallback((level: StorageWarningLevel) => {
     if (level === 'high' || level === 'critical') {
@@ -111,6 +120,26 @@ function AppRoutes() {
   };
 
   if (!isLoaded || isCheckingOnboarding) {
+    if (clerkTimedOut) {
+      return (
+        <div className="min-h-screen flex flex-col items-center justify-center gap-4 p-8 text-center">
+          <p className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>
+            Authentication service unavailable
+          </p>
+          <p className="text-sm max-w-sm" style={{ color: 'var(--color-text-secondary)' }}>
+            Could not connect to the authentication service. Please check your internet connection
+            and try refreshing the page.
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-2 px-6 py-2 rounded-lg text-sm font-medium text-white cursor-pointer transition-colors duration-150"
+            style={{ backgroundColor: 'var(--color-primary)' }}
+          >
+            Retry
+          </button>
+        </div>
+      );
+    }
     return <PageLoader />;
   }
 

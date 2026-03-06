@@ -6,7 +6,7 @@ import { BrowserRouter } from 'react-router-dom';
 
 // Mock Clerk
 const mockOpenSignIn = vi.fn();
-vi.mock('@clerk/clerk-react', () => ({
+vi.mock('@clerk/react', () => ({
   useClerk: () => ({
     openSignIn: mockOpenSignIn,
   }),

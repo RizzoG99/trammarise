@@ -1,7 +1,7 @@
 import { FileDown, AudioWaveform } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { SignInButton, useUser } from '@clerk/clerk-react';
+import { SignInButton, useUser } from '@clerk/react';
 import { ThemeToggle, Button, Input } from '@/lib';
 import { useTheme } from '../../hooks/useTheme';
 import { LanguageSwitcher } from '../../features/i18n/components/LanguageSwitcher';

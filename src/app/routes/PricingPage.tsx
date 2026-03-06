@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useUser, useAuth } from '@clerk/clerk-react';
+import { useUser, useAuth } from '@clerk/react';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { Button } from '@/lib/components/ui/Button';
 import { GlassCard } from '@/lib';

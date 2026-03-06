@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { useUser } from '@clerk/clerk-react';
+import { useUser } from '@clerk/react';
 import type { HistorySession } from '../types/history';
 import type { ContentType } from '@/types/content-types';
 import type { LanguageCode } from '@/types/languages';
