@@ -1,7 +1,7 @@
 import { useParams } from 'react-router-dom';
 import { useState, useRef, useEffect, useCallback, lazy, Suspense } from 'react';
 import { ArrowRight } from 'lucide-react';
-import { Heading, Text, GlassCard, WaveformPlayer } from '@/lib';
+import { Heading, Text, GlassCard, WaveformPlayer, Button } from '@/lib';
 import type { WaveformPlayerRef } from '@/lib';
 
 const SEO = lazy(() =>
@@ -11,9 +11,9 @@ import { PageLayout } from '../../components/layout/PageLayout';
 import { useSessionStorage } from '../../hooks/useSessionStorage';
 import { useRouteState } from '../../hooks/useRouteState';
 import { EnhancedPlaybackControls } from '../../features/audio-editing/components/EnhancedPlaybackControls';
-import { RegionTimeDisplay } from '../../features/audio-editing/components/RegionTimeDisplay';
 import { AudioStatusBadges } from '../../features/audio-editing/components/AudioStatusBadges';
 import { TimelineRuler } from '../../features/audio-editing/components/TimelineRuler';
+import { TrimTimeInputs } from '../../features/audio-editing/components/TrimTimeInputs';
 import { formatTime } from '../../utils/audio';
 import { useTranslation } from 'react-i18next';
 
@@ -36,31 +36,45 @@ export function AudioEditingPage() {
   const handleWaveSurferReady = useCallback((player: WaveformPlayerRef) => {
     playerRef.current = player;
 
-    // Enable drag selection
+    // Enable drag selection on the waveform
     player.enableRegionSelection();
 
-    // Listen for region changes
     const regionsPlugin = player.regions;
+    if (!regionsPlugin) return;
 
+    const syncRegion = () => {
+      const activeRegion = playerRef.current?.getActiveRegion();
+      setRegion(activeRegion ?? null);
+    };
+
+    regionsPlugin.on('region-created', syncRegion);
+    regionsPlugin.on('region-updated', syncRegion);
+    regionsPlugin.on('region-removed', () => setRegion(null));
+  }, []);
+
+  const handleRegionChange = useCallback((start: number, end: number) => {
+    setRegion({ start, end });
+    // Reflect in WaveSurfer region visually
+    const regionsPlugin = playerRef.current?.regions;
     if (regionsPlugin) {
-      const handleRegionCreated = () => {
-        const activeRegion = playerRef.current?.getActiveRegion();
-        setRegion(activeRegion ?? null);
-      };
-
-      const handleRegionUpdated = () => {
-        const activeRegion = playerRef.current?.getActiveRegion();
-        setRegion(activeRegion ?? null);
-      };
-
-      const handleRegionRemoved = () => {
-        setRegion(null);
-      };
-
-      regionsPlugin.on('region-created', handleRegionCreated);
-      regionsPlugin.on('region-updated', handleRegionUpdated);
-      regionsPlugin.on('region-removed', handleRegionRemoved);
+      const existing = regionsPlugin.getRegions();
+      if (existing.length > 0) {
+        existing[0].setOptions({ start, end });
+      } else {
+        regionsPlugin.addRegion({
+          start,
+          end,
+          color: 'rgba(59, 130, 246, 0.15)',
+          drag: true,
+          resize: true,
+        });
+      }
     }
+  }, []);
+
+  const handleRegionClear = useCallback(() => {
+    playerRef.current?.clearRegions();
+    setRegion(null);
   }, []);
 
   // Keyboard shortcuts
@@ -110,12 +124,41 @@ export function AudioEditingPage() {
           ws.setVolume(newVolumeDown);
           break;
         }
+
+        case 'KeyI': {
+          // Set region in-point to current playhead
+          e.preventDefault();
+          const inPoint = ws.getCurrentTime();
+          const existingEnd = region?.end ?? duration;
+          if (inPoint < existingEnd) {
+            handleRegionChange(inPoint, existingEnd);
+          }
+          break;
+        }
+
+        case 'KeyO': {
+          // Set region out-point to current playhead
+          e.preventDefault();
+          const outPoint = ws.getCurrentTime();
+          const existingStart = region?.start ?? 0;
+          if (outPoint > existingStart) {
+            handleRegionChange(existingStart, outPoint);
+          }
+          break;
+        }
+
+        case 'Escape': {
+          // Clear region
+          playerRef.current?.clearRegions();
+          setRegion(null);
+          break;
+        }
       }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [currentTime, duration, volume]);
+  }, [currentTime, duration, volume, region, handleRegionChange]);
 
   // Playback handlers
   const handlePlayPause = useCallback(() => {
@@ -221,7 +264,7 @@ export function AudioEditingPage() {
         <div className="flex flex-col gap-2">
           <Heading level="h1">{session.audioFile.name}</Heading>
           <Text variant="body" color="secondary">
-            {t('layout.instructions')}
+            {t('audioEditing.instructions')}
           </Text>
         </div>
         <AudioStatusBadges totalDuration={duration} />
@@ -232,13 +275,14 @@ export function AudioEditingPage() {
         variant="dark"
         className="flex flex-col mb-6 border rounded-xl shadow-glass overflow-hidden"
       >
-        {/* Toolbar */}
-        <div
-          className="flex flex-wrap items-center justify-end gap-4 p-4 border-b border-border"
-        >
-          {/* Region Time Display */}
-          <RegionTimeDisplay startTime={region?.start ?? null} endTime={region?.end ?? null} />
-        </div>
+        {/* Waveform hint — shown only when no region is set */}
+        {!hasRegion && (
+          <div className="px-4 pt-3 pb-1">
+            <Text variant="small" color="tertiary">
+              {t('audioEditing.regionHint')}
+            </Text>
+          </div>
+        )}
 
         {/* Waveform Visualization */}
         <div className="p-6">
@@ -256,6 +300,15 @@ export function AudioEditingPage() {
         {/* Timeline Ruler */}
         <TimelineRuler duration={duration} />
 
+        {/* Trim Time Inputs — bidirectional sync with waveform region */}
+        <TrimTimeInputs
+          start={region?.start ?? null}
+          end={region?.end ?? null}
+          duration={duration}
+          onChange={handleRegionChange}
+          onClear={handleRegionClear}
+        />
+
         {/* Playback Controls */}
         <EnhancedPlaybackControls
           isPlaying={isPlaying}
@@ -271,89 +324,84 @@ export function AudioEditingPage() {
 
       {/* Action Buttons */}
       <div
-        className="flex flex-col sm:flex-row gap-4 border-t border-border pt-4"
+        className="flex flex-col sm:flex-row gap-4 border-t pt-4"
+        style={{ borderColor: 'var(--color-border)' }}
       >
         {hasRegion ? (
           <>
-            {/* Primary: Process Selection */}
-            <button
+            <Button
+              variant="primary"
               onClick={() => region && handleProcessSelection(region)}
-              className="flex-1 flex flex-col items-center justify-center py-4 px-6 rounded-xl bg-blue-500 hover:bg-blue-600 text-white shadow-lg transition-all transform active:scale-[0.99] group"
+              className="flex-1 flex flex-col items-center justify-center py-4 group"
             >
-              <span className="text-lg font-bold flex items-center gap-2">
-                Process Selection
-                <ArrowRight className="group-hover:translate-x-1 transition-transform" size={20} />
+              <span className="flex items-center gap-2">
+                {t('audioEditing.actions.processSelection')}
+                <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
               </span>
-              <span className="text-blue-100 text-sm font-medium opacity-90 mt-1">
-                Summarize {regionDuration} segment
+              <span className="text-xs font-normal mt-1 opacity-80">
+                {t('audioEditing.actions.processSelectionHint', { duration: regionDuration })}
               </span>
-            </button>
+            </Button>
 
-            {/* Secondary: Process Full Audio */}
-            <button
+            <Button
+              variant="ghost"
               onClick={handleProcessFullAudio}
-              className="flex-1 flex flex-col items-center justify-center py-4 px-6 rounded-xl border-2 transition-all transform active:scale-[0.99] bg-bg-secondary border-border text-text-primary hover:bg-bg-tertiary"
+              className="flex-1 flex flex-col items-center justify-center py-4"
             >
-              <span className="text-lg font-bold flex items-center gap-2">Process Full Audio</span>
-              <span
-                className="text-sm font-medium mt-1 text-text-secondary"
-              >
-                Transcribe all {formatTime(duration)}
+              <span>{t('audioEditing.actions.processFullAudio')}</span>
+              <span className="text-xs font-normal mt-1 opacity-60">
+                {t('audioEditing.actions.processFullAudioHint', { duration: formatTime(duration) })}
               </span>
-            </button>
+            </Button>
           </>
         ) : (
-          <>
-            {/* Primary: Process Full Audio (when no region) */}
-            <button
-              onClick={handleProcessFullAudio}
-              className="flex-1 flex flex-col items-center justify-center py-4 px-6 rounded-xl bg-blue-500 hover:bg-blue-600 text-white shadow-lg transition-all transform active:scale-[0.99] group"
-            >
-              <span className="text-lg font-bold flex items-center gap-2">
-                Process Full Audio
-                <ArrowRight className="group-hover:translate-x-1 transition-transform" size={20} />
-              </span>
-              <span className="text-blue-100 text-sm font-medium opacity-90 mt-1">
-                Transcribe all {formatTime(duration)}
-              </span>
-            </button>
-          </>
+          <Button
+            variant="primary"
+            onClick={handleProcessFullAudio}
+            className="flex-1 flex flex-col items-center justify-center py-4 group"
+          >
+            <span className="flex items-center gap-2">
+              {t('audioEditing.actions.processFullAudio')}
+              <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+            </span>
+            <span className="text-xs font-normal mt-1 opacity-80">
+              {t('audioEditing.actions.processFullAudioHint', { duration: formatTime(duration) })}
+            </span>
+          </Button>
         )}
       </div>
 
       {/* Keyboard Shortcuts Hint */}
-      <div className="text-center mt-4">
-        <Text variant="small" color="tertiary" className="opacity-60">
-          <span
-            className="font-mono px-1.5 py-0.5 rounded text-[10px] border"
-            style={{
-              backgroundColor: 'var(--color-bg-tertiary)',
-              borderColor: 'var(--color-border)',
-            }}
+      <div className="text-center mt-4 flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
+        {[
+          {
+            key: t('audioEditing.keyboardHint.space'),
+            label: t('audioEditing.keyboardHint.playPause'),
+          },
+          { key: '← →', label: t('audioEditing.keyboardHint.arrows') },
+          {
+            key: `${t('audioEditing.keyboardHint.iKey')} / ${t('audioEditing.keyboardHint.oKey')}`,
+            label: t('audioEditing.keyboardHint.setInOut'),
+          },
+        ].map(({ key, label }) => (
+          <Text
+            key={key}
+            variant="small"
+            color="tertiary"
+            className="opacity-60 flex items-center gap-1"
           >
-            {t('layout.keyboardShortcuts.space')}
-          </span>{' '}
-          {t('layout.keyboardShortcuts.playPause')} ·{' '}
-          <span
-            className="font-mono px-1.5 py-0.5 rounded text-[10px] border"
-            style={{
-              backgroundColor: 'var(--color-bg-tertiary)',
-              borderColor: 'var(--color-border)',
-            }}
-          >
-            ←
-          </span>{' '}
-          <span
-            className="font-mono px-1.5 py-0.5 rounded text-[10px] border"
-            style={{
-              backgroundColor: 'var(--color-bg-tertiary)',
-              borderColor: 'var(--color-border)',
-            }}
-          >
-            →
-          </span>{' '}
-          {t('layout.keyboardShortcuts.arrows')}
-        </Text>
+            <kbd
+              className="font-mono px-1.5 py-0.5 rounded text-[10px] border"
+              style={{
+                backgroundColor: 'var(--color-bg-tertiary)',
+                borderColor: 'var(--color-border)',
+              }}
+            >
+              {key}
+            </kbd>
+            {label}
+          </Text>
+        ))}
       </div>
     </PageLayout>
   );

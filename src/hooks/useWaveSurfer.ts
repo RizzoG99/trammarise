@@ -163,7 +163,7 @@ export const useWaveSurfer = (
       regionsPluginRef.current.addRegion({
         start: duration * 0.1,
         end: duration * 0.9,
-        color: 'rgba(139, 92, 246, 0.3)',
+        color: 'rgba(59, 130, 246, 0.15)',
         drag: true,
         resize: true,
       });
@@ -209,7 +209,7 @@ export const useWaveSurfer = (
 
     // Enable drag selection on the waveform
     regionsPluginRef.current.enableDragSelection({
-      color: 'rgba(139, 92, 246, 0.3)',
+      color: 'rgba(59, 130, 246, 0.15)',
     });
   }, []);
 

@@ -354,14 +354,38 @@
       "redo": "Rehacer",
       "reset": "Restablecer"
     },
+    "pageTitle": "Recortar audio",
+    "instructions": "Arrastra en la forma de onda para seleccionar un segmento, o escribe los tiempos de inicio y fin.",
+    "trimButtonLabel": "Recortar audio",
+    "trimButtonHint": "Seleccionar un segmento específico",
+    "regionHint": "Arrastra en la forma de onda o escribe los tiempos",
+    "startLabel": "Inicio",
+    "endLabel": "Fin",
+    "durationLabel": "Duración",
+    "clearRegion": "Limpiar selección",
     "actions": {
       "processSelection": "Procesar Selección",
-      "processFullAudio": "Procesar Audio Completo"
+      "processSelectionHint": "Transcribir segmento de {{duration}}",
+      "processFullAudio": "Procesar Audio Completo",
+      "processFullAudioHint": "Transcribir todo {{duration}}"
     },
     "timeDisplay": {
       "start": "Inicio",
       "end": "Fin",
       "placeholder": "--:--"
+    },
+    "keyboardHint": {
+      "space": "Espacio",
+      "playPause": "reproducir / pausar",
+      "arrows": "buscar ±5s",
+      "iKey": "I",
+      "oKey": "O",
+      "setInOut": "establecer punto de entrada / salida"
+    },
+    "timeInput": {
+      "invalidFormat": "Usar formato M:SS",
+      "startAfterEnd": "El inicio debe ser antes del fin",
+      "endBeforeStart": "El fin debe ser después del inicio"
     }
   },
   "fileSizeWarning": {

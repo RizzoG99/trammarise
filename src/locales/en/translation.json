@@ -353,14 +353,38 @@
       "redo": "Redo",
       "reset": "Reset"
     },
+    "pageTitle": "Trim Audio",
+    "instructions": "Drag on the waveform to select a segment, or type start and end times below.",
+    "trimButtonLabel": "Trim audio",
+    "trimButtonHint": "Select a specific segment",
+    "regionHint": "Drag on the waveform to select a segment, or type start and end times",
+    "startLabel": "Start",
+    "endLabel": "End",
+    "durationLabel": "Duration",
+    "clearRegion": "Clear selection",
     "actions": {
       "processSelection": "Process Selection",
-      "processFullAudio": "Process Full Audio"
+      "processSelectionHint": "Transcribe {{duration}} segment",
+      "processFullAudio": "Process Full Audio",
+      "processFullAudioHint": "Transcribe all {{duration}}"
     },
     "timeDisplay": {
       "start": "Start",
       "end": "End",
       "placeholder": "--:--"
+    },
+    "keyboardHint": {
+      "space": "Space",
+      "playPause": "play / pause",
+      "arrows": "seek ±5s",
+      "iKey": "I",
+      "oKey": "O",
+      "setInOut": "set in / out point"
+    },
+    "timeInput": {
+      "invalidFormat": "Use M:SS format",
+      "startAfterEnd": "Start must be before end",
+      "endBeforeStart": "End must be after start"
     }
   },
   "fileSizeWarning": {

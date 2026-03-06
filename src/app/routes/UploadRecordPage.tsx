@@ -112,7 +112,49 @@ export function UploadRecordPage() {
         subscription?.tier
       );
 
-      // Navigate ONLY after successful save
+      // Navigate ONLY after successful save — skip audio editing, go straight to processing
+      const path = buildRoutePath(ROUTES.PROCESSING, { sessionId });
+      navigate(path);
+    } catch (error) {
+      console.error('Failed to save session:', error);
+      setProcessingError(t('home.processingError', 'Failed to save session. Please try again.'));
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleTrimFirst = async () => {
+    if (!audioFile) return;
+
+    setProcessingError(null);
+    setIsProcessing(true);
+
+    try {
+      const sessionId = generateSessionId();
+      await saveSession(
+        sessionId,
+        {
+          audioFile: {
+            name: audioFile instanceof File ? audioFile.name : 'recording.webm',
+            blob: audioFile,
+            file:
+              audioFile instanceof File
+                ? audioFile
+                : new File([audioFile], 'recording.webm', { type: 'audio/webm' }),
+          },
+          contextFiles,
+          language,
+          contentType,
+          processingMode,
+          noiseProfile,
+          enableSpeakerDiarization,
+          speakersExpected,
+          sessionId,
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+        },
+        subscription?.tier
+      );
       const path = buildRoutePath(ROUTES.AUDIO, { sessionId });
       navigate(path);
     } catch (error) {
@@ -211,12 +253,28 @@ export function UploadRecordPage() {
       </GlassCard>
 
       {/* Process Audio Button — elevated, full-width, outside config card */}
-      <div className="mb-8">
+      <div className="mb-8 flex flex-col gap-3">
         <ProcessAudioButton
           disabled={!audioFile || isProcessing}
           onProcess={handleProcessAudio}
           isLoading={isProcessing}
         />
+        {audioFile && !isProcessing && (
+          <button
+            type="button"
+            onClick={handleTrimFirst}
+            className="text-sm cursor-pointer transition-colors duration-150 self-center"
+            style={{ color: 'var(--color-text-tertiary)' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = 'var(--color-primary)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = 'var(--color-text-tertiary)';
+            }}
+          >
+            {t('audioEditing.trimButtonLabel')} →
+          </button>
+        )}
       </div>
 
       <UpgradeModal

@@ -354,14 +354,38 @@
       "redo": "Ripeti",
       "reset": "Reimposta"
     },
+    "pageTitle": "Taglia audio",
+    "instructions": "Trascina sulla forma d'onda per selezionare un segmento, o digita i tempi di inizio e fine.",
+    "trimButtonLabel": "Taglia audio",
+    "trimButtonHint": "Seleziona un segmento specifico",
+    "regionHint": "Trascina sulla forma d'onda per selezionare un segmento, o digita i tempi",
+    "startLabel": "Inizio",
+    "endLabel": "Fine",
+    "durationLabel": "Durata",
+    "clearRegion": "Cancella selezione",
     "actions": {
       "processSelection": "Elabora Selezione",
-      "processFullAudio": "Elabora Audio Completo"
+      "processSelectionHint": "Trascrivi segmento di {{duration}}",
+      "processFullAudio": "Elabora Audio Completo",
+      "processFullAudioHint": "Trascrivi tutto {{duration}}"
     },
     "timeDisplay": {
       "start": "Inizio",
       "end": "Fine",
       "placeholder": "--:--"
+    },
+    "keyboardHint": {
+      "space": "Spazio",
+      "playPause": "play / pausa",
+      "arrows": "avanza ±5s",
+      "iKey": "I",
+      "oKey": "O",
+      "setInOut": "imposta punto in / out"
+    },
+    "timeInput": {
+      "invalidFormat": "Usa il formato M:SS",
+      "startAfterEnd": "L'inizio deve essere prima della fine",
+      "endBeforeStart": "La fine deve essere dopo l'inizio"
     }
   },
   "fileSizeWarning": {

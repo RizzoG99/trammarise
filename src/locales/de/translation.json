@@ -354,14 +354,38 @@
       "redo": "Wiederholen",
       "reset": "Zurücksetzen"
     },
+    "pageTitle": "Audio zuschneiden",
+    "instructions": "Ziehen Sie auf der Wellenform, um ein Segment auszuwählen, oder geben Sie Start- und Endzeiten ein.",
+    "trimButtonLabel": "Audio zuschneiden",
+    "trimButtonHint": "Bestimmtes Segment auswählen",
+    "regionHint": "Ziehen Sie auf der Wellenform oder geben Sie Zeiten ein",
+    "startLabel": "Start",
+    "endLabel": "Ende",
+    "durationLabel": "Dauer",
+    "clearRegion": "Auswahl löschen",
     "actions": {
       "processSelection": "Auswahl Verarbeiten",
-      "processFullAudio": "Gesamtes Audio Verarbeiten"
+      "processSelectionHint": "{{duration}} Segment transkribieren",
+      "processFullAudio": "Gesamtes Audio Verarbeiten",
+      "processFullAudioHint": "Alles {{duration}} transkribieren"
     },
     "timeDisplay": {
       "start": "Start",
       "end": "Ende",
       "placeholder": "--:--"
+    },
+    "keyboardHint": {
+      "space": "Leertaste",
+      "playPause": "abspielen / pausieren",
+      "arrows": "suchen ±5s",
+      "iKey": "I",
+      "oKey": "O",
+      "setInOut": "In / Out-Punkt setzen"
+    },
+    "timeInput": {
+      "invalidFormat": "M:SS Format verwenden",
+      "startAfterEnd": "Start muss vor dem Ende liegen",
+      "endBeforeStart": "Ende muss nach dem Start liegen"
     }
   },
   "fileSizeWarning": {
