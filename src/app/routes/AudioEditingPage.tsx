@@ -32,24 +32,35 @@ export function AudioEditingPage() {
   const [volume, setVolume] = useState(0.75);
   const playerRef = useRef<WaveformPlayerRef | null>(null);
 
-  // Setup region selection when WaveSurfer player is ready
+  // Setup region events + drag selection when WaveSurfer player is ready
   const handleWaveSurferReady = useCallback((player: WaveformPlayerRef) => {
     playerRef.current = player;
-
-    // Enable drag selection on the waveform
-    player.enableRegionSelection();
 
     const regionsPlugin = player.regions;
     if (!regionsPlugin) return;
 
-    const syncRegion = () => {
-      const activeRegion = playerRef.current?.getActiveRegion();
-      setRegion(activeRegion ?? null);
-    };
+    // Enable built-in drag-to-select (works because dragToSeek:false prevents pointer conflicts)
+    regionsPlugin.enableDragSelection({ color: 'rgba(59, 130, 246, 0.15)' });
 
-    regionsPlugin.on('region-created', syncRegion);
-    regionsPlugin.on('region-updated', syncRegion);
-    regionsPlugin.on('region-removed', () => setRegion(null));
+    // When a new region is created by drag, keep only the latest one
+    regionsPlugin.on('region-created', (newRegion) => {
+      regionsPlugin
+        .getRegions()
+        .filter((r) => r !== newRegion)
+        .forEach((r) => r.remove());
+      newRegion.setOptions({ drag: true, resize: true });
+      setRegion({ start: newRegion.start, end: newRegion.end });
+    });
+
+    // Sync region state when WaveSurfer regions change (drag/resize of existing region)
+    regionsPlugin.on('region-updated', () => {
+      const r = regionsPlugin.getRegions()[0] ?? null;
+      setRegion(r ? { start: r.start, end: r.end } : null);
+    });
+
+    regionsPlugin.on('region-removed', () => {
+      if (regionsPlugin.getRegions().length === 0) setRegion(null);
+    });
   }, []);
 
   const handleRegionChange = useCallback((start: number, end: number) => {
@@ -285,7 +296,7 @@ export function AudioEditingPage() {
         )}
 
         {/* Waveform Visualization */}
-        <div className="p-6">
+        <div className="p-6" style={{ cursor: 'crosshair' }}>
           <WaveformPlayer
             audioFile={session.audioFile.blob}
             onWaveSurferReady={handleWaveSurferReady}
@@ -294,6 +305,7 @@ export function AudioEditingPage() {
               setCurrentTime(time);
               setDuration(dur);
             }}
+            dragToSeek={false}
           />
         </div>
 
