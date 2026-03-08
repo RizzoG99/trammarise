@@ -344,40 +344,43 @@ export function AudioEditingPage() {
             <Button
               variant="primary"
               onClick={() => region && handleProcessSelection(region)}
-              className="flex-1 flex flex-col items-center justify-center py-4 group"
+              className="flex-1 py-4 group"
             >
-              <span className="flex items-center gap-2">
-                {t('audioEditing.actions.processSelection')}
-                <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-              </span>
-              <span className="text-xs font-normal mt-1 opacity-80">
-                {t('audioEditing.actions.processSelectionHint', { duration: regionDuration })}
+              <span className="flex flex-col items-center gap-0.5">
+                <span className="flex items-center gap-2">
+                  {t('audioEditing.actions.processSelection')}
+                  <ArrowRight
+                    size={18}
+                    className="group-hover:translate-x-1 transition-transform"
+                  />
+                </span>
+                <span className="text-xs font-normal opacity-80 whitespace-nowrap">
+                  {t('audioEditing.actions.processSelectionHint', { duration: regionDuration })}
+                </span>
               </span>
             </Button>
 
-            <Button
-              variant="ghost"
-              onClick={handleProcessFullAudio}
-              className="flex-1 flex flex-col items-center justify-center py-4"
-            >
-              <span>{t('audioEditing.actions.processFullAudio')}</span>
-              <span className="text-xs font-normal mt-1 opacity-60">
-                {t('audioEditing.actions.processFullAudioHint', { duration: formatTime(duration) })}
+            <Button variant="ghost" onClick={handleProcessFullAudio} className="flex-1 py-4">
+              <span className="flex flex-col items-center gap-0.5">
+                <span>{t('audioEditing.actions.processFullAudio')}</span>
+                <span className="text-xs font-normal opacity-60 whitespace-nowrap">
+                  {t('audioEditing.actions.processFullAudioHint', {
+                    duration: formatTime(duration),
+                  })}
+                </span>
               </span>
             </Button>
           </>
         ) : (
-          <Button
-            variant="primary"
-            onClick={handleProcessFullAudio}
-            className="flex-1 flex flex-col items-center justify-center py-4 group"
-          >
-            <span className="flex items-center gap-2">
-              {t('audioEditing.actions.processFullAudio')}
-              <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-            </span>
-            <span className="text-xs font-normal mt-1 opacity-80">
-              {t('audioEditing.actions.processFullAudioHint', { duration: formatTime(duration) })}
+          <Button variant="primary" onClick={handleProcessFullAudio} className="flex-1 py-4 group">
+            <span className="flex flex-col items-center gap-0.5">
+              <span className="flex items-center gap-2">
+                {t('audioEditing.actions.processFullAudio')}
+                <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+              </span>
+              <span className="text-xs font-normal opacity-80 whitespace-nowrap">
+                {t('audioEditing.actions.processFullAudioHint', { duration: formatTime(duration) })}
+              </span>
             </span>
           </Button>
         )}

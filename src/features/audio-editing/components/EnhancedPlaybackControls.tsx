@@ -1,5 +1,6 @@
-import { Play, Pause, SkipBack, SkipForward, Volume2 } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { VolumeControl } from '@/lib';
 
 interface EnhancedPlaybackControlsProps {
   isPlaying: boolean;
@@ -109,33 +110,8 @@ export function EnhancedPlaybackControls({
       </div>
 
       {/* Volume Control */}
-      <div className="hidden md:flex items-center justify-end gap-2 w-1/4 group">
-        <div className="p-1.5" aria-hidden="true" style={{ color: 'var(--color-text-secondary)' }}>
-          <Volume2 size={20} />
-        </div>
-        <div
-          className="w-24 h-1 rounded-full overflow-hidden cursor-pointer relative"
-          style={{ backgroundColor: 'var(--color-bg-tertiary)' }}
-        >
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            value={volume}
-            onChange={(e) => onVolumeChange(parseFloat(e.target.value))}
-            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-            aria-label={t('playback.aria.volumeSlider')}
-          />
-          <div
-            className="h-full transition-colors duration-150 group-hover:opacity-100"
-            style={{
-              backgroundColor: 'var(--color-primary)',
-              width: `${volume * 100}%`,
-              opacity: 0.6,
-            }}
-          />
-        </div>
+      <div className="hidden md:flex items-center justify-end w-1/4">
+        <VolumeControl volume={volume} onChange={onVolumeChange} />
       </div>
     </div>
   );

@@ -13,3 +13,7 @@ export type { WaveformPlayerRef } from './WaveformPlayer';
 
 // WaveformEditorWithUndo (example component for Command Pattern)
 export { WaveformEditorWithUndo } from './WaveformEditorWithUndo';
+
+// VolumeControl
+export { VolumeControl } from './VolumeControl';
+export type { VolumeControlProps } from './VolumeControl';

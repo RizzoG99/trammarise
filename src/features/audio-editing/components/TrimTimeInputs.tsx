@@ -1,5 +1,6 @@
 import { useState, useId } from 'react';
 import { useTranslation } from 'react-i18next';
+import { X } from 'lucide-react';
 import { formatTime } from '../../../utils/audio';
 
 export interface TrimTimeInputsProps {
@@ -85,7 +86,7 @@ export function TrimTimeInputs({ start, end, duration, onChange, onClear }: Trim
 
   return (
     <div
-      className="flex flex-wrap items-end gap-4 px-4 py-3 border-t"
+      className="flex flex-wrap items-center gap-4 px-4 py-4 border-t"
       style={{ borderColor: 'var(--color-border)' }}
     >
       {/* Start input */}
@@ -118,16 +119,20 @@ export function TrimTimeInputs({ start, end, duration, onChange, onClear }: Trim
             borderColor: startError ? 'var(--color-accent-error)' : 'var(--color-border)',
           }}
         />
-        {startError && (
-          <span className="text-xs" style={{ color: 'var(--color-accent-error)' }}>
-            {startError}
-          </span>
-        )}
+        <span
+          className="text-xs"
+          style={{
+            color: 'var(--color-accent-error)',
+            visibility: startError ? 'visible' : 'hidden',
+          }}
+        >
+          {startError || '\u00A0'}
+        </span>
       </div>
 
       {/* Separator */}
       <span
-        className="mb-2 text-sm select-none"
+        className="text-sm select-none"
         style={{ color: 'var(--color-text-tertiary)' }}
         aria-hidden="true"
       >
@@ -164,39 +169,50 @@ export function TrimTimeInputs({ start, end, duration, onChange, onClear }: Trim
             borderColor: endError ? 'var(--color-accent-error)' : 'var(--color-border)',
           }}
         />
-        {endError && (
-          <span className="text-xs" style={{ color: 'var(--color-accent-error)' }}>
-            {endError}
-          </span>
-        )}
+        <span
+          className="text-xs"
+          style={{
+            color: 'var(--color-accent-error)',
+            visibility: endError ? 'visible' : 'hidden',
+          }}
+        >
+          {endError || '\u00A0'}
+        </span>
       </div>
 
       {/* Duration display */}
       {hasRegion && regionDuration !== null && (
-        <div
-          className="flex flex-col gap-1 mb-0.5"
-          style={{ color: 'var(--color-text-secondary)' }}
-        >
+        <div className="flex flex-col gap-1" style={{ color: 'var(--color-text-secondary)' }}>
           <span className="text-xs font-medium">{t('audioEditing.durationLabel')}</span>
           <span className="text-sm font-mono font-medium">{formatTime(regionDuration)}</span>
         </div>
       )}
 
-      {/* Clear region */}
+      {/* Clear region — ghost pill, pushed to far right */}
       {hasRegion && (
         <button
           type="button"
           onClick={onClear}
           aria-label={t('audioEditing.clearRegion')}
-          className="mb-0.5 text-xs cursor-pointer transition-colors duration-150"
-          style={{ color: 'var(--color-text-tertiary)' }}
+          className={[
+            'ml-auto flex items-center gap-1.5',
+            'text-xs font-medium px-2.5 py-1 rounded-full border',
+            'cursor-pointer transition-colors duration-150',
+          ].join(' ')}
+          style={{
+            color: 'var(--color-text-tertiary)',
+            borderColor: 'var(--color-border)',
+          }}
           onMouseEnter={(e) => {
             e.currentTarget.style.color = 'var(--color-accent-error)';
+            e.currentTarget.style.borderColor = 'var(--color-accent-error)';
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.color = 'var(--color-text-tertiary)';
+            e.currentTarget.style.borderColor = 'var(--color-border)';
           }}
         >
+          <X size={12} strokeWidth={2.5} />
           {t('audioEditing.clearRegion')}
         </button>
       )}
