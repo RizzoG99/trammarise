@@ -12,7 +12,7 @@ import {
   Zap,
   AlertCircle,
 } from 'lucide-react';
-import { fetchWithAuth } from '@/utils/api';
+import { fetchWithAuth } from '@/utils/fetch-with-auth';
 import { getApiConfig } from '@/utils/session-storage';
 import { ROUTES } from '@/types/routing';
 
@@ -34,8 +34,9 @@ export function FreePlanPanel() {
   const hasApiKey = getApiConfig() !== null;
 
   useEffect(() => {
-    fetchWithAuth<UsageCurrentResponse>('/api/usage/current', getToken)
-      .then((data) => setEventCount(data.eventCount))
+    fetchWithAuth(getToken, '/api/usage/current')
+      .then((r) => r.json() as Promise<UsageCurrentResponse>)
+      .then((data: UsageCurrentResponse) => setEventCount(data.eventCount))
       .catch(() => setEventCount(0));
   }, [getToken]);
 

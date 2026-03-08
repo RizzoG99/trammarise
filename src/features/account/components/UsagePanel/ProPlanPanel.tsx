@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '@clerk/react';
 import { Zap, ChevronRight, AlertTriangle, XCircle } from 'lucide-react';
 import type { Subscription, SubscriptionStatus } from '@/context/subscription-types';
-import { fetchWithAuth } from '@/utils/api';
+import { fetchWithAuth } from '@/utils/fetch-with-auth';
 import { ROUTES } from '@/types/routing';
 
 interface Props {
@@ -70,8 +70,9 @@ export function ProPlanPanel({ subscription }: Props) {
   const formattedDate = formatDate(currentPeriodEnd);
 
   useEffect(() => {
-    fetchWithAuth<UsageCurrentResponse>('/api/usage/current', getToken)
-      .then((data) => setEventCount(data.eventCount))
+    fetchWithAuth(getToken, '/api/usage/current')
+      .then((r) => r.json() as Promise<UsageCurrentResponse>)
+      .then((data: UsageCurrentResponse) => setEventCount(data.eventCount))
       .catch(() => setEventCount(0));
   }, [getToken]);
 

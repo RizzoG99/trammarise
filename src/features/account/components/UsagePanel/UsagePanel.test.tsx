@@ -15,7 +15,7 @@ const mockUseAuth = vi.fn(() => ({ getToken: vi.fn().mockResolvedValue('mock-tok
 vi.mock('@clerk/react', () => ({ useAuth: () => mockUseAuth() }));
 
 const mockFetchWithAuth = vi.fn();
-vi.mock('@/utils/api', () => ({
+vi.mock('@/utils/fetch-with-auth', () => ({
   fetchWithAuth: (...args: unknown[]) => mockFetchWithAuth(...args),
 }));
 
@@ -71,7 +71,7 @@ describe('UsagePanel', () => {
       openaiKey: 'sk-test',
       timestamp: Date.now(),
     });
-    mockFetchWithAuth.mockResolvedValue(makeUsageResponse());
+    mockFetchWithAuth.mockResolvedValue({ json: () => Promise.resolve(makeUsageResponse()) });
   });
 
   describe('loading state', () => {
@@ -110,7 +110,9 @@ describe('UsagePanel', () => {
     });
 
     it('shows transcription count from API', async () => {
-      mockFetchWithAuth.mockResolvedValue(makeUsageResponse({ eventCount: 7 }));
+      mockFetchWithAuth.mockResolvedValue({
+        json: () => Promise.resolve(makeUsageResponse({ eventCount: 7 })),
+      });
       renderPanel();
       expect(await screen.findByText('7')).toBeInTheDocument();
     });
@@ -160,7 +162,9 @@ describe('UsagePanel', () => {
         isLoading: false,
         error: null,
       });
-      mockFetchWithAuth.mockResolvedValue(makeUsageResponse({ eventCount: 12, tier: 'pro' }));
+      mockFetchWithAuth.mockResolvedValue({
+        json: () => Promise.resolve(makeUsageResponse({ eventCount: 12, tier: 'pro' })),
+      });
     });
 
     it('renders the pro plan badge', async () => {
