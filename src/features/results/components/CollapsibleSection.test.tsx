@@ -249,29 +249,29 @@ describe('CollapsibleSection', () => {
       );
       const contentWrapper = container.querySelector('div[aria-hidden="true"]');
       expect(contentWrapper).toBeInTheDocument();
-      expect((contentWrapper as HTMLElement).style.transition).toContain('grid-template-rows');
+      expect((contentWrapper as HTMLElement).style.transition).toContain('height');
     });
 
-    it('uses CSS grid to animate height without limiting content size', () => {
+    it('animates height between 0 and measured content height', () => {
       const { container, rerender } = render(
         <CollapsibleSection title="Section" isExpanded={false} onToggle={mockOnToggle}>
           <div>Content</div>
         </CollapsibleSection>
       );
-      // Collapsed: grid-template-rows is 0fr
+      // Collapsed: height is 0
       const contentWrapper = container.querySelector('div[aria-hidden="true"]');
       expect(contentWrapper).toBeInTheDocument();
-      expect((contentWrapper as HTMLElement).style.gridTemplateRows).toBe('0fr');
+      expect((contentWrapper as HTMLElement).style.height).toBe('0px');
 
       rerender(
         <CollapsibleSection title="Section" isExpanded={true} onToggle={mockOnToggle}>
           <div>Content</div>
         </CollapsibleSection>
       );
-      // Expanded: grid-template-rows is 1fr — content can grow to natural height
+      // Expanded: height is the measured scrollHeight (non-zero in real browser; 0 in jsdom)
       const expandedWrapper = container.querySelector('div[aria-hidden="false"]');
       expect(expandedWrapper).toBeInTheDocument();
-      expect((expandedWrapper as HTMLElement).style.gridTemplateRows).toBe('1fr');
+      expect((expandedWrapper as HTMLElement).style.overflow).toBe('hidden');
     });
   });
 
@@ -293,7 +293,7 @@ describe('CollapsibleSection', () => {
         </CollapsibleSection>
       );
       const title = screen.getByText('Section');
-      expect(title).toHaveClass('text-text-primary');
+      expect(title).toHaveClass('text-text-secondary');
     });
 
     it('applies border when expanded', () => {
@@ -323,7 +323,7 @@ describe('CollapsibleSection', () => {
         </CollapsibleSection>
       );
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('hover:bg-surface-hover');
+      expect(button).toHaveClass('hover:bg-bg-surface-hover');
     });
 
     it('has focus ring styles', () => {
@@ -333,7 +333,7 @@ describe('CollapsibleSection', () => {
         </CollapsibleSection>
       );
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('focus:ring-2', 'focus:ring-primary');
+      expect(button).toHaveClass('focus:ring-2', 'focus:ring-primary/40');
     });
   });
 

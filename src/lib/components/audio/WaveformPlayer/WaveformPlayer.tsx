@@ -88,5 +88,11 @@ export const WaveformPlayer: React.FC<WaveformPlayerProps> = ({
     }
   }, [currentTime, duration, onTimeUpdate]);
 
-  return <div ref={containerRef} className="min-h-[128px] md:min-h-[160px]" />;
+  return (
+    <div
+      ref={containerRef}
+      className="min-h-[128px] md:min-h-[160px] touch-none select-none"
+      style={{ overscrollBehavior: 'none' }}
+    />
+  );
 };

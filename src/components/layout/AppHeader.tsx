@@ -2,7 +2,7 @@ import { FileDown, AudioWaveform } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SignInButton, useUser } from '@clerk/react';
-import { ThemeToggle, Button, Input } from '@/lib';
+import { ThemeToggle, Button } from '@/lib';
 import { useTheme } from '../../hooks/useTheme';
 import { LanguageSwitcher } from '../../features/i18n/components/LanguageSwitcher';
 import { CustomUserMenu } from '../../features/user-menu';
@@ -49,30 +49,28 @@ export function AppHeader() {
               </h1>
             </Link>
 
-            {/* File Name (Results Page Only - presence of onExport implies "Results Mode" or similar context) */}
+            {/* File Name (Results Page Only) */}
             {onExport && (
-              <div className="flex flex-col">
-                <div className="flex items-center gap-2">
-                  <Input
-                    value={editValue}
-                    onChange={(e) => setEditValue(e.target.value)}
-                    onBlur={handleBlur}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        e.currentTarget.blur();
-                      }
-                    }}
-                    placeholder="Enter file name..."
-                    className="w-[300px]"
-                    error={!editValue.trim() ? 'File name is required' : undefined}
-                  />
-                  <span className="text-sm text-text-secondary">.pdf</span>
-                </div>
-                <div className="h-4">
-                  {!editValue.trim() && (
-                    <span className="text-xs text-accent-error">File name is required</span>
-                  )}
-                </div>
+              <div className="flex items-center gap-1.5">
+                <input
+                  type="text"
+                  value={editValue}
+                  onChange={(e) => setEditValue(e.target.value)}
+                  onBlur={handleBlur}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') e.currentTarget.blur();
+                  }}
+                  placeholder={t('header.fileNamePlaceholder', 'Document name…')}
+                  aria-label={t('header.fileNameLabel', 'PDF file name')}
+                  className={`
+                    w-44 lg:w-60 px-3 py-1.5 rounded-lg text-sm
+                    bg-bg-surface border transition-colors
+                    text-text-primary placeholder:text-text-tertiary
+                    focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary
+                    ${!editValue.trim() ? 'border-accent-error' : 'border-border hover:border-primary/50'}
+                  `}
+                />
+                <span className="text-sm text-text-tertiary font-mono select-none">.pdf</span>
               </div>
             )}
           </div>
@@ -101,10 +99,9 @@ export function AppHeader() {
             {/* Export Button (Results Page Only) */}
             {onExport && (
               <Button
-                variant="outline"
+                variant="primary"
                 icon={<FileDown className="w-4 h-4" />}
                 onClick={onExport}
-                className="flex items-center gap-2"
                 disabled={!editValue.trim()}
               >
                 {t('header.export')}

@@ -54,16 +54,16 @@ export const AudioPlayerBar = memo(function AudioPlayerBar({
   const { state, togglePlayPause, skipBy, cycleSpeed } = audioPlayer;
 
   return (
-    <div className="w-full bg-[var(--color-surface)] border-b border-[var(--color-border)] shadow-md">
+    <div className="w-full bg-bg-glass backdrop-blur-md border-b border-border shadow-[0_4px_24px_rgba(0,0,0,0.12)]">
       <div className="max-w-[1400px] mx-auto px-6 py-4">
         {/* File Name */}
-        <div className="text-xs text-[var(--color-text-tertiary)] mb-2 text-center">
+        <div className="text-xs text-text-tertiary mb-3 text-center tracking-wide uppercase font-medium">
           {audioFile.name}
         </div>
 
         {/* Waveform Visualization */}
-        <div className="flex-col mb-6 border rounded-xl shadow-lg overflow-hidden">
-          <div className="p-6">
+        <div className="mb-5 rounded-xl overflow-hidden border border-border/60 bg-bg-surface shadow-inner">
+          <div className="px-4 py-3">
             <WaveformPlayer audioFile={audioFile.blob} onTimeUpdate={onTimeUpdate} />
           </div>
         </div>
