@@ -77,8 +77,10 @@ export function FilePreview({ file, onRemove, onReplace }: FilePreviewProps) {
         </div>
       </div>
 
-      {/* Audio Preview Player */}
-      <MiniAudioPlayer file={file} className="mt-3" />
+      {/* Audio Preview Player — hidden on mobile where AudioPreviewBar (above tabs) handles it */}
+      <div className="hidden lg:block">
+        <MiniAudioPlayer file={file} className="mt-3" />
+      </div>
 
       {/* Action Buttons */}
       <div className="flex gap-3 mt-3">
