@@ -222,7 +222,6 @@ export const useWaveSurfer = (
 
     // Note: WaveSurfer doesn't have a direct disable method
     // Regions are cleared and AudioEditingPage manages when selection is active
-    console.log('[useWaveSurfer] Region selection disabled, all regions cleared');
   }, []);
 
   const getActiveRegion = useCallback(() => {
