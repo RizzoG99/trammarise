@@ -1,5 +1,4 @@
-import { FileDown, AudioWaveform } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { AudioWaveform } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { SignInButton, useUser } from '@clerk/react';
 import { ThemeToggle, Button } from '@/lib';
@@ -8,30 +7,11 @@ import { LanguageSwitcher } from '../../features/i18n/components/LanguageSwitche
 import { CustomUserMenu } from '../../features/user-menu';
 import { Link, NavLink } from 'react-router-dom';
 import { ROUTES } from '@/types/routing';
-import { useHeader } from '../../hooks/useHeader';
 
 export function AppHeader() {
   const { t } = useTranslation();
   const { theme, setTheme } = useTheme();
   const { isSignedIn } = useUser();
-  // Consume global header context
-  const { fileName, setFileName, onExport } = useHeader();
-
-  // Local state for input field to avoid jitter, syncs with context on blur/enter or debounce could be used
-  const [editValue, setEditValue] = useState(fileName);
-
-  // Sync local state when context changes (e.g. initial load)
-  useEffect(() => {
-    setEditValue(fileName);
-  }, [fileName]);
-
-  const handleBlur = () => {
-    if (editValue.trim()) {
-      setFileName(editValue.trim());
-    } else {
-      setEditValue(fileName); // Revert if empty
-    }
-  };
 
   return (
     <header className="sticky top-0 z-50 w-full bg-bg-glass backdrop-blur-md border-b border-border">
@@ -48,31 +28,6 @@ export function AppHeader() {
                 Trammarise
               </h1>
             </Link>
-
-            {/* File Name (Results Page Only) */}
-            {onExport && (
-              <div className="flex items-center gap-1.5">
-                <input
-                  type="text"
-                  value={editValue}
-                  onChange={(e) => setEditValue(e.target.value)}
-                  onBlur={handleBlur}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') e.currentTarget.blur();
-                  }}
-                  placeholder={t('header.fileNamePlaceholder', 'Document name…')}
-                  aria-label={t('header.fileNameLabel', 'PDF file name')}
-                  className={`
-                    w-44 lg:w-60 px-3 py-1.5 rounded-lg text-sm
-                    bg-bg-surface border transition-colors
-                    text-text-primary placeholder:text-text-tertiary
-                    focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary
-                    ${!editValue.trim() ? 'border-accent-error' : 'border-border hover:border-primary/50'}
-                  `}
-                />
-                <span className="text-sm text-text-tertiary font-mono select-none">.pdf</span>
-              </div>
-            )}
           </div>
 
           {/* Center Section: Navigation - Only show when authenticated */}
@@ -96,18 +51,6 @@ export function AppHeader() {
 
           {/* Right Section */}
           <div className="flex items-center gap-3">
-            {/* Export Button (Results Page Only) */}
-            {onExport && (
-              <Button
-                variant="primary"
-                icon={<FileDown className="w-4 h-4" />}
-                onClick={onExport}
-                disabled={!editValue.trim()}
-              >
-                {t('header.export')}
-              </Button>
-            )}
-
             {/* Language Switcher */}
             <LanguageSwitcher />
 

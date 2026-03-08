@@ -20,42 +20,28 @@ export function FloatingChatButton({
 
   return (
     <div className="fixed bottom-6 right-6 z-50">
-      <button
-        onClick={onClick}
-        className="
-          relative
-          p-4 rounded-full
-          bg-[var(--color-primary)] text-white
-          shadow-2xl shadow-black/50
-          hover:shadow-2xl hover:shadow-primary/60
-          hover:scale-110
-          transition-all duration-[var(--transition-normal)]
-          group
-          border-2 border-white/20
-        "
-      >
-        <MessageSquare className="w-6 h-6" />
-
-        {/* Badge for new messages */}
-        {hasNewMessages && (
-          <span className="absolute -top-1 -right-1 w-3 h-3 bg-accent-error rounded-full animate-pulse" />
-        )}
-
-        {/* Tooltip */}
-        <span
+      <div className="relative group">
+        <button
+          onClick={onClick}
           className="
-          absolute bottom-full right-0 mb-2
-          px-3 py-1 rounded-lg
-          bg-[var(--color-bg-secondary)] border border-border
-          text-sm text-text-primary whitespace-nowrap
-          opacity-0 group-hover:opacity-100
-          transition-opacity duration-[var(--transition-fast)]
-          pointer-events-none
-        "
+            relative flex items-center gap-2
+            px-4 py-2.5 rounded-xl
+            bg-primary text-white text-sm font-medium
+            shadow-lg shadow-primary/20
+            hover:bg-primary-hover hover:shadow-xl hover:shadow-primary/30
+            transition-all duration-200
+            border border-white/10
+            cursor-pointer
+          "
         >
-          {t('results.chat.floatingButtonTooltip')}
-        </span>
-      </button>
+          <MessageSquare className="w-4 h-4" />
+          <span>{t('results.chat.floatingButtonTooltip')}</span>
+
+          {hasNewMessages && (
+            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-accent-error rounded-full" />
+          )}
+        </button>
+      </div>
     </div>
   );
 }

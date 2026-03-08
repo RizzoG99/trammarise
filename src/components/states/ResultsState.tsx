@@ -19,7 +19,6 @@ import {
   ExportPDFDialog,
   type ExportOptions,
 } from '../../features/results/components/ExportPDFDialog';
-import { useHeader, useHeaderConfig } from '../../hooks/useHeader';
 import { useAudioPlayer } from '../../features/results/hooks/useAudioPlayer';
 import {
   parseTranscriptToSegments,
@@ -80,8 +79,8 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
   // Clerk authentication
   const { getToken } = useAuth();
 
-  // Get current filename from global header context
-  const { fileName } = useHeader();
+  // Derive base file name from audio name (strip extension)
+  const baseFileName = audioName.replace(/\.[^/.]+$/, '');
 
   // Audio player state (shared between AudioPlayerBar and SearchableTranscript)
   const audioPlayer = useAudioPlayer(audioFile);
@@ -197,7 +196,7 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
         // Use client-side PDF generation with @react-pdf/renderer
         // Dynamically import to reduce bundle size (1.6MB+)
         const { generatePDF } = await import('../../utils/pdf-generator');
-        const effectiveFileName = fileNameOverride ?? fileName;
+        const effectiveFileName = fileNameOverride ?? baseFileName;
         await generatePDF(
           result.summary,
           result.transcript,
@@ -228,16 +227,10 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
         setIsPdfGenerating(false);
       }
     },
-    [result.summary, result.transcript, result.configuration, fileName, userTier, t]
+    [result.summary, result.transcript, result.configuration, baseFileName, userTier, t]
   );
 
   const handleOpenExportDialog = useCallback(() => setIsExportDialogOpen(true), []);
-
-  // Sync header configuration — Export button opens the dialog
-  useHeaderConfig({
-    initialFileName: audioName.replace(/\.[^/.]+$/, ''),
-    onExport: handleOpenExportDialog,
-  });
 
   return (
     <>
@@ -255,7 +248,7 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
             </div>
           </div>
         }
-        summaryPanel={<SummaryPanel summary={result.summary} />}
+        summaryPanel={<SummaryPanel summary={result.summary} onExport={handleOpenExportDialog} />}
         transcriptPanel={
           <div className="flex flex-col h-full">
             {hasDiarization && (
@@ -300,7 +293,7 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
       <ExportPDFDialog
         isOpen={isExportDialogOpen}
         onClose={() => setIsExportDialogOpen(false)}
-        initialFileName={fileName}
+        initialFileName={baseFileName}
         onExport={(name, options) => {
           setIsExportDialogOpen(false);
           void handleDownloadPDF(name, options);

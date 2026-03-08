@@ -70,7 +70,6 @@ function ConfigurationPlaceholder() {
 import { PageLoader } from '@/lib/components/ui/PageLoader/PageLoader';
 
 import { migrateFromSessionStorage } from '@/utils/session-manager';
-import { HeaderProvider } from '@/context/HeaderContext';
 import { SubscriptionProvider } from '@/context/SubscriptionContext';
 import { OnboardingProvider, useOnboarding } from '@/context/OnboardingContext';
 // ApiKeyOnboardingModal replaced by OnboardingPage route redirect
@@ -244,9 +243,7 @@ function App() {
     <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY}>
       <SubscriptionProvider>
         <OnboardingProvider>
-          <HeaderProvider>
-            <AppRoutes />
-          </HeaderProvider>
+          <AppRoutes />
         </OnboardingProvider>
       </SubscriptionProvider>
     </ClerkProvider>

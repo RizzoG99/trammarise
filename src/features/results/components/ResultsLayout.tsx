@@ -41,8 +41,6 @@ export function ResultsLayout({
 }: ResultsLayoutProps) {
   return (
     <div className="flex flex-col bg-bg-primary overflow-x-hidden">
-      {/* Header is now handled by AppLayout/HeaderContext */}
-
       {/* Audio Player Bar — sticky so it stays visible while transcript scrolls */}
       <div className="sticky top-0 z-40">{audioPlayer}</div>
 
