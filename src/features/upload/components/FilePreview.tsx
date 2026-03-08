@@ -1,7 +1,6 @@
 import { CheckCircle, Music, Trash2, RefreshCw } from 'lucide-react';
-import { Text } from '@/lib';
+import { Text, AudioPlayer } from '@/lib';
 import { useTranslation } from 'react-i18next';
-import { MiniAudioPlayer } from './MiniAudioPlayer';
 
 export interface FilePreviewProps {
   file: File | Blob;
@@ -79,7 +78,7 @@ export function FilePreview({ file, onRemove, onReplace }: FilePreviewProps) {
 
       {/* Audio Preview Player — hidden on mobile where AudioPreviewBar (above tabs) handles it */}
       <div className="hidden lg:block">
-        <MiniAudioPlayer file={file} className="mt-3" />
+        <AudioPlayer file={file} className="mt-3" />
       </div>
 
       {/* Action Buttons */}

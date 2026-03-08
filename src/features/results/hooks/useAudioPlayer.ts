@@ -25,7 +25,7 @@ export interface AudioPlaybackState {
  * @param audioFile - Audio file from session storage
  * @returns Audio control functions and current state
  */
-export function useAudioPlayer(audioFile: AudioFile) {
+export function useAudioPlayer(audioFile: AudioFile | null) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [state, setState] = useState<AudioPlaybackState>({
     isPlaying: false,
@@ -37,6 +37,8 @@ export function useAudioPlayer(audioFile: AudioFile) {
 
   // Initialize audio element and setup blob URL
   useEffect(() => {
+    if (!audioFile) return;
+
     const audio = new Audio();
     audioRef.current = audio;
 
@@ -124,19 +126,25 @@ export function useAudioPlayer(audioFile: AudioFile) {
   }, [state.isPlaying, play, pause]);
 
   // Seek to specific time
-  const seek = useCallback((time: number) => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = Math.max(0, Math.min(time, state.duration));
-    }
-  }, [state.duration]);
+  const seek = useCallback(
+    (time: number) => {
+      if (audioRef.current) {
+        audioRef.current.currentTime = Math.max(0, Math.min(time, state.duration));
+      }
+    },
+    [state.duration]
+  );
 
   // Skip by offset (positive for forward, negative for backward)
-  const skipBy = useCallback((seconds: number) => {
-    if (audioRef.current) {
-      const newTime = audioRef.current.currentTime + seconds;
-      seek(newTime);
-    }
-  }, [seek]);
+  const skipBy = useCallback(
+    (seconds: number) => {
+      if (audioRef.current) {
+        const newTime = audioRef.current.currentTime + seconds;
+        seek(newTime);
+      }
+    },
+    [seek]
+  );
 
   // Set playback speed
   const setSpeed = useCallback((rate: number) => {

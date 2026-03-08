@@ -1,12 +1,11 @@
 import React, { useState, useMemo, useCallback } from 'react';
-import { Modal, Snackbar, AILoadingOrb, Text } from '@/lib';
+import { Modal, Snackbar, AILoadingOrb, Text, AudioPlayer } from '@/lib';
 import { chatWithAI } from '../../utils/api';
 import { useAuth } from '@clerk/react';
 import { useTranslation } from 'react-i18next';
 
 import type { ProcessingResult, ChatMessage, AudioFile, AIConfiguration } from '../../types/audio';
 import { ResultsLayout } from '../../features/results/components/ResultsLayout';
-import { ResultsAudioBar } from '../../features/results/components/ResultsAudioBar';
 import { SummaryPanel } from '../../features/results/components/SummaryPanel';
 import { SearchableTranscript } from '../../features/results/components/SearchableTranscript';
 import { SpeakerTranscriptView } from '../../features/results/components/SpeakerTranscriptView';
@@ -243,7 +242,19 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
   return (
     <>
       <ResultsLayout
-        audioPlayer={<ResultsAudioBar audioFile={audioFile} audioPlayer={audioPlayer} />}
+        audioPlayer={
+          <div className="w-full bg-bg-glass backdrop-blur-md border-b border-border shadow-[0_4px_24px_rgba(0,0,0,0.12)]">
+            <div className="max-w-[1400px] mx-auto px-6 py-3">
+              <AudioPlayer
+                file={audioFile.blob}
+                audioPlayer={audioPlayer}
+                showSkipButtons
+                showSpeedControl
+                fileName={audioFile.name}
+              />
+            </div>
+          </div>
+        }
         summaryPanel={<SummaryPanel summary={result.summary} />}
         transcriptPanel={
           <div className="flex flex-col h-full">

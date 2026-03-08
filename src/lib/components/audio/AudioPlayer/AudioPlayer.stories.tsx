@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { MiniAudioPlayer } from './MiniAudioPlayer';
+import { AudioPlayer } from './AudioPlayer';
 
-// Minimal silent audio blob (WAV header, ~0.1s of silence)
+// Minimal silent WAV blob (~0.5s silence)
 function silentAudioBlob(): Blob {
   const sampleRate = 8000;
   const numSamples = sampleRate * 0.5;
@@ -26,9 +26,11 @@ function silentAudioBlob(): Blob {
   return new Blob([buffer], { type: 'audio/wav' });
 }
 
-const meta: Meta<typeof MiniAudioPlayer> = {
-  title: 'Upload/MiniAudioPlayer',
-  component: MiniAudioPlayer,
+const audioFile = new File([silentAudioBlob()], 'interview-2024-03.wav', { type: 'audio/wav' });
+
+const meta: Meta<typeof AudioPlayer> = {
+  title: 'Audio/AudioPlayer',
+  component: AudioPlayer,
   tags: ['autodocs'],
   parameters: {
     layout: 'padded',
@@ -40,19 +42,40 @@ const meta: Meta<typeof MiniAudioPlayer> = {
       ],
     },
   },
+  args: { file: audioFile },
 };
 
 export default meta;
-type Story = StoryObj<typeof MiniAudioPlayer>;
+type Story = StoryObj<typeof AudioPlayer>;
 
-const audioFile = new File([silentAudioBlob()], 'sample-recording.wav', { type: 'audio/wav' });
+/** Uncontrolled — upload page style. Just a file, no extras. */
+export const Default: Story = {};
 
-export const Default: Story = {
-  args: { file: audioFile },
+/** With file name label shown above controls. */
+export const WithFileName: Story = {
+  args: { fileName: 'interview-2024-03.wav' },
 };
 
+/** Full results page configuration — skip buttons, speed control, file name. */
+export const ResultsPage: Story = {
+  args: {
+    showSkipButtons: true,
+    showSpeedControl: true,
+    fileName: 'interview-2024-03.wav',
+  },
+  decorators: [
+    (Story) => (
+      <div className="w-full bg-bg-glass backdrop-blur-md border-b border-border shadow-[0_4px_24px_rgba(0,0,0,0.12)]">
+        <div className="max-w-[1400px] mx-auto px-6 py-3">
+          <Story />
+        </div>
+      </div>
+    ),
+  ],
+};
+
+/** Embedded in a card — upload page FilePreview context. */
 export const InCard: Story = {
-  args: { file: audioFile },
   decorators: [
     (Story) => (
       <div
@@ -65,6 +88,7 @@ export const InCard: Story = {
   ],
 };
 
-export const Blob: Story = {
+/** With a Blob instead of a File. */
+export const FromBlob: Story = {
   args: { file: silentAudioBlob() },
 };

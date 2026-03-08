@@ -1,6 +1,5 @@
 import { Music } from 'lucide-react';
-import { GlassCard } from '@/lib';
-import { MiniAudioPlayer } from './MiniAudioPlayer';
+import { GlassCard, AudioPlayer } from '@/lib';
 
 export interface AudioPreviewBarProps {
   file: File | Blob;
@@ -26,7 +25,7 @@ export function AudioPreviewBar({ file }: AudioPreviewBarProps) {
           </div>
 
           {/* Player */}
-          <MiniAudioPlayer file={file} className="flex-1 min-w-0" />
+          <AudioPlayer file={file} className="flex-1 min-w-0" />
         </div>
       </GlassCard>
     </div>

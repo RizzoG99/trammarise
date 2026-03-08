@@ -43,8 +43,8 @@ export function ResultsLayout({
     <div className="flex flex-col bg-bg-primary overflow-x-hidden">
       {/* Header is now handled by AppLayout/HeaderContext */}
 
-      {/* Audio Player Bar */}
-      <div className="z-40">{audioPlayer}</div>
+      {/* Audio Player Bar — sticky so it stays visible while transcript scrolls */}
+      <div className="sticky top-0 z-40">{audioPlayer}</div>
 
       {/* Main Content: Split Panel Layout */}
       <div className="flex-1 w-full max-w-[1600px] mx-auto p-4 lg:p-6 transition-all duration-300">
