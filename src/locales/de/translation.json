@@ -878,5 +878,63 @@
     "pauseAriaLabel": "Audio pausieren",
     "seekAriaLabel": "Audioposition suchen",
     "previewLabel": "Audiovorschau"
+  },
+  "usagePanel": {
+    "free": {
+      "planBadge": "Kostenlos",
+      "upgradeBtn": "Auf Pro upgraden",
+      "sectionThisMonth": "Diesen Monat",
+      "transcriptionCount_one": "{{count}} Transkription",
+      "transcriptionCount_other": "{{count}} Transkriptionen",
+      "byokStatus": "Du verwendest deinen eigenen OpenAI-Schlüssel (BYOK)",
+      "checkBalance": "OpenAI-Guthaben prüfen",
+      "noKeyWarning": "Kein API-Schlüssel konfiguriert",
+      "noKeyCta": "API-Schlüssel einrichten",
+      "sectionMissing": "Was dir fehlt",
+      "sectionMissingCaption": "Verfügbar ab Pro",
+      "proBadge": "Pro",
+      "feature": {
+        "hostedApi": {
+          "name": "Kein API-Schlüssel erforderlich",
+          "desc": "Die Plattform übernimmt die Transkription"
+        },
+        "chat": {
+          "name": "KI-Chat zu Ergebnissen",
+          "desc": "Fragen stellen, übersetzen oder verfeinern mit KI"
+        },
+        "diarization": { "name": "Sprecher-Diarisierung", "desc": "Erkennt, wer was gesagt hat" },
+        "cloudSync": {
+          "name": "Cloud-Synchronisierung",
+          "desc": "Zugriff auf deine Transkriptionen von überall"
+        }
+      }
+    },
+    "pro": {
+      "planBadge": "Pro",
+      "managePlan": "Plan verwalten",
+      "sectionMinutes": "Minuten diesen Monat",
+      "minutesUsed": "{{minutesUsed}} / {{minutesIncluded}} Min.",
+      "transcriptionCount_one": "{{count}} Transkription diesen Monat",
+      "transcriptionCount_other": "{{count}} Transkriptionen diesen Monat",
+      "renews": "Verlängert am {{date}}",
+      "accessEnds": "Zugang endet am {{date}}",
+      "progressAriaLabel": "{{pct}}% der monatlichen Minuten verbraucht",
+      "warning": {
+        "title": "Minuten werden knapp",
+        "body": "{{minutesUsed}} von {{minutesIncluded}} Minuten genutzt — {{remaining}} verbleibend."
+      },
+      "quota": {
+        "title": "Kontingent erreicht",
+        "body": "Upgrade oder warte bis zur Verlängerung am {{date}}.",
+        "upgradeBtn": "Upgrade für mehr Minuten"
+      },
+      "badge": {
+        "cancels": "Kündigt am {{date}}",
+        "trial": "Test endet am {{date}}",
+        "pastDue": "Zahlung fehlgeschlagen",
+        "unpaid": "Unbezahlt",
+        "canceled": "Gekündigt"
+      }
+    }
   }
 }

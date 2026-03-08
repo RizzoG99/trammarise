@@ -878,5 +878,63 @@
     "pauseAriaLabel": "Pausar audio",
     "seekAriaLabel": "Buscar posición de audio",
     "previewLabel": "Vista previa de audio"
+  },
+  "usagePanel": {
+    "free": {
+      "planBadge": "Gratis",
+      "upgradeBtn": "Actualizar a Pro",
+      "sectionThisMonth": "Este mes",
+      "transcriptionCount_one": "{{count}} transcripción",
+      "transcriptionCount_other": "{{count}} transcripciones",
+      "byokStatus": "Usando tu propia clave de OpenAI (BYOK)",
+      "checkBalance": "Ver tu saldo de OpenAI",
+      "noKeyWarning": "Sin clave API configurada",
+      "noKeyCta": "Configurar tu clave API",
+      "sectionMissing": "Lo que te falta",
+      "sectionMissingCaption": "Disponible en Pro y superior",
+      "proBadge": "Pro",
+      "feature": {
+        "hostedApi": {
+          "name": "Sin clave API necesaria",
+          "desc": "La plataforma gestiona la transcripción"
+        },
+        "chat": {
+          "name": "Chat IA en resultados",
+          "desc": "Pregunta, traduce o refina tu transcripción con IA"
+        },
+        "diarization": { "name": "Diarización de oradores", "desc": "Identifica quién dijo qué" },
+        "cloudSync": {
+          "name": "Sincronización en la nube",
+          "desc": "Accede a tus transcripciones desde cualquier dispositivo"
+        }
+      }
+    },
+    "pro": {
+      "planBadge": "Pro",
+      "managePlan": "Administrar plan",
+      "sectionMinutes": "Minutos este mes",
+      "minutesUsed": "{{minutesUsed}} / {{minutesIncluded}} min",
+      "transcriptionCount_one": "{{count}} transcripción este mes",
+      "transcriptionCount_other": "{{count}} transcripciones este mes",
+      "renews": "Se renueva el {{date}}",
+      "accessEnds": "El acceso termina el {{date}}",
+      "progressAriaLabel": "{{pct}}% de los minutos mensuales usados",
+      "warning": {
+        "title": "Pocos minutos restantes",
+        "body": "{{minutesUsed}} de {{minutesIncluded}} minutos usados — {{remaining}} restantes."
+      },
+      "quota": {
+        "title": "Cuota alcanzada",
+        "body": "Actualiza tu plan o espera la renovación el {{date}}.",
+        "upgradeBtn": "Actualizar para más minutos"
+      },
+      "badge": {
+        "cancels": "Cancela el {{date}}",
+        "trial": "Prueba termina el {{date}}",
+        "pastDue": "Pago fallido",
+        "unpaid": "Sin pagar",
+        "canceled": "Cancelado"
+      }
+    }
   }
 }

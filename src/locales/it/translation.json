@@ -878,5 +878,63 @@
     "pauseAriaLabel": "Metti in pausa",
     "seekAriaLabel": "Scorri la posizione audio",
     "previewLabel": "Anteprima audio"
+  },
+  "usagePanel": {
+    "free": {
+      "planBadge": "Gratuito",
+      "upgradeBtn": "Passa a Pro",
+      "sectionThisMonth": "Questo mese",
+      "transcriptionCount_one": "{{count}} trascrizione",
+      "transcriptionCount_other": "{{count}} trascrizioni",
+      "byokStatus": "Stai usando la tua chiave OpenAI (BYOK)",
+      "checkBalance": "Controlla il tuo saldo OpenAI",
+      "noKeyWarning": "Nessuna chiave API configurata",
+      "noKeyCta": "Configura la tua chiave API",
+      "sectionMissing": "Cosa ti manca",
+      "sectionMissingCaption": "Disponibile con Pro e superiore",
+      "proBadge": "Pro",
+      "feature": {
+        "hostedApi": {
+          "name": "Nessuna chiave API richiesta",
+          "desc": "La piattaforma gestisce la trascrizione"
+        },
+        "chat": {
+          "name": "Chat AI sui risultati",
+          "desc": "Fai domande, traduci o raffina la trascrizione con l'AI"
+        },
+        "diarization": { "name": "Diarizzazione speaker", "desc": "Identifica chi ha detto cosa" },
+        "cloudSync": {
+          "name": "Sincronizzazione cloud",
+          "desc": "Accedi alle tue trascrizioni da qualsiasi dispositivo"
+        }
+      }
+    },
+    "pro": {
+      "planBadge": "Pro",
+      "managePlan": "Gestisci piano",
+      "sectionMinutes": "Minuti questo mese",
+      "minutesUsed": "{{minutesUsed}} / {{minutesIncluded}} min",
+      "transcriptionCount_one": "{{count}} trascrizione questo mese",
+      "transcriptionCount_other": "{{count}} trascrizioni questo mese",
+      "renews": "Si rinnova il {{date}}",
+      "accessEnds": "Accesso termina il {{date}}",
+      "progressAriaLabel": "{{pct}}% dei minuti mensili utilizzati",
+      "warning": {
+        "title": "Minuti in esaurimento",
+        "body": "{{minutesUsed}} di {{minutesIncluded}} minuti usati — {{remaining}} rimanenti."
+      },
+      "quota": {
+        "title": "Quota raggiunta",
+        "body": "Aggiorna il piano o attendi il rinnovo il {{date}}.",
+        "upgradeBtn": "Aggiorna per più minuti"
+      },
+      "badge": {
+        "cancels": "Annulla il {{date}}",
+        "trial": "Trial termina il {{date}}",
+        "pastDue": "Pagamento fallito",
+        "unpaid": "Non pagato",
+        "canceled": "Annullato"
+      }
+    }
   }
 }
