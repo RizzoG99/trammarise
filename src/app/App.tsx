@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { lazy, Suspense, useEffect, useState, useCallback } from 'react';
 import { ClerkProvider, useUser } from '@clerk/react';
+import { identifyUser, resetAnalytics } from '../lib/analytics';
 import { AppLayout } from './AppLayout';
 import { ROUTES } from '../types/routing';
 import { WelcomePage } from '../pages/WelcomePage';
@@ -82,7 +83,7 @@ if (!CLERK_PUBLISHABLE_KEY) {
 }
 
 function AppRoutes() {
-  const { isSignedIn, isLoaded } = useUser();
+  const { isSignedIn, isLoaded, user } = useUser();
   const { needsOnboarding, isCheckingOnboarding } = useOnboarding();
   const navigate = useNavigate();
   const [showStorageWarning, setShowStorageWarning] = useState(false);
@@ -112,6 +113,16 @@ function AppRoutes() {
   useEffect(() => {
     migrateFromSessionStorage();
   }, []);
+
+  // Identify user in analytics when signed in, reset on sign-out
+  useEffect(() => {
+    if (!isLoaded) return;
+    if (isSignedIn && user) {
+      identifyUser(user.id, { email: user.primaryEmailAddress?.emailAddress });
+    } else {
+      resetAnalytics();
+    }
+  }, [isLoaded, isSignedIn, user]);
 
   const handleCleanup = async () => {
     // Implement cleanup logic

@@ -63,8 +63,14 @@ vi.mock('@/utils/session-storage', () => ({
 }));
 
 const mockValidateApiKey = vi.fn();
+const mockSaveApiKeyFn = vi.fn().mockResolvedValue({ success: true, message: 'ok' });
 vi.mock('@/utils/api', () => ({
   validateApiKey: (...args: unknown[]) => mockValidateApiKey(...args),
+  saveApiKey: (...args: unknown[]) => mockSaveApiKeyFn(...args),
+}));
+
+vi.mock('@clerk/react', () => ({
+  useAuth: () => ({ getToken: vi.fn().mockResolvedValue('mock-token') }),
 }));
 
 // Stub lib components to keep tests focused
@@ -290,12 +296,8 @@ describe('OnboardingPage', () => {
       fireEvent.change(screen.getByRole('textbox'), { target: { value: 'sk-validkey123' } });
       fireEvent.click(screen.getByText('Get Started'));
       await waitFor(() => expect(mockCompleteOnboarding).toHaveBeenCalledTimes(1));
-      expect(mockSaveApiConfig).toHaveBeenCalledWith(
-        'openai',
-        'sk-validkey123',
-        'sk-validkey123',
-        false
-      );
+      expect(mockSaveApiConfig).toHaveBeenCalledWith('openai', 'sk-validkey123', 'sk-validkey123');
+      expect(mockSaveApiKeyFn).not.toHaveBeenCalled();
     });
 
     it('shows "Remember my key" checkbox', () => {
@@ -309,18 +311,17 @@ describe('OnboardingPage', () => {
       expect(screen.getByRole('checkbox')).not.toBeChecked();
     });
 
-    it('saves with persist=true when checkbox is checked', async () => {
+    it('saves to DB when checkbox is checked', async () => {
       goToStep3();
       fireEvent.click(screen.getByRole('checkbox'));
       fireEvent.change(screen.getByRole('textbox'), { target: { value: 'sk-validkey123' } });
       fireEvent.click(screen.getByText('Get Started'));
-      await waitFor(() =>
-        expect(mockSaveApiConfig).toHaveBeenCalledWith(
-          'openai',
-          'sk-validkey123',
-          'sk-validkey123',
-          true
-        )
+      await waitFor(() => expect(mockCompleteOnboarding).toHaveBeenCalledTimes(1));
+      expect(mockSaveApiConfig).toHaveBeenCalledWith('openai', 'sk-validkey123', 'sk-validkey123');
+      expect(mockSaveApiKeyFn).toHaveBeenCalledWith(
+        'sk-validkey123',
+        'openai',
+        expect.any(Function)
       );
     });
 

@@ -7,6 +7,9 @@ import './index.css';
 import './i18n'; // Initialize i18n
 import { ThemeProvider } from './context/ThemeContext';
 import { ApiKeyProvider } from './context/ApiKeyContext';
+import { initAnalytics } from './lib/analytics';
+
+initAnalytics();
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

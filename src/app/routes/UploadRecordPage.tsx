@@ -22,6 +22,8 @@ import { ApiKeySetupBanner } from '../../features/onboarding/ApiKeySetupBanner';
 import { UpgradeModal } from '../../components/marketing/UpgradeModal';
 import { generateSessionId, saveSession } from '../../utils/session-manager';
 import { buildRoutePath, ROUTES } from '../../types/routing';
+import { getOnboardingUseCase } from '../../utils/session-storage';
+import { isContentType } from '../../types/content-types';
 import { useSubscription } from '../../context/SubscriptionContext';
 import { useFeatureGate } from '../../hooks/useFeatureGate';
 
@@ -35,7 +37,10 @@ export function UploadRecordPage() {
   const [audioFile, setAudioFile] = useState<File | Blob | null>(null);
   const [contextFiles, setContextFiles] = useState<File[]>([]);
   const [language, setLanguage] = useState<string>('auto');
-  const [contentType, setContentType] = useState<ContentType>('meeting');
+  const [contentType, setContentType] = useState<ContentType>(() => {
+    const saved = getOnboardingUseCase();
+    return saved && isContentType(saved) ? saved : 'meeting';
+  });
   const [processingMode, setProcessingMode] = useState<ProcessingMode>('balanced');
   const [noiseProfile, setNoiseProfile] = useState<NoiseProfile>('quiet');
   const [enableSpeakerDiarization, setEnableSpeakerDiarization] = useState<boolean>(false);

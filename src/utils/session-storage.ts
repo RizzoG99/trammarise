@@ -52,3 +52,13 @@ export function isApiConfigPersisted(): boolean {
 
 // Note: sessionStorage automatically clears when the tab/window closes
 // No need to manually clear on beforeunload (which also fires on refresh/navigation)
+
+const ONBOARDING_USE_CASE_KEY = 'trammarise_onboarding_use_case';
+
+export function saveOnboardingUseCase(useCase: string): void {
+  sessionStorage.setItem(ONBOARDING_USE_CASE_KEY, useCase);
+}
+
+export function getOnboardingUseCase(): string | null {
+  return sessionStorage.getItem(ONBOARDING_USE_CASE_KEY);
+}

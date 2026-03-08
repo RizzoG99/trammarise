@@ -67,6 +67,7 @@
     "openai": "^6.9.1",
     "pako": "^1.0.11",
     "pdf-parse": "^2.4.5",
+    "posthog-js": "^1.359.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-i18next": "^16.5.3",
