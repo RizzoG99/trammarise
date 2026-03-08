@@ -272,6 +272,7 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
                 transcript={result.transcript}
                 activeSegmentId={activeSegmentId}
                 onTimestampClick={handleTimestampClick}
+                includeSpeakers={hasDiarization}
               />
             )}
           </div>

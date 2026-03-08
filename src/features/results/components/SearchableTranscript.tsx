@@ -12,12 +12,15 @@ export interface SearchableTranscriptProps {
   activeSegmentId?: string;
   /** Optional: Handler when timestamp is clicked */
   onTimestampClick?: (timestampSeconds: number) => void;
+  /** Whether to show speaker labels (only when diarization data is present) */
+  includeSpeakers?: boolean;
 }
 
 export const SearchableTranscript = memo(function SearchableTranscript({
   transcript,
   activeSegmentId,
   onTimestampClick,
+  includeSpeakers = false,
 }: SearchableTranscriptProps) {
   const { t } = useTranslation();
   const {
@@ -32,7 +35,10 @@ export const SearchableTranscript = memo(function SearchableTranscript({
   } = useTranscriptSearch(transcript);
 
   // Parse transcript into segments (memoized)
-  const segments = useMemo(() => parseTranscriptToSegments(transcript), [transcript]);
+  const segments = useMemo(
+    () => parseTranscriptToSegments(transcript, includeSpeakers),
+    [transcript, includeSpeakers]
+  );
 
   // Auto-scroll to active segment during playback
   useEffect(() => {
