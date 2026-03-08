@@ -19,17 +19,24 @@ export function UploadRecordTabs({ uploadPanel, recordPanel }: UploadRecordTabsP
         <div
           role="tablist"
           aria-label={t('home.tabs.ariaLabel', 'Upload or Record Audio')}
-          className="flex bg-bg-secondary/50 p-1 rounded-xl border border-border-subtle w-full max-w-sm mx-auto"
+          className="relative flex bg-bg-secondary/50 p-1 rounded-xl border border-border-subtle w-full max-w-sm mx-auto"
         >
+          {/* Sliding pill */}
+          <div
+            aria-hidden="true"
+            className={`absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] rounded-lg bg-white dark:bg-bg-tertiary shadow-sm transition-transform duration-200 ease-out ${
+              activeTab === 'record' ? 'translate-x-full' : 'translate-x-0'
+            }`}
+          />
           <button
             role="tab"
             aria-selected={activeTab === 'upload'}
             aria-controls="panel-upload"
             id="tab-upload"
             onClick={() => setActiveTab('upload')}
-            className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-medium transition-all ${
+            className={`relative flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-medium transition-colors duration-200 cursor-pointer ${
               activeTab === 'upload'
-                ? 'bg-white dark:bg-bg-tertiary text-text-primary shadow-sm'
+                ? 'text-text-primary'
                 : 'text-text-secondary hover:text-text-primary'
             }`}
           >
@@ -42,9 +49,9 @@ export function UploadRecordTabs({ uploadPanel, recordPanel }: UploadRecordTabsP
             aria-controls="panel-record"
             id="tab-record"
             onClick={() => setActiveTab('record')}
-            className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-medium transition-all ${
+            className={`relative flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-medium transition-colors duration-200 cursor-pointer ${
               activeTab === 'record'
-                ? 'bg-white dark:bg-bg-tertiary text-text-primary shadow-sm'
+                ? 'text-text-primary'
                 : 'text-text-secondary hover:text-text-primary'
             }`}
           >
@@ -53,7 +60,13 @@ export function UploadRecordTabs({ uploadPanel, recordPanel }: UploadRecordTabsP
           </button>
         </div>
 
-        <div role="tabpanel" id={`panel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
+        <div
+          key={activeTab}
+          role="tabpanel"
+          id={`panel-${activeTab}`}
+          aria-labelledby={`tab-${activeTab}`}
+          className="animate-tab-switch"
+        >
           {activeTab === 'upload' ? uploadPanel : recordPanel}
         </div>
       </div>
