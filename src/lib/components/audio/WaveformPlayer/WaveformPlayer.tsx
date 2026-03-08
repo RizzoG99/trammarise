@@ -18,6 +18,7 @@ interface WaveformPlayerProps {
   onWaveSurferReady?: (player: WaveformPlayerRef) => void;
   onPlaybackChange?: (isPlaying: boolean) => void;
   onTimeUpdate?: (currentTime: number, duration: number) => void;
+  dragToSeek?: boolean;
 }
 
 export const WaveformPlayer: React.FC<WaveformPlayerProps> = ({
@@ -25,9 +26,10 @@ export const WaveformPlayer: React.FC<WaveformPlayerProps> = ({
   onWaveSurferReady,
   onPlaybackChange,
   onTimeUpdate,
+  dragToSeek = true,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const waveSurferInstance = useWaveSurfer(containerRef);
+  const waveSurferInstance = useWaveSurfer(containerRef, { dragToSeek });
   const {
     wavesurfer,
     isPlaying,
@@ -61,7 +63,16 @@ export const WaveformPlayer: React.FC<WaveformPlayerProps> = ({
       };
       onWaveSurferReady(playerRef);
     }
-  }, [wavesurfer, waveSurferInstance.regions, waveSurferInstance.enableRegions, onWaveSurferReady, enableRegionSelection, disableRegionSelection, getActiveRegion, clearRegions]);
+  }, [
+    wavesurfer,
+    waveSurferInstance.regions,
+    waveSurferInstance.enableRegions,
+    onWaveSurferReady,
+    enableRegionSelection,
+    disableRegionSelection,
+    getActiveRegion,
+    clearRegions,
+  ]);
 
   // Notify parent of playback changes
   useEffect(() => {

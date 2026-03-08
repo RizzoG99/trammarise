@@ -72,6 +72,7 @@ export interface WaveSurferConfig {
   barGap?: number;
   responsive?: boolean;
   normalize?: boolean;
+  dragToSeek?: boolean;
 }
 
 // Chat message

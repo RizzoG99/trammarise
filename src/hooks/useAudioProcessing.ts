@@ -253,9 +253,8 @@ function handleError(errorMsg: string, _session: SessionData, onError: (error: E
   if (message.includes('api key') || message.includes('unauthorized') || message.includes('401')) {
     onError(
       new Error(
-        'Invalid API credentials. Please check your API keys in .env.local:\n' +
-          'VITE_OPENAI_API_KEY=sk-...\n\n' +
-          'Get your key at: https://platform.openai.com/api-keys'
+        'Invalid API key. Please update your OpenAI key in Account Settings → API Keys.\n\n' +
+          'Make sure your key starts with "sk-" and has sufficient credits.'
       )
     );
     return;
