@@ -96,7 +96,7 @@ export const Modal: React.FC<ModalProps> = ({
 
   return createPortal(
     <div
-      className="fixed inset-0 bg-black/70 flex items-center justify-center z-[1000] animate-[fadeIn_0.2s_ease-out]"
+      className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-[1000] animate-[fadeIn_0.2s_ease-out]"
       onClick={handleBackdropClick}
       role="dialog"
       aria-modal="true"
@@ -105,18 +105,18 @@ export const Modal: React.FC<ModalProps> = ({
       {...rest}
     >
       <div
-        className={`bg-white dark:bg-[#1e1e1e] rounded-xl w-[90%] max-h-[80vh] overflow-y-auto shadow-2xl animate-[slideUp_0.3s_ease-out] ${className}`}
+        className={`bg-bg-surface rounded-xl w-[90%] max-h-[80vh] overflow-y-auto shadow-2xl border border-border animate-[slideUp_0.3s_ease-out] ${className}`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         {!hideHeader && (
-          <div className="flex justify-between items-center p-6 border-b border-gray-200 dark:border-[#333]">
-            <h2 id="modal-title" className="m-0 text-2xl text-[#333] dark:text-white">
+          <div className="flex justify-between items-center p-6 border-b border-border">
+            <h2 id="modal-title" className="m-0 text-2xl text-text-primary">
               {title}
             </h2>
             {!hideCloseButton && (
               <button
-                className="bg-transparent border-none text-[2rem] text-[#999] cursor-pointer p-0 w-8 h-8 flex items-center justify-center rounded transition-all hover:bg-gray-100 hover:text-[#333] dark:hover:bg-[#333] dark:hover:text-white"
+                className="bg-transparent border-none text-[2rem] text-text-tertiary cursor-pointer p-0 w-8 h-8 flex items-center justify-center rounded transition-all hover:bg-bg-surface hover:text-text-primary"
                 onClick={onClose}
                 aria-label="Close modal"
                 type="button"
@@ -128,11 +128,11 @@ export const Modal: React.FC<ModalProps> = ({
         )}
 
         {/* Body */}
-        <div className="p-6 text-[#555] dark:text-[#ccc] leading-relaxed">{children}</div>
+        <div className="p-6 text-text-secondary leading-relaxed">{children}</div>
 
         {/* Footer with actions */}
         {actions && actions.length > 0 && (
-          <div className="flex gap-3 p-6 border-t border-gray-200 dark:border-[#333] justify-end">
+          <div className="flex gap-3 p-6 border-t border-border justify-end">
             {actions.map((action, index) => (
               <Button key={index} variant={action.variant || 'primary'} onClick={action.onClick}>
                 {action.label}
