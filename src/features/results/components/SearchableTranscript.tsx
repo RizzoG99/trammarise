@@ -54,7 +54,7 @@ export const SearchableTranscript = memo(function SearchableTranscript({
   }, [activeSegmentId]);
 
   return (
-    <GlassCard variant="light" className="p-6">
+    <GlassCard variant="dark" className="p-6">
       {/* Search Bar */}
       <div className="mb-4">
         <div className="flex items-center gap-2 mb-2">

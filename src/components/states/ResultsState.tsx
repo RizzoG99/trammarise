@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 
 import type { ProcessingResult, ChatMessage, AudioFile, AIConfiguration } from '../../types/audio';
 import { ResultsLayout } from '../../features/results/components/ResultsLayout';
-import { AudioPlayerBar } from '../../features/results/components/AudioPlayerBar';
+import { ResultsAudioBar } from '../../features/results/components/ResultsAudioBar';
 import { SummaryPanel } from '../../features/results/components/SummaryPanel';
 import { SearchableTranscript } from '../../features/results/components/SearchableTranscript';
 import { SpeakerTranscriptView } from '../../features/results/components/SpeakerTranscriptView';
@@ -64,7 +64,6 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
 }) => {
   const { t } = useTranslation();
   const [isLoadingChat, setIsLoadingChat] = useState(false);
-  const [waveformTime, setWaveformTime] = useState(0);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
   const [isPdfGenerating, setIsPdfGenerating] = useState(false);
@@ -102,15 +101,15 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
     return parseTranscriptToSegments(result.transcript, hasDiarization);
   }, [result.transcript, result.segments, hasDiarization]);
 
-  // Find active segment based on waveform playback time (driven by WaveSurfer)
+  // Find active segment based on audio playback time
   const activeSegmentId = useMemo(() => {
-    const currentTime = waveformTime;
+    const currentTime = audioPlayer.state.currentTime;
     const activeSegment = transcriptSegments.find((seg, index, arr) => {
       const nextTime = arr[index + 1]?.timestampSeconds ?? Infinity;
       return currentTime >= seg.timestampSeconds && currentTime < nextTime;
     });
     return activeSegment?.id;
-  }, [waveformTime, transcriptSegments]);
+  }, [audioPlayer.state.currentTime, transcriptSegments]);
 
   // Handle timestamp click to seek audio
   const handleTimestampClick = (timestampSeconds: number) => {
@@ -244,13 +243,7 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
   return (
     <>
       <ResultsLayout
-        audioPlayer={
-          <AudioPlayerBar
-            audioFile={audioFile}
-            audioPlayer={audioPlayer}
-            onTimeUpdate={setWaveformTime}
-          />
-        }
+        audioPlayer={<ResultsAudioBar audioFile={audioFile} audioPlayer={audioPlayer} />}
         summaryPanel={<SummaryPanel summary={result.summary} />}
         transcriptPanel={
           <div className="flex flex-col h-full">
@@ -264,7 +257,7 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
             {activeTab === 'diarization' && result.utterances && result.utterances.length > 0 ? (
               <SpeakerTranscriptView
                 utterances={result.utterances}
-                currentTime={waveformTime}
+                currentTime={audioPlayer.state.currentTime}
                 onTimestampClick={handleTimestampClick}
               />
             ) : (

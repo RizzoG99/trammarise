@@ -27,7 +27,7 @@ export function SummaryPanel({ summary, structuredSummary }: SummaryPanelProps) 
     .trim();
 
   return (
-    <GlassCard variant="light">
+    <GlassCard variant="dark">
       <div className="p-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
