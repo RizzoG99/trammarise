@@ -5,7 +5,7 @@ import { User, Key, Sparkles, ArrowLeft } from 'lucide-react';
 import { GlassCard, Heading } from '@/lib';
 import { ProfileTab } from '../user-menu/components/ProfileTab';
 import { ApiKeysTab } from '../user-menu/components/ApiKeysTab';
-import { UsageTab } from '../user-menu/components/UsageTab';
+import { UsagePanel } from './components/UsagePanel';
 
 type Section = 'profile' | 'apiKeys' | 'plan';
 
@@ -82,7 +82,7 @@ export function AccountBillingPage() {
             <GlassCard variant="dark" className="p-6">
               {activeSection === 'profile' && <ProfileTab />}
               {activeSection === 'apiKeys' && <ApiKeysTab />}
-              {activeSection === 'plan' && <UsageTab />}
+              {activeSection === 'plan' && <UsagePanel />}
             </GlassCard>
           </div>
         </div>

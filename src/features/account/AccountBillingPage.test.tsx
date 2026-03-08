@@ -45,8 +45,8 @@ vi.mock('../user-menu/components/ApiKeysTab', () => ({
   ApiKeysTab: () => <div data-testid="apikeys-tab">API Keys Content</div>,
 }));
 
-vi.mock('../user-menu/components/UsageTab', () => ({
-  UsageTab: () => <div data-testid="usage-tab">Plan & Usage Content</div>,
+vi.mock('./components/UsagePanel', () => ({
+  UsagePanel: () => <div data-testid="usage-tab">Plan & Usage Content</div>,
 }));
 
 // --- Tests ---
