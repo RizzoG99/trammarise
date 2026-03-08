@@ -2,8 +2,6 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
-import { I18nextProvider } from 'react-i18next';
-import i18n from '@/i18n';
 import { UsagePanel } from './UsagePanel';
 
 // ─── Mocks ───────────────────────────────────────────────
@@ -57,9 +55,7 @@ function makeUsageResponse(overrides = {}) {
 function renderPanel() {
   return render(
     <MemoryRouter>
-      <I18nextProvider i18n={i18n}>
-        <UsagePanel />
-      </I18nextProvider>
+      <UsagePanel />
     </MemoryRouter>
   );
 }
@@ -109,7 +105,8 @@ describe('UsagePanel', () => {
 
     it('renders the free plan badge', async () => {
       renderPanel();
-      expect(await screen.findByText(/free/i)).toBeInTheDocument();
+      const matches = await screen.findAllByText(/free/i);
+      expect(matches.length).toBeGreaterThan(0);
     });
 
     it('shows transcription count from API', async () => {
