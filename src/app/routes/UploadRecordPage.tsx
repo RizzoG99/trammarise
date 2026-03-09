@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { ContentType } from '../../types/content-types';
@@ -22,25 +22,30 @@ import { ApiKeySetupBanner } from '../../features/onboarding/ApiKeySetupBanner';
 import { UpgradeModal } from '../../components/marketing/UpgradeModal';
 import { generateSessionId, saveSession } from '../../utils/session-manager';
 import { buildRoutePath, ROUTES } from '../../types/routing';
-import { getOnboardingUseCase } from '../../utils/session-storage';
 import { isContentType } from '../../types/content-types';
 import { useSubscription } from '../../context/SubscriptionContext';
+import { useOnboarding } from '../../context/OnboardingContext';
 import { useFeatureGate } from '../../hooks/useFeatureGate';
 
 export function UploadRecordPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { subscription } = useSubscription();
+  const { onboardingUseCase } = useOnboarding();
   const { hasAccess: isSpeakerIdPro } = useFeatureGate('speaker-diarization');
   const [showSpeakerUpgradeModal, setShowSpeakerUpgradeModal] = useState(false);
   const recordPanelRef = useRef<RecordPanelRef>(null);
   const [audioFile, setAudioFile] = useState<File | Blob | null>(null);
   const [contextFiles, setContextFiles] = useState<File[]>([]);
   const [language, setLanguage] = useState<string>('auto');
-  const [contentType, setContentType] = useState<ContentType>(() => {
-    const saved = getOnboardingUseCase();
-    return saved && isContentType(saved) ? saved : 'meeting';
-  });
+  const [contentType, setContentType] = useState<ContentType>('meeting');
+
+  // Sync default content type once the DB value arrives
+  useEffect(() => {
+    if (onboardingUseCase && isContentType(onboardingUseCase)) {
+      setContentType(onboardingUseCase);
+    }
+  }, [onboardingUseCase]);
   const [processingMode, setProcessingMode] = useState<ProcessingMode>('balanced');
   const [noiseProfile, setNoiseProfile] = useState<NoiseProfile>('quiet');
   const [enableSpeakerDiarization, setEnableSpeakerDiarization] = useState<boolean>(false);
