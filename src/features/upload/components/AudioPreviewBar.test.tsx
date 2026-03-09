@@ -23,10 +23,9 @@ const mockAudioInstance = {
 
 beforeEach(() => {
   vi.clearAllMocks();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   vi.stubGlobal('Audio', function (this: unknown) {
     return mockAudioInstance;
-  } as any);
+  } as unknown as typeof Audio);
 });
 
 describe('AudioPreviewBar', () => {

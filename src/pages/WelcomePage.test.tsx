@@ -116,8 +116,7 @@ describe('WelcomePage', () => {
     fireEvent.click(buttons[0]);
 
     expect(mockOpenSignIn).toHaveBeenCalledWith({
-      afterSignInUrl: '/',
-      afterSignUpUrl: '/',
+      fallbackRedirectUrl: '/',
     });
   });
 

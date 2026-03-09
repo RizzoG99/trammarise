@@ -52,7 +52,11 @@ export const AudioPlayer = memo(function AudioPlayer({
     () =>
       externalPlayer
         ? null
-        : { blob: file instanceof File ? file : file, name: file instanceof File ? file.name : '' },
+        : {
+            blob: file,
+            name: file instanceof File ? file.name : '',
+            file: file instanceof File ? file : new File([file], ''),
+          },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [file, !!externalPlayer]
   );

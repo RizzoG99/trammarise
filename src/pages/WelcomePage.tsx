@@ -10,8 +10,7 @@ export function WelcomePage() {
 
   const handleGetStarted = () => {
     openSignIn({
-      afterSignInUrl: '/',
-      afterSignUpUrl: '/',
+      fallbackRedirectUrl: '/',
     });
   };
 

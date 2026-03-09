@@ -25,7 +25,7 @@ export function WaveformVisualization({
 
   const [phase, setPhase] = useState<WavePhase>('idle');
   const phaseRef = useRef<WavePhase>('idle');
-  const timerRef = useRef<ReturnType<typeof setTimeout>>();
+  const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   // Keep ref in sync so the isAnimating effect can read the latest phase
   // without adding phase to its dependency array.
