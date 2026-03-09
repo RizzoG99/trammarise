@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import { useUser } from '@clerk/react';
 import { useSubscription } from './SubscriptionContext';
 import { getApiConfig, saveApiConfig } from '@/utils/session-storage';
-import { getSavedApiKey } from '@/utils/api';
+import { getSavedApiKey, getOnboardingUseCaseFromDb } from '@/utils/api';
 
 interface OnboardingContextValue {
   needsOnboarding: boolean;
@@ -12,6 +12,7 @@ interface OnboardingContextValue {
   completeOnboarding: () => void;
   isViewingPricing: boolean;
   setIsViewingPricing: (viewing: boolean) => void;
+  onboardingUseCase: string | null;
 }
 
 const OnboardingContext = createContext<OnboardingContextValue | null>(null);
@@ -22,6 +23,7 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
   const [needsOnboarding, setNeedsOnboarding] = useState(false);
   const [isCheckingOnboarding, setIsCheckingOnboarding] = useState(true);
   const [isViewingPricing, setIsViewingPricing] = useState(false);
+  const [onboardingUseCase, setOnboardingUseCase] = useState<string | null>(null);
 
   const checkOnboardingStatus = useCallback(async () => {
     // Not signed in - no onboarding needed (will see WelcomePage)
@@ -49,7 +51,13 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
 
     // Check database
     try {
-      const savedKey = await getSavedApiKey();
+      const [savedKey, savedUseCase] = await Promise.all([
+        getSavedApiKey(),
+        getOnboardingUseCaseFromDb(),
+      ]);
+
+      if (savedUseCase) setOnboardingUseCase(savedUseCase);
+
       if (savedKey.hasKey && savedKey.apiKey) {
         // Restore API key to session storage
         saveApiConfig('openai', savedKey.apiKey, savedKey.apiKey);
@@ -91,6 +99,7 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
         completeOnboarding,
         isViewingPricing,
         setIsViewingPricing,
+        onboardingUseCase,
       }}
     >
       {children}
