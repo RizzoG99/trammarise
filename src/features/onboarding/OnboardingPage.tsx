@@ -15,8 +15,8 @@ import type { LucideIcon } from 'lucide-react';
 import { GlassCard, Heading, Text, Button, StepIndicator, PricingCard } from '@/lib';
 import type { PricingPlan } from '@/lib';
 import { useOnboarding } from '@/context/OnboardingContext';
-import { saveApiConfig, saveOnboardingUseCase } from '@/utils/session-storage';
-import { validateApiKey, saveApiKey } from '@/utils/api';
+import { saveApiConfig } from '@/utils/session-storage';
+import { validateApiKey, saveApiKey, saveOnboardingUseCaseToDb } from '@/utils/api';
 import { trackEvent } from '@/lib/analytics';
 import { ROUTES } from '@/types/routing';
 
@@ -59,12 +59,12 @@ const PRO_PLAN: PricingPlan = {
 
 export function OnboardingPage() {
   const { t } = useTranslation();
-  const { completeOnboarding } = useOnboarding();
+  const { completeOnboarding, onboardingUseCase } = useOnboarding();
   const navigate = useNavigate();
   const { getToken } = useAuth();
 
   const [step, setStep] = useState(1);
-  const [selectedUseCase, setSelectedUseCase] = useState<string>('');
+  const [selectedUseCase, setSelectedUseCase] = useState<string>(onboardingUseCase ?? '');
   const [apiKey, setApiKey] = useState('');
   const [apiKeyError, setApiKeyError] = useState('');
   const [isValidatingKey, setIsValidatingKey] = useState(false);
@@ -76,6 +76,12 @@ export function OnboardingPage() {
     { id: 2, label: t('onboarding.steps.plan') },
     { id: 3, label: t('onboarding.steps.apiSetup') },
   ];
+
+  const handleSelectUseCase = (id: string) => {
+    setSelectedUseCase(id);
+    // Fire and forget — non-blocking
+    void saveOnboardingUseCaseToDb(id, getToken);
+  };
 
   const handleNext = () => setStep((s) => s + 1);
 
@@ -108,10 +114,7 @@ export function OnboardingPage() {
     if (rememberKey) {
       await saveApiKey(apiKey, 'openai', getToken);
     }
-    if (selectedUseCase) {
-      saveOnboardingUseCase(selectedUseCase);
-      trackEvent('onboarding_completed', { use_case: selectedUseCase, plan: 'free' });
-    }
+    trackEvent('onboarding_completed', { use_case: selectedUseCase || null, plan: 'free' });
     completeOnboarding();
   };
 
@@ -148,7 +151,7 @@ export function OnboardingPage() {
             </div>
 
             {step === 1 && (
-              <UseCaseStep selectedUseCase={selectedUseCase} onSelect={setSelectedUseCase} />
+              <UseCaseStep selectedUseCase={selectedUseCase} onSelect={handleSelectUseCase} />
             )}
 
             {step === 2 && (

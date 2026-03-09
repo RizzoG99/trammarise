@@ -47,14 +47,17 @@ vi.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate,
 }));
 
+const mockUseOnboarding = vi.fn(() => ({
+  completeOnboarding: mockCompleteOnboarding,
+  needsOnboarding: true,
+  isCheckingOnboarding: false,
+  isViewingPricing: false,
+  setIsViewingPricing: vi.fn(),
+  onboardingUseCase: null as string | null,
+}));
+
 vi.mock('@/context/OnboardingContext', () => ({
-  useOnboarding: () => ({
-    completeOnboarding: mockCompleteOnboarding,
-    needsOnboarding: true,
-    isCheckingOnboarding: false,
-    isViewingPricing: false,
-    setIsViewingPricing: vi.fn(),
-  }),
+  useOnboarding: () => mockUseOnboarding(),
 }));
 
 const mockSaveApiConfig = vi.fn();
@@ -64,9 +67,11 @@ vi.mock('@/utils/session-storage', () => ({
 
 const mockValidateApiKey = vi.fn();
 const mockSaveApiKeyFn = vi.fn().mockResolvedValue({ success: true, message: 'ok' });
+const mockSaveOnboardingUseCaseToDb = vi.fn().mockResolvedValue(undefined);
 vi.mock('@/utils/api', () => ({
   validateApiKey: (...args: unknown[]) => mockValidateApiKey(...args),
   saveApiKey: (...args: unknown[]) => mockSaveApiKeyFn(...args),
+  saveOnboardingUseCaseToDb: (...args: unknown[]) => mockSaveOnboardingUseCaseToDb(...args),
 }));
 
 vi.mock('@clerk/react', () => ({
@@ -136,6 +141,15 @@ describe('OnboardingPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockValidateApiKey.mockResolvedValue(true);
+    mockSaveOnboardingUseCaseToDb.mockResolvedValue(undefined);
+    mockUseOnboarding.mockReturnValue({
+      completeOnboarding: mockCompleteOnboarding,
+      needsOnboarding: true,
+      isCheckingOnboarding: false,
+      isViewingPricing: false,
+      setIsViewingPricing: vi.fn(),
+      onboardingUseCase: null,
+    });
   });
 
   // Step 1
@@ -180,6 +194,30 @@ describe('OnboardingPage', () => {
       render(<OnboardingPage />);
       fireEvent.click(screen.getByText('Next'));
       expect(screen.getByText('Choose your plan')).toBeInTheDocument();
+    });
+
+    it('pre-populates use case from context', () => {
+      mockUseOnboarding.mockReturnValueOnce({
+        completeOnboarding: mockCompleteOnboarding,
+        needsOnboarding: true,
+        isCheckingOnboarding: false,
+        isViewingPricing: false,
+        setIsViewingPricing: vi.fn(),
+        onboardingUseCase: 'podcast',
+      });
+      render(<OnboardingPage />);
+      expect(screen.getByRole('button', { name: /podcast/i })).toHaveAttribute(
+        'aria-pressed',
+        'true'
+      );
+    });
+
+    it('calls saveOnboardingUseCaseToDb when user picks a use case', async () => {
+      render(<OnboardingPage />);
+      fireEvent.click(screen.getByRole('button', { name: /lecture/i }));
+      await waitFor(() =>
+        expect(mockSaveOnboardingUseCaseToDb).toHaveBeenCalledWith('lecture', expect.any(Function))
+      );
     });
   });
 
