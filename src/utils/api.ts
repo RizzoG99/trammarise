@@ -449,3 +449,47 @@ export async function deleteSavedApiKey(getToken?: (() => Promise<string | null>
     throw error;
   }
 }
+
+/**
+ * Save onboarding use case to backend
+ */
+export async function saveOnboardingUseCaseToDb(
+  useCase: string,
+  getToken?: (() => Promise<string | null>) | null
+): Promise<void> {
+  try {
+    await fetchWithAuth(
+      getToken || null,
+      '/api/user-settings/preferences',
+      {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ onboardingUseCase: useCase }),
+      },
+      API_DEFAULT_TIMEOUT
+    );
+  } catch (error) {
+    // Non-critical: log and swallow — does not block the user flow
+    console.error('Failed to save onboarding use case:', error);
+  }
+}
+
+/**
+ * Retrieve onboarding use case from backend
+ */
+export async function getOnboardingUseCaseFromDb(
+  getToken?: (() => Promise<string | null>) | null
+): Promise<string | null> {
+  try {
+    const response = await fetchWithAuth(
+      getToken || null,
+      '/api/user-settings/preferences',
+      { method: 'GET' },
+      API_DEFAULT_TIMEOUT
+    );
+    const data = await response.json();
+    return data.onboardingUseCase ?? null;
+  } catch {
+    return null;
+  }
+}
