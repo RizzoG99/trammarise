@@ -25,7 +25,6 @@ const SubscriptionContext = createContext<SubscriptionContextValue | null>(null)
 export const TIER_MINUTES: Record<SubscriptionTier, number> = {
   free: 60,
   pro: 500,
-  team: 2000,
 };
 
 interface SubscriptionProviderProps {

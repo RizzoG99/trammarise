@@ -18,25 +18,6 @@ export const TIER_FEATURES: Record<SubscriptionTier, string[]> = {
     'email-support',
     'speaker-diarization',
   ],
-  team: [
-    'basic-editing',
-    'export-pdf',
-    'local-storage',
-    'hosted-api',
-    'cloud-sync',
-    'priority-processing',
-    'advanced-audio',
-    'chat',
-    'custom-models',
-    'email-support',
-    'speaker-diarization',
-    'team-collaboration',
-    'shared-workspaces',
-    'admin-controls',
-    'usage-analytics',
-    'priority-support',
-    'custom-integrations',
-  ],
 };
 
 /**
