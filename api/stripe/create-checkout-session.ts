@@ -21,10 +21,6 @@ const PRICE_IDS: Record<string, Record<string, string>> = {
     month: process.env.STRIPE_PRICE_PRO_MONTHLY || '',
     year: process.env.STRIPE_PRICE_PRO_ANNUAL || '',
   },
-  team: {
-    month: process.env.STRIPE_PRICE_TEAM_MONTHLY || '',
-    year: process.env.STRIPE_PRICE_TEAM_ANNUAL || '',
-  },
 };
 
 /**
@@ -48,7 +44,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     // Authenticate user
-    const { userId, clerkId } = await requireAuth(req);
+    const { userId } = await requireAuth(req);
 
     // Get user email from database
     const { data: user, error: userError } = await supabaseAdmin
@@ -90,7 +86,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:5173'}/pricing`,
       metadata: {
         userId,
-        clerkId,
         tier,
         interval,
       },
