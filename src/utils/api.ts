@@ -2,6 +2,7 @@ import type { SummarizationResponse, ChatResponse, ChatMessage } from '../types/
 import { API_VALIDATION } from './constants';
 import { fetchWithTimeout } from './fetch-with-timeout';
 import { fetchWithAuth } from './fetch-with-auth';
+import { supabaseClient } from '@/lib/supabase/client';
 
 const { API_DEFAULT_TIMEOUT, TRANSCRIBE_TIMEOUT, VALIDATION_TIMEOUT } = API_VALIDATION;
 
@@ -445,19 +446,24 @@ export async function deleteSavedApiKey(): Promise<{
 }
 
 /**
- * Save onboarding use case to backend
+ * Save onboarding use case to Supabase user_settings table
  */
 export async function saveOnboardingUseCaseToDb(useCase: string): Promise<void> {
   try {
-    await fetchWithAuth(
-      '/api/user-settings/preferences',
-      {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ onboardingUseCase: useCase }),
-      },
-      API_DEFAULT_TIMEOUT
-    );
+    const {
+      data: { session },
+    } = await supabaseClient.auth.getSession();
+    if (!session) return;
+    await supabaseClient
+      .from('user_settings')
+      .upsert(
+        {
+          user_id: session.user.id,
+          onboarding_use_case: useCase,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: 'user_id' }
+      );
   } catch (error) {
     // Non-critical: log and swallow — does not block the user flow
     console.error('Failed to save onboarding use case:', error);
@@ -465,17 +471,20 @@ export async function saveOnboardingUseCaseToDb(useCase: string): Promise<void> 
 }
 
 /**
- * Retrieve onboarding use case from backend
+ * Retrieve onboarding use case from Supabase user_settings table
  */
 export async function getOnboardingUseCaseFromDb(): Promise<string | null> {
   try {
-    const response = await fetchWithAuth(
-      '/api/user-settings/preferences',
-      { method: 'GET' },
-      API_DEFAULT_TIMEOUT
-    );
-    const data = await response.json();
-    return data.onboardingUseCase ?? null;
+    const {
+      data: { session },
+    } = await supabaseClient.auth.getSession();
+    if (!session) return null;
+    const { data } = await supabaseClient
+      .from('user_settings')
+      .select('onboarding_use_case')
+      .eq('user_id', session.user.id)
+      .maybeSingle();
+    return (data?.onboarding_use_case as string | null) ?? null;
   } catch {
     return null;
   }
