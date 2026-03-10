@@ -25,13 +25,10 @@ console.log('Validating environment variables...');
 
 const REQUIRED_ENV_VARS = [
   'ENCRYPTION_KEY',
-  'CLERK_SECRET_KEY',
-  'CLERK_WEBHOOK_SECRET',
+  'VITE_SUPABASE_URL',
+  'SUPABASE_SERVICE_ROLE_KEY',
   'STRIPE_SECRET_KEY',
   'STRIPE_WEBHOOK_SECRET',
-  'NEXT_PUBLIC_APP_URL',
-  'VITE_SUPABASE_URL',
-  'SUPABASE_SERVICE_ROLE_KEY'
 ];
 
 const missing = REQUIRED_ENV_VARS.filter(key => !process.env[key]);
@@ -233,17 +230,8 @@ app.post('/api/stripe/create-checkout-session', async (req, res) => {
   }
 });
 
-// Subscriptions endpoint
-app.get('/api/subscriptions/current', async (req, res) => {
-  console.log('GET /api/subscriptions/current');
-  try {
-    const handler = await loadHandler('./api/subscriptions/current.ts');
-    await handler(req, res);
-  } catch (error) {
-    console.error('Error in subscriptions/current:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
+// NOTE: /api/subscriptions/current removed — frontend reads subscriptions
+// directly from Supabase via RLS (SubscriptionContext.tsx)
 
 // User settings - API key management
 app.post('/api/user-settings/api-key', async (req, res) => {
