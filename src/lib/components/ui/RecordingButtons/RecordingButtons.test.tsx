@@ -30,10 +30,11 @@ describe('RecordButton', () => {
       expect(pulseRing).toBeInTheDocument();
     });
 
-    it('hides pulse ring when recording', () => {
+    it('hides pulse ring visually when recording (opacity 0)', () => {
       const { container } = render(<RecordButton onClick={() => {}} isRecording={true} />);
-      const pulseRing = container.querySelector('.pulse-ring');
-      expect(pulseRing).not.toBeInTheDocument();
+      const pulseRing = container.querySelector('.pulse-ring') as HTMLElement | null;
+      expect(pulseRing).toBeInTheDocument();
+      expect(pulseRing?.style.opacity).toBe('0');
     });
 
     it('hides pulse ring when disabled', () => {
@@ -47,14 +48,41 @@ describe('RecordButton', () => {
       expect(screen.getByRole('button')).toBeDisabled();
     });
 
-    it('applies disabled attribute when recording', () => {
-      render(<RecordButton onClick={() => {}} isRecording={true} />);
-      expect(screen.getByRole('button')).toBeDisabled();
-    });
-
     it('is enabled when not recording and not disabled', () => {
       render(<RecordButton onClick={() => {}} />);
       expect(screen.getByRole('button')).not.toBeDisabled();
+    });
+  });
+
+  describe('Stop state (isRecording=true)', () => {
+    it('is enabled when recording', () => {
+      render(<RecordButton onClick={() => {}} isRecording={true} />);
+      expect(screen.getByRole('button')).not.toBeDisabled();
+    });
+
+    it('shows Stop recording aria-label when recording', () => {
+      render(<RecordButton onClick={() => {}} isRecording={true} />);
+      expect(screen.getByRole('button', { name: 'Stop recording' })).toBeInTheDocument();
+    });
+
+    it('calls onStop when clicked while recording', async () => {
+      const user = userEvent.setup();
+      const handleRecord = vi.fn();
+      const handleStop = vi.fn();
+      render(<RecordButton onClick={handleRecord} isRecording={true} onStop={handleStop} />);
+      await user.click(screen.getByRole('button'));
+      expect(handleStop).toHaveBeenCalledTimes(1);
+      expect(handleRecord).not.toHaveBeenCalled();
+    });
+
+    it('does not fire when disabled even if recording', async () => {
+      const user = userEvent.setup();
+      const handleStop = vi.fn();
+      render(
+        <RecordButton onClick={() => {}} isRecording={true} disabled={true} onStop={handleStop} />
+      );
+      await user.click(screen.getByRole('button'));
+      expect(handleStop).not.toHaveBeenCalled();
     });
   });
 
@@ -76,15 +104,6 @@ describe('RecordButton', () => {
       await user.click(screen.getByRole('button'));
       expect(handleClick).not.toHaveBeenCalled();
     });
-
-    it('does not call onClick when recording', async () => {
-      const user = userEvent.setup();
-      const handleClick = vi.fn();
-      render(<RecordButton onClick={handleClick} isRecording={true} />);
-
-      await user.click(screen.getByRole('button'));
-      expect(handleClick).not.toHaveBeenCalled();
-    });
   });
 
   describe('Styling', () => {
@@ -93,19 +112,14 @@ describe('RecordButton', () => {
       expect(screen.getByRole('button')).toHaveClass('custom-class');
     });
 
-    it('has larger padding when not recording and not disabled', () => {
+    it('has consistent padding in idle state', () => {
       render(<RecordButton onClick={() => {}} />);
-      expect(screen.getByRole('button')).toHaveClass('p-6');
+      expect(screen.getByRole('button')).toHaveClass('p-5');
     });
 
-    it('has smaller padding when recording', () => {
+    it('has consistent padding in recording state', () => {
       render(<RecordButton onClick={() => {}} isRecording={true} />);
-      expect(screen.getByRole('button')).toHaveClass('p-3');
-    });
-
-    it('has smaller padding when disabled', () => {
-      render(<RecordButton onClick={() => {}} disabled={true} />);
-      expect(screen.getByRole('button')).toHaveClass('p-3');
+      expect(screen.getByRole('button')).toHaveClass('p-5');
     });
   });
 });

@@ -252,7 +252,7 @@ export const InitialState: React.FC<InitialStateProps> = ({
     <>
       <div className="w-full max-w-[600px] animate-[fadeIn_0.3s_ease-out]">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-center mb-2 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent sm:text-5xl">
+          <h1 className="text-4xl font-bold text-center mb-2 text-text-primary sm:text-5xl">
             {t('initialState.title')}
           </h1>
           <p className="text-lg text-text-secondary text-center font-light">
@@ -312,7 +312,7 @@ export const InitialState: React.FC<InitialStateProps> = ({
         {/* Context Files Display */}
         {contextFiles.length > 0 && (
           <div className="mt-4">
-            <p className="text-sm font-semibold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
+            <p className="text-sm font-semibold text-text-primary mb-2 flex items-center gap-2">
               <AttachmentIcon className="w-4 h-4" />
               {t('initialState.contextFiles.title')} ({contextFiles.length})
             </p>
@@ -324,7 +324,7 @@ export const InitialState: React.FC<InitialStateProps> = ({
                 return (
                   <div
                     key={index}
-                    className="flex items-center justify-between p-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg animate-[fadeIn_0.2s_ease-out]"
+                    className="flex items-center justify-between p-3 bg-bg-surface border border-border rounded-lg animate-[fadeIn_0.2s_ease-out]"
                   >
                     <div className="flex items-center gap-3 overflow-hidden">
                       {/* Image Preview or Icon */}
@@ -332,7 +332,7 @@ export const InitialState: React.FC<InitialStateProps> = ({
                         <img
                           src={previewUrl}
                           alt={file.name}
-                          className="w-12 h-12 object-cover rounded border border-slate-300 dark:border-slate-600 flex-shrink-0"
+                          className="w-12 h-12 object-cover rounded border border-border flex-shrink-0"
                         />
                       ) : (
                         <span className="text-xl flex-shrink-0">
@@ -341,10 +341,10 @@ export const InitialState: React.FC<InitialStateProps> = ({
                       )}
 
                       <div className="flex flex-col min-w-0">
-                        <span className="text-sm font-medium text-slate-900 dark:text-white truncate">
+                        <span className="text-sm font-medium text-text-primary truncate">
                           {file.name}
                         </span>
-                        <span className="text-xs text-slate-500">
+                        <span className="text-xs text-text-secondary">
                           {(file.size / 1024).toFixed(1)} KB
                         </span>
                       </div>
@@ -353,7 +353,7 @@ export const InitialState: React.FC<InitialStateProps> = ({
                     <button
                       type="button"
                       onClick={() => removeContextFile(index)}
-                      className="p-1 text-slate-400 hover:text-red-500 transition-colors"
+                      className="p-1 text-text-tertiary hover:text-accent-error transition-colors"
                       aria-label="Remove file"
                     >
                       <svg

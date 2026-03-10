@@ -22,7 +22,7 @@ export interface SelectProps {
   /** Array of options or groups to display */
   options: SelectOption[] | SelectGroup[];
   /** Label for the select input */
-  label?: string;
+  label?: React.ReactNode;
   /** Placeholder text when nothing is selected */
   placeholder?: string;
   /** Whether the select is disabled */
@@ -65,6 +65,7 @@ export function Select({
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [highlightedIndex, setHighlightedIndex] = useState(0);
+  const [openUpward, setOpenUpward] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
@@ -248,7 +249,15 @@ export function Select({
       {/* Trigger Button */}
       <button
         type="button"
-        onClick={() => !disabled && setIsOpen(!isOpen)}
+        onClick={() => {
+          if (disabled) return;
+          if (!isOpen && containerRef.current) {
+            const rect = containerRef.current.getBoundingClientRect();
+            const spaceBelow = window.innerHeight - rect.bottom;
+            setOpenUpward(spaceBelow < 340);
+          }
+          setIsOpen(!isOpen);
+        }}
         disabled={disabled}
         className={`
           w-full px-4 py-3 rounded-lg text-left
@@ -288,7 +297,11 @@ export function Select({
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute z-50 w-full mt-2 bg-bg-surface dark:bg-bg-secondary border border-[var(--color-border)] rounded-lg shadow-xl max-h-96 overflow-hidden animate-[fadeIn_0.1s_ease-out]">
+        <div
+          className={`absolute z-50 w-full bg-bg-surface dark:bg-bg-secondary border border-[var(--color-border)] rounded-lg shadow-xl max-h-96 overflow-hidden animate-[fadeIn_0.1s_ease-out] ${
+            openUpward ? 'bottom-full mb-2' : 'top-full mt-2'
+          }`}
+        >
           {searchable && (
             <div className="p-2 border-b border-[var(--color-border)] sticky top-0 bg-bg-surface">
               <div className="relative">

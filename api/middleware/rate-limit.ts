@@ -123,4 +123,10 @@ export const RATE_LIMITS = {
     windowMs: 60 * 1000, // 1 minute
     maxRequests: 60, // 60 messages per minute per user
   },
+
+  /** Permissive rate limit for user preferences endpoint */
+  PREFERENCES: {
+    windowMs: 60 * 1000, // 1 minute
+    maxRequests: 60,
+  },
 } as const;

@@ -1,5 +1,6 @@
 import { Play, Copy, Check, Download } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface HistoryQuickActionsProps {
   onPlay?: () => void;
@@ -12,13 +13,17 @@ export function HistoryQuickActions({
   onCopySummary,
   onDownload,
 }: HistoryQuickActionsProps) {
+  const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
+  const [copying, setCopying] = useState(false);
 
   const handleCopy = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (onCopySummary) {
+    if (onCopySummary && !copying) {
+      setCopying(true);
       await onCopySummary();
       setCopied(true);
+      setCopying(false);
       setTimeout(() => setCopied(false), 2000);
     }
   };
@@ -39,7 +44,7 @@ export function HistoryQuickActions({
         <button
           onClick={handlePlay}
           className="p-1.5 rounded-full hover:bg-primary/10 text-text-secondary hover:text-primary transition-colors"
-          title="Play Preview"
+          title={t('history.quickActions.play')}
         >
           <Play className="w-4 h-4" />
         </button>
@@ -48,8 +53,9 @@ export function HistoryQuickActions({
       {onCopySummary && (
         <button
           onClick={handleCopy}
-          className="p-1.5 rounded-full hover:bg-primary/10 text-text-secondary hover:text-primary transition-colors"
-          title="Copy Summary"
+          disabled={copying}
+          className="p-1.5 rounded-full hover:bg-primary/10 text-text-secondary hover:text-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          title={t('history.quickActions.copy')}
         >
           {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
         </button>
@@ -59,7 +65,7 @@ export function HistoryQuickActions({
         <button
           onClick={handleDownload}
           className="p-1.5 rounded-full hover:bg-primary/10 text-text-secondary hover:text-primary transition-colors"
-          title="Download"
+          title={t('history.quickActions.download')}
         >
           <Download className="w-4 h-4" />
         </button>

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useClerk } from '@clerk/clerk-react';
+import { useClerk } from '@clerk/react';
 import { Modal, Button, Text, Heading, Input } from '@/lib';
 import { Key, ExternalLink, ChevronDown, ChevronUp } from 'lucide-react';
 import { saveApiKey, deleteSavedApiKey } from '@/utils/api';

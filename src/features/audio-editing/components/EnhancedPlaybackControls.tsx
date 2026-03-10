@@ -1,5 +1,6 @@
-import { Play, Pause, SkipBack, SkipForward, Volume2 } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { VolumeControl } from '@/lib';
 
 interface EnhancedPlaybackControlsProps {
   isPlaying: boolean;
@@ -40,12 +41,16 @@ export function EnhancedPlaybackControls({
           <button
             key={speed}
             onClick={() => onSpeedChange(speed)}
-            className={`text-xs ${playbackSpeed === speed ? 'font-bold' : 'font-medium'} px-2 py-1 rounded hover:bg-gray-100/50 transition ${
-              playbackSpeed === speed
-                ? 'text-[var(--color-text-primary)]'
-                : 'text-[var(--color-text-secondary)]'
-            }`}
+            className="text-xs px-2 py-1 rounded cursor-pointer transition-colors duration-150"
+            style={{
+              fontWeight: playbackSpeed === speed ? 600 : 400,
+              backgroundColor:
+                playbackSpeed === speed ? 'var(--color-primary-alpha-10)' : 'transparent',
+              color:
+                playbackSpeed === speed ? 'var(--color-primary)' : 'var(--color-text-secondary)',
+            }}
             aria-label={t('playback.aria.speedControl', { speed })}
+            aria-pressed={playbackSpeed === speed}
           >
             {speed}x
           </button>
@@ -57,55 +62,56 @@ export function EnhancedPlaybackControls({
         <button
           onClick={onSkipBack}
           aria-label={t('playback.aria.skipBack')}
-          className="group p-2 rounded-full hover:bg-gray-100/50 text-[var(--color-text-primary)] transition-colors"
+          className="p-2 rounded-full cursor-pointer transition-colors duration-150"
+          style={{ color: 'var(--color-text-secondary)' }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = 'var(--color-primary)';
+            e.currentTarget.style.backgroundColor = 'var(--color-primary-alpha-10)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = 'var(--color-text-secondary)';
+            e.currentTarget.style.backgroundColor = 'transparent';
+          }}
         >
-          <SkipBack size={28} className="group-hover:text-blue-500" />
+          <SkipBack size={28} />
         </button>
 
         <button
           onClick={onPlayPause}
           aria-label={isPlaying ? t('playback.aria.pause') : t('playback.aria.play')}
-          className="size-14 flex items-center justify-center rounded-full bg-blue-500 hover:bg-blue-600 text-white shadow-lg shadow-blue-500/30 transition-all transform active:scale-95"
+          className="size-14 flex items-center justify-center rounded-full text-white shadow-md cursor-pointer transition-colors duration-150 active:scale-95"
+          style={{ backgroundColor: 'var(--color-primary)' }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'var(--color-primary)';
+          }}
         >
-          {isPlaying ? <Pause size={32} /> : <Play size={32} className="ml-1" />}
+          {isPlaying ? <Pause size={28} /> : <Play size={28} className="ml-1" />}
         </button>
 
         <button
           onClick={onSkipForward}
           aria-label={t('playback.aria.skipForward')}
-          className="group p-2 rounded-full hover:bg-gray-100/50 text-[var(--color-text-primary)] transition-colors"
+          className="p-2 rounded-full cursor-pointer transition-colors duration-150"
+          style={{ color: 'var(--color-text-secondary)' }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = 'var(--color-primary)';
+            e.currentTarget.style.backgroundColor = 'var(--color-primary-alpha-10)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = 'var(--color-text-secondary)';
+            e.currentTarget.style.backgroundColor = 'transparent';
+          }}
         >
-          <SkipForward size={28} className="group-hover:text-blue-500" />
+          <SkipForward size={28} />
         </button>
       </div>
 
       {/* Volume Control */}
-      <div className="hidden md:flex items-center justify-end gap-2 w-1/4 group">
-        <div className="p-1.5 text-[var(--color-text-secondary)]" aria-hidden="true">
-          <Volume2 size={20} />
-        </div>
-        <div
-          className="w-24 h-1 rounded-full overflow-hidden cursor-pointer relative"
-          style={{ backgroundColor: 'var(--color-bg-tertiary)' }}
-        >
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            value={volume}
-            onChange={(e) => onVolumeChange(parseFloat(e.target.value))}
-            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-            aria-label={t('playback.aria.volumeSlider')}
-          />
-          <div
-            className="h-full group-hover:bg-blue-500 transition-colors"
-            style={{
-              backgroundColor: 'var(--color-text-secondary)',
-              width: `${volume * 100}%`,
-            }}
-          />
-        </div>
+      <div className="hidden md:flex items-center justify-end w-1/4">
+        <VolumeControl volume={volume} onChange={onVolumeChange} />
       </div>
     </div>
   );

@@ -186,7 +186,7 @@ describe('CollapsibleSection', () => {
           <div>Content</div>
         </CollapsibleSection>
       );
-      const content = container.querySelector('[aria-hidden="false"]');
+      const content = container.querySelector('div[aria-hidden="false"]');
       expect(content).toBeInTheDocument();
     });
 
@@ -196,7 +196,7 @@ describe('CollapsibleSection', () => {
           <div>Content</div>
         </CollapsibleSection>
       );
-      const content = container.querySelector('[aria-hidden="true"]');
+      const content = container.querySelector('div[aria-hidden="true"]');
       expect(content).toBeInTheDocument();
     });
 
@@ -241,32 +241,37 @@ describe('CollapsibleSection', () => {
       expect(chevron).toHaveClass('rotate-180');
     });
 
-    it('applies transition classes to content', () => {
+    it('applies transition style to content wrapper', () => {
       const { container } = render(
         <CollapsibleSection title="Section" isExpanded={false} onToggle={mockOnToggle}>
           <div>Content</div>
         </CollapsibleSection>
       );
-      const contentWrapper = container.querySelector('[class*="transition"]');
+      const contentWrapper = container.querySelector('div[aria-hidden="true"]');
       expect(contentWrapper).toBeInTheDocument();
+      expect((contentWrapper as HTMLElement).style.transition).toContain('height');
     });
 
-    it('applies max-height classes based on expanded state', () => {
+    it('animates height between 0 and measured content height', () => {
       const { container, rerender } = render(
         <CollapsibleSection title="Section" isExpanded={false} onToggle={mockOnToggle}>
           <div>Content</div>
         </CollapsibleSection>
       );
-      let contentWrapper = container.querySelector('[class*="max-h-0"]');
+      // Collapsed: height is 0
+      const contentWrapper = container.querySelector('div[aria-hidden="true"]');
       expect(contentWrapper).toBeInTheDocument();
+      expect((contentWrapper as HTMLElement).style.height).toBe('0px');
 
       rerender(
         <CollapsibleSection title="Section" isExpanded={true} onToggle={mockOnToggle}>
           <div>Content</div>
         </CollapsibleSection>
       );
-      contentWrapper = container.querySelector('[class*="max-h-"]');
-      expect(contentWrapper).toBeInTheDocument();
+      // Expanded: height is the measured scrollHeight (non-zero in real browser; 0 in jsdom)
+      const expandedWrapper = container.querySelector('div[aria-hidden="false"]');
+      expect(expandedWrapper).toBeInTheDocument();
+      expect((expandedWrapper as HTMLElement).style.overflow).toBe('hidden');
     });
   });
 
@@ -288,7 +293,7 @@ describe('CollapsibleSection', () => {
         </CollapsibleSection>
       );
       const title = screen.getByText('Section');
-      expect(title).toHaveClass('text-text-primary');
+      expect(title).toHaveClass('text-text-secondary');
     });
 
     it('applies border when expanded', () => {
@@ -318,7 +323,7 @@ describe('CollapsibleSection', () => {
         </CollapsibleSection>
       );
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('hover:bg-surface-hover');
+      expect(button).toHaveClass('hover:bg-bg-surface-hover');
     });
 
     it('has focus ring styles', () => {
@@ -328,7 +333,7 @@ describe('CollapsibleSection', () => {
         </CollapsibleSection>
       );
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('focus:ring-2', 'focus:ring-primary');
+      expect(button).toHaveClass('focus:ring-2', 'focus:ring-primary/40');
     });
   });
 
@@ -370,7 +375,8 @@ describe('CollapsibleSection', () => {
     });
 
     it('handles very long title text', () => {
-      const longTitle = 'This is a very long title that should still render correctly without breaking the layout or causing issues';
+      const longTitle =
+        'This is a very long title that should still render correctly without breaking the layout or causing issues';
       render(
         <CollapsibleSection title={longTitle} isExpanded={false} onToggle={mockOnToggle}>
           <div>Content</div>

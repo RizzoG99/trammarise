@@ -20,7 +20,7 @@ export function DocsPage() {
   const { t } = useTranslation();
 
   return (
-    <div className="min-h-screen bg-bg-primary flex flex-col font-sans text-text-primary">
+    <div className="bg-bg-primary flex flex-col font-sans text-text-primary">
       <Suspense fallback={null}>
         <SEO
           title={t('docs.title')}
@@ -57,7 +57,7 @@ export function DocsPage() {
                 variant="light"
                 className="p-6 flex flex-col items-center text-center gap-4 h-full"
               >
-                <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                   <Play className="w-6 h-6 ml-1" />
                 </div>
                 <div>
@@ -72,7 +72,7 @@ export function DocsPage() {
                 variant="light"
                 className="p-6 flex flex-col items-center text-center gap-4 h-full"
               >
-                <div className="w-12 h-12 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400">
+                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                   <Settings className="w-6 h-6" />
                 </div>
                 <div>

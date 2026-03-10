@@ -10,7 +10,12 @@ export interface StoredConfig {
   timestamp: number;
 }
 
-export function saveApiConfig(provider: string, apiKey: string, openaiKey: string): void {
+export function saveApiConfig(
+  provider: string,
+  apiKey: string,
+  openaiKey: string,
+  persist = false
+): void {
   const config: StoredConfig = {
     provider,
     apiKey,
@@ -18,11 +23,15 @@ export function saveApiConfig(provider: string, apiKey: string, openaiKey: strin
     timestamp: Date.now(),
   };
 
-  sessionStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+  const payload = JSON.stringify(config);
+  sessionStorage.setItem(STORAGE_KEY, payload);
+  if (persist) {
+    localStorage.setItem(STORAGE_KEY, payload);
+  }
 }
 
 export function getApiConfig(): StoredConfig | null {
-  const stored = sessionStorage.getItem(STORAGE_KEY);
+  const stored = sessionStorage.getItem(STORAGE_KEY) ?? localStorage.getItem(STORAGE_KEY);
   if (!stored) return null;
 
   try {
@@ -34,6 +43,11 @@ export function getApiConfig(): StoredConfig | null {
 
 export function clearApiConfig(): void {
   sessionStorage.removeItem(STORAGE_KEY);
+  localStorage.removeItem(STORAGE_KEY);
+}
+
+export function isApiConfigPersisted(): boolean {
+  return localStorage.getItem(STORAGE_KEY) !== null;
 }
 
 // Note: sessionStorage automatically clears when the tab/window closes

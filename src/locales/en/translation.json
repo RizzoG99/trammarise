@@ -25,6 +25,7 @@
       "usage": "Usage",
       "billing": "Usage & Billing",
       "upgrade": "Upgrade to Pro",
+      "pricing": "Pricing",
       "signOut": "Sign Out"
     },
     "manageAccount": "Manage Account",
@@ -49,6 +50,8 @@
       "testing": "Testing...",
       "connectionSuccess": "✓ Connection successful!",
       "connectionError": "✗ Connection failed. Please check your API key.",
+      "saveKey": "Save Key",
+      "updateKey": "Update Key",
       "clear": "Clear",
       "securityNotice": "Your API key is stored securely in your browser and never sent to our servers."
     },
@@ -119,7 +122,38 @@
       "summarizing": "Summarizing Key Points"
     },
     "estimatedTime": "Estimated time",
-    "almostDone": "Almost done"
+    "almostDone": "Almost done",
+    "error": {
+      "title": "Transcription Error",
+      "explanation": "We couldn't transcribe your audio file. This can happen for a few reasons.",
+      "possibleReasons": "Possible reasons:",
+      "reasonFormat": "The audio format is unsupported or corrupted.",
+      "reasonSilence": "The recording contains mostly silence or background noise.",
+      "reasonNetwork": "A momentary network error interrupted the connection.",
+      "fixApiKey": "Fix API Key",
+      "tryAgain": "Try Again",
+      "closeAndRetry": "Close & Try Again"
+    }
+  },
+  "processingState": {
+    "messages": {
+      "loading": "Loading audio processor...",
+      "compressing": "Optimizing audio for processing...",
+      "transcribing": "Transcribing audio with Whisper...",
+      "configuring": "Configuring AI settings...",
+      "summarizing": "Generating AI summary...",
+      "complete": "Processing complete!",
+      "default": "Processing..."
+    },
+    "steps": {
+      "preparing": "Preparing",
+      "optimizing": "Optimizing",
+      "step1of2": "1/2",
+      "step2of2": "2/2"
+    },
+    "stepLabel": "Step {{step}}",
+    "hint": "This may take a moment. Please don't close this window.",
+    "cancel": "Cancel Processing"
   },
   "languages": {
     "en": "English",
@@ -212,7 +246,9 @@
     "uploadSuccess": "File uploaded successfully",
     "recordingSaved": "Recording saved",
     "replaceFile": "Replace File",
+    "replaceAriaLabel": "Replace audio file",
     "remove": "Remove",
+    "removeAriaLabel": "Remove audio file",
     "unknownFormat": "Unknown format"
   },
   "configuration": {
@@ -250,7 +286,9 @@
       "description": "Identify and label different speakers in the transcript",
       "speakersExpected": "Expected Number of Speakers (Optional)",
       "speakersPlaceholder": "Auto-detect",
-      "speakersHint": "Specify 2-10 speakers for better accuracy, or leave blank for auto-detection"
+      "speakersHint": "Specify 2-10 speakers for better accuracy, or leave blank for auto-detection",
+      "proBadge": "Pro",
+      "proUpgradeHint": "Upgrade to Pro to identify speakers"
     },
     "meetingType": {
       "title": "Meeting Type",
@@ -315,14 +353,38 @@
       "redo": "Redo",
       "reset": "Reset"
     },
+    "pageTitle": "Trim Audio",
+    "instructions": "Drag on the waveform to select a segment, or type start and end times below.",
+    "trimButtonLabel": "Trim audio",
+    "trimButtonHint": "Select a specific segment",
+    "regionHint": "Drag on the waveform to select a segment, or type start and end times",
+    "startLabel": "Start",
+    "endLabel": "End",
+    "durationLabel": "Duration",
+    "clearRegion": "Clear selection",
     "actions": {
       "processSelection": "Process Selection",
-      "processFullAudio": "Process Full Audio"
+      "processSelectionHint": "Transcribe {{duration}} segment",
+      "processFullAudio": "Process Full Audio",
+      "processFullAudioHint": "Transcribe all {{duration}}"
     },
     "timeDisplay": {
       "start": "Start",
       "end": "End",
       "placeholder": "--:--"
+    },
+    "keyboardHint": {
+      "space": "Space",
+      "playPause": "play / pause",
+      "arrows": "seek ±5s",
+      "iKey": "I",
+      "oKey": "O",
+      "setInOut": "set in / out point"
+    },
+    "timeInput": {
+      "invalidFormat": "Use M:SS format",
+      "startAfterEnd": "Start must be before end",
+      "endBeforeStart": "End must be after start"
     }
   },
   "fileSizeWarning": {
@@ -384,11 +446,22 @@
     "aria": {
       "startRecording": "Start recording",
       "pauseRecording": "Pause recording",
-      "resumeRecording": "Resume recording"
+      "resumeRecording": "Resume recording",
+      "stopRecording": "Stop recording"
     }
   },
   "footer": {
-    "copyright": "Trammarise © 2025 - Audio Transcription & Summarization"
+    "copyright": "© {{year}} Trammarise. All rights reserved.",
+    "links": {
+      "privacy": "Privacy",
+      "terms": "Terms of Service"
+    },
+    "social": {
+      "github": "GitHub",
+      "linkedin": "LinkedIn",
+      "twitter": "Twitter",
+      "contact": "Contact us"
+    }
   },
   "layout": {
     "loading": "Loading session...",
@@ -452,19 +525,59 @@
       "utterances": "utterances",
       "resultsFound": "results found",
       "noResults": "No results found",
-      "noUtterances": "No utterances available"
+      "noUtterances": "No utterances available",
+      "jumpTo": "Jump to {{timestamp}}",
+      "clearSearch": "Clear search"
     },
     "summary": {
       "title": "Summary",
       "copyAll": "Copy All",
       "phase4Placeholder": "Structured summaries coming in Phase 4"
+    },
+    "chat": {
+      "floatingButtonTooltip": "Refine with Chat"
     }
+  },
+  "audioPlayer": {
+    "skipBack": "Skip back 10 seconds",
+    "play": "Play",
+    "pause": "Pause",
+    "skipForward": "Skip forward 10 seconds",
+    "playbackSpeed": "Playback speed: {{speed}}x"
   },
   "chatModal": {
     "title": "Refine with AI",
     "emptyState": "Ask me anything about your transcript or summary",
     "disclaimer": "AI can make mistakes. Verify important information.",
     "tokenLimit": "Token limit reached"
+  },
+  "pdfModal": {
+    "generating": "Generating PDF",
+    "description": "Creating your professional PDF document...",
+    "success": "PDF downloaded successfully!",
+    "error": "Failed to generate PDF: {{message}}"
+  },
+  "deleteConfirmModal": {
+    "titleSingle": "Delete Recording?",
+    "titleBulk": "Delete {{count}} Recordings?",
+    "messageSingle": "Are you sure you want to delete this recording? This action cannot be undone.",
+    "messageBulk": "Are you sure you want to delete {{count}} recordings? This action cannot be undone.",
+    "recordingLabel": "Recording:",
+    "createdLabel": "Created:",
+    "confirmButton": "Yes, Delete",
+    "confirmingButton": "Deleting...",
+    "cancelButton": "Cancel",
+    "typeToConfirm": "Type DELETE to confirm",
+    "typeToConfirmPlaceholder": "Type DELETE here",
+    "affectedItems": "Recordings to be deleted:"
+  },
+  "export": {
+    "templates": {
+      "meeting": "Meeting",
+      "lecture": "Academic",
+      "interview": "Q&A",
+      "generic": "Standard"
+    }
   },
   "tokenUsage": {
     "label": "Token Usage",
@@ -526,6 +639,11 @@
       "sessions": "{{count}} session",
       "sessions_plural": "{{count}} sessions"
     },
+    "quickActions": {
+      "play": "Play Preview",
+      "copy": "Copy Summary",
+      "download": "Download"
+    },
     "title": "Recording History",
     "subtitle": "{{count}} total recordings",
     "description": "Manage your recordings and generated summaries",
@@ -581,85 +699,45 @@
   },
   "welcome": {
     "hero": {
-      "newBadge": "✨ Introducing Liquid Glass Design",
       "titlePart1": "Transcribe & Summarize",
-      "titlePart2": "In Seconds",
-      "description": "Transform your meetings, lectures, and interviews into actionable insights. Start with 60 free minutes, upgrade for unlimited access.",
-      "cta": {
-        "primary": "Start Free Trial",
-        "secondary": "View Pricing",
-        "getStarted": "Get Started Free",
-        "viewFeatures": "View Features",
-        "appPreview": "[App Preview Visualization]"
-      },
-      "noCreditCard": "No credit card required"
+      "titlePart2": "In Seconds.",
+      "description": "Turn meetings, lectures, and interviews into transcripts and summaries — using your own AI key.",
+      "cta": "Get Started Free",
+      "proof": "· 60 minutes free  · No subscription  · Your API key",
+      "mockup": {
+        "speaker": "Speaker 1",
+        "summaryLabel": "Key points · 3 items",
+        "bullet1": "Follow up with the design team on mockup revisions",
+        "bullet2": "Schedule next sprint planning for Thursday"
+      }
     },
     "features": {
-      "title": "Power Tools for Audio",
-      "subtitle": "Everything you need to master your recordings.",
+      "title": "Everything you need",
+      "subtitle": "Accurate transcription, AI summaries, complete privacy.",
       "cards": {
         "transcription": {
           "title": "Crystal Clear Transcription",
-          "description": "Upload files or record directly. Accurate transcription for reliable records using advanced on-device processing."
+          "description": "Upload a file or record live. Whisper-accurate transcription every time."
         },
         "summaries": {
           "title": "Instant AI Summaries",
-          "description": "Get key points, action items, and structured summaries automatically generated by top-tier AI models."
+          "description": "Key points, action items, structured summaries — generated instantly."
         },
         "security": {
           "title": "Private & Secure",
-          "description": "Your data stays yours. Client-side processing ensures maximum privacy. No audio leaves your device without permission."
+          "description": "Client-side processing. Your audio never leaves without your permission."
         }
       }
     },
-    "pricing": {
-      "title": "Simple, Transparent Pricing",
-      "subtitle": "Choose the plan that fits your needs",
-      "free": {
-        "name": "Free",
-        "price": "$0",
-        "interval": "/month",
-        "description": "Try before you upgrade",
-        "cta": "Start Free Trial"
-      },
-      "pro": {
-        "name": "Pro",
-        "price": "$19",
-        "interval": "/month",
-        "badge": "Most Popular",
-        "description": "For professionals",
-        "cta": "Upgrade to Pro"
-      },
-      "team": {
-        "name": "Team",
-        "price": "$49",
-        "interval": "/month",
-        "description": "For teams",
-        "cta": "Contact Sales"
-      },
-      "viewComparison": "View detailed comparison"
-    },
-    "cta": {
-      "title": "Ready to boost your productivity?",
-      "description": "Join professionals who save hours every week with AI-powered transcription.",
-      "free": "Start Free Trial (60 min)",
-      "pro": "Unlock Pro Features"
-    },
-    "ctaSection": {
-      "title": "Ready to transform your workflow?",
-      "description": "Join thousands of users who are saving hours every week with Trammarise.",
-      "button": "Start for Free"
-    },
-    "footer": {
-      "tagline": "AI-powered audio transcription and summarization",
-      "links": {
-        "docs": "Documentation",
-        "pricing": "Pricing",
-        "privacy": "Privacy",
-        "terms": "Terms",
-        "contact": "Contact"
-      },
-      "copyright": "© {{year}} Trammarise. All rights reserved."
+    "byok": {
+      "label": "Free tier",
+      "title": "Use your own OpenAI key. Pay nothing to us.",
+      "description": "Connect your OpenAI API key and start transcribing immediately. You pay OpenAI directly for what you use — no Trammarise subscription required.",
+      "cta": "Get Started Free",
+      "mockup": {
+        "placeholder": "sk-••••••••••••••••",
+        "connected": "Connected ✓"
+      }
     }
   },
   "pricing": {
@@ -692,41 +770,191 @@
     }
   },
   "onboarding": {
-    "modal": {
-      "title": "🔑 Welcome to Trammarise",
-      "heading": "One More Step to Get Started",
-      "description": "To use Trammarise, you need to either provide your own OpenAI API key or upgrade to a Pro plan.",
-      "option1": {
-        "title": "Option 1: Use Your Own API Key (Free)",
-        "placeholder": "sk-...",
-        "rememberKey": "Remember my API key (stored encrypted)",
-        "continueButton": "Continue with API Key",
-        "saving": "Saving...",
-        "instructions": {
-          "toggle": "How to get an OpenAI API key",
-          "step1": "Go to platform.openai.com",
-          "step2": "Sign in or create an account",
-          "step3": "Click \"Create new secret key\"",
-          "step4": "Copy the key (starts with \"sk-\")",
-          "step5": "Paste it in the field above",
-          "note": "💡 You'll pay OpenAI directly for usage (typically $0.006/minute for Whisper)"
-        },
-        "errors": {
-          "empty": "Please enter your API key",
-          "invalidFormat": "Invalid API key format. OpenAI keys start with \"sk-\"",
-          "saveFailed": "Failed to save API key. Please try again."
-        }
-      },
-      "option2": {
-        "title": "Option 2: Upgrade to Pro",
-        "description": "Get 500 minutes/month with hosted API, cloud sync, and priority support.",
-        "button": "View Pro Plans →"
-      },
-      "divider": "or"
+    "title": "Welcome to Trammarise",
+    "subtitle": "Let's get you set up in a few steps",
+    "step1": {
+      "title": "How will you use Trammarise?",
+      "subtitle": "Choose your primary use case so we can tailor the experience",
+      "useCases": {
+        "meeting": "Meeting",
+        "lecture": "Lecture",
+        "interview": "Interview",
+        "podcast": "Podcast",
+        "voiceMemo": "Voice Memo",
+        "other": "Other"
+      }
     },
-    "banner": {
-      "message": "You're almost there! Complete setup to unlock Trammarise.",
-      "button": "Back to Setup"
+    "step2": {
+      "title": "Choose your plan",
+      "subtitle": "Start free, upgrade anytime",
+      "free": {
+        "name": "Free",
+        "description": "Bring your own API key",
+        "feature1": "Unlimited transcriptions",
+        "feature2": "Your own OpenAI key",
+        "feature3": "All content types",
+        "cta": "Continue Free"
+      },
+      "pro": {
+        "name": "Pro",
+        "description": "Hosted API, no key needed",
+        "feature1": "500 min / month",
+        "feature2": "No API key required",
+        "feature3": "Cloud sync",
+        "feature4": "Priority support",
+        "cta": "Upgrade to Pro",
+        "badge": "Most Popular"
+      }
+    },
+    "step3": {
+      "title": "Connect your API key",
+      "subtitle": "Your key is stored securely in your browser session only",
+      "rememberKey": "Remember my key across sessions",
+      "errorInvalid": "Invalid API key. Please check and try again.",
+      "validating": "Verifying…"
+    },
+    "navigation": {
+      "back": "Back",
+      "next": "Next",
+      "skip": "Skip for now",
+      "finish": "Get Started"
+    },
+    "steps": {
+      "useCase": "Use Case",
+      "apiSetup": "API Setup",
+      "plan": "Plan"
+    },
+    "setupBanner": {
+      "message": "No API key configured — add yours to start transcribing",
+      "cta": "Set up API key",
+      "dismiss": "Dismiss"
+    }
+  },
+  "account": {
+    "title": "Account Settings",
+    "back": "Back to app",
+    "nav": {
+      "profile": "Profile",
+      "apiKeys": "API Keys",
+      "plan": "Plan & Usage"
+    },
+    "navigation": {
+      "profile": "Profile",
+      "billing": "Billing",
+      "apiKeys": "API Keys",
+      "notifications": "Notifications"
+    },
+    "profile": {
+      "title": "Profile",
+      "displayName": "Display Name",
+      "email": "Email",
+      "saveChanges": "Save Changes",
+      "saved": "Saved!",
+      "memberSince": "Member since"
+    },
+    "billing": {
+      "title": "Billing & Usage",
+      "currentPlan": "Current Plan",
+      "usage": "Usage this month",
+      "upgrade": "Upgrade Plan",
+      "cancelSubscription": "Cancel Subscription",
+      "billingHistory": "Billing History",
+      "minutesUsed": "{{used}} / {{limit}} minutes used"
+    },
+    "apiKeys": {
+      "title": "API Keys",
+      "openai": "OpenAI API Key",
+      "openrouter": "OpenRouter API Key",
+      "updateKey": "Update Key",
+      "removeKey": "Remove Key",
+      "keyStored": "Key stored in session only"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "emailUpdates": "Product updates & announcements",
+      "usageAlerts": "Usage limit alerts",
+      "transcriptionComplete": "Transcription complete notifications",
+      "save": "Save Preferences"
+    }
+  },
+  "upgrade": {
+    "speakerDiarization": {
+      "title": "Identify every voice",
+      "desc": "Speaker Identification labels who said what — color-coded, timestamped, up to 10 speakers.",
+      "feature1": "Color-coded speaker labels",
+      "feature2": "Up to 10 speakers",
+      "feature3": "Timestamped per utterance",
+      "cta": "Unlock Speaker ID",
+      "annualHint": "or pay annually and save 2 months",
+      "previewSubtitle": "See who said what, when"
+    }
+  },
+  "audioPreview": {
+    "playAriaLabel": "Play audio",
+    "pauseAriaLabel": "Pause audio",
+    "seekAriaLabel": "Seek audio position",
+    "previewLabel": "Audio preview"
+  },
+  "usagePanel": {
+    "error": "Failed to load usage data. Please refresh the page.",
+    "free": {
+      "planBadge": "Free",
+      "upgradeBtn": "Upgrade to Pro",
+      "sectionThisMonth": "This month",
+      "transcriptionCount_one": "{{count}} transcription",
+      "transcriptionCount_other": "{{count}} transcriptions",
+      "byokStatus": "Using your own OpenAI key (BYOK)",
+      "checkBalance": "Check your OpenAI balance",
+      "noKeyWarning": "No API key configured",
+      "noKeyCta": "Set up your API key",
+      "sectionMissing": "What you're missing",
+      "sectionMissingCaption": "Available on Pro and above",
+      "proBadge": "Pro",
+      "feature": {
+        "hostedApi": {
+          "name": "No API key needed",
+          "desc": "Platform handles transcription — no OpenAI key required"
+        },
+        "chat": {
+          "name": "AI Chat on results",
+          "desc": "Ask questions, translate, or refine your transcript with AI"
+        },
+        "diarization": {
+          "name": "Speaker diarization",
+          "desc": "Identify who said what — perfect for interviews and meetings"
+        },
+        "cloudSync": {
+          "name": "Cloud sync",
+          "desc": "Access your transcriptions from any device"
+        }
+      }
+    },
+    "pro": {
+      "planBadge": "Pro",
+      "managePlan": "Manage plan",
+      "sectionMinutes": "Minutes this month",
+      "minutesUsed": "{{minutesUsed}} / {{minutesIncluded}} min",
+      "transcriptionCount_one": "{{count}} transcription this month",
+      "transcriptionCount_other": "{{count}} transcriptions this month",
+      "renews": "Renews {{date}}",
+      "accessEnds": "Access ends {{date}}",
+      "progressAriaLabel": "{{pct}}% of monthly minutes used",
+      "warning": {
+        "title": "Running low on minutes",
+        "body": "{{minutesUsed}} of {{minutesIncluded}} minutes used — {{remaining}} remaining this period."
+      },
+      "quota": {
+        "title": "Quota reached",
+        "body": "Upgrade your plan or wait for renewal on {{date}}.",
+        "upgradeBtn": "Upgrade for more minutes"
+      },
+      "badge": {
+        "cancels": "Cancels {{date}}",
+        "trial": "Trial ends {{date}}",
+        "pastDue": "Payment failed",
+        "unpaid": "Unpaid",
+        "canceled": "Canceled"
+      }
     }
   }
 }

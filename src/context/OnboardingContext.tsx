@@ -1,10 +1,10 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import type { ReactNode } from 'react';
-import { useUser } from '@clerk/clerk-react';
+import { useUser } from '@clerk/react';
 import { useSubscription } from './SubscriptionContext';
 import { getApiConfig, saveApiConfig } from '@/utils/session-storage';
-import { getSavedApiKey } from '@/utils/api';
+import { getSavedApiKey, getOnboardingUseCaseFromDb } from '@/utils/api';
 
 interface OnboardingContextValue {
   needsOnboarding: boolean;
@@ -12,6 +12,7 @@ interface OnboardingContextValue {
   completeOnboarding: () => void;
   isViewingPricing: boolean;
   setIsViewingPricing: (viewing: boolean) => void;
+  onboardingUseCase: string | null;
 }
 
 const OnboardingContext = createContext<OnboardingContextValue | null>(null);
@@ -22,6 +23,7 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
   const [needsOnboarding, setNeedsOnboarding] = useState(false);
   const [isCheckingOnboarding, setIsCheckingOnboarding] = useState(true);
   const [isViewingPricing, setIsViewingPricing] = useState(false);
+  const [onboardingUseCase, setOnboardingUseCase] = useState<string | null>(null);
 
   const checkOnboardingStatus = useCallback(async () => {
     // Not signed in - no onboarding needed (will see WelcomePage)
@@ -47,18 +49,26 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    // Check database
+    // Check database — use allSettled so a use-case fetch failure doesn't
+    // discard a successfully retrieved API key (and vice versa).
     try {
-      const savedKey = await getSavedApiKey();
-      if (savedKey.hasKey && savedKey.apiKey) {
-        // Restore API key to session storage
-        saveApiConfig('openai', savedKey.apiKey, savedKey.apiKey);
+      const [keyResult, useCaseResult] = await Promise.allSettled([
+        getSavedApiKey(),
+        getOnboardingUseCaseFromDb(),
+      ]);
+
+      if (useCaseResult.status === 'fulfilled' && useCaseResult.value) {
+        setOnboardingUseCase(useCaseResult.value);
+      }
+
+      if (keyResult.status === 'fulfilled' && keyResult.value.hasKey && keyResult.value.apiKey) {
+        saveApiConfig('openai', keyResult.value.apiKey, keyResult.value.apiKey);
         setNeedsOnboarding(false);
       } else {
         setNeedsOnboarding(true);
       }
     } catch {
-      // If fetch fails, assume needs onboarding
+      // Unexpected error (allSettled itself shouldn't reject)
       setNeedsOnboarding(true);
     } finally {
       setIsCheckingOnboarding(false);
@@ -91,6 +101,7 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
         completeOnboarding,
         isViewingPricing,
         setIsViewingPricing,
+        onboardingUseCase,
       }}
     >
       {children}

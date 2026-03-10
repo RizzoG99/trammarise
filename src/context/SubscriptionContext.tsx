@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import type { ReactNode } from 'react';
-import { useUser, useAuth } from '@clerk/clerk-react';
+import { useUser, useAuth } from '@clerk/react';
 import { TIER_FEATURES, FREE_SUBSCRIPTION } from './subscription-tiers';
 import type { SubscriptionTier, SubscriptionStatus, Subscription } from './subscription-types';
 import { fetchWithAuth } from '@/utils/fetch-with-auth';

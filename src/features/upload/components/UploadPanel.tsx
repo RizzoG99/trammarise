@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import type { DragEvent } from 'react';
-import { Upload, AlertCircle } from 'lucide-react';
+import { AudioLines, AlertCircle } from 'lucide-react';
 import { GlassCard, Heading, Text } from '@/lib';
 import { FilePreview } from './FilePreview';
 import { useTranslation } from 'react-i18next';
@@ -166,19 +166,36 @@ export function UploadPanel({ onFileUpload, uploadedFile, onFileRemove }: Upload
           onDrop={handleDrop}
           onClick={handleClick}
           className={`
-            border-2 border-dashed rounded-lg p-8
+            relative overflow-hidden
+            border rounded-xl p-8
             flex flex-col items-center justify-center
             min-h-[300px] cursor-pointer
             transition-all duration-200
             ${
               isDragging
-                ? 'border-primary bg-[var(--color-primary-alpha-10)]'
+                ? 'drag-active scale-[1.01]'
                 : 'border-border hover:border-primary hover:bg-[var(--color-primary-alpha-5)]'
             }
           `}
         >
-          <div className="w-16 h-16 rounded-full bg-[var(--color-primary-alpha-10)] flex items-center justify-center mb-4">
-            <Upload className="w-8 h-8 text-primary" />
+          {/* Decorative waveform background — communicates "audio" before any text is read */}
+          <div
+            className="absolute inset-0 flex items-end justify-center gap-[3px] pb-8 opacity-[0.06] pointer-events-none"
+            aria-hidden="true"
+          >
+            {[4, 8, 14, 10, 18, 12, 6, 16, 10, 14, 8, 12, 18, 6, 10, 14, 8, 16, 12, 6].map(
+              (h, i) => (
+                <div
+                  key={i}
+                  className="w-1 rounded-full bg-[var(--color-primary)]"
+                  style={{ height: `${h * 4}px` }}
+                />
+              )
+            )}
+          </div>
+
+          <div className="w-12 h-12 rounded-full bg-[var(--color-primary-alpha-10)] flex items-center justify-center mb-4">
+            <AudioLines className="w-6 h-6 text-primary" />
           </div>
 
           <Text variant="body" color="primary" className="font-medium mb-2">
@@ -189,11 +206,9 @@ export function UploadPanel({ onFileUpload, uploadedFile, onFileRemove }: Upload
             {t('uploadFormats.label')}
           </Text>
 
-          <div className="inline-flex px-4 py-2 rounded-full bg-[var(--color-bg-surface)] border border-border">
-            <Text variant="caption" color="secondary">
-              {t('home.supportedFormats')}
-            </Text>
-          </div>
+          <Text variant="caption" color="secondary">
+            {t('home.supportedFormats')}
+          </Text>
         </div>
       )}
 

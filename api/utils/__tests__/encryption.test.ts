@@ -96,8 +96,10 @@ describe('encryption utilities', () => {
       const encrypted = encrypt(plaintext);
       const parts = encrypted.split(':');
 
-      // Tamper with ciphertext
-      const tamperedCiphertext = parts[2].slice(0, -2) + 'ff';
+      // Tamper with ciphertext — XOR last byte to guarantee it differs
+      const lastByteHex = parts[2].slice(-2);
+      const flippedByte = (parseInt(lastByteHex, 16) ^ 0xff).toString(16).padStart(2, '0');
+      const tamperedCiphertext = parts[2].slice(0, -2) + flippedByte;
       const tampered = `${parts[0]}:${parts[1]}:${tamperedCiphertext}`;
 
       expect(() => decrypt(tampered)).toThrow();

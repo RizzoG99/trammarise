@@ -1,11 +1,28 @@
 import { useTranslation } from 'react-i18next';
+import { Tooltip } from '@/lib/components/ui/Tooltip/Tooltip';
+import { Info } from 'lucide-react';
+import { RadioCard } from '@/lib/components/form/RadioCard/RadioCard';
 
 export type ProcessingMode = 'balanced' | 'quality';
 
 export interface ProcessingModeSelectorProps {
   value: ProcessingMode;
   onChange: (mode: ProcessingMode) => void;
-  disabled?: boolean; // Disable mode selection
+  disabled?: boolean;
+}
+
+function CreditsBadge({ label }: { label: string }) {
+  return (
+    <span
+      className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
+      style={{
+        backgroundColor: 'var(--color-primary-alpha-10)',
+        color: 'var(--color-primary)',
+      }}
+    >
+      {label}
+    </span>
+  );
 }
 
 export function ProcessingModeSelector({ value, onChange, disabled }: ProcessingModeSelectorProps) {
@@ -15,112 +32,47 @@ export function ProcessingModeSelector({ value, onChange, disabled }: Processing
 
   return (
     <div className="space-y-3">
-      <label
-        className="block text-sm font-semibold mb-1"
-        style={{ color: 'var(--color-text-primary)' }}
-      >
-        {t('configuration.processingMode.title')}
-      </label>
+      <div className="flex items-center gap-2 mb-2">
+        <label
+          className="block text-sm font-semibold"
+          style={{ color: 'var(--color-text-primary)' }}
+        >
+          {t('configuration.processingMode.title')}
+        </label>
+        <Tooltip
+          content={t(
+            'configuration.processingMode.tooltip',
+            'Select how your audio will be processed for optimal results'
+          )}
+          placement="top"
+        >
+          <Info className="w-4 h-4 text-text-tertiary" />
+        </Tooltip>
+      </div>
 
       <div className="flex flex-col gap-3">
-        {/* Balanced Mode */}
-        <label
-          className={`relative flex items-center p-3 rounded-lg border cursor-pointer transition-colors ${
-            disabled
-              ? 'opacity-50 cursor-not-allowed bg-gray-100/10'
-              : value === 'balanced'
-                ? 'bg-primary/5'
-                : 'hover:bg-gray-100/30'
-          }`}
-          style={{
-            borderColor:
-              value === 'balanced' && !disabled ? 'var(--color-primary)' : 'var(--color-border)',
-          }}
-        >
-          <input
-            type="radio"
-            name="mode"
-            value="balanced"
-            checked={value === 'balanced'}
-            onChange={(e) => !disabled && onChange(e.target.value as ProcessingMode)}
-            disabled={disabled}
-            className="h-4 w-4 border-gray-300 focus:ring-2 focus:ring-offset-0 disabled:cursor-not-allowed"
-            style={{
-              accentColor: 'var(--color-primary)',
-            }}
-          />
-          <div className="ml-3 flex-1">
-            <div className="flex justify-between">
-              <span
-                className={`block text-sm font-medium ${disabled ? 'text-gray-400' : 'text-[var(--color-text-primary)]'}`}
-              >
-                {t('configuration.processingMode.balanced.title')}
-              </span>
-              <span
-                className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
-                style={{
-                  backgroundColor: 'var(--color-primary-alpha-10)',
-                  color: 'var(--color-primary)',
-                }}
-              >
-                {t('configuration.processingMode.balanced.credits')}
-              </span>
-            </div>
-            <span
-              className={`block text-xs ${disabled ? 'text-gray-400' : 'text-[var(--color-text-secondary)]'}`}
-            >
-              {t('configuration.processingMode.balanced.description')}
-            </span>
-          </div>
-        </label>
-
-        {/* Quality Mode */}
-        <label
-          className={`relative flex items-center p-3 rounded-lg border cursor-pointer transition-colors ${
-            disabled
-              ? 'opacity-50 cursor-not-allowed bg-gray-100/10'
-              : value === 'quality'
-                ? 'bg-primary/5'
-                : 'hover:bg-gray-100/30'
-          }`}
-          style={{
-            borderColor:
-              value === 'quality' && !disabled ? 'var(--color-primary)' : 'var(--color-border)',
-          }}
-        >
-          <input
-            type="radio"
-            name="mode"
-            value="quality"
-            checked={value === 'quality'}
-            onChange={(e) => !disabled && onChange(e.target.value as ProcessingMode)}
-            disabled={disabled}
-            className="h-4 w-4 border-gray-300 focus:ring-2 focus:ring-offset-0 disabled:cursor-not-allowed"
-            style={{
-              accentColor: 'var(--color-primary)',
-            }}
-          />
-          <div className="ml-3 flex-1">
-            <div className="flex justify-between">
-              <span
-                className={`block text-sm font-medium ${disabled ? 'text-gray-400' : 'text-[var(--color-text-primary)]'}`}
-              >
-                {t('configuration.processingMode.quality.title')}
-              </span>
-              <span
-                className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
-                style={{ backgroundColor: 'rgba(168, 85, 247, 0.1)', color: '#a855f7' }}
-              >
-                {t('configuration.processingMode.quality.credits')}
-              </span>
-            </div>
-            <span
-              className={`block text-xs ${disabled ? 'text-gray-400' : 'text-[var(--color-text-secondary)]'}`}
-            >
-              {t('configuration.processingMode.quality.description')}
-            </span>
-          </div>
-        </label>
+        <RadioCard
+          size="sm"
+          name="mode"
+          value="balanced"
+          checked={value === 'balanced'}
+          onChange={(v) => !disabled && onChange(v as ProcessingMode)}
+          disabled={disabled}
+          title={t('configuration.processingMode.balanced.title')}
+          description={t('configuration.processingMode.balanced.description')}
+          badge={<CreditsBadge label={t('configuration.processingMode.balanced.credits')} />}
+        />
+        <RadioCard
+          size="sm"
+          name="mode"
+          value="quality"
+          checked={value === 'quality'}
+          onChange={(v) => !disabled && onChange(v as ProcessingMode)}
+          disabled={disabled}
+          title={t('configuration.processingMode.quality.title')}
+          description={t('configuration.processingMode.quality.description')}
+          badge={<CreditsBadge label={t('configuration.processingMode.quality.credits')} />}
+        />
       </div>
     </div>
   );

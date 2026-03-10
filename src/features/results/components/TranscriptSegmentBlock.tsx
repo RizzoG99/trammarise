@@ -1,5 +1,5 @@
 import { memo, useMemo } from 'react';
-import { Text } from '../../../lib';
+import { useTranslation } from 'react-i18next';
 import type { TranscriptSegment } from '../utils/transcriptParser';
 
 /**
@@ -40,6 +40,7 @@ export const TranscriptSegmentBlock = memo(function TranscriptSegmentBlock({
   searchQuery,
   onTimestampClick,
 }: TranscriptSegmentBlockProps) {
+  const { t } = useTranslation();
   // Memoize highlighted text - only recompute when text or query changes
   const highlightedText = useMemo(() => {
     if (!searchQuery || searchQuery.trim().length === 0) {
@@ -72,43 +73,51 @@ export const TranscriptSegmentBlock = memo(function TranscriptSegmentBlock({
       }}
       tabIndex={onTimestampClick ? 0 : undefined}
       role={onTimestampClick ? 'button' : undefined}
-      aria-label={onTimestampClick ? `Jump to ${segment.timestamp}` : undefined}
+      aria-label={
+        onTimestampClick
+          ? t('results.transcript.jumpTo', { timestamp: segment.timestamp })
+          : undefined
+      }
       className={`
-        p-4 rounded-lg transition-all
+        group px-3 py-3 rounded-lg transition-all duration-150
         ${onTimestampClick ? 'cursor-pointer' : ''}
         ${
           isActive
-            ? 'bg-[var(--color-primary)]/10 border-l-4 border-[var(--color-primary)]'
-            : 'hover:bg-[var(--color-surface-hover)] hover:shadow-sm'
+            ? 'bg-primary/8 border-l-2 border-primary ml-0 pl-3'
+            : 'border-l-2 border-transparent hover:bg-white/[0.025] hover:border-border'
         }
       `}
     >
       {/* Timestamp & Speaker */}
-      <div className="flex items-center gap-3 mb-2">
-        {/* Timestamp Badge (visual only) */}
+      <div className="flex items-center gap-2.5 mb-1.5">
         <span
-          className="
-            px-2 py-1 rounded text-xs font-mono
-            bg-[var(--color-primary)]/20 text-[var(--color-primary)]
-            pointer-events-none
-          "
+          className={`
+            px-1.5 py-0.5 rounded text-[11px] font-mono tabular-nums
+            pointer-events-none transition-colors duration-150
+            ${
+              isActive
+                ? 'bg-primary/20 text-primary'
+                : 'bg-bg-surface text-text-tertiary group-hover:text-text-secondary'
+            }
+          `}
           aria-hidden="true"
         >
           {segment.timestamp}
         </span>
 
-        {/* Speaker Label - Only show if speaker exists */}
         {segment.speaker && (
-          <Text variant="caption" className="font-semibold text-[var(--color-text)]">
+          <span className="text-[11px] font-semibold uppercase tracking-widest text-text-tertiary">
             {segment.speaker}
-          </Text>
+          </span>
         )}
       </div>
 
       {/* Text Content */}
-      <Text variant="body" className="leading-relaxed">
+      <p
+        className={`text-[15px] leading-[1.7] transition-colors duration-150 ${isActive ? 'text-text-primary' : 'text-text-secondary group-hover:text-text-primary'}`}
+      >
         {highlightedText}
-      </Text>
+      </p>
     </div>
   );
 });

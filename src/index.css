@@ -5,12 +5,21 @@
   :root {
     /* Base Configuration (Light Mode Default) */
     font-family:
-      'Inter',
+      'Plus Jakarta Sans',
       system-ui,
       -apple-system,
       sans-serif;
     line-height: 1.5;
     font-weight: 400;
+
+    /* Font stack */
+    --font-display: 'Plus Jakarta Sans', system-ui, sans-serif;
+    --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
+
+    /* Letter spacing — geometric fonts breathe at tighter tracking */
+    --tracking-tight: -0.03em;
+    --tracking-normal: -0.01em;
+    --tracking-wide: 0.05em;
 
     /* Colors - Light Mode */
     /* Colors - Light Mode (Updated to match V8.0 base but kept usable) */
@@ -30,11 +39,12 @@
     --color-text-tertiary: #94a3b8;
 
     /* Brand Primary - Ocean Gloss Blue */
-    --color-primary: #3b82f6;
-    --color-primary-light: #60a5fa;
-    --color-primary-hover: #2563eb;
-    --color-primary-alpha-10: rgba(59, 130, 246, 0.1);
-    --color-primary-alpha-20: rgba(59, 130, 246, 0.2);
+    --color-primary: oklch(54% 0.21 260);
+    --color-primary-light: oklch(72% 0.14 260);
+    --color-primary-hover: oklch(47% 0.21 260);
+    --color-primary-alpha-5: color-mix(in oklch, var(--color-primary) 5%, transparent);
+    --color-primary-alpha-10: color-mix(in oklch, var(--color-primary) 10%, transparent);
+    --color-primary-alpha-20: color-mix(in oklch, var(--color-primary) 20%, transparent);
 
     /* Accents */
     --color-accent-success: #10b981;
@@ -89,6 +99,11 @@
     --transition-fast: 150ms ease;
     --transition-normal: 250ms ease;
     --transition-slow: 350ms ease;
+
+    /* Easing Functions */
+    --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
   }
 
   /* Dark Mode - Liquid Glass V8.0 */
@@ -110,11 +125,12 @@
     --color-text-tertiary: #94a3b8;
 
     /* Brand Primary - Ocean Gloss Blue */
-    --color-primary: #3b82f6;
-    --color-primary-light: #60a5fa;
-    --color-primary-hover: #2563eb;
-    --color-primary-alpha-10: rgba(59, 130, 246, 0.15);
-    --color-primary-alpha-20: rgba(59, 130, 246, 0.25);
+    --color-primary: oklch(54% 0.21 260);
+    --color-primary-light: oklch(72% 0.14 260);
+    --color-primary-hover: oklch(47% 0.21 260);
+    --color-primary-alpha-5: color-mix(in oklch, var(--color-primary) 5%, transparent);
+    --color-primary-alpha-10: color-mix(in oklch, var(--color-primary) 15%, transparent);
+    --color-primary-alpha-20: color-mix(in oklch, var(--color-primary) 25%, transparent);
 
     /* Glassmorphism for Dark Mode - 5% opacity, 24px blur */
     --glass-bg: rgba(15, 23, 42, 0.5); /* Slightly more opaque for legibility */
@@ -127,6 +143,11 @@
     min-width: 320px;
     min-height: 100vh;
     background-color: var(--color-bg-primary);
+    background-image: radial-gradient(
+      ellipse 80% 60% at 50% -10%,
+      color-mix(in oklch, var(--color-primary) 6%, transparent),
+      transparent 70%
+    );
     color: var(--color-text-primary);
     transition:
       background-color 0.3s ease,
@@ -160,15 +181,237 @@
   @keyframes pulse-ring {
     0% {
       transform: scale(1);
-      opacity: 0.2;
+      opacity: 0.5;
     }
     100% {
-      transform: scale(1.15);
+      transform: scale(1.8);
       opacity: 0;
     }
   }
 
   .pulse-ring {
-    animation: pulse-ring 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    animation: pulse-ring 2s cubic-bezier(0.2, 0.8, 0.4, 1) infinite;
+  }
+
+  /* Pulsing shadow for drag and drop area */
+  @keyframes drag-pulse {
+    0% {
+      box-shadow: 0 0 0 0 var(--color-primary-alpha-20);
+    }
+    70% {
+      box-shadow: 0 0 0 15px transparent;
+    }
+    100% {
+      box-shadow: 0 0 0 0 transparent;
+    }
+  }
+
+  .drag-active {
+    animation: drag-pulse 1.5s infinite;
+    border-color: var(--color-primary);
+    background-color: var(--color-primary-alpha-10);
+  }
+
+  /* Cursor blink for mockups */
+  @keyframes blink {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
+  }
+
+  /* Page entry animation */
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-up {
+    animation: fade-up 0.45s var(--ease-out-quart) both;
+  }
+
+  @keyframes tab-switch {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-tab-switch {
+    animation: tab-switch 0.2s ease-out both;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-fade-up,
+    .animate-tab-switch {
+      animation: none;
+    }
+  }
+
+  @keyframes dropdown-enter {
+    from {
+      opacity: 0;
+      transform: translateY(-6px) scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .animate-dropdown-enter {
+    animation: dropdown-enter 0.18s ease-out both;
+    transform-origin: top right;
+  }
+
+  /* Animatable CSS custom property for seek bar fill */
+  @property --audio-fill-pct {
+    syntax: '<percentage>';
+    inherits: false;
+    initial-value: 0%;
+  }
+
+  /* Mini audio player seek bar */
+  .mini-audio-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 4px;
+    border-radius: 9999px;
+    cursor: pointer;
+    outline: none;
+  }
+
+  .mini-audio-range:focus-visible {
+    ring: 2px solid var(--color-primary);
+    ring-offset: 2px;
+  }
+
+  .mini-audio-range::-webkit-slider-runnable-track {
+    height: 4px;
+    border-radius: 9999px;
+  }
+
+  .mini-audio-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    border: 2px solid var(--color-bg-surface);
+    box-shadow: 0 0 0 1.5px var(--color-primary);
+    margin-top: -5px;
+    cursor: pointer;
+    transition:
+      transform 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+
+  .mini-audio-range:hover::-webkit-slider-thumb {
+    transform: scale(1.2);
+    box-shadow: 0 0 0 2px var(--color-primary);
+  }
+
+  .mini-audio-range::-moz-range-track {
+    height: 4px;
+    border-radius: 9999px;
+    background: transparent;
+  }
+
+  .mini-audio-range::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    border: 2px solid var(--color-bg-surface);
+    box-shadow: 0 0 0 1.5px var(--color-primary);
+    cursor: pointer;
+    transition:
+      transform 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+
+  .mini-audio-range:hover::-moz-range-thumb {
+    transform: scale(1.2);
+    box-shadow: 0 0 0 2px var(--color-primary);
+  }
+
+  /* Volume control slider — same track as mini-audio-range but with a
+     subtle default thumb (no persistent ring) so it doesn't look hovered at rest. */
+  .volume-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 4px;
+    border-radius: 9999px;
+    cursor: pointer;
+    outline: none;
+  }
+
+  .volume-range:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  .volume-range::-webkit-slider-runnable-track {
+    height: 4px;
+    border-radius: 9999px;
+  }
+
+  .volume-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    border: 2px solid var(--color-bg-surface);
+    box-shadow: none;
+    margin-top: -4px;
+    cursor: pointer;
+    transition:
+      transform 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+
+  .volume-range:hover::-webkit-slider-thumb {
+    transform: scale(1.25);
+    box-shadow: 0 0 0 2px var(--color-primary);
+  }
+
+  .volume-range::-moz-range-track {
+    height: 4px;
+    border-radius: 9999px;
+    background: transparent;
+  }
+
+  .volume-range::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    border: 2px solid var(--color-bg-surface);
+    box-shadow: none;
+    cursor: pointer;
+    transition:
+      transform 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+
+  .volume-range:hover::-moz-range-thumb {
+    transform: scale(1.25);
+    box-shadow: 0 0 0 2px var(--color-primary);
   }
 }

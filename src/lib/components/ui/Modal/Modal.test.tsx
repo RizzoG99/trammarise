@@ -85,9 +85,7 @@ describe('Modal', () => {
 
     it('calls action onClick when action button is clicked', () => {
       const onConfirm = vi.fn();
-      const actions = [
-        { label: 'Confirm', onClick: onConfirm },
-      ];
+      const actions = [{ label: 'Confirm', onClick: onConfirm }];
       render(<Modal {...defaultProps} actions={actions} />);
 
       fireEvent.click(screen.getByText('Confirm'));
@@ -240,7 +238,7 @@ describe('Modal', () => {
       // The className is on the modal content div (child of backdrop)
       const backdrop = screen.getByRole('dialog');
       const modalContent = backdrop.querySelector('div');
-      expect(modalContent?.className).toContain('bg-white');
+      expect(modalContent?.className).toContain('bg-bg-surface');
       expect(modalContent?.className).toContain('custom-class');
     });
   });

@@ -214,6 +214,8 @@ Audio files are served through `/api/audio/:sessionId` endpoint which:
 - [ ] API keys in database are encrypted (not plaintext)
 - [ ] Session storage API keys are cleared on tab close
 - [ ] No API keys logged to console (except in development)
+- [ ] `VITE_POSTHOG_KEY` is set for analytics (optional but recommended)
+- [ ] `VITE_POSTHOG_HOST` matches the PostHog region (EU or US)
 
 ---
 

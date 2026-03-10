@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { lazy, Suspense, useEffect, useState, useCallback } from 'react';
-import { ClerkProvider, useUser } from '@clerk/clerk-react';
+import { ClerkProvider, useUser } from '@clerk/react';
+import { identifyUser, resetAnalytics } from '../lib/analytics';
 import { AppLayout } from './AppLayout';
 import { ROUTES } from '../types/routing';
 import { WelcomePage } from '../pages/WelcomePage';
@@ -39,6 +40,12 @@ const DocsPage = lazy(() =>
 const PricingPage = lazy(() =>
   import('./routes/PricingPage').then((module) => ({ default: module.PricingPage }))
 );
+const OnboardingPage = lazy(() =>
+  import('./routes/OnboardingPage').then((module) => ({ default: module.OnboardingPage }))
+);
+const AccountBillingPage = lazy(() =>
+  import('./routes/AccountBillingPage').then((module) => ({ default: module.AccountBillingPage }))
+);
 
 // Placeholder for Configuration page (will be enhanced later)
 import { Heading, Text, GlassCard } from '@/lib';
@@ -63,10 +70,9 @@ function ConfigurationPlaceholder() {
 import { PageLoader } from '@/lib/components/ui/PageLoader/PageLoader';
 
 import { migrateFromSessionStorage } from '@/utils/session-manager';
-import { HeaderProvider } from '@/context/HeaderContext';
 import { SubscriptionProvider } from '@/context/SubscriptionContext';
 import { OnboardingProvider, useOnboarding } from '@/context/OnboardingContext';
-import { ApiKeyOnboardingModal } from '@/components/modals/ApiKeyOnboardingModal';
+// ApiKeyOnboardingModal replaced by OnboardingPage route redirect
 
 // Get Clerk publishable key from environment
 const CLERK_PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || '';
@@ -76,10 +82,19 @@ if (!CLERK_PUBLISHABLE_KEY) {
 }
 
 function AppRoutes() {
-  const { isSignedIn, isLoaded } = useUser();
-  const { needsOnboarding, isCheckingOnboarding, completeOnboarding } = useOnboarding();
+  const { isSignedIn, isLoaded, user } = useUser();
+  const { needsOnboarding, isCheckingOnboarding } = useOnboarding();
   const navigate = useNavigate();
   const [showStorageWarning, setShowStorageWarning] = useState(false);
+  const [clerkTimedOut, setClerkTimedOut] = useState(false);
+
+  // If Clerk's script fails to load (e.g. 530 network error), isLoaded never
+  // becomes true. After 10 s we stop showing the spinner and surface an error.
+  useEffect(() => {
+    if (isLoaded) return;
+    const timer = setTimeout(() => setClerkTimedOut(true), 10_000);
+    return () => clearTimeout(timer);
+  }, [isLoaded]);
 
   const handleStorageWarning = useCallback((level: StorageWarningLevel) => {
     if (level === 'high' || level === 'critical') {
@@ -98,6 +113,16 @@ function AppRoutes() {
     migrateFromSessionStorage();
   }, []);
 
+  // Identify user in analytics when signed in, reset on sign-out
+  useEffect(() => {
+    if (!isLoaded) return;
+    if (isSignedIn && user) {
+      identifyUser(user.id, { email: user.primaryEmailAddress?.emailAddress });
+    } else {
+      resetAnalytics();
+    }
+  }, [isLoaded, isSignedIn, user]);
+
   const handleCleanup = async () => {
     // Implement cleanup logic
     setShowStorageWarning(false);
@@ -105,23 +130,40 @@ function AppRoutes() {
   };
 
   if (!isLoaded || isCheckingOnboarding) {
+    if (clerkTimedOut) {
+      return (
+        <div className="min-h-screen flex flex-col items-center justify-center gap-4 p-8 text-center">
+          <p className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>
+            Authentication service unavailable
+          </p>
+          <p className="text-sm max-w-sm" style={{ color: 'var(--color-text-secondary)' }}>
+            Could not connect to the authentication service. Please check your internet connection
+            and try refreshing the page.
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-2 px-6 py-2 rounded-lg text-sm font-medium text-white cursor-pointer transition-colors duration-150"
+            style={{ backgroundColor: 'var(--color-primary)' }}
+          >
+            Retry
+          </button>
+        </div>
+      );
+    }
     return <PageLoader />;
   }
 
-  // If signed in and needs onboarding, block routes except pricing
+  // If signed in and needs onboarding, redirect to onboarding page
   if (isSignedIn && needsOnboarding) {
     return (
-      <>
-        <ApiKeyOnboardingModal isOpen={true} onComplete={completeOnboarding} />
-        <Suspense fallback={<PageLoader />}>
-          <Routes>
-            {/* Only allow pricing page during onboarding */}
-            <Route path="/pricing" element={<PricingPage />} />
-            {/* Redirect everything else to home (which will show modal) */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </Suspense>
-      </>
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
+          {/* Onboarding wizard */}
+          <Route path={ROUTES.ONBOARDING} element={<OnboardingPage />} />
+          {/* Redirect everything else to onboarding */}
+          <Route path="*" element={<Navigate to={ROUTES.ONBOARDING} replace />} />
+        </Routes>
+      </Suspense>
     );
   }
 
@@ -173,6 +215,9 @@ function AppRoutes() {
 
                 {/* Pricing route */}
                 <Route path="/pricing" element={<PricingPage />} />
+
+                {/* Account & Billing route */}
+                <Route path={ROUTES.ACCOUNT} element={<AccountBillingPage />} />
               </Route>
 
               {/* Redirect unknown routes to home */}
@@ -198,9 +243,7 @@ function App() {
     <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY}>
       <SubscriptionProvider>
         <OnboardingProvider>
-          <HeaderProvider>
-            <AppRoutes />
-          </HeaderProvider>
+          <AppRoutes />
         </OnboardingProvider>
       </SubscriptionProvider>
     </ClerkProvider>

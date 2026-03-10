@@ -8,12 +8,27 @@ export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   size?: BadgeSize;
 }
 
-const variantClasses: Record<BadgeVariant, string> = {
-  default: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-100',
-  secondary: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300',
-  success: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
-  warning: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
-  error: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
+const variantStyles: Record<BadgeVariant, React.CSSProperties> = {
+  default: {
+    backgroundColor: 'var(--color-bg-tertiary)',
+    color: 'var(--color-text-secondary)',
+  },
+  secondary: {
+    backgroundColor: 'var(--color-primary-alpha-10)',
+    color: 'var(--color-primary)',
+  },
+  success: {
+    backgroundColor: 'var(--color-accent-success-alpha-10)',
+    color: 'var(--color-accent-success)',
+  },
+  warning: {
+    backgroundColor: 'var(--color-accent-warning-alpha-10)',
+    color: 'var(--color-accent-warning)',
+  },
+  error: {
+    backgroundColor: 'var(--color-accent-error-alpha-10)',
+    color: 'var(--color-accent-error)',
+  },
 };
 
 const sizeClasses: Record<BadgeSize, string> = {
@@ -22,15 +37,20 @@ const sizeClasses: Record<BadgeSize, string> = {
   lg: 'text-base px-3 py-1',
 };
 
-export function Badge({ className = '', variant = 'default', size = 'md', ...props }: BadgeProps) {
+export function Badge({
+  className = '',
+  variant = 'default',
+  size = 'md',
+  style,
+  ...props
+}: BadgeProps) {
   const classes = [
-    'inline-flex items-center rounded-full font-medium transition-colors',
-    variantClasses[variant],
+    'inline-flex items-center gap-1 rounded-full font-medium transition-colors',
     sizeClasses[size],
     className,
   ]
     .filter(Boolean)
     .join(' ');
 
-  return <span className={classes} {...props} />;
+  return <span className={classes} style={{ ...variantStyles[variant], ...style }} {...props} />;
 }

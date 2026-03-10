@@ -15,7 +15,7 @@ export function OnboardingBanner() {
   };
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg">
+    <div className="fixed top-0 left-0 right-0 z-50 bg-primary text-white shadow-lg">
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-2 h-2 bg-yellow-300 rounded-full animate-pulse"></div>

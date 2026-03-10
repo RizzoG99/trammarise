@@ -82,20 +82,19 @@ export const SelectCard: React.FC<SelectCardProps> = ({
 }) => {
   const baseClasses = `
     flex flex-col items-center justify-center gap-3 p-5
-    bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700
+    bg-bg-surface border border-border
     rounded-xl transition-all relative overflow-hidden h-full w-full
-    text-slate-900 dark:text-white
+    text-text-primary
   `.trim();
 
   const interactiveClasses = disabled
     ? 'cursor-not-allowed opacity-50'
-    : 'cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-indigo-300 hover:-translate-y-0.5';
+    : 'cursor-pointer hover:bg-bg-surface-hover hover:border-primary/50 hover:-translate-y-0.5';
 
-  const selectedClasses = selected
-    ? 'bg-indigo-50 dark:bg-indigo-900/20 border-indigo-600 shadow-md'
-    : '';
+  const selectedClasses = selected ? 'bg-primary/10 border-primary shadow-md' : '';
 
-  const buttonClasses = `${baseClasses} ${interactiveClasses} ${selectedClasses} ${className}`.trim();
+  const buttonClasses =
+    `${baseClasses} ${interactiveClasses} ${selectedClasses} ${className}`.trim();
 
   const handleClick = () => {
     if (!disabled) {
@@ -114,22 +113,18 @@ export const SelectCard: React.FC<SelectCardProps> = ({
       value={value}
     >
       {icon && (
-        <div className="text-3xl flex items-center justify-center text-slate-900 dark:text-white">
-          {icon}
-        </div>
+        <div className="text-3xl flex items-center justify-center text-text-primary">{icon}</div>
       )}
       <div className="flex flex-col items-center gap-1">
-        <span className="text-sm font-medium text-center leading-tight">
-          {label}
-        </span>
+        <span className="text-sm font-medium text-center leading-tight">{label}</span>
         {description && (
-          <span className="text-xs text-slate-500 dark:text-slate-400 text-center leading-tight">
+          <span className="text-xs text-text-secondary text-center leading-tight">
             {description}
           </span>
         )}
       </div>
       {selected && !disabled && (
-        <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-indigo-600 shadow-sm" />
+        <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-primary shadow-sm" />
       )}
     </button>
   );

@@ -22,10 +22,11 @@ export function EmptyState({
 }: EmptyStateProps) {
   return (
     <div
-      className={`flex flex-col items-center justify-center p-8 text-center bg-gray-50/50 dark:bg-gray-800/30 rounded-lg border border-dashed border-gray-200 dark:border-gray-700 ${className}`}
+      className={`flex flex-col items-center justify-center p-8 text-center rounded-lg border border-dashed border-border ${className}`}
+      style={{ backgroundColor: 'var(--color-bg-surface)' }}
     >
-      {icon && <div className="mb-4 text-gray-400 dark:text-gray-500">{icon}</div>}
-      <Heading level="h3" className="mb-2 text-gray-900 dark:text-white">
+      {icon && <div className="mb-4 text-text-tertiary">{icon}</div>}
+      <Heading level="h3" className="mb-2">
         {title}
       </Heading>
       {description && (

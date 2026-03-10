@@ -27,7 +27,7 @@ vercel dev
 
 Open [http://localhost:3000](http://localhost:3000)
 
-**Note**: No environment variables needed - users provide API keys via UI
+**Note**: Users provide their own API keys via UI. Optionally add `VITE_POSTHOG_KEY` for analytics (see `.env.local.example`).
 
 ---
 
@@ -308,7 +308,14 @@ For internal development workflows and agent-based development patterns, see [do
 2. Import repository in [Vercel Dashboard](https://vercel.com)
 3. Deploy!
 
-**No environment variables needed** - users provide their own API keys through the application UI.
+Users provide their own API keys through the application UI. The following env vars are optional but recommended:
+
+| Variable            | Purpose                                                                 |
+| ------------------- | ----------------------------------------------------------------------- |
+| `VITE_POSTHOG_KEY`  | PostHog analytics (get from posthog.com)                                |
+| `VITE_POSTHOG_HOST` | PostHog host (`https://eu.i.posthog.com` or `https://us.i.posthog.com`) |
+
+See `.env.local.example` for the full list including auth, database, and payment variables.
 
 ### Manual Deployment
 

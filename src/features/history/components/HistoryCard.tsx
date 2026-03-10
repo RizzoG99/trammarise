@@ -88,7 +88,7 @@ export function HistoryCard({
                   type="checkbox"
                   checked={selected}
                   onChange={handleCheckboxChange}
-                  className="peer appearance-none w-5 h-5 rounded border border-gray-300 dark:border-gray-600 checked:bg-primary checked:border-primary transition-colors cursor-pointer"
+                  className="peer appearance-none w-5 h-5 rounded border border-border checked:bg-primary checked:border-primary transition-colors cursor-pointer"
                   aria-label={t('history.card.select', { name: session.audioName })}
                 />
                 <CheckCircle2 className="absolute w-3.5 h-3.5 text-white opacity-0 peer-checked:opacity-100 pointer-events-none" />
@@ -98,11 +98,11 @@ export function HistoryCard({
             <div
               className={`flex-1 min-w-0 transition-all duration-200 ${selectionMode || selected ? 'pl-8' : 'group-hover:pl-8'}`}
             >
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white truncate mb-2 group-hover:text-primary transition-colors">
+              <h3 className="text-lg font-semibold text-text-primary truncate mb-2 group-hover:text-primary transition-colors">
                 {session.audioName}
               </h3>
 
-              <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+              <div className="flex items-center gap-2 text-sm text-text-secondary">
                 <Calendar className="w-3.5 h-3.5" />
                 <span>{formatDate(session.createdAt)}</span>
               </div>
@@ -110,15 +110,15 @@ export function HistoryCard({
 
             <div className="flex items-center gap-2">
               {session.hasSummary ? (
-                <div className="flex items-center gap-1.5 text-xs font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 px-2 py-1 rounded-full">
+                <Badge variant="success" size="sm">
                   <CheckCircle2 className="w-3.5 h-3.5" />
                   <span className="hidden sm:inline">{t('history.card.processed')}</span>
-                </div>
+                </Badge>
               ) : (
-                <div className="flex items-center gap-1.5 text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 px-2 py-1 rounded-full">
+                <Badge variant="warning" size="sm">
                   <Clock className="w-3.5 h-3.5" />
                   <span className="hidden sm:inline">{t('history.card.unprocessed')}</span>
-                </div>
+                </Badge>
               )}
             </div>
           </div>
@@ -138,7 +138,7 @@ export function HistoryCard({
           </div>
 
           <div
-            className={`mt-auto pt-4 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between transition-all duration-200 ${selectionMode || selected ? 'pl-8' : 'group-hover:pl-8'}`}
+            className={`mt-auto pt-4 border-t border-border flex items-center justify-between transition-all duration-200 ${selectionMode || selected ? 'pl-8' : 'group-hover:pl-8'}`}
           >
             {/* Quick Actions (Hover) */}
             <div className="-ml-2">

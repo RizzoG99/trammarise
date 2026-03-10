@@ -133,17 +133,13 @@ export function UsageDashboard() {
       </div>
 
       <div className="grid grid-cols-2 gap-4 mb-6">
-        <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-          <p className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
-            {minutesRemaining}
-          </p>
-          <p className="text-sm text-gray-600 dark:text-gray-400">Minutes Remaining</p>
+        <div className="text-center p-4 bg-bg-surface rounded-lg">
+          <p className="text-2xl font-bold text-primary">{minutesRemaining}</p>
+          <p className="text-sm text-text-secondary">Minutes Remaining</p>
         </div>
-        <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-          <p className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
-            {usage?.eventCount || 0}
-          </p>
-          <p className="text-sm text-gray-600 dark:text-gray-400">Transcriptions</p>
+        <div className="text-center p-4 bg-bg-surface rounded-lg">
+          <p className="text-2xl font-bold text-primary">{usage?.eventCount || 0}</p>
+          <p className="text-sm text-text-secondary">Transcriptions</p>
         </div>
       </div>
 

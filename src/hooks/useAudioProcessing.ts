@@ -7,6 +7,7 @@ import {
 } from '../utils/api';
 import type { AIConfiguration, ProcessingResult } from '../types/audio';
 import type { SessionData } from '../types/routing';
+import { trackEvent } from '../lib/analytics';
 
 /**
  * Processing step types matching the UI step IDs
@@ -82,6 +83,16 @@ export function useAudioProcessing({ onProgress, onComplete, onError }: UseAudio
       setIsProcessing(true);
       const abortController = new AbortController();
       abortControllerRef.current = abortController;
+      const startedAt = Date.now();
+
+      trackEvent('transcription_started', {
+        content_type: config.contentType,
+        language: config.language,
+        processing_mode: config.mode,
+        file_size_mb: session.audioFile.file.size
+          ? +(session.audioFile.file.size / 1_048_576).toFixed(2)
+          : null,
+      });
 
       try {
         // Check if aborted before starting
@@ -176,12 +187,24 @@ export function useAudioProcessing({ onProgress, onComplete, onError }: UseAudio
           configuration: config,
         };
 
+        trackEvent('transcription_completed', {
+          content_type: config.contentType,
+          duration_ms: Date.now() - startedAt,
+          word_count: fullTranscript.trim().split(/\s+/).length,
+        });
+
         // Processing complete
         onComplete(result);
       } catch (error) {
         const err = error as { message?: string };
         console.error('Processing error:', error);
         const errorMsg = err.message || 'Unknown error';
+
+        trackEvent('transcription_failed', {
+          content_type: config.contentType,
+          duration_ms: Date.now() - startedAt,
+          error_type: classifyError(errorMsg),
+        });
 
         // Enhanced error handling with user-friendly messages
         handleError(errorMsg, session, onError);
@@ -219,6 +242,17 @@ export function useAudioProcessing({ onProgress, onComplete, onError }: UseAudio
   return { startProcessing, cancel, isProcessing };
 }
 
+function classifyError(msg: string): string {
+  const m = msg.toLowerCase();
+  if (m.includes('cancelled') || m.includes('aborted')) return 'cancelled';
+  if (m.includes('timeout')) return 'timeout';
+  if (m.includes('api key') || m.includes('unauthorized') || m.includes('401')) return 'api_key';
+  if (m.includes('job not found') || m.includes('job timed out')) return 'job_failed';
+  if (m.includes('network') || m.includes('fetch')) return 'network';
+  if (m.includes('usage limit')) return 'usage_limit';
+  return 'unknown';
+}
+
 /**
  * Enhanced error handler with user-friendly messages based on error type
  */
@@ -253,9 +287,8 @@ function handleError(errorMsg: string, _session: SessionData, onError: (error: E
   if (message.includes('api key') || message.includes('unauthorized') || message.includes('401')) {
     onError(
       new Error(
-        'Invalid API credentials. Please check your API keys in .env.local:\n' +
-          'VITE_OPENAI_API_KEY=sk-...\n\n' +
-          'Get your key at: https://platform.openai.com/api-keys'
+        'Invalid API key. Please update your OpenAI key in Account Settings → API Keys.\n\n' +
+          'Make sure your key starts with "sk-" and has sufficient credits.'
       )
     );
     return;

@@ -26,6 +26,7 @@
       "usage": "Uso",
       "billing": "Uso y Facturación",
       "upgrade": "Actualizar a Pro",
+      "pricing": "Precios",
       "signOut": "Cerrar Sesión"
     },
     "manageAccount": "Administrar Cuenta",
@@ -50,6 +51,8 @@
       "testing": "Probando...",
       "connectionSuccess": "✓ ¡Conexión exitosa!",
       "connectionError": "✗ Conexión fallida. Por favor verifica tu clave API.",
+      "saveKey": "Guardar clave",
+      "updateKey": "Actualizar clave",
       "clear": "Limpiar",
       "securityNotice": "Tu clave API se almacena de forma segura en tu navegador y nunca se envía a nuestros servidores."
     },
@@ -120,7 +123,38 @@
       "summarizing": "Generando Resumen"
     },
     "estimatedTime": "Tiempo estimado",
-    "almostDone": "Casi listo"
+    "almostDone": "Casi listo",
+    "error": {
+      "title": "Error de Transcripción",
+      "explanation": "No pudimos transcribir tu archivo de audio. Esto puede ocurrir por varias razones.",
+      "possibleReasons": "Posibles razones:",
+      "reasonFormat": "El formato de audio no es compatible o está dañado.",
+      "reasonSilence": "La grabación contiene principalmente silencio o ruido de fondo.",
+      "reasonNetwork": "Un error de red momentáneo interrumpió la conexión.",
+      "fixApiKey": "Corregir Clave API",
+      "tryAgain": "Intentar de nuevo",
+      "closeAndRetry": "Cerrar e intentar de nuevo"
+    }
+  },
+  "processingState": {
+    "messages": {
+      "loading": "Cargando procesador de audio...",
+      "compressing": "Optimizando audio para el procesamiento...",
+      "transcribing": "Transcribiendo audio con Whisper...",
+      "configuring": "Configurando ajustes de IA...",
+      "summarizing": "Generando resumen de IA...",
+      "complete": "¡Procesamiento completo!",
+      "default": "Procesando..."
+    },
+    "steps": {
+      "preparing": "Preparando",
+      "optimizing": "Optimizando",
+      "step1of2": "1/2",
+      "step2of2": "2/2"
+    },
+    "stepLabel": "Paso {{step}}",
+    "hint": "Esto puede tardar un momento. Por favor, no cierre esta ventana.",
+    "cancel": "Cancelar Procesamiento"
   },
   "languages": {
     "en": "Inglés",
@@ -213,7 +247,9 @@
     "uploadSuccess": "Archivo subido exitosamente",
     "recordingSaved": "Grabación guardada",
     "replaceFile": "Reemplazar Archivo",
+    "replaceAriaLabel": "Reemplazar archivo de audio",
     "remove": "Eliminar",
+    "removeAriaLabel": "Eliminar archivo de audio",
     "unknownFormat": "Formato desconocido"
   },
   "configuration": {
@@ -251,7 +287,9 @@
       "description": "Identifica y etiqueta diferentes oradores en la transcripción",
       "speakersExpected": "Número de Oradores Esperados (Opcional)",
       "speakersPlaceholder": "Auto-detectar",
-      "speakersHint": "Especifica 2-10 oradores para mayor precisión, o deja en blanco para detección automática"
+      "speakersHint": "Especifica 2-10 oradores para mayor precisión, o deja en blanco para detección automática",
+      "proBadge": "Pro",
+      "proUpgradeHint": "Actualiza a Pro para identificar hablantes"
     },
     "meetingType": {
       "title": "Tipo de Reunión",
@@ -316,14 +354,38 @@
       "redo": "Rehacer",
       "reset": "Restablecer"
     },
+    "pageTitle": "Recortar audio",
+    "instructions": "Arrastra en la forma de onda para seleccionar un segmento, o escribe los tiempos de inicio y fin.",
+    "trimButtonLabel": "Recortar audio",
+    "trimButtonHint": "Seleccionar un segmento específico",
+    "regionHint": "Arrastra en la forma de onda o escribe los tiempos",
+    "startLabel": "Inicio",
+    "endLabel": "Fin",
+    "durationLabel": "Duración",
+    "clearRegion": "Limpiar selección",
     "actions": {
       "processSelection": "Procesar Selección",
-      "processFullAudio": "Procesar Audio Completo"
+      "processSelectionHint": "Transcribir segmento de {{duration}}",
+      "processFullAudio": "Procesar Audio Completo",
+      "processFullAudioHint": "Transcribir todo {{duration}}"
     },
     "timeDisplay": {
       "start": "Inicio",
       "end": "Fin",
       "placeholder": "--:--"
+    },
+    "keyboardHint": {
+      "space": "Espacio",
+      "playPause": "reproducir / pausar",
+      "arrows": "buscar ±5s",
+      "iKey": "I",
+      "oKey": "O",
+      "setInOut": "establecer punto de entrada / salida"
+    },
+    "timeInput": {
+      "invalidFormat": "Usar formato M:SS",
+      "startAfterEnd": "El inicio debe ser antes del fin",
+      "endBeforeStart": "El fin debe ser después del inicio"
     }
   },
   "fileSizeWarning": {
@@ -385,11 +447,22 @@
     "aria": {
       "startRecording": "Iniciar grabación",
       "pauseRecording": "Pausar grabación",
-      "resumeRecording": "Reanudar grabación"
+      "resumeRecording": "Reanudar grabación",
+      "stopRecording": "Detener grabación"
     }
   },
   "footer": {
-    "copyright": "Trammarise © 2025 - Transcripción y Resumen de Audio"
+    "copyright": "© {{year}} Trammarise. Todos los derechos reservados.",
+    "links": {
+      "privacy": "Privacidad",
+      "terms": "Términos de servicio"
+    },
+    "social": {
+      "github": "GitHub",
+      "linkedin": "LinkedIn",
+      "twitter": "Twitter",
+      "contact": "Contáctanos"
+    }
   },
   "layout": {
     "loading": "Cargando sesión...",
@@ -453,19 +526,59 @@
       "utterances": "intervenciones",
       "resultsFound": "resultados encontrados",
       "noResults": "No se encontraron resultados",
-      "noUtterances": "No hay intervenciones disponibles"
+      "noUtterances": "No hay intervenciones disponibles",
+      "jumpTo": "Ir a {{timestamp}}",
+      "clearSearch": "Borrar búsqueda"
     },
     "summary": {
       "title": "Resumen",
       "copyAll": "Copiar Todo",
       "phase4Placeholder": "Resúmenes estructurados próximamente en Fase 4"
+    },
+    "chat": {
+      "floatingButtonTooltip": "Refinar con Chat"
     }
+  },
+  "audioPlayer": {
+    "skipBack": "Retroceder 10 segundos",
+    "play": "Reproducir",
+    "pause": "Pausar",
+    "skipForward": "Avanzar 10 segundos",
+    "playbackSpeed": "Velocidad de reproducción: {{speed}}x"
   },
   "chatModal": {
     "title": "Refinar con IA",
     "emptyState": "Pregúntame cualquier cosa sobre tu transcripción o resumen",
     "disclaimer": "La IA puede cometer errores. Verifica la información importante.",
     "tokenLimit": "Límite de tokens alcanzado"
+  },
+  "pdfModal": {
+    "generating": "Generando PDF",
+    "description": "Creando tu documento PDF profesional...",
+    "success": "¡PDF descargado con éxito!",
+    "error": "Error al generar el PDF: {{message}}"
+  },
+  "deleteConfirmModal": {
+    "titleSingle": "¿Eliminar Grabación?",
+    "titleBulk": "¿Eliminar {{count}} Grabaciones?",
+    "messageSingle": "¿Estás seguro de que deseas eliminar esta grabación? Esta acción no se puede deshacer.",
+    "messageBulk": "¿Estás seguro de que deseas eliminar {{count}} grabaciones? Esta acción no se puede deshacer.",
+    "recordingLabel": "Grabación:",
+    "createdLabel": "Creado:",
+    "confirmButton": "Sí, Eliminar",
+    "confirmingButton": "Eliminando...",
+    "cancelButton": "Cancelar",
+    "typeToConfirm": "Escribe DELETE para confirmar",
+    "typeToConfirmPlaceholder": "Escribe DELETE aquí",
+    "affectedItems": "Grabaciones a eliminar:"
+  },
+  "export": {
+    "templates": {
+      "meeting": "Reunión",
+      "lecture": "Académico",
+      "interview": "Preguntas y Respuestas",
+      "generic": "Estándar"
+    }
   },
   "tokenUsage": {
     "label": "Uso de Tokens",
@@ -537,6 +650,11 @@
       "sessions": "{{count}} sesión",
       "sessions_plural": "{{count}} sesiones"
     },
+    "quickActions": {
+      "play": "Vista previa",
+      "copy": "Copiar resumen",
+      "download": "Descargar"
+    },
     "stats": {
       "recordingCount": "{{count}} grabación",
       "recordingCount_plural": "{{count}} grabaciones"
@@ -582,85 +700,45 @@
   },
   "welcome": {
     "hero": {
-      "newBadge": "✨ Presentamos el Diseño Liquid Glass",
       "titlePart1": "Transcribe y Resume",
-      "titlePart2": "En Segundos",
-      "description": "Transforma tus reuniones, conferencias y entrevistas en información útil. Comienza con 60 minutos gratis, actualiza para acceso ilimitado.",
-      "cta": {
-        "primary": "Iniciar Prueba Gratuita",
-        "secondary": "Ver Precios",
-        "getStarted": "Comenzar Gratis",
-        "viewFeatures": "Ver Características",
-        "appPreview": "[Visualización de Vista Previa de la App]"
-      },
-      "noCreditCard": "No se requiere tarjeta de crédito"
+      "titlePart2": "En Segundos.",
+      "description": "Convierte reuniones, conferencias y entrevistas en transcripciones y resúmenes — usando tu propia clave API.",
+      "cta": "Comenzar Gratis",
+      "proof": "· 60 minutos gratis  · Sin suscripción  · Tu clave API",
+      "mockup": {
+        "speaker": "Hablante 1",
+        "summaryLabel": "Puntos clave · 3 elementos",
+        "bullet1": "Hacer seguimiento con el equipo de diseño sobre las revisiones del mockup",
+        "bullet2": "Programar la próxima planificación del sprint para el jueves"
+      }
     },
     "features": {
-      "title": "Herramientas Potentes para Audio",
-      "subtitle": "Todo lo que necesitas para dominar tus grabaciones.",
+      "title": "Todo lo que necesitas",
+      "subtitle": "Transcripción precisa, resúmenes IA, privacidad total.",
       "cards": {
         "transcription": {
           "title": "Transcripción Cristalina",
-          "description": "Sube archivos o graba directamente. Transcripción precisa para registros confiables utilizando procesamiento avanzado en el dispositivo."
+          "description": "Sube un archivo o graba en vivo. Transcripción precisa como Whisper, siempre."
         },
         "summaries": {
-          "title": "Resúmenes AI Instantáneos",
-          "description": "Obtén puntos clave, elementos de acción y resúmenes estructurados generados automáticamente por modelos AI de primera categoría."
+          "title": "Resúmenes IA Instantáneos",
+          "description": "Puntos clave, elementos de acción, resúmenes estructurados — generados al instante."
         },
         "security": {
           "title": "Privado y Seguro",
-          "description": "Tus datos siguen siendo tuyos. El procesamiento del lado del cliente garantiza la máxima privacidad. Ningún audio sale de tu dispositivo sin permiso."
+          "description": "Procesamiento en el cliente. Tu audio nunca sale sin tu permiso."
         }
       }
     },
-    "pricing": {
-      "title": "Precios Simples y Transparentes",
-      "subtitle": "Elige el plan que se adapte a tus necesidades",
-      "free": {
-        "name": "Gratis",
-        "price": "$0",
-        "interval": "/mes",
-        "description": "Prueba antes de actualizar",
-        "cta": "Iniciar Prueba Gratuita"
-      },
-      "pro": {
-        "name": "Pro",
-        "price": "$19",
-        "interval": "/mes",
-        "badge": "Más Popular",
-        "description": "Para profesionales",
-        "cta": "Actualizar a Pro"
-      },
-      "team": {
-        "name": "Equipo",
-        "price": "$49",
-        "interval": "/mes",
-        "description": "Para equipos",
-        "cta": "Contactar Ventas"
-      },
-      "viewComparison": "Ver comparación detallada"
-    },
-    "cta": {
-      "title": "¿Listo para aumentar tu productividad?",
-      "description": "Únete a profesionales que ahorran horas cada semana con transcripción impulsada por IA.",
-      "free": "Iniciar Prueba Gratuita (60 min)",
-      "pro": "Desbloquear Características Pro"
-    },
-    "ctaSection": {
-      "title": "¿Listo para transformar tu flujo de trabajo?",
-      "description": "Únete a miles de usuarios que ahorran horas cada semana con Trammarise.",
-      "button": "Comenzar Gratis"
-    },
-    "footer": {
-      "tagline": "Transcripción y resumen de audio con IA",
-      "links": {
-        "docs": "Documentación",
-        "pricing": "Precios",
-        "privacy": "Privacidad",
-        "terms": "Términos",
-        "contact": "Contacto"
-      },
-      "copyright": "© {{year}} Trammarise. Todos los derechos reservados."
+    "byok": {
+      "label": "Nivel gratuito",
+      "title": "Usa tu propia clave OpenAI. No nos pagas nada.",
+      "description": "Conecta tu clave API de OpenAI y comienza a transcribir de inmediato. Pagas directamente a OpenAI por lo que usas — sin suscripción a Trammarise.",
+      "cta": "Comenzar Gratis",
+      "mockup": {
+        "placeholder": "sk-••••••••••••••••",
+        "connected": "Conectado ✓"
+      }
     }
   },
   "pricing": {
@@ -693,41 +771,188 @@
     }
   },
   "onboarding": {
-    "modal": {
-      "title": "🔑 Bienvenido a Trammarise",
-      "heading": "Un Paso Más para Comenzar",
-      "description": "Para usar Trammarise, necesitas proporcionar tu propia clave API de OpenAI o actualizar a un plan Pro.",
-      "option1": {
-        "title": "Opción 1: Usa tu Propia Clave API (Gratis)",
-        "placeholder": "sk-...",
-        "rememberKey": "Recordar mi clave API (almacenada encriptada)",
-        "continueButton": "Continuar con Clave API",
-        "saving": "Guardando...",
-        "instructions": {
-          "toggle": "Cómo obtener una clave API de OpenAI",
-          "step1": "Ve a platform.openai.com",
-          "step2": "Inicia sesión o crea una cuenta",
-          "step3": "Haz clic en \"Crear nueva clave secreta\"",
-          "step4": "Copia la clave (comienza con \"sk-\")",
-          "step5": "Pégala en el campo de arriba",
-          "note": "💡 Pagarás a OpenAI directamente por el uso (típicamente $0.006/minuto para Whisper)"
-        },
-        "errors": {
-          "empty": "Por favor ingresa tu clave API",
-          "invalidFormat": "Formato de clave API no válido. Las claves de OpenAI comienzan con \"sk-\"",
-          "saveFailed": "Error al guardar la clave API. Por favor inténtalo de nuevo."
-        }
-      },
-      "option2": {
-        "title": "Opción 2: Actualizar a Pro",
-        "description": "Obtén 500 minutos/mes con API alojada, sincronización en la nube y soporte prioritario.",
-        "button": "Ver Planes Pro →"
-      },
-      "divider": "o"
+    "title": "Bienvenido a Trammarise",
+    "subtitle": "Configuremos todo en unos pasos",
+    "step1": {
+      "title": "¿Cómo usarás Trammarise?",
+      "subtitle": "Elige tu caso de uso principal para personalizar la experiencia",
+      "useCases": {
+        "meeting": "Reunión",
+        "lecture": "Conferencia",
+        "interview": "Entrevista",
+        "podcast": "Podcast",
+        "voiceMemo": "Nota de voz",
+        "other": "Otro"
+      }
     },
-    "banner": {
-      "message": "¡Ya casi estás! Completa la configuración para desbloquear Trammarise.",
-      "button": "Volver a Configuración"
+    "step2": {
+      "title": "Elige tu plan",
+      "subtitle": "Empieza gratis, actualiza cuando quieras",
+      "free": {
+        "name": "Gratis",
+        "description": "Trae tu propia clave API",
+        "feature1": "Transcripciones ilimitadas",
+        "feature2": "Tu propia clave OpenAI",
+        "feature3": "Todos los tipos de contenido",
+        "cta": "Continuar Gratis"
+      },
+      "pro": {
+        "name": "Pro",
+        "description": "API alojada, sin clave necesaria",
+        "feature1": "500 min / mes",
+        "feature2": "No se requiere clave API",
+        "feature3": "Sincronización en la nube",
+        "feature4": "Soporte prioritario",
+        "cta": "Actualizar a Pro",
+        "badge": "Más Popular"
+      }
+    },
+    "step3": {
+      "title": "Conecta tu clave API",
+      "subtitle": "Tu clave se guarda de forma segura solo en la sesión del navegador",
+      "rememberKey": "Recordar mi clave entre sesiones",
+      "errorInvalid": "Clave API no válida. Por favor verifica e intenta de nuevo.",
+      "validating": "Verificando…"
+    },
+    "navigation": {
+      "back": "Atrás",
+      "next": "Siguiente",
+      "skip": "Omitir por ahora",
+      "finish": "Comenzar"
+    },
+    "steps": {
+      "useCase": "Caso de uso",
+      "apiSetup": "Configuración API",
+      "plan": "Plan"
+    },
+    "setupBanner": {
+      "message": "No hay clave API configurada — añade la tuya para empezar a transcribir",
+      "cta": "Configurar clave API",
+      "dismiss": "Descartar"
+    }
+  },
+  "account": {
+    "title": "Configuración de Cuenta",
+    "back": "Volver a la app",
+    "nav": {
+      "profile": "Perfil",
+      "apiKeys": "Claves API",
+      "plan": "Plan y Uso"
+    },
+    "navigation": {
+      "profile": "Perfil",
+      "billing": "Facturación",
+      "apiKeys": "Claves API",
+      "notifications": "Notificaciones"
+    },
+    "profile": {
+      "title": "Perfil",
+      "displayName": "Nombre de visualización",
+      "email": "Correo electrónico",
+      "saveChanges": "Guardar cambios",
+      "saved": "¡Guardado!",
+      "memberSince": "Miembro desde"
+    },
+    "billing": {
+      "title": "Facturación y uso",
+      "currentPlan": "Plan actual",
+      "usage": "Uso este mes",
+      "upgrade": "Mejorar plan",
+      "cancelSubscription": "Cancelar suscripción",
+      "billingHistory": "Historial de facturación",
+      "minutesUsed": "{{used}} / {{limit}} minutos usados"
+    },
+    "apiKeys": {
+      "title": "Claves API",
+      "openai": "Clave API de OpenAI",
+      "openrouter": "Clave API de OpenRouter",
+      "updateKey": "Actualizar clave",
+      "removeKey": "Eliminar clave",
+      "keyStored": "Clave guardada solo en la sesión"
+    },
+    "notifications": {
+      "title": "Notificaciones",
+      "emailUpdates": "Actualizaciones y anuncios del producto",
+      "usageAlerts": "Alertas de límite de uso",
+      "transcriptionComplete": "Notificaciones de transcripción completada",
+      "save": "Guardar preferencias"
+    }
+  },
+  "upgrade": {
+    "speakerDiarization": {
+      "title": "Identifica cada voz",
+      "desc": "La identificación de hablantes etiqueta quién dijo qué — con colores, marcas de tiempo, hasta 10 hablantes.",
+      "feature1": "Etiquetas de hablantes con colores",
+      "feature2": "Hasta 10 hablantes",
+      "feature3": "Marcas de tiempo por intervención",
+      "cta": "Desbloquear ID de voz",
+      "annualHint": "o paga anualmente y ahorra 2 meses",
+      "previewSubtitle": "Ve quién dijo qué y cuándo"
+    }
+  },
+  "audioPreview": {
+    "playAriaLabel": "Reproducir audio",
+    "pauseAriaLabel": "Pausar audio",
+    "seekAriaLabel": "Buscar posición de audio",
+    "previewLabel": "Vista previa de audio"
+  },
+  "usagePanel": {
+    "error": "No se pudieron cargar los datos de uso. Por favor recarga la página.",
+    "free": {
+      "planBadge": "Gratis",
+      "upgradeBtn": "Actualizar a Pro",
+      "sectionThisMonth": "Este mes",
+      "transcriptionCount_one": "{{count}} transcripción",
+      "transcriptionCount_other": "{{count}} transcripciones",
+      "byokStatus": "Usando tu propia clave de OpenAI (BYOK)",
+      "checkBalance": "Ver tu saldo de OpenAI",
+      "noKeyWarning": "Sin clave API configurada",
+      "noKeyCta": "Configurar tu clave API",
+      "sectionMissing": "Lo que te falta",
+      "sectionMissingCaption": "Disponible en Pro y superior",
+      "proBadge": "Pro",
+      "feature": {
+        "hostedApi": {
+          "name": "Sin clave API necesaria",
+          "desc": "La plataforma gestiona la transcripción"
+        },
+        "chat": {
+          "name": "Chat IA en resultados",
+          "desc": "Pregunta, traduce o refina tu transcripción con IA"
+        },
+        "diarization": { "name": "Diarización de oradores", "desc": "Identifica quién dijo qué" },
+        "cloudSync": {
+          "name": "Sincronización en la nube",
+          "desc": "Accede a tus transcripciones desde cualquier dispositivo"
+        }
+      }
+    },
+    "pro": {
+      "planBadge": "Pro",
+      "managePlan": "Administrar plan",
+      "sectionMinutes": "Minutos este mes",
+      "minutesUsed": "{{minutesUsed}} / {{minutesIncluded}} min",
+      "transcriptionCount_one": "{{count}} transcripción este mes",
+      "transcriptionCount_other": "{{count}} transcripciones este mes",
+      "renews": "Se renueva el {{date}}",
+      "accessEnds": "El acceso termina el {{date}}",
+      "progressAriaLabel": "{{pct}}% de los minutos mensuales usados",
+      "warning": {
+        "title": "Pocos minutos restantes",
+        "body": "{{minutesUsed}} de {{minutesIncluded}} minutos usados — {{remaining}} restantes."
+      },
+      "quota": {
+        "title": "Cuota alcanzada",
+        "body": "Actualiza tu plan o espera la renovación el {{date}}.",
+        "upgradeBtn": "Actualizar para más minutos"
+      },
+      "badge": {
+        "cancels": "Cancela el {{date}}",
+        "trial": "Prueba termina el {{date}}",
+        "pastDue": "Pago fallido",
+        "unpaid": "Sin pagar",
+        "canceled": "Cancelado"
+      }
     }
   }
 }

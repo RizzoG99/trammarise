@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useUser } from '@clerk/clerk-react';
+import { useUser } from '@clerk/react';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { HistoryList } from '@/features/history/components/HistoryList';
 import { HistoryEmptyState } from '@/features/history/components/HistoryEmptyState';
@@ -170,7 +170,7 @@ export function HistoryPage() {
 
   return (
     <PageLayout>
-      <div className="min-h-screen bg-bg-primary text-text-primary p-4 md:p-8">
+      <div className="bg-bg-primary text-text-primary p-4 md:p-8">
         <div className="max-w-7xl mx-auto space-y-8">
           {/* Header Section */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">

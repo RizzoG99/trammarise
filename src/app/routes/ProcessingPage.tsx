@@ -8,7 +8,7 @@ import {
   StepChecklist,
   type ProcessingStep,
 } from '../../features/processing/components/StepChecklist';
-import { Button, Text, Heading } from '@/lib';
+import { Button, Text } from '@/lib';
 import { useSessionStorage } from '../../hooks/useSessionStorage';
 import { useRouteState } from '../../hooks/useRouteState';
 import {
@@ -21,6 +21,7 @@ import {
 } from '../../utils/config-helper';
 
 import { UpgradeModal, type UpgradeTrigger } from '@/components/marketing/UpgradeModal';
+import { TranscriptionErrorDialog } from '../../features/processing/components/TranscriptionErrorDialog';
 
 export function ProcessingPage() {
   const { t } = useTranslation();
@@ -60,7 +61,15 @@ export function ProcessingPage() {
 
   // Start processing on mount
   useEffect(() => {
-    if (!session || !session.audioFile || isProcessing || error || session.result || isUpgradeModalOpen) return;
+    if (
+      !session ||
+      !session.audioFile ||
+      isProcessing ||
+      error ||
+      session.result ||
+      isUpgradeModalOpen
+    )
+      return;
 
     let config;
     try {
@@ -122,24 +131,8 @@ export function ProcessingPage() {
     [progress, t]
   );
 
-  // Error state
-  if (error) {
-    return (
-      <PageLayout maxWidth="1200px">
-        <div className="text-center">
-          <Heading level="h2" className="mb-4">
-            {t('common.error')}
-          </Heading>
-          <div className="max-w-[600px] mx-auto mb-6">
-            <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/30">
-              <Text className="whitespace-pre-line text-red-600 dark:text-red-400">{error}</Text>
-            </div>
-          </div>
-          <Button onClick={() => goToAudio()}>{t('common.back')}</Button>
-        </div>
-      </PageLayout>
-    );
-  }
+  // Error state handled via Dialog below
+  // We still render the layout behind it
 
   // Loading session
   if (isLoading) {
@@ -186,11 +179,26 @@ export function ProcessingPage() {
           {t('common.cancel')}
         </Button>
       </div>
-      
+
       <UpgradeModal
         isOpen={isUpgradeModalOpen}
         onClose={handleUpgradeModalClose}
         trigger={upgradeTrigger}
+      />
+      <TranscriptionErrorDialog
+        isOpen={!!error}
+        onClose={handleCancel}
+        errorMessage={error || undefined}
+        errorType={
+          error?.toLowerCase().includes('api key')
+            ? 'api_key_invalid'
+            : error?.toLowerCase().includes('network')
+              ? 'network'
+              : error
+                ? 'unknown'
+                : undefined
+        }
+        onTryAgain={goToAudio}
       />
     </PageLayout>
   );

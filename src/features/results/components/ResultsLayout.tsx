@@ -12,8 +12,10 @@ interface ResultsLayoutProps {
   transcriptPanel: ReactNode;
   /** Floating chat button */
   floatingChatButton: ReactNode;
-  /** Chat modal (conditional) */
-  chatModal?: ReactNode;
+  /** Chat side panel (conditional) */
+  chatPanel?: ReactNode;
+  /** Whether the chat panel is currently open */
+  isChatOpen?: boolean;
 }
 
 /**
@@ -34,31 +36,41 @@ export function ResultsLayout({
   summaryPanel,
   transcriptPanel,
   floatingChatButton,
-  chatModal,
+  chatPanel,
+  isChatOpen = false,
 }: ResultsLayoutProps) {
   return (
-    <div className="min-h-screen flex flex-col bg-bg-primary">
-      {/* Header is now handled by AppLayout/HeaderContext */}
-
-      {/* Audio Player Bar */}
-      <div className="z-40">{audioPlayer}</div>
+    <div className="flex flex-col bg-bg-primary overflow-x-hidden">
+      {/* Audio Player Bar — sticky so it stays visible while transcript scrolls */}
+      <div className="sticky top-0 z-40">{audioPlayer}</div>
 
       {/* Main Content: Split Panel Layout */}
-      <div className="flex-1 w-full max-w-[1400px] mx-auto p-6">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Summary Panel - 5 columns (40%) on large screens */}
-          <div className="lg:col-span-5 h-fit">{summaryPanel}</div>
+      <div className="flex-1 w-full max-w-[1600px] mx-auto p-4 lg:p-6 transition-all duration-300">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 relative items-start">
+          {/* Summary Panel - 4 cols when chat open, 5 cols when chat closed */}
+          <div
+            className={`transition-all duration-300 ${isChatOpen ? 'lg:col-span-4 hidden lg:block' : 'lg:col-span-5'}`}
+          >
+            {summaryPanel}
+          </div>
 
-          {/* Transcript Panel - 7 columns (60%) on large screens */}
-          <div className="lg:col-span-7 h-fit">{transcriptPanel}</div>
+          {/* Transcript Panel - 5 cols when chat open, 7 cols when chat closed */}
+          <div
+            className={`transition-all duration-300 ${isChatOpen ? 'lg:col-span-5' : 'lg:col-span-7'}`}
+          >
+            {transcriptPanel}
+          </div>
+
+          {/* Chat Panel - 3 cols when chat open */}
+          {isChatOpen && <div className="lg:col-span-3 hidden lg:block h-full">{chatPanel}</div>}
         </div>
       </div>
 
-      {/* Floating Chat Button (bottom-right) */}
-      {floatingChatButton}
+      {/* Mobile Chat render outside the grid for proper fixed positioning overlay */}
+      <div className="lg:hidden">{isChatOpen && chatPanel}</div>
 
-      {/* Chat Modal (conditional) */}
-      {chatModal}
+      {/* Floating Chat Button (bottom-right) */}
+      {!isChatOpen && floatingChatButton}
     </div>
   );
 }

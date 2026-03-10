@@ -1,0 +1,47 @@
+Codemap Analysis Report — 2026-02-26
+=====================================
+
+STATUS: Initial generation (no previous codemaps found)
+
+## Files Scanned
+- src/ TypeScript source files: ~130
+- api/ serverless handler files: ~45
+- Total: ~175 files
+
+## Architecture Summary
+- React 19 SPA + Vercel serverless API
+- Clerk auth + Supabase DB + Stripe payments
+- Multi-provider AI: OpenAI Whisper (transcription), GPT-4/OpenRouter (summarize/chat), AssemblyAI (async alt)
+
+## Feature Modules Identified
+- upload: file drag-drop + microphone recording
+- configuration: language, content type, processing mode, noise profile, speaker diarization
+- processing: async transcription pipeline with progress tracking
+- results: transcript + summary + PDF export + AI chat
+- history: session list with filters and delete
+- user-menu: profile, API keys, usage stats
+- chat: floating chat overlay with token tracking
+- credits: credit purchase and balance
+
+## New Components (vs previous known state)
+- Phase 2.1 UX refactoring additions:
+  - src/features/upload/UploadRecordTabs.tsx (responsive tab/grid layout)
+  - src/features/results/TranscriptTabBar.tsx (tabbed transcript views)
+  - src/features/results/ChatSidePanel.tsx (slide-in chat panel)
+  - src/components/marketing/UpgradeModal.tsx (redesigned with PricingCard)
+
+## Codemaps Generated
+- docs/CODEMAPS/architecture.md  (~600 tokens)
+- docs/CODEMAPS/backend.md       (~500 tokens)
+- docs/CODEMAPS/frontend.md      (~700 tokens)
+- docs/CODEMAPS/data.md          (~300 tokens)
+- docs/CODEMAPS/dependencies.md  (~300 tokens)
+Total: ~2,400 tokens for full codebase context
+
+## Staleness Warnings
+None (initial generation)
+
+## Next Update Recommended After
+- Phase 2.2+ (ResultsPage, HistoryPage refactors)
+- Phase 3 (new pages: WelcomePage, AccountBillingPage, OnboardingPage)
+- Any new API routes or database tables

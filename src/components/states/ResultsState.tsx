@@ -1,17 +1,24 @@
 import React, { useState, useMemo, useCallback } from 'react';
-import { Modal, ChatInterface, Snackbar, AILoadingOrb, Text } from '@/lib';
+import { Modal, Snackbar, AILoadingOrb, Text, AudioPlayer } from '@/lib';
 import { chatWithAI } from '../../utils/api';
-import { useAuth } from '@clerk/clerk-react';
+import { useAuth } from '@clerk/react';
+import { useTranslation } from 'react-i18next';
 
 import type { ProcessingResult, ChatMessage, AudioFile, AIConfiguration } from '../../types/audio';
 import { ResultsLayout } from '../../features/results/components/ResultsLayout';
-import { AudioPlayerBar } from '../../features/results/components/AudioPlayerBar';
 import { SummaryPanel } from '../../features/results/components/SummaryPanel';
 import { SearchableTranscript } from '../../features/results/components/SearchableTranscript';
 import { SpeakerTranscriptView } from '../../features/results/components/SpeakerTranscriptView';
+import {
+  TranscriptTabBar,
+  type TranscriptTab,
+} from '../../features/results/components/TranscriptTabBar';
+import { ChatSidePanel } from '../../features/results/components/ChatSidePanel';
 import { FloatingChatButton } from '../../features/results/components/FloatingChatButton';
-import { ExportPDFDialog } from '../../features/results/components/ExportPDFDialog';
-import { useHeader, useHeaderConfig } from '../../hooks/useHeader';
+import {
+  ExportPDFDialog,
+  type ExportOptions,
+} from '../../features/results/components/ExportPDFDialog';
 import { useAudioPlayer } from '../../features/results/hooks/useAudioPlayer';
 import {
   parseTranscriptToSegments,
@@ -53,13 +60,14 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
   language,
   onUpdateResult,
 }) => {
+  const { t } = useTranslation();
   const [isLoadingChat, setIsLoadingChat] = useState(false);
-  const [waveformTime, setWaveformTime] = useState(0);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
   const [isPdfGenerating, setIsPdfGenerating] = useState(false);
   const [pdfError, setPdfError] = useState<string | null>(null);
   const [pdfSuccess, setPdfSuccess] = useState(false);
+  const [activeTab, setActiveTab] = useState<TranscriptTab>('transcript');
 
   // Upgrade Modal State
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
@@ -71,8 +79,8 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
   // Clerk authentication
   const { getToken } = useAuth();
 
-  // Get current filename from global header context
-  const { fileName } = useHeader();
+  // Derive base file name from audio name (strip extension)
+  const baseFileName = audioName.replace(/\.[^/.]+$/, '');
 
   // Audio player state (shared between AudioPlayerBar and SearchableTranscript)
   const audioPlayer = useAudioPlayer(audioFile);
@@ -91,15 +99,15 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
     return parseTranscriptToSegments(result.transcript, hasDiarization);
   }, [result.transcript, result.segments, hasDiarization]);
 
-  // Find active segment based on waveform playback time (driven by WaveSurfer)
+  // Find active segment based on audio playback time
   const activeSegmentId = useMemo(() => {
-    const currentTime = waveformTime;
+    const currentTime = audioPlayer.state.currentTime;
     const activeSegment = transcriptSegments.find((seg, index, arr) => {
       const nextTime = arr[index + 1]?.timestampSeconds ?? Infinity;
       return currentTime >= seg.timestampSeconds && currentTime < nextTime;
     });
     return activeSegment?.id;
-  }, [waveformTime, transcriptSegments]);
+  }, [audioPlayer.state.currentTime, transcriptSegments]);
 
   // Handle timestamp click to seek audio
   const handleTimestampClick = (timestampSeconds: number) => {
@@ -179,9 +187,7 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
   };
 
   const handleDownloadPDF = useCallback(
-    async (fileNameOverride?: string) => {
-      console.log('📥 Starting PDF generation...');
-
+    async (fileNameOverride?: string, options?: ExportOptions) => {
       setIsPdfGenerating(true);
       setPdfError(null);
       setPdfSuccess(false);
@@ -190,16 +196,16 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
         // Use client-side PDF generation with @react-pdf/renderer
         // Dynamically import to reduce bundle size (1.6MB+)
         const { generatePDF } = await import('../../utils/pdf-generator');
-        const effectiveFileName = fileNameOverride ?? fileName;
+        const effectiveFileName = fileNameOverride ?? baseFileName;
         await generatePDF(
           result.summary,
           result.transcript,
           result.configuration,
           effectiveFileName,
-          userTier
+          userTier,
+          options
         );
 
-        console.log('✅ PDF downloaded successfully');
         setPdfSuccess(true);
 
         // Auto-dismiss success message after 3 seconds
@@ -213,69 +219,73 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
           }, 2000);
         }
       } catch (error) {
-        console.error('❌ PDF generation error:', error);
         const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-        setPdfError(`Failed to generate PDF: ${errorMessage}`);
+        setPdfError(
+          t('pdfModal.error', 'Failed to generate PDF: {{message}}', { message: errorMessage })
+        );
       } finally {
         setIsPdfGenerating(false);
       }
     },
-    [result.summary, result.transcript, result.configuration, fileName, userTier]
+    [result.summary, result.transcript, result.configuration, baseFileName, userTier, t]
   );
 
   const handleOpenExportDialog = useCallback(() => setIsExportDialogOpen(true), []);
-
-  // Sync header configuration — Export button opens the dialog
-  useHeaderConfig({
-    initialFileName: audioName.replace(/\.[^/.]+$/, ''),
-    onExport: handleOpenExportDialog,
-  });
 
   return (
     <>
       <ResultsLayout
         audioPlayer={
-          <AudioPlayerBar
-            audioFile={audioFile}
-            audioPlayer={audioPlayer}
-            onTimeUpdate={setWaveformTime}
-          />
+          <div className="w-full bg-bg-glass backdrop-blur-md border-b border-border shadow-[0_4px_24px_rgba(0,0,0,0.12)]">
+            <div className="max-w-[1400px] mx-auto px-6 py-3">
+              <AudioPlayer
+                file={audioFile.blob}
+                audioPlayer={audioPlayer}
+                showSkipButtons
+                showSpeedControl
+                fileName={audioFile.name}
+              />
+            </div>
+          </div>
         }
-        summaryPanel={<SummaryPanel summary={result.summary} />}
+        summaryPanel={<SummaryPanel summary={result.summary} onExport={handleOpenExportDialog} />}
         transcriptPanel={
-          result.utterances && result.utterances.length > 0 ? (
-            <SpeakerTranscriptView
-              utterances={result.utterances}
-              currentTime={audioPlayer.state.currentTime}
-              onTimestampClick={handleTimestampClick}
-            />
-          ) : (
-            <SearchableTranscript
-              transcript={result.transcript}
-              activeSegmentId={activeSegmentId}
-              onTimestampClick={handleTimestampClick}
-            />
-          )
+          <div className="flex flex-col h-full">
+            {hasDiarization && (
+              <TranscriptTabBar
+                activeTab={activeTab}
+                onTabChange={setActiveTab}
+                hasDiarization={hasDiarization}
+              />
+            )}
+            {activeTab === 'diarization' && result.utterances && result.utterances.length > 0 ? (
+              <SpeakerTranscriptView
+                utterances={result.utterances}
+                currentTime={audioPlayer.state.currentTime}
+                onTimestampClick={handleTimestampClick}
+              />
+            ) : (
+              <SearchableTranscript
+                transcript={result.transcript}
+                activeSegmentId={activeSegmentId}
+                onTimestampClick={handleTimestampClick}
+                includeSpeakers={hasDiarization}
+              />
+            )}
+          </div>
         }
         floatingChatButton={
           <FloatingChatButton onClick={handleChatOpen} isOpen={isChatOpen} hasNewMessages={false} />
         }
-        chatModal={
-          isChatOpen && (
-            <Modal
-              isOpen={isChatOpen}
-              onClose={() => setIsChatOpen(false)}
-              title="Refine with Chat"
-            >
-              <div className="h-[600px]">
-                <ChatInterface
-                  onSendMessage={handleSendMessage}
-                  isLoading={isLoadingChat}
-                  chatHistory={result.chatHistory}
-                />
-              </div>
-            </Modal>
-          )
+        isChatOpen={isChatOpen}
+        chatPanel={
+          <ChatSidePanel
+            isOpen={isChatOpen}
+            onClose={() => setIsChatOpen(false)}
+            isLoading={isLoadingChat}
+            chatHistory={result.chatHistory}
+            onSendMessage={handleSendMessage}
+          />
         }
       />
 
@@ -283,10 +293,10 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
       <ExportPDFDialog
         isOpen={isExportDialogOpen}
         onClose={() => setIsExportDialogOpen(false)}
-        initialFileName={fileName}
-        onExport={(name) => {
+        initialFileName={baseFileName}
+        onExport={(name, options) => {
           setIsExportDialogOpen(false);
-          void handleDownloadPDF(name);
+          void handleDownloadPDF(name, options);
         }}
         isExporting={isPdfGenerating}
         summary={result.summary}
@@ -305,7 +315,7 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
       <Modal
         isOpen={isPdfGenerating}
         onClose={() => {}}
-        title="Generating PDF"
+        title={t('pdfModal.generating', 'Generating PDF')}
         disableBackdropClick={true}
         role="status"
         aria-busy="true"
@@ -313,7 +323,7 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
         <div className="flex flex-col items-center justify-center py-8 gap-6">
           <AILoadingOrb size={120} />
           <Text variant="body" className="text-center text-text-secondary">
-            Creating your professional PDF document...
+            {t('pdfModal.description', 'Creating your professional PDF document...')}
           </Text>
         </div>
       </Modal>
@@ -322,7 +332,7 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
       <Snackbar
         isOpen={pdfSuccess}
         onClose={() => setPdfSuccess(false)}
-        message="PDF downloaded successfully!"
+        message={t('pdfModal.success', 'PDF downloaded successfully!')}
         variant="success"
         duration={3000}
       />

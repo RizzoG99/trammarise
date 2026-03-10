@@ -8,7 +8,7 @@ const mockGetToken = vi.fn();
 const mockUseUser = vi.fn();
 const mockUseAuth = vi.fn(() => ({ getToken: mockGetToken }));
 
-vi.mock('@clerk/clerk-react', () => ({
+vi.mock('@clerk/react', () => ({
   useUser: () => mockUseUser(),
   useAuth: () => mockUseAuth(),
 }));

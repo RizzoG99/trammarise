@@ -1,5 +1,5 @@
 import { CheckCircle, Music, Trash2, RefreshCw } from 'lucide-react';
-import { Text } from '@/lib';
+import { Text, AudioPlayer } from '@/lib';
 import { useTranslation } from 'react-i18next';
 
 export interface FilePreviewProps {
@@ -76,11 +76,16 @@ export function FilePreview({ file, onRemove, onReplace }: FilePreviewProps) {
         </div>
       </div>
 
+      {/* Audio Preview Player — hidden on mobile where AudioPreviewBar (above tabs) handles it */}
+      <div className="hidden lg:block">
+        <AudioPlayer file={file} className="mt-3" />
+      </div>
+
       {/* Action Buttons */}
-      <div className="flex gap-3">
+      <div className="flex gap-3 mt-3">
         <button
           onClick={onReplace}
-          aria-label="Replace audio file"
+          aria-label={t('filePreview.replaceAriaLabel')}
           className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 border-border hover:border-primary hover:bg-[var(--color-primary-alpha-5)] transition-all cursor-pointer"
           style={{
             backgroundColor: 'var(--color-bg-surface)',
@@ -95,7 +100,7 @@ export function FilePreview({ file, onRemove, onReplace }: FilePreviewProps) {
 
         <button
           onClick={onRemove}
-          aria-label="Remove audio file"
+          aria-label={t('filePreview.removeAriaLabel')}
           className="flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all cursor-pointer"
           style={{
             backgroundColor: 'var(--color-bg-surface)',

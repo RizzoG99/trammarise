@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, act } from '@testing-library/react';
+import { render, screen, act, fireEvent } from '@testing-library/react';
 import { ProcessingPage } from './ProcessingPage';
 
 // Mock dependencies
@@ -260,7 +260,7 @@ describe('ProcessingPage', () => {
         onError(new Error('Test processing error'));
       });
 
-      expect(screen.getByText('An error occurred')).toBeInTheDocument();
+      expect(screen.getByText('Transcription Error')).toBeInTheDocument();
       expect(screen.getByText('Test processing error')).toBeInTheDocument();
     });
 
@@ -272,8 +272,8 @@ describe('ProcessingPage', () => {
         onError(new Error('Test error'));
       });
 
-      const backButton = screen.getByRole('button', { name: 'Back' });
-      backButton.click();
+      const tryAgainButton = screen.getByRole('button', { name: /try again/i });
+      fireEvent.click(tryAgainButton);
 
       expect(mockGoToAudio).toHaveBeenCalled();
     });

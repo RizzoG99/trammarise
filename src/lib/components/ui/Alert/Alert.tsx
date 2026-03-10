@@ -8,16 +8,38 @@ export interface AlertProps {
   className?: string;
 }
 
-export function Alert({ children, variant = 'info', className = '' }: AlertProps) {
-  const styles = {
-    info: 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-200',
-    warning:
-      'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800 text-yellow-800 dark:text-yellow-200',
-    error:
-      'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-800 dark:text-red-200',
-    success:
-      'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 text-green-800 dark:text-green-200',
-  };
+const variantStyles: Record<AlertVariant, React.CSSProperties> = {
+  info: {
+    backgroundColor: 'var(--color-primary-alpha-10)',
+    borderColor: 'var(--color-primary-alpha-20)',
+    color: 'var(--color-primary)',
+  },
+  warning: {
+    backgroundColor: 'var(--color-accent-warning-alpha-10)',
+    borderColor: 'var(--color-accent-warning-alpha-20)',
+    color: 'var(--color-accent-warning)',
+  },
+  error: {
+    backgroundColor: 'var(--color-accent-error-alpha-10)',
+    borderColor: 'var(--color-accent-error-alpha-20)',
+    color: 'var(--color-accent-error)',
+  },
+  success: {
+    backgroundColor: 'var(--color-accent-success-alpha-10)',
+    borderColor: 'var(--color-accent-success-alpha-20)',
+    color: 'var(--color-accent-success)',
+  },
+};
 
-  return <div className={`p-4 rounded-lg border ${styles[variant]} ${className}`}>{children}</div>;
+export function Alert({ children, variant = 'info', className = '' }: AlertProps) {
+  const role = variant === 'error' || variant === 'warning' ? 'alert' : undefined;
+  return (
+    <div
+      role={role}
+      className={`p-4 rounded-lg border ${className}`}
+      style={variantStyles[variant]}
+    >
+      {children}
+    </div>
+  );
 }
