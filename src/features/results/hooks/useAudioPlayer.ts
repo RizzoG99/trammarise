@@ -93,6 +93,7 @@ export function useAudioPlayer(audioFile: AudioFile | null) {
       audio.removeEventListener('play', handlePlay);
       audio.removeEventListener('pause', handlePause);
       audio.pause();
+      audio.src = ''; // detach src before revoking to prevent ERR_FILE_NOT_FOUND
       URL.revokeObjectURL(blobUrl);
       audioRef.current = null;
     };

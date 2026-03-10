@@ -34,7 +34,7 @@ export async function createTranscriptionJob(
     formData.append('performanceLevel', performanceLevel);
   }
 
-  const response = await fetchWithTimeout(
+  const response = await fetchWithAuth(
     '/api/transcribe',
     {
       method: 'POST',
@@ -67,7 +67,7 @@ export async function createTranscriptionJob(
  * Cancel a transcription job
  */
 export async function cancelJob(jobId: string): Promise<void> {
-  const response = await fetch(`/api/transcribe-job/${jobId}/cancel`, {
+  const response = await fetchWithAuth(`/api/transcribe-job/${jobId}/cancel`, {
     method: 'POST',
   });
 
@@ -91,7 +91,7 @@ export async function pollJobStatus(
 
   while (pollCount < MAX_POLLS) {
     try {
-      const response = await fetch(`/api/transcribe-job/${jobId}/status`);
+      const response = await fetchWithAuth(`/api/transcribe-job/${jobId}/status`);
 
       if (!response.ok) {
         if (response.status === 404) {
@@ -165,7 +165,7 @@ export async function transcribeAudio(
     formData.append('contentType', contentType);
   }
 
-  const response = await fetchWithTimeout(
+  const response = await fetchWithAuth(
     '/api/transcribe',
     {
       method: 'POST',
@@ -226,7 +226,7 @@ export async function summarizeTranscript(
     formData.append('noiseProfile', noiseProfile);
   }
 
-  const response = await fetchWithTimeout(
+  const response = await fetchWithAuth(
     '/api/summarize',
     {
       method: 'POST',
@@ -454,16 +454,14 @@ export async function saveOnboardingUseCaseToDb(useCase: string): Promise<void> 
       data: { session },
     } = await supabaseClient.auth.getSession();
     if (!session) return;
-    await supabaseClient
-      .from('user_settings')
-      .upsert(
-        {
-          user_id: session.user.id,
-          onboarding_use_case: useCase,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: 'user_id' }
-      );
+    await supabaseClient.from('user_settings').upsert(
+      {
+        user_id: session.user.id,
+        onboarding_use_case: useCase,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'user_id' }
+    );
   } catch (error) {
     // Non-critical: log and swallow — does not block the user flow
     console.error('Failed to save onboarding use case:', error);
