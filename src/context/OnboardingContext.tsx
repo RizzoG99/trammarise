@@ -1,7 +1,8 @@
+// src/context/OnboardingContext.tsx
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import type { ReactNode } from 'react';
-import { useUser } from '@clerk/react';
+import { useUser } from '@/hooks/useUser';
 import { useSubscription } from './SubscriptionContext';
 import { getApiConfig, saveApiConfig } from '@/utils/session-storage';
 import { getSavedApiKey, getOnboardingUseCaseFromDb } from '@/utils/api';
@@ -26,22 +27,18 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
   const [onboardingUseCase, setOnboardingUseCase] = useState<string | null>(null);
 
   const checkOnboardingStatus = useCallback(async () => {
-    // Not signed in - no onboarding needed (will see WelcomePage)
     if (!isSignedIn) {
       setNeedsOnboarding(false);
       setIsCheckingOnboarding(false);
       return;
     }
 
-    // Paid user - no onboarding needed
     if (subscription && subscription.tier !== 'free') {
       setNeedsOnboarding(false);
       setIsCheckingOnboarding(false);
       return;
     }
 
-    // Free user - check if they have API key
-    // Check session storage first
     const sessionConfig = getApiConfig();
     if (sessionConfig?.openaiKey) {
       setNeedsOnboarding(false);
@@ -49,26 +46,21 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    // Check database — use allSettled so a use-case fetch failure doesn't
-    // discard a successfully retrieved API key (and vice versa).
     try {
-      const [keyResult, useCaseResult] = await Promise.allSettled([
+      const [savedKey, savedUseCase] = await Promise.all([
         getSavedApiKey(),
         getOnboardingUseCaseFromDb(),
       ]);
 
-      if (useCaseResult.status === 'fulfilled' && useCaseResult.value) {
-        setOnboardingUseCase(useCaseResult.value);
-      }
+      if (savedUseCase) setOnboardingUseCase(savedUseCase);
 
-      if (keyResult.status === 'fulfilled' && keyResult.value.hasKey && keyResult.value.apiKey) {
-        saveApiConfig('openai', keyResult.value.apiKey, keyResult.value.apiKey);
+      if (savedKey.hasKey && savedKey.apiKey) {
+        saveApiConfig('openai', savedKey.apiKey, savedKey.apiKey);
         setNeedsOnboarding(false);
       } else {
         setNeedsOnboarding(true);
       }
     } catch {
-      // Unexpected error (allSettled itself shouldn't reject)
       setNeedsOnboarding(true);
     } finally {
       setIsCheckingOnboarding(false);
@@ -81,7 +73,6 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
     }
   }, [userLoaded, subscriptionLoading, checkOnboardingStatus]);
 
-  // When subscription tier changes from 'free' to 'pro'/'team', complete onboarding
   useEffect(() => {
     if (subscription && subscription.tier !== 'free') {
       setNeedsOnboarding(false);
