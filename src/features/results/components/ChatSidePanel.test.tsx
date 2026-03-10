@@ -20,9 +20,7 @@ vi.mock('@/lib', () => ({
     isLoading: boolean;
   }) => (
     <div data-testid="mock-chat-interface">
-      <button onClick={() => onSendMessage('test message')} disabled={isLoading}>
-        Send
-      </button>
+      <button onClick={() => onSendMessage('test message')}>Send</button>
       {isLoading && <span>Loading...</span>}
     </div>
   ),

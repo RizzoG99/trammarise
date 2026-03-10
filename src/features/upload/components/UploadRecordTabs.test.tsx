@@ -35,11 +35,11 @@ describe('UploadRecordTabs', () => {
     render(<UploadRecordTabs uploadPanel={uploadPanel} recordPanel={recordPanel} />);
 
     // By default 'upload' is active
-    const uploadTabButton = screen.getByRole('button', { name: /Upload File/i });
-    const recordTabButton = screen.getByRole('button', { name: /Record Audio/i });
+    const uploadTabButton = screen.getByRole('tab', { name: /Upload File/i });
+    const recordTabButton = screen.getByRole('tab', { name: /Record Audio/i });
 
-    expect(uploadTabButton).toHaveClass('bg-white');
-    expect(recordTabButton).not.toHaveClass('bg-white');
+    expect(uploadTabButton).toHaveAttribute('aria-selected', 'true');
+    expect(recordTabButton).toHaveAttribute('aria-selected', 'false');
 
     // Default mobile view shows the upload panel in the tab container
     // To check this robustly, we can check which element matches our mobile view container
@@ -51,8 +51,8 @@ describe('UploadRecordTabs', () => {
 
     // Click Record Tab
     fireEvent.click(recordTabButton);
-    expect(recordTabButton).toHaveClass('bg-white');
-    expect(uploadTabButton).not.toHaveClass('bg-white');
+    expect(recordTabButton).toHaveAttribute('aria-selected', 'true');
+    expect(uploadTabButton).toHaveAttribute('aria-selected', 'false');
 
     // Mobile container should now show the record panel
     expect(mobileContainer).toContainElement(screen.getAllByTestId('record-panel')[0]);
