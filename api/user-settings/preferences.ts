@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { requireAuth } from '../middleware/auth';
+import { requireAuth, AuthError } from '../middleware/auth';
 import { supabaseAdmin } from '../lib/supabase-admin';
+import { rateLimit, RateLimitError, RATE_LIMITS } from '../middleware/rate-limit';
 
 const VALID_USE_CASES = [
   'meeting',
@@ -18,6 +19,7 @@ function isValidUseCase(value: unknown): value is UseCase {
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
+    await rateLimit(req, RATE_LIMITS.PREFERENCES);
     const { userId } = await requireAuth(req);
 
     switch (req.method) {
@@ -29,8 +31,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
   } catch (error) {
-    if (error instanceof Error && error.name === 'AuthError') {
+    if (error instanceof AuthError) {
       return res.status(401).json({ error: 'Unauthorized' });
+    }
+    if (error instanceof RateLimitError) {
+      return res.status(429).json({ error: 'Too many requests' });
     }
     return res.status(500).json({ error: 'Internal server error' });
   }

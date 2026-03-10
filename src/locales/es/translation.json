@@ -811,7 +811,6 @@
       "title": "Conecta tu clave API",
       "subtitle": "Tu clave se guarda de forma segura solo en la sesión del navegador",
       "rememberKey": "Recordar mi clave entre sesiones",
-      "errorFormat": "La clave API debe comenzar con \"sk-\"",
       "errorInvalid": "Clave API no válida. Por favor verifica e intenta de nuevo.",
       "validating": "Verificando…"
     },

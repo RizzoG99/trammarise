@@ -102,7 +102,7 @@ export function OnboardingPage() {
 
   const handleSelectPlan = (planId: 'free' | 'pro') => {
     if (planId === 'pro') {
-      trackEvent('onboarding_completed', { use_case: selectedUseCase || null, plan: 'pro' });
+      trackEvent('onboarding_plan_selected', { use_case: selectedUseCase || null, plan: 'pro' });
       completeOnboarding();
       navigate(ROUTES.PRICING);
     } else {
@@ -111,10 +111,6 @@ export function OnboardingPage() {
   };
 
   const handleFinish = async () => {
-    if (!apiKey.startsWith('sk-')) {
-      setApiKeyError(t('onboarding.step3.errorFormat'));
-      return;
-    }
     setIsValidatingKey(true);
     setApiKeyError('');
     const isValid = await validateApiKey('openai', apiKey);

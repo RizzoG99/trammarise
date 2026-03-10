@@ -811,7 +811,6 @@
       "title": "API-Schlüssel verbinden",
       "subtitle": "Ihr Schlüssel wird nur in der Browser-Sitzung gespeichert",
       "rememberKey": "Schlüssel sitzungsübergreifend merken",
-      "errorFormat": "Der API-Schlüssel muss mit \"sk-\" beginnen",
       "errorInvalid": "Ungültiger API-Schlüssel. Bitte prüfen und erneut versuchen.",
       "validating": "Wird geprüft…"
     },

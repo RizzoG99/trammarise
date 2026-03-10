@@ -810,7 +810,6 @@
       "title": "Connect your API key",
       "subtitle": "Your key is stored securely in your browser session only",
       "rememberKey": "Remember my key across sessions",
-      "errorFormat": "API key must start with \"sk-\"",
       "errorInvalid": "Invalid API key. Please check and try again.",
       "validating": "Verifying…"
     },

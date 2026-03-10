@@ -31,7 +31,6 @@ vi.mock('react-i18next', () => ({
         'onboarding.steps.plan': 'Plan',
         'onboarding.steps.apiSetup': 'API Setup',
         'onboarding.step3.rememberKey': 'Remember my key across sessions',
-        'onboarding.step3.errorFormat': 'API key must start with "sk-"',
         'onboarding.step3.errorInvalid': 'Invalid API key. Please check and try again.',
         'onboarding.step3.validating': 'Verifying…',
         'onboarding.step2.free.name': 'Free',
@@ -337,19 +336,22 @@ describe('OnboardingPage', () => {
       expect(screen.getByLabelText('OpenAI API Key')).toBeInTheDocument();
     });
 
-    it('shows validation error for invalid key format', () => {
+    it('shows validation error when server rejects key', async () => {
+      mockValidateApiKey.mockResolvedValue(false);
       goToStep3();
       fireEvent.change(screen.getByLabelText('OpenAI API Key'), {
-        target: { value: 'invalid-key' },
+        target: { value: 'sk-badkey' },
       });
       fireEvent.click(screen.getByText('Get Started'));
-      expect(screen.getByRole('alert')).toBeInTheDocument();
+      await waitFor(() => expect(screen.getByRole('alert')).toBeInTheDocument());
     });
 
-    it('does NOT complete on invalid key', () => {
+    it('does NOT complete when server rejects key', async () => {
+      mockValidateApiKey.mockResolvedValue(false);
       goToStep3();
-      fireEvent.change(screen.getByLabelText('OpenAI API Key'), { target: { value: 'bad' } });
+      fireEvent.change(screen.getByLabelText('OpenAI API Key'), { target: { value: 'sk-bad' } });
       fireEvent.click(screen.getByText('Get Started'));
+      await waitFor(() => expect(screen.getByRole('alert')).toBeInTheDocument());
       expect(screen.getByText('Connect your API key')).toBeInTheDocument();
       expect(mockCompleteOnboarding).not.toHaveBeenCalled();
     });

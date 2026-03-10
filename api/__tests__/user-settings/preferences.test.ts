@@ -4,10 +4,40 @@ import handler from '../../user-settings/preferences';
 import * as auth from '../../middleware/auth';
 import { supabaseAdmin } from '../../lib/supabase-admin';
 
-vi.mock('../../middleware/auth');
+vi.mock('../../middleware/auth', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../middleware/auth')>();
+  return { ...actual, requireAuth: vi.fn() };
+});
 vi.mock('../../lib/supabase-admin', () => ({
   supabaseAdmin: { from: vi.fn() },
 }));
+vi.mock('../../middleware/rate-limit', () => ({
+  rateLimit: vi.fn().mockResolvedValue(undefined),
+  RateLimitError: class RateLimitError extends Error {},
+  RATE_LIMITS: { PREFERENCES: {} },
+}));
+
+describe('auth failure', () => {
+  let req: Partial<VercelRequest>;
+  let res: Partial<VercelResponse>;
+  let jsonMock: ReturnType<typeof vi.fn>;
+  let statusMock: ReturnType<typeof vi.fn>;
+
+  beforeEach(() => {
+    jsonMock = vi.fn();
+    statusMock = vi.fn(() => ({ json: jsonMock }));
+    req = { method: 'GET', body: {} };
+    res = { status: statusMock, json: jsonMock };
+  });
+
+  it('returns 401 when unauthenticated', async () => {
+    vi.mocked(auth.requireAuth).mockRejectedValue(new auth.AuthError('Unauthorized', 401));
+
+    await handler(req as VercelRequest, res as VercelResponse);
+
+    expect(statusMock).toHaveBeenCalledWith(401);
+  });
+});
 
 describe('GET /api/user-settings/preferences', () => {
   let req: Partial<VercelRequest>;
