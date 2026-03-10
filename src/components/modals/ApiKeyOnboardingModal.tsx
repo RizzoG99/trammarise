@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useClerk } from '@clerk/react';
+import { supabaseClient } from '@/lib/supabase/client';
 import { Modal, Button, Text, Heading, Input } from '@/lib';
 import { Key, ExternalLink, ChevronDown, ChevronUp } from 'lucide-react';
 import { saveApiKey, deleteSavedApiKey } from '@/utils/api';
@@ -16,7 +16,6 @@ interface ApiKeyOnboardingModalProps {
 export function ApiKeyOnboardingModal({ isOpen, onComplete }: ApiKeyOnboardingModalProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { signOut, session } = useClerk();
   const { isViewingPricing, setIsViewingPricing } = useOnboarding();
   const [apiKey, setApiKey] = useState('');
   const [rememberKey, setRememberKey] = useState(false);
@@ -75,22 +74,13 @@ export function ApiKeyOnboardingModal({ isOpen, onComplete }: ApiKeyOnboardingMo
 
   const handleClose = async () => {
     try {
-      // Clear session storage API key
       clearApiConfig();
-
-      // Delete saved API key from database
-      if (session) {
-        const getToken = async () => session.getToken();
-        await deleteSavedApiKey(getToken);
-      }
+      await deleteSavedApiKey();
     } catch (error) {
       console.error('Error clearing API keys on logout:', error);
-      // Continue with logout even if cleanup fails
     }
 
-    // Sign out the user
-    await signOut();
-    // Redirect to welcome page
+    await supabaseClient.auth.signOut();
     navigate('/welcome');
   };
 

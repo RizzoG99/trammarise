@@ -259,12 +259,10 @@ export async function chatWithAI(
   history: ChatMessage[],
   provider: string,
   apiKey: string,
-  getToken: (() => Promise<string | null>) | null,
   model?: string,
   language?: string
 ): Promise<ChatResponse> {
   const response = await fetchWithAuth(
-    getToken,
     '/api/chat',
     {
       method: 'POST',
@@ -359,12 +357,10 @@ export async function copyToClipboard(text: string): Promise<boolean> {
  */
 export async function saveApiKey(
   apiKey: string,
-  provider: string = 'openai',
-  getToken?: (() => Promise<string | null>) | null
+  provider: string = 'openai'
 ): Promise<{ success: boolean; message: string }> {
   try {
     const response = await fetchWithAuth(
-      getToken || null,
       '/api/user-settings/api-key',
       {
         method: 'POST',
@@ -391,13 +387,12 @@ export async function saveApiKey(
  * Retrieve saved API key from backend (decrypted)
  * Requires authentication
  */
-export async function getSavedApiKey(getToken?: (() => Promise<string | null>) | null): Promise<{
+export async function getSavedApiKey(): Promise<{
   hasKey: boolean;
   apiKey: string | null;
 }> {
   try {
     const response = await fetchWithAuth(
-      getToken || null,
       '/api/user-settings/api-key',
       {
         method: 'GET',
@@ -423,13 +418,12 @@ export async function getSavedApiKey(getToken?: (() => Promise<string | null>) |
  * Delete saved API key from backend
  * Requires authentication
  */
-export async function deleteSavedApiKey(getToken?: (() => Promise<string | null>) | null): Promise<{
+export async function deleteSavedApiKey(): Promise<{
   success: boolean;
   message: string;
 }> {
   try {
     const response = await fetchWithAuth(
-      getToken || null,
       '/api/user-settings/api-key',
       {
         method: 'DELETE',
@@ -453,13 +447,9 @@ export async function deleteSavedApiKey(getToken?: (() => Promise<string | null>
 /**
  * Save onboarding use case to backend
  */
-export async function saveOnboardingUseCaseToDb(
-  useCase: string,
-  getToken?: (() => Promise<string | null>) | null
-): Promise<void> {
+export async function saveOnboardingUseCaseToDb(useCase: string): Promise<void> {
   try {
     await fetchWithAuth(
-      getToken || null,
       '/api/user-settings/preferences',
       {
         method: 'PATCH',
@@ -477,12 +467,9 @@ export async function saveOnboardingUseCaseToDb(
 /**
  * Retrieve onboarding use case from backend
  */
-export async function getOnboardingUseCaseFromDb(
-  getToken?: (() => Promise<string | null>) | null
-): Promise<string | null> {
+export async function getOnboardingUseCaseFromDb(): Promise<string | null> {
   try {
     const response = await fetchWithAuth(
-      getToken || null,
       '/api/user-settings/preferences',
       { method: 'GET' },
       API_DEFAULT_TIMEOUT

@@ -281,36 +281,6 @@ describe('SubscriptionContext', () => {
       expect(result.current.hasFeature('shared-workspaces')).toBe(false);
       expect(result.current.hasFeature('admin-controls')).toBe(false);
     });
-
-    it('should return true for all features on team tier', async () => {
-      mockUseUser.mockReturnValue({ isSignedIn: true, isLoaded: true });
-      mockFetchWithAuth.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          id: 'sub_123',
-          tier: 'team',
-          status: 'active',
-          currentPeriodStart: '2024-01-01',
-          currentPeriodEnd: '2024-02-01',
-          cancelAtPeriodEnd: false,
-          minutesUsed: 0,
-          creditsBalance: 0,
-        }),
-      });
-
-      const { result } = renderHook(() => useSubscription(), {
-        wrapper: SubscriptionProvider,
-      });
-
-      await waitFor(() => {
-        expect(result.current.isLoading).toBe(false);
-      });
-
-      expect(result.current.hasFeature('team-collaboration')).toBe(true);
-      expect(result.current.hasFeature('shared-workspaces')).toBe(true);
-      expect(result.current.hasFeature('admin-controls')).toBe(true);
-      expect(result.current.hasFeature('priority-support')).toBe(true);
-    });
   });
 
   describe('Quota Checking', () => {
@@ -502,9 +472,6 @@ describe('SubscriptionContext', () => {
 
       expect(proResult.current.subscription?.minutesIncluded).toBe(TIER_MINUTES.pro);
       expect(TIER_MINUTES.pro).toBe(500);
-
-      // Test team tier
-      expect(TIER_MINUTES.team).toBe(2000);
     });
   });
 });

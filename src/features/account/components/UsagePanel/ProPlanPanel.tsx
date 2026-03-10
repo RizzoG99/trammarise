@@ -1,18 +1,13 @@
 // src/features/account/components/UsagePanel/ProPlanPanel.tsx
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '@clerk/react';
 import { Zap, ChevronRight, AlertTriangle, XCircle } from 'lucide-react';
 import type { Subscription, SubscriptionStatus } from '@/context/subscription-types';
-import { fetchWithAuth } from '@/utils/fetch-with-auth';
+import { supabaseClient } from '@/lib/supabase/client';
 import { ROUTES } from '@/types/routing';
 
 interface Props {
   subscription: Subscription;
-}
-
-interface UsageCurrentResponse {
-  eventCount: number;
 }
 
 function formatDate(isoString: string) {
@@ -57,7 +52,6 @@ const BADGE_STYLES = {
 
 export function ProPlanPanel({ subscription }: Props) {
   const { t } = useTranslation();
-  const { getToken } = useAuth();
   const [eventCount, setEventCount] = useState<number | null>(null);
 
   const { minutesUsed, minutesIncluded, currentPeriodEnd, cancelAtPeriodEnd, status } =
@@ -70,11 +64,17 @@ export function ProPlanPanel({ subscription }: Props) {
   const formattedDate = formatDate(currentPeriodEnd);
 
   useEffect(() => {
-    fetchWithAuth(getToken, '/api/usage/current')
-      .then((r) => r.json() as Promise<UsageCurrentResponse>)
-      .then((data: UsageCurrentResponse) => setEventCount(data.eventCount))
+    const startOfMonth = new Date();
+    startOfMonth.setDate(1);
+    startOfMonth.setHours(0, 0, 0, 0);
+
+    supabaseClient
+      .from('usage_events')
+      .select('*', { count: 'exact', head: true })
+      .gte('created_at', startOfMonth.toISOString())
+      .then(({ count }) => setEventCount(count ?? 0))
       .catch(() => setEventCount(0));
-  }, [getToken]);
+  }, []);
 
   const barColor = isQuotaReached
     ? 'var(--color-accent-error)'

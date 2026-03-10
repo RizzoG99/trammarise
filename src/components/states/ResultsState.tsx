@@ -1,7 +1,6 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { Modal, Snackbar, AILoadingOrb, Text, AudioPlayer } from '@/lib';
 import { chatWithAI } from '../../utils/api';
-import { useAuth } from '@clerk/react';
 import { useTranslation } from 'react-i18next';
 
 import type { ProcessingResult, ChatMessage, AudioFile, AIConfiguration } from '../../types/audio';
@@ -75,9 +74,6 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
 
   const { subscription } = useSubscription();
   const userTier = subscription?.tier || 'free';
-
-  // Clerk authentication
-  const { getToken } = useAuth();
 
   // Derive base file name from audio name (strip extension)
   const baseFileName = audioName.replace(/\.[^/.]+$/, '');
@@ -157,7 +153,6 @@ export const ResultsState: React.FC<ResultsStateProps> = ({
         result.chatHistory,
         result.configuration.provider,
         apiKey,
-        getToken,
         result.configuration.model,
         language
       );
