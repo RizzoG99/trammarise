@@ -1,18 +1,17 @@
+// src/context/SubscriptionContext.tsx
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import type { ReactNode } from 'react';
-import { useUser, useAuth } from '@clerk/react';
+import { supabaseClient } from '@/lib/supabase/client';
+import { useUser } from '@/hooks/useUser';
 import { TIER_FEATURES, FREE_SUBSCRIPTION } from './subscription-tiers';
 import type { SubscriptionTier, SubscriptionStatus, Subscription } from './subscription-types';
-import { fetchWithAuth } from '@/utils/fetch-with-auth';
 
 interface SubscriptionContextValue {
   subscription: Subscription | null;
   isLoading: boolean;
   error: string | null;
   refetch: () => Promise<void>;
-
-  // Helper functions
   hasFeature: (feature: string) => boolean;
   canUseHostedAPI: boolean;
   minutesRemaining: number;
@@ -21,7 +20,6 @@ interface SubscriptionContextValue {
 
 const SubscriptionContext = createContext<SubscriptionContextValue | null>(null);
 
-// Minutes included per tier
 export const TIER_MINUTES: Record<SubscriptionTier, number> = {
   free: 60,
   pro: 500,
@@ -32,20 +30,13 @@ interface SubscriptionProviderProps {
 }
 
 export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
-  const { isSignedIn, isLoaded } = useUser();
-  const { getToken } = useAuth();
-  // Stable ref so fetchSubscription can call the latest getToken without
-  // including it as a useCallback dependency (which would cause an infinite
-  // re-render loop because Clerk re-creates getToken on every render).
-  const getTokenRef = useRef(getToken);
-  getTokenRef.current = getToken;
+  const { isSignedIn, isLoaded, user } = useUser();
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchSubscription = useCallback(async () => {
-    // If not signed in, use free tier
-    if (!isSignedIn) {
+    if (!isSignedIn || !user) {
       setSubscription(FREE_SUBSCRIPTION);
       setIsLoading(false);
       return;
@@ -55,46 +46,50 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
     setError(null);
 
     try {
-      const response = await fetchWithAuth(getTokenRef.current, '/api/subscriptions/current');
+      const { data, error: dbError } = await supabaseClient
+        .from('subscriptions')
+        .select('*')
+        .eq('user_id', user.id)
+        .maybeSingle();
 
-      if (!response.ok) {
-        if (response.status === 404) {
-          // No subscription found OR API not implemented yet - use free tier
-          console.debug('Subscription API not available, using free tier');
-          setSubscription(FREE_SUBSCRIPTION);
-          return;
-        }
-        throw new Error('Failed to fetch subscription');
+      if (dbError) throw dbError;
+
+      if (!data) {
+        setSubscription(FREE_SUBSCRIPTION);
+        return;
       }
 
-      const data = await response.json();
       setSubscription({
         id: data.id,
         tier: data.tier as SubscriptionTier,
         status: data.status as SubscriptionStatus,
-        currentPeriodStart: data.currentPeriodStart,
-        currentPeriodEnd: data.currentPeriodEnd,
-        cancelAtPeriodEnd: data.cancelAtPeriodEnd,
-        minutesIncluded: TIER_MINUTES[data.tier as SubscriptionTier] || 0,
-        minutesUsed: data.minutesUsed || 0,
-        creditsBalance: data.creditsBalance || 0,
+        currentPeriodStart: data.current_period_start ?? new Date().toISOString(),
+        currentPeriodEnd: data.current_period_end ?? new Date().toISOString(),
+        cancelAtPeriodEnd: data.cancel_at_period_end ?? false,
+        minutesIncluded: TIER_MINUTES[data.tier as SubscriptionTier] ?? 0,
+        minutesUsed: data.minutes_used ?? 0,
+        creditsBalance: data.credits_balance ?? 0,
       });
     } catch (err) {
-      // Use debug logging since failing gracefully to free tier is expected
       console.debug('Subscription fetch failed, falling back to free tier:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch subscription');
-      // Fallback to free tier on error
       setSubscription(FREE_SUBSCRIPTION);
     } finally {
       setIsLoading(false);
     }
-  }, [isSignedIn]);
+  }, [isSignedIn, user]);
 
   useEffect(() => {
     if (isLoaded) {
       fetchSubscription();
     }
   }, [isLoaded, fetchSubscription]);
+
+  useEffect(() => {
+    if (subscription && subscription.tier !== 'free') {
+      // Pro user — no further action needed
+    }
+  }, [subscription]);
 
   const hasFeature = (feature: string): boolean => {
     if (!subscription) return false;
@@ -107,30 +102,24 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
     : 0;
   const isSubscribed = subscription?.tier !== 'free' && subscription?.status === 'active';
 
-  const value: SubscriptionContextValue = {
-    subscription,
-    isLoading,
-    error,
-    refetch: fetchSubscription,
-    hasFeature,
-    canUseHostedAPI,
-    minutesRemaining,
-    isSubscribed,
-  };
-
-  return <SubscriptionContext.Provider value={value}>{children}</SubscriptionContext.Provider>;
+  return (
+    <SubscriptionContext.Provider
+      value={{
+        subscription,
+        isLoading,
+        error,
+        refetch: fetchSubscription,
+        hasFeature,
+        canUseHostedAPI,
+        minutesRemaining,
+        isSubscribed,
+      }}
+    >
+      {children}
+    </SubscriptionContext.Provider>
+  );
 }
 
-/**
- * Hook to access subscription context
- *
- * @example
- * const { subscription, hasFeature, canUseHostedAPI } = useSubscription();
- *
- * if (hasFeature('team-collaboration')) {
- *   // Show team features
- * }
- */
 export function useSubscription() {
   const context = useContext(SubscriptionContext);
   if (!context) {
