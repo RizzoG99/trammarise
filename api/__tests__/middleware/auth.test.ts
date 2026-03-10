@@ -4,92 +4,44 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 vi.unmock('../../middleware/auth');
 
 // Create mock functions
-const mockAuthenticateRequest = vi.fn();
 const mockGetUser = vi.fn();
-const mockCreateClerkClient = vi.fn(() => ({
-  authenticateRequest: mockAuthenticateRequest,
-  users: {
-    getUser: mockGetUser,
-  },
-}));
-
-const mockSupabaseFrom = vi.fn();
 
 // Mock modules BEFORE importing the module under test
-vi.mock('@clerk/backend', () => ({
-  createClerkClient: mockCreateClerkClient,
-}));
-
 vi.mock('../../lib/supabase-admin', () => ({
   supabaseAdmin: {
-    from: mockSupabaseFrom,
+    auth: { getUser: (...args: unknown[]) => mockGetUser(...args) },
   },
 }));
 
 describe('requireAuth middleware', () => {
   beforeEach(() => {
-    // Clear all mocks before each test
     vi.clearAllMocks();
-
-    // Setup default Supabase mock chain
-    mockSupabaseFrom.mockReturnValue({
-      select: vi.fn().mockReturnThis(),
-      eq: vi.fn().mockReturnThis(),
-      single: vi.fn(),
-      insert: vi.fn().mockReturnThis(),
-    });
   });
 
   describe('Successful Authentication', () => {
     it('should extract userId from valid JWT and return user data', async () => {
-      // Arrange - Mock successful Clerk authentication
-      mockAuthenticateRequest.mockResolvedValue({
-        isAuthenticated: true,
-        toAuth: () => ({ userId: 'user_clerk123' }),
-      });
-
-      // Mock Supabase to return existing user
-      const mockSingle = vi.fn().mockResolvedValue({
-        data: { id: 'uuid-123', clerk_user_id: 'user_clerk123' },
+      mockGetUser.mockResolvedValue({
+        data: { user: { id: 'uuid-123' } },
         error: null,
       });
-      mockSupabaseFrom.mockReturnValue({
-        select: vi.fn().mockReturnThis(),
-        eq: vi.fn().mockReturnThis(),
-        single: mockSingle,
-      });
 
-      // Import module AFTER mocks are set up
       const { requireAuth } = await import('../../middleware/auth');
 
-      // Create mock request
       const mockReq = {
         method: 'GET',
         url: '/api/test',
-        headers: {},
+        headers: { authorization: 'Bearer valid-token' },
       } as unknown as Parameters<typeof requireAuth>[0];
 
-      // Act
       const result = await requireAuth(mockReq);
 
-      // Assert
-      expect(result).toEqual({
-        userId: 'uuid-123',
-        clerkId: 'user_clerk123',
-      });
-      expect(mockAuthenticateRequest).toHaveBeenCalled();
-      expect(mockSupabaseFrom).toHaveBeenCalledWith('users');
+      expect(result).toEqual({ userId: 'uuid-123' });
+      expect(mockGetUser).toHaveBeenCalledWith('valid-token');
     });
   });
 
   describe('Authentication Errors', () => {
-    it('should throw 401 error when not authenticated', async () => {
-      // Arrange - Mock failed authentication
-      mockAuthenticateRequest.mockResolvedValue({
-        isAuthenticated: false,
-        toAuth: () => ({ userId: null }),
-      });
-
+    it('should throw 401 when Authorization header is missing', async () => {
       const { requireAuth } = await import('../../middleware/auth');
 
       const mockReq = {
@@ -98,39 +50,13 @@ describe('requireAuth middleware', () => {
         headers: {},
       } as unknown as Parameters<typeof requireAuth>[0];
 
-      // Act & Assert
-      await expect(requireAuth(mockReq)).rejects.toThrow('Unauthorized');
+      await expect(requireAuth(mockReq)).rejects.toThrow('Missing authorization token');
     });
 
-    it('should create user when not found in database', async () => {
-      // Arrange - Mock successful Clerk auth but user not in DB
-      mockAuthenticateRequest.mockResolvedValue({
-        isAuthenticated: true,
-        toAuth: () => ({ userId: 'user_clerk123' }),
-      });
-
-      // First call: user not found, Second call after upsert: return new user
-      const mockSingle = vi
-        .fn()
-        .mockResolvedValueOnce({
-          data: null,
-          error: { message: 'Not found' },
-        })
-        .mockResolvedValueOnce({
-          data: { id: 'uuid-new', clerk_user_id: 'user_clerk123' },
-          error: null,
-        });
-
-      mockSupabaseFrom.mockReturnValue({
-        select: vi.fn().mockReturnThis(),
-        eq: vi.fn().mockReturnThis(),
-        single: mockSingle,
-        upsert: vi.fn().mockReturnThis(),
-      });
-
-      // Mock Clerk user fetch for email
+    it('should throw 401 when token is invalid', async () => {
       mockGetUser.mockResolvedValue({
-        emailAddresses: [{ emailAddress: 'test@example.com' }],
+        data: { user: null },
+        error: { message: 'Invalid JWT' },
       });
 
       const { requireAuth } = await import('../../middleware/auth');
@@ -138,37 +64,43 @@ describe('requireAuth middleware', () => {
       const mockReq = {
         method: 'GET',
         url: '/api/test',
-        headers: {},
+        headers: { authorization: 'Bearer bad-token' },
       } as unknown as Parameters<typeof requireAuth>[0];
 
-      // Act
-      const result = await requireAuth(mockReq);
-
-      // Assert - Should create user and return
-      expect(result).toEqual({
-        userId: 'uuid-new',
-        clerkId: 'user_clerk123',
-      });
-      expect(mockGetUser).toHaveBeenCalledWith('user_clerk123');
+      await expect(requireAuth(mockReq)).rejects.toThrow('Invalid or expired token');
     });
   });
 
-  describe('Edge Cases', () => {
-    it('should handle authentication errors gracefully', async () => {
-      // Arrange - Mock Clerk throwing an error
-      mockAuthenticateRequest.mockRejectedValue(new Error('Network error'));
-
-      const { requireAuth } = await import('../../middleware/auth');
+  describe('optionalAuth', () => {
+    it('should return null when no auth header is present', async () => {
+      const { optionalAuth } = await import('../../middleware/auth');
 
       const mockReq = {
         method: 'GET',
         url: '/api/test',
         headers: {},
-      } as unknown as Parameters<typeof requireAuth>[0];
+      } as unknown as Parameters<typeof optionalAuth>[0];
 
-      // Act & Assert
-      // Should catch and rethrow as generic auth error
-      await expect(requireAuth(mockReq)).rejects.toThrow('Authentication failed');
+      const result = await optionalAuth(mockReq);
+      expect(result).toBeNull();
+    });
+
+    it('should return userId when token is valid', async () => {
+      mockGetUser.mockResolvedValue({
+        data: { user: { id: 'uuid-123' } },
+        error: null,
+      });
+
+      const { optionalAuth } = await import('../../middleware/auth');
+
+      const mockReq = {
+        method: 'GET',
+        url: '/api/test',
+        headers: { authorization: 'Bearer valid-token' },
+      } as unknown as Parameters<typeof optionalAuth>[0];
+
+      const result = await optionalAuth(mockReq);
+      expect(result).toEqual({ userId: 'uuid-123' });
     });
   });
 });

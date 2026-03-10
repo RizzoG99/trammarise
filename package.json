@@ -40,9 +40,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.0",
-    "@clerk/backend": "^3.0.1",
     "@clerk/nextjs": "^6.37.3",
-    "@clerk/react": "^6.0.1",
     "@dr.pogodin/react-helmet": "^3.0.5",
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "@ffprobe-installer/ffprobe": "^2.1.2",
@@ -76,7 +74,6 @@
     "remark-gfm": "^4.0.1",
     "remark-parse": "^11.0.0",
     "stripe": "^20.3.1",
-    "svix": "^1.84.1",
     "unified": "^11.0.5",
     "uuid": "^11.0.4",
     "wavesurfer.js": "^7.11.1"

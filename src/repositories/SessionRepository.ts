@@ -5,6 +5,10 @@
  * RLS (row-level security) enforces ownership: user_id = auth.uid().
  */
 import { supabaseClient } from '@/lib/supabase/client';
+import type { Database } from '@/types/database';
+
+type SessionInsert = Database['public']['Tables']['sessions']['Insert'];
+type SessionUpdate = Database['public']['Tables']['sessions']['Update'];
 
 // Session types matching database schema
 export interface Session {
@@ -73,7 +77,7 @@ export interface ListSessionsResponse {
 }
 
 // Maps camelCase DTO fields to snake_case DB columns
-function toDbRow(data: CreateSessionDTO, userId: string) {
+function toDbRow(data: CreateSessionDTO, userId: string): SessionInsert {
   return {
     user_id: userId,
     session_id: data.sessionId,
@@ -185,7 +189,7 @@ export class SessionRepository {
    * @throws Error if update fails
    */
   async update(sessionId: string, data: UpdateSessionDTO): Promise<Session> {
-    const updateRow: Record<string, unknown> = {};
+    const updateRow: SessionUpdate = {};
     if (data.audioUrl !== undefined) updateRow.audio_url = data.audioUrl;
     if (data.durationSeconds !== undefined) updateRow.duration_seconds = data.durationSeconds;
     if (data.processingMode !== undefined) updateRow.processing_mode = data.processingMode;
@@ -214,9 +218,10 @@ export class SessionRepository {
    * @throws Error if deletion fails
    */
   async delete(sessionId: string): Promise<void> {
+    const softDelete: SessionUpdate = { deleted_at: new Date().toISOString() };
     const { error } = await supabaseClient
       .from('sessions')
-      .update({ deleted_at: new Date().toISOString() })
+      .update(softDelete)
       .eq('session_id', sessionId);
 
     if (error) throw new Error('Failed to delete session');

@@ -68,10 +68,12 @@ export function ProPlanPanel({ subscription }: Props) {
     startOfMonth.setDate(1);
     startOfMonth.setHours(0, 0, 0, 0);
 
-    supabaseClient
-      .from('usage_events')
-      .select('*', { count: 'exact', head: true })
-      .gte('created_at', startOfMonth.toISOString())
+    void Promise.resolve(
+      supabaseClient
+        .from('usage_events')
+        .select('*', { count: 'exact', head: true })
+        .gte('created_at', startOfMonth.toISOString())
+    )
       .then(({ count }) => setEventCount(count ?? 0))
       .catch(() => setEventCount(0));
   }, []);

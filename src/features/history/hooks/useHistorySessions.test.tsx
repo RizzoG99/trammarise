@@ -4,10 +4,9 @@ import { useHistorySessions } from './useHistorySessions';
 import * as sessionManager from '@/utils/session-manager';
 import { SubscriptionProvider } from '@/context/SubscriptionContext';
 
-// Mock Clerk
-vi.mock('@clerk/react', () => ({
-  useUser: () => ({ user: null, isSignedIn: false, isLoaded: true }), // Default to not signed in for localStorage tests
-  useAuth: () => ({ userId: null, isLoaded: true, isSignedIn: false }),
+// Mock useUser hook
+vi.mock('@/hooks/useUser', () => ({
+  useUser: () => ({ user: null, isSignedIn: false, isLoaded: true }),
 }));
 
 vi.mock('@/utils/session-manager');

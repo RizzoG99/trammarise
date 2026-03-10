@@ -6,6 +6,9 @@ import { supabaseClient } from '@/lib/supabase/client';
 import { useUser } from '@/hooks/useUser';
 import { TIER_FEATURES, FREE_SUBSCRIPTION } from './subscription-tiers';
 import type { SubscriptionTier, SubscriptionStatus, Subscription } from './subscription-types';
+import type { Database } from '@/types/database';
+
+type SubscriptionRow = Database['public']['Tables']['subscriptions']['Row'];
 
 interface SubscriptionContextValue {
   subscription: Subscription | null;
@@ -46,13 +49,15 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
     setError(null);
 
     try {
-      const { data, error: dbError } = await supabaseClient
+      const { data: rawData, error: dbError } = await supabaseClient
         .from('subscriptions')
         .select('*')
         .eq('user_id', user.id)
         .maybeSingle();
 
       if (dbError) throw dbError;
+
+      const data = rawData as SubscriptionRow | null;
 
       if (!data) {
         setSubscription(FREE_SUBSCRIPTION);
