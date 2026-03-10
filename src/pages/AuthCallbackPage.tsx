@@ -13,7 +13,7 @@ export function AuthCallbackPage() {
       supabaseClient.auth
         .exchangeCodeForSession(code)
         .then(() => navigate('/', { replace: true }))
-        .catch(() => navigate('/', { replace: true }));
+        .catch(() => navigate('/?auth_error=1', { replace: true }));
     } else {
       // Magic link or implicit flow — session is set automatically by onAuthStateChange
       navigate('/', { replace: true });

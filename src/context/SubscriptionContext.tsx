@@ -90,12 +90,6 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
     }
   }, [isLoaded, fetchSubscription]);
 
-  useEffect(() => {
-    if (subscription && subscription.tier !== 'free') {
-      // Pro user — no further action needed
-    }
-  }, [subscription]);
-
   const hasFeature = (feature: string): boolean => {
     if (!subscription) return false;
     return TIER_FEATURES[subscription.tier]?.includes(feature) ?? false;

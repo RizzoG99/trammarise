@@ -24,9 +24,8 @@ export interface AuthResult {
  */
 export async function requireAuth(req: VercelRequest): Promise<AuthResult> {
   const authHeader = req.headers['authorization'];
-  const token = Array.isArray(authHeader)
-    ? authHeader[0]?.replace('Bearer ', '')
-    : authHeader?.replace('Bearer ', '');
+  const raw = Array.isArray(authHeader) ? authHeader[0] : authHeader;
+  const token = raw?.startsWith('Bearer ') ? raw.slice(7) : null;
 
   if (!token) {
     throw new AuthError('Missing authorization token', 401);

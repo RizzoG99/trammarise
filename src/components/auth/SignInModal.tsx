@@ -9,7 +9,9 @@ interface SignInModalProps {
   onClose: () => void;
 }
 
-const CALLBACK_URL = `${window.location.origin}/auth/callback`;
+function getCallbackUrl() {
+  return `${window.location.origin}/auth/callback`;
+}
 
 export function SignInModal({ onClose }: SignInModalProps) {
   const { t } = useTranslation();
@@ -24,7 +26,7 @@ export function SignInModal({ onClose }: SignInModalProps) {
     setError('');
     const { error: err } = await supabaseClient.auth.signInWithOtp({
       email: email.trim(),
-      options: { emailRedirectTo: CALLBACK_URL },
+      options: { emailRedirectTo: getCallbackUrl() },
     });
     setIsLoading(false);
     if (err) {
@@ -35,10 +37,13 @@ export function SignInModal({ onClose }: SignInModalProps) {
   };
 
   const handleOAuth = async (provider: Provider) => {
-    await supabaseClient.auth.signInWithOAuth({
+    const { error: err } = await supabaseClient.auth.signInWithOAuth({
       provider,
-      options: { redirectTo: CALLBACK_URL },
+      options: { redirectTo: getCallbackUrl() },
     });
+    if (err) {
+      setError(err.message);
+    }
   };
 
   return (
@@ -48,6 +53,7 @@ export function SignInModal({ onClose }: SignInModalProps) {
       aria-label={t('auth.signIn.title', 'Sign in')}
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
       onClick={(e) => e.target === e.currentTarget && onClose()}
+      onKeyDown={(e) => e.key === 'Escape' && onClose()}
     >
       <GlassCard variant="dark" className="w-full max-w-sm p-8">
         {sent ? (

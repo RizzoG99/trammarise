@@ -74,6 +74,7 @@ ALTER TABLE public.subscriptions
 ALTER TABLE public.subscriptions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.sessions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.usage_events ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.user_settings ENABLE ROW LEVEL SECURITY;
 
 -- users table
 DROP POLICY IF EXISTS "deny_direct_access" ON public.users;
