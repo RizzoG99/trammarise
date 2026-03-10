@@ -33,7 +33,8 @@ describe('SignInModal', () => {
     render(<SignInModal onClose={() => {}} />);
     expect(screen.getByRole('button', { name: /google/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /github/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /apple/i })).toBeInTheDocument();
+    // Apple sign-in is disabled pending Apple Developer account setup
+    expect(screen.queryByRole('button', { name: /apple/i })).not.toBeInTheDocument();
   });
 
   it('calls signInWithOtp on email submit', async () => {
