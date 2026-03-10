@@ -787,7 +787,25 @@
     },
     "step2": {
       "title": "Plan wählen",
-      "subtitle": "Kostenlos starten, jederzeit upgraden"
+      "subtitle": "Kostenlos starten, jederzeit upgraden",
+      "free": {
+        "name": "Kostenlos",
+        "description": "Eigenen API-Schlüssel mitbringen",
+        "feature1": "Unbegrenzte Transkriptionen",
+        "feature2": "Eigener OpenAI-Schlüssel",
+        "feature3": "Alle Inhaltstypen",
+        "cta": "Kostenlos fortfahren"
+      },
+      "pro": {
+        "name": "Pro",
+        "description": "Gehostete API, kein Schlüssel nötig",
+        "feature1": "500 Min. / Monat",
+        "feature2": "Kein API-Schlüssel erforderlich",
+        "feature3": "Cloud-Synchronisation",
+        "feature4": "Prioritätssupport",
+        "cta": "Zu Pro wechseln",
+        "badge": "Am beliebtesten"
+      }
     },
     "step3": {
       "title": "API-Schlüssel verbinden",
@@ -880,6 +898,7 @@
     "previewLabel": "Audiovorschau"
   },
   "usagePanel": {
+    "error": "Nutzungsdaten konnten nicht geladen werden. Bitte aktualisieren Sie die Seite.",
     "free": {
       "planBadge": "Kostenlos",
       "upgradeBtn": "Auf Pro upgraden",

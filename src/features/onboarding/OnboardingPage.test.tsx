@@ -34,6 +34,20 @@ vi.mock('react-i18next', () => ({
         'onboarding.step3.errorFormat': 'API key must start with "sk-"',
         'onboarding.step3.errorInvalid': 'Invalid API key. Please check and try again.',
         'onboarding.step3.validating': 'Verifying…',
+        'onboarding.step2.free.name': 'Free',
+        'onboarding.step2.free.description': 'Bring your own API key',
+        'onboarding.step2.free.feature1': 'Unlimited transcriptions',
+        'onboarding.step2.free.feature2': 'Your own OpenAI key',
+        'onboarding.step2.free.feature3': 'All content types',
+        'onboarding.step2.free.cta': 'Continue Free',
+        'onboarding.step2.pro.name': 'Pro',
+        'onboarding.step2.pro.description': 'Hosted API, no key needed',
+        'onboarding.step2.pro.feature1': '500 min / month',
+        'onboarding.step2.pro.feature2': 'No API key required',
+        'onboarding.step2.pro.feature3': 'Cloud sync',
+        'onboarding.step2.pro.feature4': 'Priority support',
+        'onboarding.step2.pro.cta': 'Upgrade to Pro',
+        'onboarding.step2.pro.badge': 'Most Popular',
       };
       return map[key] ?? key;
     },
@@ -311,19 +325,21 @@ describe('OnboardingPage', () => {
 
     it('shows API key input', () => {
       goToStep3();
-      expect(screen.getByRole('textbox')).toBeInTheDocument();
+      expect(screen.getByLabelText('OpenAI API Key')).toBeInTheDocument();
     });
 
     it('shows validation error for invalid key format', () => {
       goToStep3();
-      fireEvent.change(screen.getByRole('textbox'), { target: { value: 'invalid-key' } });
+      fireEvent.change(screen.getByLabelText('OpenAI API Key'), {
+        target: { value: 'invalid-key' },
+      });
       fireEvent.click(screen.getByText('Get Started'));
       expect(screen.getByRole('alert')).toBeInTheDocument();
     });
 
     it('does NOT complete on invalid key', () => {
       goToStep3();
-      fireEvent.change(screen.getByRole('textbox'), { target: { value: 'bad' } });
+      fireEvent.change(screen.getByLabelText('OpenAI API Key'), { target: { value: 'bad' } });
       fireEvent.click(screen.getByText('Get Started'));
       expect(screen.getByText('Connect your API key')).toBeInTheDocument();
       expect(mockCompleteOnboarding).not.toHaveBeenCalled();
@@ -331,7 +347,9 @@ describe('OnboardingPage', () => {
 
     it('saves valid key and completes onboarding when checkbox is unchecked', async () => {
       goToStep3();
-      fireEvent.change(screen.getByRole('textbox'), { target: { value: 'sk-validkey123' } });
+      fireEvent.change(screen.getByLabelText('OpenAI API Key'), {
+        target: { value: 'sk-validkey123' },
+      });
       fireEvent.click(screen.getByText('Get Started'));
       await waitFor(() => expect(mockCompleteOnboarding).toHaveBeenCalledTimes(1));
       expect(mockSaveApiConfig).toHaveBeenCalledWith('openai', 'sk-validkey123', 'sk-validkey123');
@@ -352,7 +370,9 @@ describe('OnboardingPage', () => {
     it('saves to DB when checkbox is checked', async () => {
       goToStep3();
       fireEvent.click(screen.getByRole('checkbox'));
-      fireEvent.change(screen.getByRole('textbox'), { target: { value: 'sk-validkey123' } });
+      fireEvent.change(screen.getByLabelText('OpenAI API Key'), {
+        target: { value: 'sk-validkey123' },
+      });
       fireEvent.click(screen.getByText('Get Started'));
       await waitFor(() => expect(mockCompleteOnboarding).toHaveBeenCalledTimes(1));
       expect(mockSaveApiConfig).toHaveBeenCalledWith('openai', 'sk-validkey123', 'sk-validkey123');
@@ -366,7 +386,7 @@ describe('OnboardingPage', () => {
     it('shows error when API key is rejected by server', async () => {
       mockValidateApiKey.mockResolvedValue(false);
       goToStep3();
-      fireEvent.change(screen.getByRole('textbox'), { target: { value: 'sk-badkey' } });
+      fireEvent.change(screen.getByLabelText('OpenAI API Key'), { target: { value: 'sk-badkey' } });
       fireEvent.click(screen.getByText('Get Started'));
       await waitFor(() => expect(screen.getByRole('alert')).toBeInTheDocument());
       expect(screen.getByText('Invalid API key. Please check and try again.')).toBeInTheDocument();
@@ -381,7 +401,9 @@ describe('OnboardingPage', () => {
         })
       );
       goToStep3();
-      fireEvent.change(screen.getByRole('textbox'), { target: { value: 'sk-validkey123' } });
+      fireEvent.change(screen.getByLabelText('OpenAI API Key'), {
+        target: { value: 'sk-validkey123' },
+      });
       fireEvent.click(screen.getByText('Get Started'));
       await waitFor(() => expect(screen.getByText('Verifying…')).toBeInTheDocument());
       expect(screen.getByText('Verifying…').closest('button')).toBeDisabled();

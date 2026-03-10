@@ -787,7 +787,25 @@
     },
     "step2": {
       "title": "Scegli il tuo piano",
-      "subtitle": "Inizia gratuitamente, aggiorna in qualsiasi momento"
+      "subtitle": "Inizia gratuitamente, aggiorna in qualsiasi momento",
+      "free": {
+        "name": "Gratuito",
+        "description": "Porta la tua chiave API",
+        "feature1": "Trascrizioni illimitate",
+        "feature2": "La tua chiave OpenAI",
+        "feature3": "Tutti i tipi di contenuto",
+        "cta": "Continua Gratis"
+      },
+      "pro": {
+        "name": "Pro",
+        "description": "API ospitata, nessuna chiave necessaria",
+        "feature1": "500 min / mese",
+        "feature2": "Nessuna chiave API richiesta",
+        "feature3": "Sincronizzazione cloud",
+        "feature4": "Supporto prioritario",
+        "cta": "Passa a Pro",
+        "badge": "Più Popolare"
+      }
     },
     "step3": {
       "title": "Connetti la tua chiave API",
@@ -880,6 +898,7 @@
     "previewLabel": "Anteprima audio"
   },
   "usagePanel": {
+    "error": "Impossibile caricare i dati di utilizzo. Aggiorna la pagina.",
     "free": {
       "planBadge": "Gratuito",
       "upgradeBtn": "Passa a Pro",

@@ -49,24 +49,26 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    // Check database
+    // Check database — use allSettled so a use-case fetch failure doesn't
+    // discard a successfully retrieved API key (and vice versa).
     try {
-      const [savedKey, savedUseCase] = await Promise.all([
+      const [keyResult, useCaseResult] = await Promise.allSettled([
         getSavedApiKey(),
         getOnboardingUseCaseFromDb(),
       ]);
 
-      if (savedUseCase) setOnboardingUseCase(savedUseCase);
+      if (useCaseResult.status === 'fulfilled' && useCaseResult.value) {
+        setOnboardingUseCase(useCaseResult.value);
+      }
 
-      if (savedKey.hasKey && savedKey.apiKey) {
-        // Restore API key to session storage
-        saveApiConfig('openai', savedKey.apiKey, savedKey.apiKey);
+      if (keyResult.status === 'fulfilled' && keyResult.value.hasKey && keyResult.value.apiKey) {
+        saveApiConfig('openai', keyResult.value.apiKey, keyResult.value.apiKey);
         setNeedsOnboarding(false);
       } else {
         setNeedsOnboarding(true);
       }
     } catch {
-      // If fetch fails, assume needs onboarding
+      // Unexpected error (allSettled itself shouldn't reject)
       setNeedsOnboarding(true);
     } finally {
       setIsCheckingOnboarding(false);

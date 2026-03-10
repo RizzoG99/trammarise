@@ -33,28 +33,6 @@ const USE_CASES: UseCase[] = [
   { id: 'other', Icon: MessageSquare, labelKey: 'onboarding.step1.useCases.other' },
 ];
 
-const FREE_PLAN: PricingPlan = {
-  id: 'free',
-  name: 'Free',
-  description: 'Bring your own API key',
-  monthlyPrice: '$0',
-  annualPrice: '$0',
-  features: ['Unlimited transcriptions', 'Your own OpenAI key', 'All content types'],
-  cta: 'Continue Free',
-};
-
-const PRO_PLAN: PricingPlan = {
-  id: 'pro',
-  name: 'Pro',
-  description: 'Hosted API, no key needed',
-  monthlyPrice: '$12',
-  annualPrice: '$99',
-  features: ['500 min / month', 'No API key required', 'Cloud sync', 'Priority support'],
-  cta: 'Upgrade to Pro',
-  popular: true,
-  badge: 'Most Popular',
-};
-
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export function OnboardingPage() {
@@ -69,7 +47,38 @@ export function OnboardingPage() {
   const [apiKeyError, setApiKeyError] = useState('');
   const [isValidatingKey, setIsValidatingKey] = useState(false);
   const [rememberKey, setRememberKey] = useState(false);
-  const [billingPeriod] = useState<'monthly' | 'annual'>('monthly');
+  const billingPeriod = 'monthly' as const;
+
+  const FREE_PLAN: PricingPlan = {
+    id: 'free',
+    name: t('onboarding.step2.free.name'),
+    description: t('onboarding.step2.free.description'),
+    monthlyPrice: '$0',
+    annualPrice: '$0',
+    features: [
+      t('onboarding.step2.free.feature1'),
+      t('onboarding.step2.free.feature2'),
+      t('onboarding.step2.free.feature3'),
+    ],
+    cta: t('onboarding.step2.free.cta'),
+  };
+
+  const PRO_PLAN: PricingPlan = {
+    id: 'pro',
+    name: t('onboarding.step2.pro.name'),
+    description: t('onboarding.step2.pro.description'),
+    monthlyPrice: '$12',
+    annualPrice: '$99',
+    features: [
+      t('onboarding.step2.pro.feature1'),
+      t('onboarding.step2.pro.feature2'),
+      t('onboarding.step2.pro.feature3'),
+      t('onboarding.step2.pro.feature4'),
+    ],
+    cta: t('onboarding.step2.pro.cta'),
+    popular: true,
+    badge: t('onboarding.step2.pro.badge'),
+  };
 
   const steps = [
     { id: 1, label: t('onboarding.steps.useCase') },
@@ -112,7 +121,13 @@ export function OnboardingPage() {
     }
     saveApiConfig('openai', apiKey, apiKey);
     if (rememberKey) {
-      await saveApiKey(apiKey, 'openai', getToken);
+      try {
+        await saveApiKey(apiKey, 'openai', getToken);
+      } catch {
+        // Non-blocking: key is in sessionStorage for this session;
+        // user can re-save from Account Settings if the request failed.
+        console.error('Failed to persist API key to server');
+      }
     }
     trackEvent('onboarding_completed', { use_case: selectedUseCase || null, plan: 'free' });
     completeOnboarding();
@@ -155,7 +170,12 @@ export function OnboardingPage() {
             )}
 
             {step === 2 && (
-              <PlanStep billingPeriod={billingPeriod} onSelectPlan={handleSelectPlan} />
+              <PlanStep
+                freePlan={FREE_PLAN}
+                proPlan={PRO_PLAN}
+                billingPeriod={billingPeriod}
+                onSelectPlan={handleSelectPlan}
+              />
             )}
 
             {step === 3 && (
@@ -299,7 +319,7 @@ function ApiKeyStep({
         </label>
         <input
           id="api-key-input"
-          type="text"
+          type="password"
           value={apiKey}
           onChange={(e) => onChange(e.target.value)}
           placeholder="sk-..."
@@ -329,22 +349,26 @@ function ApiKeyStep({
 }
 
 function PlanStep({
+  freePlan,
+  proPlan,
   billingPeriod,
   onSelectPlan,
 }: {
+  freePlan: PricingPlan;
+  proPlan: PricingPlan;
   billingPeriod: 'monthly' | 'annual';
   onSelectPlan: (plan: 'free' | 'pro') => void;
 }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <PricingCard
-        plan={FREE_PLAN}
+        plan={freePlan}
         isCurrentPlan={false}
         billingPeriod={billingPeriod}
         onSelect={() => onSelectPlan('free')}
       />
       <PricingCard
-        plan={PRO_PLAN}
+        plan={proPlan}
         isCurrentPlan={false}
         billingPeriod={billingPeriod}
         onSelect={() => onSelectPlan('pro')}

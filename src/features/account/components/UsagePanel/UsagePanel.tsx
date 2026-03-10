@@ -1,9 +1,11 @@
 // src/features/account/components/UsagePanel/UsagePanel.tsx
+import { useTranslation } from 'react-i18next';
 import { useSubscription } from '@/context/SubscriptionContext';
 import { FreePlanPanel } from './FreePlanPanel';
 import { ProPlanPanel } from './ProPlanPanel';
 
 export function UsagePanel() {
+  const { t } = useTranslation();
   const { subscription, isLoading, error } = useSubscription();
 
   if (isLoading) {
@@ -22,7 +24,7 @@ export function UsagePanel() {
         role="alert"
         className="p-4 rounded-xl border border-accent-error/25 bg-accent-error/10 text-accent-error text-sm"
       >
-        Failed to load usage data. Please refresh the page.
+        {t('usagePanel.error')}
       </div>
     );
   }

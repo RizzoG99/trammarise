@@ -786,7 +786,25 @@
     },
     "step2": {
       "title": "Choose your plan",
-      "subtitle": "Start free, upgrade anytime"
+      "subtitle": "Start free, upgrade anytime",
+      "free": {
+        "name": "Free",
+        "description": "Bring your own API key",
+        "feature1": "Unlimited transcriptions",
+        "feature2": "Your own OpenAI key",
+        "feature3": "All content types",
+        "cta": "Continue Free"
+      },
+      "pro": {
+        "name": "Pro",
+        "description": "Hosted API, no key needed",
+        "feature1": "500 min / month",
+        "feature2": "No API key required",
+        "feature3": "Cloud sync",
+        "feature4": "Priority support",
+        "cta": "Upgrade to Pro",
+        "badge": "Most Popular"
+      }
     },
     "step3": {
       "title": "Connect your API key",
@@ -879,6 +897,7 @@
     "previewLabel": "Audio preview"
   },
   "usagePanel": {
+    "error": "Failed to load usage data. Please refresh the page.",
     "free": {
       "planBadge": "Free",
       "upgradeBtn": "Upgrade to Pro",

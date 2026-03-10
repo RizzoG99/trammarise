@@ -110,7 +110,11 @@ describe('AccountBillingPage', () => {
     expect(screen.getByRole('button', { name: 'Back to app' })).toBeInTheDocument();
   });
 
-  it('back button calls navigate(-1)', () => {
+  it('back button calls navigate(-1) when history exists', () => {
+    Object.defineProperty(window, 'history', {
+      value: { ...window.history, length: 2 },
+      configurable: true,
+    });
     render(<AccountBillingPage />);
     fireEvent.click(screen.getByRole('button', { name: 'Back to app' }));
     expect(mockNavigate).toHaveBeenCalledWith(-1);

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { User, Key, Sparkles, ArrowLeft } from 'lucide-react';
 import { GlassCard, Heading } from '@/lib';
+import { ROUTES } from '@/types/routing';
 import { ProfileTab } from '../user-menu/components/ProfileTab';
 import { ApiKeysTab } from '../user-menu/components/ApiKeysTab';
 import { UsagePanel } from './components/UsagePanel';
@@ -35,7 +36,7 @@ export function AccountBillingPage() {
         <div className="mb-8">
           <button
             type="button"
-            onClick={() => navigate(-1)}
+            onClick={() => (window.history.length > 1 ? navigate(-1) : navigate(ROUTES.HOME))}
             className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-text-secondary hover:text-text-primary hover:bg-bg-surface transition-all cursor-pointer"
             aria-label={t('account.back')}
           >
