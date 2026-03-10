@@ -204,8 +204,15 @@ describe('OnboardingPage', () => {
       expect(mockCompleteOnboarding).toHaveBeenCalledTimes(1);
     });
 
-    it('Next advances to step 2 (Plan)', () => {
+    it('Next does not advance without a use case selected', () => {
       render(<OnboardingPage />);
+      fireEvent.click(screen.getByText('Next'));
+      expect(screen.getByText('How will you use Trammarise?')).toBeInTheDocument();
+    });
+
+    it('Next advances to step 2 (Plan) after selecting a use case', () => {
+      render(<OnboardingPage />);
+      fireEvent.click(screen.getByRole('button', { name: /meeting/i }));
       fireEvent.click(screen.getByText('Next'));
       expect(screen.getByText('Choose your plan')).toBeInTheDocument();
     });
@@ -239,6 +246,7 @@ describe('OnboardingPage', () => {
   describe('Step 2 — Plan', () => {
     const goToStep2 = () => {
       render(<OnboardingPage />);
+      fireEvent.click(screen.getByRole('button', { name: /meeting/i }));
       fireEvent.click(screen.getByText('Next'));
     };
 
@@ -298,6 +306,7 @@ describe('OnboardingPage', () => {
   describe('Step 3 — API Setup', () => {
     const goToStep3 = () => {
       render(<OnboardingPage />);
+      fireEvent.click(screen.getByRole('button', { name: /meeting/i }));
       fireEvent.click(screen.getByText('Next')); // → step 2 Plan
       fireEvent.click(screen.getByText('Select Free')); // → step 3 API Key
     };
@@ -354,6 +363,7 @@ describe('OnboardingPage', () => {
       await waitFor(() => expect(mockCompleteOnboarding).toHaveBeenCalledTimes(1));
       expect(mockSaveApiConfig).toHaveBeenCalledWith('openai', 'sk-validkey123', 'sk-validkey123');
       expect(mockSaveApiKeyFn).not.toHaveBeenCalled();
+      expect(mockNavigate).toHaveBeenCalledWith('/');
     });
 
     it('shows "Remember my key" checkbox', () => {

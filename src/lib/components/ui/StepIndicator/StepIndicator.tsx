@@ -13,6 +13,9 @@ export interface StepIndicatorProps {
 
 type StepStatus = 'completed' | 'active' | 'pending';
 
+// NOTE: step IDs must be sequential integers starting at 1 (matching
+// currentStep values). Non-sequential or zero-based IDs will produce
+// incorrect completed/active/pending states.
 function getStepStatus(stepId: number, currentStep: number): StepStatus {
   if (stepId < currentStep) return 'completed';
   if (stepId === currentStep) return 'active';

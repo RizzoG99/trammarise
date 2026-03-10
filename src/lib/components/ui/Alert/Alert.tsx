@@ -32,8 +32,13 @@ const variantStyles: Record<AlertVariant, React.CSSProperties> = {
 };
 
 export function Alert({ children, variant = 'info', className = '' }: AlertProps) {
+  const role = variant === 'error' || variant === 'warning' ? 'alert' : undefined;
   return (
-    <div className={`p-4 rounded-lg border ${className}`} style={variantStyles[variant]}>
+    <div
+      role={role}
+      className={`p-4 rounded-lg border ${className}`}
+      style={variantStyles[variant]}
+    >
       {children}
     </div>
   );

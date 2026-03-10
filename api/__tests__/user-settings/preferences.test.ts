@@ -107,6 +107,12 @@ describe('PATCH /api/user-settings/preferences', () => {
     expect(statusMock).toHaveBeenCalledWith(400);
   });
 
+  it('returns 400 when req.body is null', async () => {
+    req.body = null;
+    await handler(req as VercelRequest, res as VercelResponse);
+    expect(statusMock).toHaveBeenCalledWith(400);
+  });
+
   it('returns 405 for unsupported methods', async () => {
     req.method = 'DELETE';
     await handler(req as VercelRequest, res as VercelResponse);

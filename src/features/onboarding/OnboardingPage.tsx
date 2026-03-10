@@ -47,6 +47,7 @@ export function OnboardingPage() {
   const [apiKeyError, setApiKeyError] = useState('');
   const [isValidatingKey, setIsValidatingKey] = useState(false);
   const [rememberKey, setRememberKey] = useState(false);
+  // Annual toggle intentionally deferred — onboarding shows monthly pricing only.
   const billingPeriod = 'monthly' as const;
 
   const FREE_PLAN: PricingPlan = {
@@ -92,7 +93,10 @@ export function OnboardingPage() {
     void saveOnboardingUseCaseToDb(id, getToken);
   };
 
-  const handleNext = () => setStep((s) => s + 1);
+  const handleNext = () => {
+    if (step === 1 && !selectedUseCase) return;
+    setStep((s) => s + 1);
+  };
 
   const handleBack = () => setStep((s) => s - 1);
 
@@ -131,6 +135,10 @@ export function OnboardingPage() {
     }
     trackEvent('onboarding_completed', { use_case: selectedUseCase || null, plan: 'free' });
     completeOnboarding();
+    // Navigate explicitly — after completeOnboarding() the onboarding gate
+    // in App.tsx lifts, but the user is still at /onboarding (not in normal
+    // routing), so we must redirect manually.
+    navigate(ROUTES.HOME);
   };
 
   const stepTitle = t(`onboarding.step${step}.title`);
