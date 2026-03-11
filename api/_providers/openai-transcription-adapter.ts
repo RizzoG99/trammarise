@@ -6,7 +6,7 @@ import type {
   TranscriptionProvider,
   TranscriptionRequest,
   TranscriptionResponse,
-} from '../types/provider';
+} from '../_types/provider';
 
 /**
  * Whisper API verbose response with segments

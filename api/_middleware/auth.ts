@@ -1,5 +1,5 @@
 import type { VercelRequest } from '@vercel/node';
-import { supabaseAdmin } from '../lib/supabase-admin';
+import { supabaseAdmin } from '../_lib/supabase-admin';
 
 export class AuthError extends Error {
   constructor(

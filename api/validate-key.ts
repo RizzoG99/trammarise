@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { AIProviderFactory, type AIProviderType } from './providers/ai-factory';
+import { AIProviderFactory, type AIProviderType } from './_providers/ai-factory';
 import { API_VALIDATION } from '../src/utils/constants';
-import { rateLimit, RateLimitError, RATE_LIMITS } from './middleware/rate-limit';
+import { rateLimit, RateLimitError, RATE_LIMITS } from './_middleware/rate-limit';
 
 const { MIN_API_KEY_LENGTH, MAX_API_KEY_LENGTH } = API_VALIDATION;
 

@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { requireAuth } from '../middleware/auth';
-import { supabaseAdmin } from '../lib/supabase-admin';
+import { requireAuth } from '../_middleware/auth';
+import { supabaseAdmin } from '../_lib/supabase-admin';
 
 /**
  * GET /api/audio/:sessionId

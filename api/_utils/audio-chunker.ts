@@ -6,13 +6,12 @@
  * - Best Quality: 10-minute chunks, 15-second overlap
  */
 
-import ffmpeg from 'fluent-ffmpeg';
 import { promises as fs } from 'fs';
 import * as path from 'path';
 import * as crypto from 'crypto';
-import { setupFFmpeg } from './ffmpeg-setup';
-import type { ChunkMetadata, ChunkingResult, ProcessingMode } from '../types/chunking';
-import { CHUNKING_CONFIGS } from '../types/chunking';
+import { setupFFmpeg, ffprobeDuration, extractFFmpegChunk } from './ffmpeg-setup';
+import type { ChunkMetadata, ChunkingResult, ProcessingMode } from '../_types/chunking';
+import { CHUNKING_CONFIGS } from '../_types/chunking';
 
 /**
  * Main chunking function: splits audio file into chunks based on processing mode
@@ -43,6 +42,16 @@ export async function chunkAudio(
     const chunks: ChunkMetadata[] = [];
     let currentStart = 0;
     let chunkIndex = 0;
+
+    // We do not need a while loop if duration is not defined?
+    // the previous code was:
+    // const chunks: ChunkMetadata[] = [];
+    // let currentStart = 0;
+    // let chunkIndex = 0;
+    //
+    // while (currentStart < duration) {
+    //  ...
+    //
 
     while (currentStart < duration) {
       const currentEnd = Math.min(currentStart + chunkDuration, duration);
@@ -102,24 +111,7 @@ export async function chunkAudio(
  * Get audio duration using ffprobe
  */
 export async function getAudioDuration(filePath: string): Promise<number> {
-  setupFFmpeg();
-
-  return new Promise((resolve, reject) => {
-    ffmpeg.ffprobe(filePath, (err, metadata) => {
-      if (err) {
-        reject(new Error(`Failed to probe audio file: ${err.message}`));
-        return;
-      }
-
-      const duration = metadata.format.duration;
-      if (typeof duration !== 'number') {
-        reject(new Error('Could not determine audio duration'));
-        return;
-      }
-
-      resolve(duration);
-    });
-  });
+  return ffprobeDuration(filePath);
 }
 
 /**
@@ -131,26 +123,7 @@ export async function extractChunk(
   duration: number,
   outputPath: string
 ): Promise<void> {
-  setupFFmpeg();
-
-  return new Promise((resolve, reject) => {
-    ffmpeg(inputPath)
-      .setStartTime(startTime)
-      .setDuration(duration)
-      // Cost optimization: Compress to Mono 64kbps MP3 for efficient Whisper API uploads
-      .audioCodec('libmp3lame')
-      .audioBitrate('64k')
-      .audioChannels(1) // Mono
-      .audioFrequency(16000) // 16kHz sample rate (sufficient for speech)
-      .output(outputPath)
-      .on('end', () => {
-        resolve();
-      })
-      .on('error', (err: Error) => {
-        reject(new Error(`FFmpeg extraction failed: ${err.message}`));
-      })
-      .run();
-  });
+  await extractFFmpegChunk(inputPath, startTime, duration, outputPath);
 }
 
 /**

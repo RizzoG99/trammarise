@@ -8,10 +8,10 @@
  * - Request queuing and priority management
  */
 
-import type { QueuedRequest, RateLimitState, RateLimitStats } from '../types/rate-limiting';
-import type { ProcessingMode } from '../types/chunking';
-import { CHUNKING_CONFIGS } from '../types/chunking';
-import { BACKOFF_CONFIGS, DEGRADED_MODE_CONFIG } from '../types/rate-limiting';
+import type { QueuedRequest, RateLimitState, RateLimitStats } from '../_types/rate-limiting';
+import type { ProcessingMode } from '../_types/chunking';
+import { CHUNKING_CONFIGS } from '../_types/chunking';
+import { BACKOFF_CONFIGS, DEGRADED_MODE_CONFIG } from '../_types/rate-limiting';
 import { JobManager } from './job-manager';
 
 export class RateLimitGovernor {

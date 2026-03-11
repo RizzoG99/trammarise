@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type { TranscriptionResponse } from '../types/provider';
+import type { TranscriptionResponse } from '../_types/provider';
 
 /**
  * Unit tests for speaker diarization integration logic

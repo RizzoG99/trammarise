@@ -12,7 +12,7 @@ process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-anon-key';
 process.env.CLERK_WEBHOOK_SECRET = 'whsec_test123456789';
 
 import { beforeEach, afterEach, vi } from 'vitest';
-import { MockOpenAIAPI } from './utils/__test-helpers__/mock-openai-api';
+import { MockOpenAIAPI } from './_utils/__test-helpers__/mock-openai-api';
 
 // CRITICAL: Mock @supabase/supabase-js BEFORE any imports
 const mockSupabaseFactory = vi.hoisted(() => {
@@ -45,7 +45,7 @@ vi.mock('@supabase/supabase-js', () => mockSupabaseFactory);
 
 // Mock authentication middleware to bypass auth in most tests
 // Individual tests can override this mock if they need to test auth failures
-vi.mock('./middleware/auth', () => ({
+vi.mock('./_middleware/auth', () => ({
   requireAuth: vi.fn().mockResolvedValue({
     userId: 'test-user-id',
     clerkId: 'test-clerk-id',

@@ -5,16 +5,16 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { JobManager } from '../utils/job-manager';
-import { chunkAudio, cleanupChunks, computeChunkHash } from '../utils/audio-chunker';
-import { processChunk } from '../utils/chunk-processor';
-import { assembleTranscript } from '../utils/transcript-assembler';
-import { RateLimitGovernor } from '../utils/rate-limit-governor';
-import { generateMockAudio } from '../utils/__test-helpers__/mock-audio-generator';
-import { createTestJob, createTestChunk } from '../utils/__test-helpers__/test-fixtures';
-import { JOB_SAFEGUARDS } from '../types/job';
+import { JobManager } from '../_utils/job-manager';
+import { chunkAudio, cleanupChunks, computeChunkHash } from '../_utils/audio-chunker';
+import { processChunk } from '../_utils/chunk-processor';
+import { assembleTranscript } from '../_utils/transcript-assembler';
+import { RateLimitGovernor } from '../_utils/rate-limit-governor';
+import { generateMockAudio } from '../_utils/__test-helpers__/mock-audio-generator';
+import { createTestJob, createTestChunk } from '../_utils/__test-helpers__/test-fixtures';
+import { JOB_SAFEGUARDS } from '../_types/job';
 import { mockFFmpeg, mockFileSystem } from '../vitest.setup';
-import type { MockFluentFFmpegCommand } from '../utils/__test-helpers__/types';
+import type { MockFluentFFmpegCommand } from '../_utils/__test-helpers__/types';
 
 // Mock ffmpeg-setup to prevent it from configuring real binaries
 vi.mock('../utils/ffmpeg-setup', () => ({

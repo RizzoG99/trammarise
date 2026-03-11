@@ -273,7 +273,22 @@ export interface Database {
       };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      increment_minutes_used: {
+        Args: { sub_id: string; minutes: number };
+        Returns: void;
+      };
+      add_credits: {
+        Args: {
+          sub_id: string;
+          credits: number;
+          stripe_payment_intent_id: string;
+          amount_paid_cents: number;
+          p_description: string;
+        };
+        Returns: void;
+      };
+    };
     Enums: Record<string, never>;
   };
 }

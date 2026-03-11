@@ -21,8 +21,15 @@
       "memory": 1024,
       "includeFiles": "node_modules/{@ffmpeg-installer,@ffprobe-installer}/**"
     },
-    "api/**/*.ts": {
-      "maxDuration": 60
-    }
+    "api/chat.ts": { "maxDuration": 60 },
+    "api/summarize.ts": { "maxDuration": 60 },
+    "api/validate-key.ts": { "maxDuration": 60 },
+    "api/audio/[sessionId].ts": { "maxDuration": 60 },
+    "api/credits/purchase.ts": { "maxDuration": 60 },
+    "api/stripe/create-checkout-session.ts": { "maxDuration": 60 },
+    "api/transcribe-job/[jobId]/cancel.ts": { "maxDuration": 60 },
+    "api/transcribe-job/[jobId]/status.ts": { "maxDuration": 60 },
+    "api/user-settings/api-key.ts": { "maxDuration": 60 },
+    "api/webhooks/stripe.ts": { "maxDuration": 60 }
   }
 }

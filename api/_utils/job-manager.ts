@@ -16,10 +16,10 @@ import type {
   ChunkStatus,
   JobStatus,
   JobStatusResponse,
-} from '../types/job';
-import type { ChunkMetadata } from '../types/chunking';
-import type { Utterance } from '../types/provider';
-import { JOB_SAFEGUARDS } from '../types/job';
+} from '../_types/job';
+import type { ChunkMetadata } from '../_types/chunking';
+import type { Utterance } from '../_types/provider';
+import { JOB_SAFEGUARDS } from '../_types/job';
 
 /**
  * Singleton Job Manager

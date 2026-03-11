@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { requireAuth } from '../middleware/auth';
-import { supabaseAdmin } from '../lib/supabase-admin';
-import { encrypt, decrypt } from '../utils/encryption';
+import { requireAuth } from '../_middleware/auth';
+import { supabaseAdmin } from '../_lib/supabase-admin';
+import { encrypt, decrypt } from '../_utils/encryption';
 
 /**
  * API Key Management Endpoint

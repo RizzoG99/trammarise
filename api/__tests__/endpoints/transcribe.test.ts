@@ -7,7 +7,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { JobManager } from '../../utils/job-manager';
+import { JobManager } from '../../_utils/job-manager';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 // Mock response object

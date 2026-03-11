@@ -4,7 +4,7 @@ import type {
   TranscriptionRequest,
   TranscriptionResponse,
   Utterance,
-} from '../types/provider';
+} from '../_types/provider';
 
 interface AssemblyAIProviderOptions {
   apiKey?: string;

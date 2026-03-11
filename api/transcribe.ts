@@ -2,20 +2,20 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import busboy from 'busboy';
 import { API_VALIDATION } from '../src/utils/constants';
 import { WHISPER_STYLE_PROMPT } from '../src/utils/transcription-prompts';
-import { JobManager } from './utils/job-manager';
-import { chunkAudio, cleanupChunks } from './utils/audio-chunker';
-import { RateLimitGovernor } from './utils/rate-limit-governor';
-import { processChunk } from './utils/chunk-processor';
-import { OpenAIProvider } from './providers/openai';
-import { TranscriptionProviderFactory } from './providers/factory';
-import { assembleTranscript } from './utils/transcript-assembler';
-import type { ProcessingMode } from './types/chunking';
-import type { JobConfiguration } from './types/job';
-import { requireAuth, AuthError } from './middleware/auth';
-import { rateLimit, RateLimitError, RATE_LIMITS } from './middleware/rate-limit';
-import { checkQuota, trackUsage } from './middleware/usage-tracking';
-import { validateAudioFile } from './utils/file-validator';
-import { supabaseAdmin } from './lib/supabase-admin';
+import { JobManager } from './_utils/job-manager';
+import { chunkAudio, cleanupChunks } from './_utils/audio-chunker';
+import { RateLimitGovernor } from './_utils/rate-limit-governor';
+import { processChunk } from './_utils/chunk-processor';
+import { OpenAIProvider } from './_providers/openai';
+import { TranscriptionProviderFactory } from './_providers/factory';
+import { assembleTranscript } from './_utils/transcript-assembler';
+import type { ProcessingMode } from './_types/chunking';
+import type { JobConfiguration } from './_types/job';
+import { requireAuth, AuthError } from './_middleware/auth';
+import { rateLimit, RateLimitError, RATE_LIMITS } from './_middleware/rate-limit';
+import { checkQuota, trackUsage } from './_middleware/usage-tracking';
+import { validateAudioFile } from './_utils/file-validator';
+import { supabaseAdmin } from './_lib/supabase-admin';
 
 export const config = {
   api: {

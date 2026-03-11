@@ -1,4 +1,4 @@
-import { supabaseAdmin } from '../lib/supabase-admin';
+import { supabaseAdmin } from '../_lib/supabase-admin';
 
 /**
  * Usage Tracking Middleware

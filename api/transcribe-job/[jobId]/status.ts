@@ -5,8 +5,8 @@
  */
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { JobManager } from '../../utils/job-manager';
-import { requireAuth, AuthError } from '../../middleware/auth';
+import { JobManager } from '../../_utils/job-manager';
+import { requireAuth, AuthError } from '../../_middleware/auth';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Only allow GET requests

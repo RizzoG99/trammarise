@@ -1,4 +1,4 @@
-import type { TranscriptionProvider } from '../types/provider';
+import type { TranscriptionProvider } from '../_types/provider';
 import { OpenAITranscriptionAdapter } from './openai-transcription-adapter';
 import { AssemblyAIProvider } from './assemblyai';
 

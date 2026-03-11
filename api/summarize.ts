@@ -1,18 +1,18 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { AIProviderFactory, type AIProviderType } from './providers/ai-factory';
+import { AIProviderFactory, type AIProviderType } from './_providers/ai-factory';
 import { API_VALIDATION, CONTENT_TYPES } from '../src/utils/constants';
 import busboy from 'busboy';
-import { extractPdfText } from './utils/pdf-extractor';
+import { extractPdfText } from './_utils/pdf-extractor';
 import {
   getSummarizationModelForLevel,
   type PerformanceLevel,
 } from '../src/types/performance-levels';
-import { chunkText, shouldUseMapReduce } from './utils/text-chunker';
-import { requireAuth, AuthError } from './middleware/auth';
-import { rateLimit, RateLimitError, RATE_LIMITS } from './middleware/rate-limit';
-import { checkQuota, trackUsage } from './middleware/usage-tracking';
-import { validatePdfFile } from './utils/file-validator';
-import { supabaseAdmin } from './lib/supabase-admin';
+import { chunkText, shouldUseMapReduce } from './_utils/text-chunker';
+import { requireAuth, AuthError } from './_middleware/auth';
+import { rateLimit, RateLimitError, RATE_LIMITS } from './_middleware/rate-limit';
+import { checkQuota, trackUsage } from './_middleware/usage-tracking';
+import { validatePdfFile } from './_utils/file-validator';
+import { supabaseAdmin } from './_lib/supabase-admin';
 
 export const config = {
   api: {

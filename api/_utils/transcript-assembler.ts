@@ -7,7 +7,7 @@
  * - Sentence boundary normalization
  */
 
-import type { ChunkMetadata, ProcessingMode } from '../types/chunking';
+import type { ChunkMetadata, ProcessingMode } from '../_types/chunking';
 
 /**
  * Assemble final transcript from chunk transcripts

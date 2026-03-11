@@ -1,6 +1,5 @@
 import * as fs from 'fs/promises';
-import ffmpeg from 'fluent-ffmpeg';
-import { setupFFmpeg } from './ffmpeg-setup';
+import { setupFFmpeg, ffprobeDuration } from './ffmpeg-setup';
 
 /**
  * File Validation Utility
@@ -142,13 +141,5 @@ function matchesSignature(buffer: Buffer, signature: number[], offset: number): 
  * Get audio duration using FFmpeg
  */
 async function getAudioDuration(filePath: string): Promise<number> {
-  return new Promise((resolve, reject) => {
-    ffmpeg.ffprobe(filePath, (err, metadata) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(metadata.format.duration || 0);
-      }
-    });
-  });
+  return ffprobeDuration(filePath);
 }

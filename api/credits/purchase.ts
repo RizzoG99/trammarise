@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import Stripe from 'stripe';
-import { requireAuth } from '../middleware/auth';
-import { supabaseAdmin } from '../lib/supabase-admin';
+import { requireAuth } from '../_middleware/auth';
+import { supabaseAdmin } from '../_lib/supabase-admin';
 
 /**
  * Credit Purchase Endpoint

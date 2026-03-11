@@ -5,26 +5,17 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Hoist mock functions to top
-const { mockFfprobe, mockWriteFile, mockUnlink } = vi.hoisted(() => ({
-  mockFfprobe: vi.fn(),
+const { mockFfprobeDuration, mockWriteFile, mockUnlink } = vi.hoisted(() => ({
+  mockFfprobeDuration: vi.fn(),
   mockWriteFile: vi.fn(),
   mockUnlink: vi.fn(),
 }));
 
 // Mock ffmpeg-setup
-vi.mock('../../utils/ffmpeg-setup', () => ({
+vi.mock('../../_utils/ffmpeg-setup', () => ({
   setupFFmpeg: vi.fn(),
+  ffprobeDuration: mockFfprobeDuration,
 }));
-
-// Mock ffmpeg with hoisted function
-vi.mock('fluent-ffmpeg', () => {
-  const mockFfmpegModule = {
-    ffprobe: mockFfprobe,
-  };
-  return {
-    default: mockFfmpegModule,
-  };
-});
 
 // Mock fs/promises with hoisted functions
 vi.mock('fs/promises', () => ({
@@ -33,10 +24,7 @@ vi.mock('fs/promises', () => ({
 }));
 
 // Now import after mocks are set up
-import { validateAudioFile, validatePdfFile } from '../../utils/file-validator';
-
-// Type for FFmpeg probe callback
-type FfprobeCallback = (err: Error | null, metadata?: { format: { duration?: number } }) => void;
+import { validateAudioFile, validatePdfFile } from '../../_utils/file-validator';
 
 describe('File Validation', () => {
   beforeEach(() => {
@@ -52,9 +40,7 @@ describe('File Validation', () => {
       it('should validate MP3 with FF FB magic bytes', async () => {
         const mp3Buffer = Buffer.from([0xff, 0xfb, 0x90, 0x00, ...Array(100).fill(0)]);
 
-        mockFfprobe.mockImplementation((path: string, callback: FfprobeCallback) => {
-          callback(null, { format: { duration: 120 } });
-        });
+        mockFfprobeDuration.mockResolvedValue(120);
 
         const result = await validateAudioFile(mp3Buffer, 'audio/mpeg', 7200);
 
@@ -71,9 +57,7 @@ describe('File Validation', () => {
           ...Array(100).fill(0),
         ]);
 
-        mockFfprobe.mockImplementation((path: string, callback: FfprobeCallback) => {
-          callback(null, { format: { duration: 30 } });
-        });
+        mockFfprobeDuration.mockResolvedValue(30);
 
         const result = await validateAudioFile(wavBuffer, 'audio/wav', 7200);
 
@@ -94,9 +78,7 @@ describe('File Validation', () => {
       it('should accept audio within duration limit', async () => {
         const validBuffer = Buffer.from([0xff, 0xfb, ...Array(100).fill(0)]);
 
-        mockFfprobe.mockImplementation((path: string, callback: FfprobeCallback) => {
-          callback(null, { format: { duration: 3600 } }); // 1 hour
-        });
+        mockFfprobeDuration.mockResolvedValue(3600); // 1 hour
 
         const result = await validateAudioFile(validBuffer, 'audio/mpeg', 7200);
 
@@ -107,9 +89,7 @@ describe('File Validation', () => {
       it('should reject audio exceeding duration limit', async () => {
         const longBuffer = Buffer.from([0xff, 0xfb, ...Array(100).fill(0)]);
 
-        mockFfprobe.mockImplementation((path: string, callback: FfprobeCallback) => {
-          callback(null, { format: { duration: 7300 } }); // Over 2 hours
-        });
+        mockFfprobeDuration.mockResolvedValue(7300); // Over 2 hours
 
         const result = await validateAudioFile(longBuffer, 'audio/mpeg', 7200);
 

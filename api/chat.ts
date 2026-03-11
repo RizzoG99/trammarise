@@ -1,12 +1,12 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { AIProviderFactory, type AIProviderType } from './providers/ai-factory';
+import { AIProviderFactory, type AIProviderType } from './_providers/ai-factory';
 import { API_VALIDATION } from '../src/utils/constants';
 import {
   getSummarizationModelForLevel,
   type PerformanceLevel,
 } from '../src/types/performance-levels';
-import { requireAuth, AuthError } from './middleware/auth';
-import { rateLimit, RateLimitError, RATE_LIMITS } from './middleware/rate-limit';
+import { requireAuth, AuthError } from './_middleware/auth';
+import { rateLimit, RateLimitError, RATE_LIMITS } from './_middleware/rate-limit';
 
 const {
   MAX_MESSAGE_LENGTH,

@@ -8,13 +8,13 @@
  */
 
 import { promises as fs } from 'fs';
-import type { ChunkMetadata } from '../types/chunking';
-import type { TranscriptionJob, JobStatus } from '../types/job';
-import { JOB_SAFEGUARDS } from '../types/job';
-import { CHUNKING_CONFIGS, AUTO_SPLIT_CONFIG } from '../types/chunking';
+import type { ChunkMetadata } from '../_types/chunking';
+import type { TranscriptionJob, JobStatus } from '../_types/job';
+import { JOB_SAFEGUARDS } from '../_types/job';
+import { CHUNKING_CONFIGS, AUTO_SPLIT_CONFIG } from '../_types/chunking';
 import { RateLimitGovernor } from './rate-limit-governor';
 import { extractChunk, computeChunkHash } from './audio-chunker';
-import type { AIProvider } from '../providers/base';
+import type { AIProvider } from '../_providers/base';
 
 /**
  * Process a single chunk with retry and auto-split logic
