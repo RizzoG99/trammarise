@@ -1,7 +1,6 @@
 // src/features/account/components/UsagePanel/FreePlanPanel.tsx
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '@clerk/react';
 import {
   Key,
   Lock,
@@ -12,13 +11,9 @@ import {
   Zap,
   AlertCircle,
 } from 'lucide-react';
-import { fetchWithAuth } from '@/utils/fetch-with-auth';
+import { supabaseClient } from '@/lib/supabase/client';
 import { getApiConfig } from '@/utils/session-storage';
 import { ROUTES } from '@/types/routing';
-
-interface UsageCurrentResponse {
-  eventCount: number;
-}
 
 const LOCKED_FEATURES = [
   { key: 'hostedApi', Icon: Key },
@@ -29,16 +24,23 @@ const LOCKED_FEATURES = [
 
 export function FreePlanPanel() {
   const { t } = useTranslation();
-  const { getToken } = useAuth();
   const [eventCount, setEventCount] = useState<number | null>(null);
   const hasApiKey = getApiConfig() !== null;
 
   useEffect(() => {
-    fetchWithAuth(getToken, '/api/usage/current')
-      .then((r) => r.json() as Promise<UsageCurrentResponse>)
-      .then((data: UsageCurrentResponse) => setEventCount(data.eventCount))
+    const startOfMonth = new Date();
+    startOfMonth.setDate(1);
+    startOfMonth.setHours(0, 0, 0, 0);
+
+    void Promise.resolve(
+      supabaseClient
+        .from('usage_events')
+        .select('*', { count: 'exact', head: true })
+        .gte('created_at', startOfMonth.toISOString())
+    )
+      .then(({ count }) => setEventCount(count ?? 0))
       .catch(() => setEventCount(0));
-  }, [getToken]);
+  }, []);
 
   return (
     <div className="space-y-5">

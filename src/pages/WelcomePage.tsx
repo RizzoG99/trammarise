@@ -1,21 +1,19 @@
-import { useClerk } from '@clerk/react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Heading, Text, Button, GlassCard } from '@/lib';
 import { ArrowRight, Mic, Zap, Shield, Check } from 'lucide-react';
 import { AppFooter } from '@/components/layout/AppFooter';
+import { SignInModal } from '@/components/auth/SignInModal';
 
 export function WelcomePage() {
-  const { openSignIn } = useClerk();
   const { t } = useTranslation();
+  const [showSignIn, setShowSignIn] = useState(false);
 
-  const handleGetStarted = () => {
-    openSignIn({
-      fallbackRedirectUrl: '/',
-    });
-  };
+  const handleGetStarted = () => setShowSignIn(true);
 
   return (
     <div className="min-h-screen bg-bg-primary text-text-primary overflow-x-hidden selection:bg-primary/30">
+      {showSignIn && <SignInModal onClose={() => setShowSignIn(false)} />}
       {/* Hero ─────────────────────────────────────────── */}
       <section className="relative pt-28 pb-24 md:pt-40 md:pb-32 px-4">
         <div className="container mx-auto max-w-6xl">

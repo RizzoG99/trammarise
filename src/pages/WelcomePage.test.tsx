@@ -4,12 +4,13 @@ import '@testing-library/jest-dom/vitest';
 import { WelcomePage } from './WelcomePage';
 import { BrowserRouter } from 'react-router-dom';
 
-// Mock Clerk
-const mockOpenSignIn = vi.fn();
-vi.mock('@clerk/react', () => ({
-  useClerk: () => ({
-    openSignIn: mockOpenSignIn,
-  }),
+// Mock SignInModal
+vi.mock('@/components/auth/SignInModal', () => ({
+  SignInModal: ({ onClose }: { onClose: () => void }) => (
+    <div role="dialog" aria-label="Sign in" data-testid="sign-in-modal">
+      <button onClick={onClose}>Close</button>
+    </div>
+  ),
 }));
 
 // Mock react-i18next with actual translations
@@ -105,7 +106,7 @@ describe('WelcomePage', () => {
     expect(ctaButtons.length).toBeGreaterThanOrEqual(1);
   });
 
-  it('calls openSignIn when hero CTA is clicked', () => {
+  it('opens SignInModal when hero CTA is clicked', () => {
     render(
       <BrowserRouter>
         <WelcomePage />
@@ -115,9 +116,7 @@ describe('WelcomePage', () => {
     const buttons = screen.getAllByRole('button', { name: /Get Started Free/i });
     fireEvent.click(buttons[0]);
 
-    expect(mockOpenSignIn).toHaveBeenCalledWith({
-      fallbackRedirectUrl: '/',
-    });
+    expect(screen.getByTestId('sign-in-modal')).toBeInTheDocument();
   });
 
   it('renders the features section', () => {

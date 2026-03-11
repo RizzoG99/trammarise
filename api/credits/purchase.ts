@@ -41,7 +41,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const { userId, clerkId } = await requireAuth(req);
+    const { userId } = await requireAuth(req);
     const { credits } = req.body;
 
     // Validate credit amount
@@ -71,7 +71,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       currency: 'usd',
       metadata: {
         userId,
-        clerkId,
         credits: String(credits),
         type: 'credit_purchase',
       },

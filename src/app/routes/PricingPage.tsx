@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useUser, useAuth } from '@clerk/react';
+import { useUser } from '@/hooks/useUser';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { Button } from '@/lib/components/ui/Button';
 import { GlassCard } from '@/lib';
@@ -13,7 +13,7 @@ import { fetchWithAuth } from '@/utils/fetch-with-auth';
 import { useSubscription } from '@/context/SubscriptionContext';
 
 type BillingInterval = 'month' | 'year';
-type Tier = 'pro' | 'team';
+type Tier = 'pro';
 
 interface PricingTier {
   id: string;
@@ -87,7 +87,6 @@ export function PricingPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { isSignedIn, isLoaded } = useUser();
-  const { getToken } = useAuth();
   const { needsOnboarding, isViewingPricing, setIsViewingPricing } = useOnboarding();
   const { subscription } = useSubscription();
   const [billingInterval, setBillingInterval] = useState<BillingInterval>(
@@ -131,7 +130,7 @@ export function PricingPage() {
 
     try {
       // Call Stripe checkout endpoint
-      const response = await fetchWithAuth(getToken, '/api/stripe/create-checkout-session', {
+      const response = await fetchWithAuth('/api/stripe/create-checkout-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

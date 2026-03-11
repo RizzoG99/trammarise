@@ -17,7 +17,7 @@ const mockRequireAuth = vi.fn(async (req) => {
   if (!req.headers.authorization) {
     throw new AuthError('Unauthorized', 401);
   }
-  return { userId: 'test-user-id', clerkId: 'clerk_123' };
+  return { userId: 'test-user-id' };
 });
 vi.mock('../../middleware/auth', () => ({
   requireAuth: mockRequireAuth,
@@ -67,7 +67,6 @@ describe('POST /api/stripe/create-checkout-session', () => {
 
     mockRequireAuth.mockResolvedValue({
       userId: 'user-uuid-123',
-      clerkId: 'user_clerk123',
     });
 
     // Mock user lookup
@@ -120,7 +119,6 @@ describe('POST /api/stripe/create-checkout-session', () => {
           cancel_url: expect.stringContaining('/pricing'),
           metadata: {
             userId: 'user-uuid-123',
-            clerkId: 'user_clerk123',
             tier: 'pro',
             interval: 'month',
           },
@@ -168,13 +166,7 @@ describe('POST /api/stripe/create-checkout-session', () => {
       expect(mockRes.status).toHaveBeenCalledWith(200);
     });
 
-    it('should create checkout session for Team tier', async () => {
-      // Arrange
-      mockCheckoutSessionsCreate.mockResolvedValue({
-        id: 'cs_test_789',
-        url: 'https://checkout.stripe.com/pay/cs_test_789',
-      });
-
+    it('should return 400 for Team tier (removed)', async () => {
       const { default: handler } = await import('../../stripe/create-checkout-session');
       const mockReq = {
         method: 'POST',
@@ -189,8 +181,9 @@ describe('POST /api/stripe/create-checkout-session', () => {
       // Act
       await handler(mockReq, mockRes);
 
-      // Assert
-      expect(mockRes.status).toHaveBeenCalledWith(200);
+      // Assert - Team tier was removed, so it should be treated as invalid
+      expect(mockRes.status).toHaveBeenCalledWith(400);
+      expect(mockRes.json).toHaveBeenCalledWith({ error: 'Invalid tier or interval' });
     });
   });
 

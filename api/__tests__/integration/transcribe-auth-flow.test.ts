@@ -56,7 +56,6 @@ describe('Transcription Authentication Flow', () => {
       // Mock authentication - free tier user
       vi.mocked(requireAuth).mockResolvedValue({
         userId: 'free-user-123',
-        clerkId: 'clerk-free-123',
       });
 
       // Mock Supabase - free tier subscription
@@ -83,7 +82,6 @@ describe('Transcription Authentication Flow', () => {
       // Mock authentication - free tier user
       vi.mocked(requireAuth).mockResolvedValue({
         userId: 'free-user-456',
-        clerkId: 'clerk-free-456',
       });
 
       // Mock Supabase - free tier subscription
@@ -110,12 +108,11 @@ describe('Transcription Authentication Flow', () => {
     });
   });
 
-  describe('Pro/Team Tier Users', () => {
+  describe('Pro Tier Users', () => {
     it('should allow transcription with platform key when quota is available', async () => {
       // Mock authentication - pro tier user
       vi.mocked(requireAuth).mockResolvedValue({
         userId: 'pro-user-123',
-        clerkId: 'clerk-pro-123',
       });
 
       // Mock Supabase - pro tier subscription
@@ -146,7 +143,6 @@ describe('Transcription Authentication Flow', () => {
       // Mock authentication - pro tier user
       vi.mocked(requireAuth).mockResolvedValue({
         userId: 'pro-user-456',
-        clerkId: 'clerk-pro-456',
       });
 
       // Mock Supabase - pro tier subscription
@@ -178,7 +174,6 @@ describe('Transcription Authentication Flow', () => {
       // Mock authentication - pro tier user
       vi.mocked(requireAuth).mockResolvedValue({
         userId: 'pro-user-789',
-        clerkId: 'clerk-pro-789',
       });
 
       // When user provides their own API key, we should NOT check quota
@@ -197,7 +192,6 @@ describe('Transcription Authentication Flow', () => {
 
   describe('Authentication Failures', () => {
     it('should verify AuthError has correct structure for unauthorized requests', () => {
-      // Verify AuthError class structure
       const error = new AuthError('Unauthorized', 401);
 
       expect(error).toBeInstanceOf(AuthError);
@@ -228,7 +222,6 @@ describe('Transcription Authentication Flow', () => {
       // Mock authentication
       vi.mocked(requireAuth).mockResolvedValue({
         userId: 'test-user-123',
-        clerkId: 'clerk-test-123',
       });
 
       const { req } = createMocks<VercelRequest, VercelResponse>({

@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { lazy, Suspense, useEffect, useState, useCallback } from 'react';
-import { ClerkProvider, useUser } from '@clerk/react';
+import { useUser } from '@/hooks/useUser';
 import { identifyUser, resetAnalytics } from '../lib/analytics';
 import { AppLayout } from './AppLayout';
 import { ROUTES } from '../types/routing';
@@ -47,6 +47,10 @@ const AccountBillingPage = lazy(() =>
   import('./routes/AccountBillingPage').then((module) => ({ default: module.AccountBillingPage }))
 );
 
+const AuthCallbackPage = lazy(() =>
+  import('../pages/AuthCallbackPage').then((module) => ({ default: module.AuthCallbackPage }))
+);
+
 // Placeholder for Configuration page (will be enhanced later)
 import { Heading, Text, GlassCard } from '@/lib';
 import { useTranslation } from 'react-i18next';
@@ -74,27 +78,11 @@ import { SubscriptionProvider } from '@/context/SubscriptionContext';
 import { OnboardingProvider, useOnboarding } from '@/context/OnboardingContext';
 // ApiKeyOnboardingModal replaced by OnboardingPage route redirect
 
-// Get Clerk publishable key from environment
-const CLERK_PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || '';
-
-if (!CLERK_PUBLISHABLE_KEY) {
-  console.warn('Missing VITE_CLERK_PUBLISHABLE_KEY. Authentication features will be disabled.');
-}
-
 function AppRoutes() {
   const { isSignedIn, isLoaded, user } = useUser();
   const { needsOnboarding, isCheckingOnboarding } = useOnboarding();
   const navigate = useNavigate();
   const [showStorageWarning, setShowStorageWarning] = useState(false);
-  const [clerkTimedOut, setClerkTimedOut] = useState(false);
-
-  // If Clerk's script fails to load (e.g. 530 network error), isLoaded never
-  // becomes true. After 10 s we stop showing the spinner and surface an error.
-  useEffect(() => {
-    if (isLoaded) return;
-    const timer = setTimeout(() => setClerkTimedOut(true), 10_000);
-    return () => clearTimeout(timer);
-  }, [isLoaded]);
 
   const handleStorageWarning = useCallback((level: StorageWarningLevel) => {
     if (level === 'high' || level === 'critical') {
@@ -117,7 +105,7 @@ function AppRoutes() {
   useEffect(() => {
     if (!isLoaded) return;
     if (isSignedIn && user) {
-      identifyUser(user.id, { email: user.primaryEmailAddress?.emailAddress });
+      identifyUser(user.id, { email: user.email ?? undefined });
     } else {
       resetAnalytics();
     }
@@ -130,26 +118,6 @@ function AppRoutes() {
   };
 
   if (!isLoaded || isCheckingOnboarding) {
-    if (clerkTimedOut) {
-      return (
-        <div className="min-h-screen flex flex-col items-center justify-center gap-4 p-8 text-center">
-          <p className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>
-            Authentication service unavailable
-          </p>
-          <p className="text-sm max-w-sm" style={{ color: 'var(--color-text-secondary)' }}>
-            Could not connect to the authentication service. Please check your internet connection
-            and try refreshing the page.
-          </p>
-          <button
-            onClick={() => window.location.reload()}
-            className="mt-2 px-6 py-2 rounded-lg text-sm font-medium text-white cursor-pointer transition-colors duration-150"
-            style={{ backgroundColor: 'var(--color-primary)' }}
-          >
-            Retry
-          </button>
-        </div>
-      );
-    }
     return <PageLoader />;
   }
 
@@ -179,6 +147,9 @@ function AppRoutes() {
       )}
       <Suspense fallback={<PageLoader />}>
         <Routes>
+          {/* Auth callback — must be reachable before session is confirmed */}
+          <Route path="/auth/callback" element={<AuthCallbackPage />} />
+
           {/* Dev preview route */}
           {import.meta.env.DEV && <Route path={ROUTES.PREVIEW} element={<PreviewPage />} />}
           {/* PDF Debug route */}
@@ -240,13 +211,11 @@ function AppRoutes() {
 
 function App() {
   return (
-    <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY}>
-      <SubscriptionProvider>
-        <OnboardingProvider>
-          <AppRoutes />
-        </OnboardingProvider>
-      </SubscriptionProvider>
-    </ClerkProvider>
+    <SubscriptionProvider>
+      <OnboardingProvider>
+        <AppRoutes />
+      </OnboardingProvider>
+    </SubscriptionProvider>
   );
 }
 

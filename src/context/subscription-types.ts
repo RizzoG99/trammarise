@@ -2,7 +2,7 @@
  * Subscription type definitions
  */
 
-export type SubscriptionTier = 'free' | 'pro' | 'team';
+export type SubscriptionTier = 'free' | 'pro';
 
 export type SubscriptionStatus =
   | 'active'

@@ -11,12 +11,11 @@ vi.mock('@/context/SubscriptionContext', () => ({
   useSubscription: () => mockUseSubscription(),
 }));
 
-const mockUseAuth = vi.fn(() => ({ getToken: vi.fn().mockResolvedValue('mock-token') }));
-vi.mock('@clerk/react', () => ({ useAuth: () => mockUseAuth() }));
-
-const mockFetchWithAuth = vi.fn();
-vi.mock('@/utils/fetch-with-auth', () => ({
-  fetchWithAuth: (...args: unknown[]) => mockFetchWithAuth(...args),
+const mockSupabaseFrom = vi.fn();
+vi.mock('@/lib/supabase/client', () => ({
+  supabaseClient: {
+    from: (...args: unknown[]) => mockSupabaseFrom(...args),
+  },
 }));
 
 const mockGetApiConfig = vi.fn();
@@ -39,17 +38,12 @@ function makeSubscription(overrides = {}) {
   };
 }
 
-function makeUsageResponse(overrides = {}) {
-  return {
-    totalMinutes: 10,
-    eventCount: 4,
-    billingPeriod: '2026-01-01',
-    tier: 'free' as const,
-    limit: 60,
-    remainingMinutes: 50,
-    isOverLimit: false,
-    ...overrides,
+function makeSupabaseChain(count: number) {
+  const chain: Record<string, unknown> = {
+    select: () => chain,
+    gte: () => Promise.resolve({ count }),
   };
+  return chain;
 }
 
 function renderPanel() {
@@ -71,7 +65,7 @@ describe('UsagePanel', () => {
       openaiKey: 'sk-test',
       timestamp: Date.now(),
     });
-    mockFetchWithAuth.mockResolvedValue({ json: () => Promise.resolve(makeUsageResponse()) });
+    mockSupabaseFrom.mockReturnValue(makeSupabaseChain(4));
   });
 
   describe('loading state', () => {
@@ -110,9 +104,7 @@ describe('UsagePanel', () => {
     });
 
     it('shows transcription count from API', async () => {
-      mockFetchWithAuth.mockResolvedValue({
-        json: () => Promise.resolve(makeUsageResponse({ eventCount: 7 })),
-      });
+      mockSupabaseFrom.mockReturnValue(makeSupabaseChain(7));
       renderPanel();
       expect(await screen.findByText('7')).toBeInTheDocument();
     });
@@ -162,9 +154,7 @@ describe('UsagePanel', () => {
         isLoading: false,
         error: null,
       });
-      mockFetchWithAuth.mockResolvedValue({
-        json: () => Promise.resolve(makeUsageResponse({ eventCount: 12, tier: 'pro' })),
-      });
+      mockSupabaseFrom.mockReturnValue(makeSupabaseChain(12));
     });
 
     it('renders the pro plan badge', async () => {

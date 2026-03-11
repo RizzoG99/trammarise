@@ -1,23 +1,45 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { useSubscription, SubscriptionProvider, TIER_MINUTES } from './SubscriptionContext';
-import type { Subscription } from './subscription-types';
 
-// Mock Clerk
-const mockGetToken = vi.fn();
+// Mock useUser hook
 const mockUseUser = vi.fn();
-const mockUseAuth = vi.fn(() => ({ getToken: mockGetToken }));
-
-vi.mock('@clerk/react', () => ({
+vi.mock('@/hooks/useUser', () => ({
   useUser: () => mockUseUser(),
-  useAuth: () => mockUseAuth(),
 }));
 
-// Mock fetch-with-auth
-const mockFetchWithAuth = vi.fn();
-vi.mock('@/utils/fetch-with-auth', () => ({
-  fetchWithAuth: (...args: unknown[]) => mockFetchWithAuth(...args),
+// Mock Supabase client
+const mockSupabaseFrom = vi.fn();
+vi.mock('@/lib/supabase/client', () => ({
+  supabaseClient: {
+    from: (...args: unknown[]) => mockSupabaseFrom(...args),
+  },
 }));
+
+// Helper: build a Supabase chain that resolves maybeSingle() with { data, error }
+function makeSubsChain(data: unknown, error: unknown = null) {
+  const chain: Record<string, unknown> = {
+    select: () => chain,
+    eq: () => chain,
+    maybeSingle: () => Promise.resolve({ data, error }),
+  };
+  return chain;
+}
+
+// Helper: DB-format subscription row
+function makeDbSub(overrides: Record<string, unknown> = {}) {
+  return {
+    id: 'sub_123',
+    tier: 'pro',
+    status: 'active',
+    current_period_start: '2024-01-01',
+    current_period_end: '2024-02-01',
+    cancel_at_period_end: false,
+    minutes_used: 100,
+    credits_balance: 50,
+    ...overrides,
+  };
+}
 
 describe('SubscriptionContext', () => {
   beforeEach(() => {
@@ -26,7 +48,6 @@ describe('SubscriptionContext', () => {
 
   describe('useSubscription Hook', () => {
     it('should throw error when used outside SubscriptionProvider', () => {
-      // Suppress console.error for this test
       const originalError = console.error;
       console.error = vi.fn();
 
@@ -38,42 +59,24 @@ describe('SubscriptionContext', () => {
     });
 
     it('should fetch subscription on mount when user is signed in', async () => {
-      mockUseUser.mockReturnValue({ isSignedIn: true, isLoaded: true });
-      const mockSubscription: Subscription = {
-        id: 'sub_123',
-        tier: 'pro',
-        status: 'active',
-        currentPeriodStart: '2024-01-01',
-        currentPeriodEnd: '2024-02-01',
-        cancelAtPeriodEnd: false,
-        minutesIncluded: 500,
-        minutesUsed: 100,
-        creditsBalance: 50,
-      };
-
-      mockFetchWithAuth.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockSubscription,
-      });
+      mockUseUser.mockReturnValue({ user: { id: 'user-123' }, isSignedIn: true, isLoaded: true });
+      mockSupabaseFrom.mockReturnValue(makeSubsChain(makeDbSub()));
 
       const { result } = renderHook(() => useSubscription(), {
         wrapper: SubscriptionProvider,
       });
 
-      // Initially loading
       expect(result.current.isLoading).toBe(true);
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      expect(mockFetchWithAuth).toHaveBeenCalledWith(mockGetToken, '/api/subscriptions/current');
-      expect(result.current.subscription).toEqual({
+      expect(mockSupabaseFrom).toHaveBeenCalledWith('subscriptions');
+      expect(result.current.subscription).toMatchObject({
         id: 'sub_123',
         tier: 'pro',
         status: 'active',
-        currentPeriodStart: '2024-01-01',
-        currentPeriodEnd: '2024-02-01',
         cancelAtPeriodEnd: false,
         minutesIncluded: 500,
         minutesUsed: 100,
@@ -82,7 +85,7 @@ describe('SubscriptionContext', () => {
     });
 
     it('should default to free tier when user is not signed in', async () => {
-      mockUseUser.mockReturnValue({ isSignedIn: false, isLoaded: true });
+      mockUseUser.mockReturnValue({ user: null, isSignedIn: false, isLoaded: true });
 
       const { result } = renderHook(() => useSubscription(), {
         wrapper: SubscriptionProvider,
@@ -92,17 +95,14 @@ describe('SubscriptionContext', () => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      expect(mockFetchWithAuth).not.toHaveBeenCalled();
+      expect(mockSupabaseFrom).not.toHaveBeenCalled();
       expect(result.current.subscription?.tier).toBe('free');
       expect(result.current.subscription?.status).toBe('active');
     });
 
-    it('should handle API 404 error and fallback to free tier', async () => {
-      mockUseUser.mockReturnValue({ isSignedIn: true, isLoaded: true });
-      mockFetchWithAuth.mockResolvedValueOnce({
-        ok: false,
-        status: 404,
-      });
+    it('should handle no subscription row and fallback to free tier', async () => {
+      mockUseUser.mockReturnValue({ user: { id: 'user-123' }, isSignedIn: true, isLoaded: true });
+      mockSupabaseFrom.mockReturnValue(makeSubsChain(null));
 
       const { result } = renderHook(() => useSubscription(), {
         wrapper: SubscriptionProvider,
@@ -116,12 +116,9 @@ describe('SubscriptionContext', () => {
       expect(result.current.error).toBeNull();
     });
 
-    it('should handle API error and fallback to free tier with error message', async () => {
-      mockUseUser.mockReturnValue({ isSignedIn: true, isLoaded: true });
-      mockFetchWithAuth.mockResolvedValueOnce({
-        ok: false,
-        status: 500,
-      });
+    it('should handle DB error and fallback to free tier with error message', async () => {
+      mockUseUser.mockReturnValue({ user: { id: 'user-123' }, isSignedIn: true, isLoaded: true });
+      mockSupabaseFrom.mockReturnValue(makeSubsChain(null, new Error('DB error')));
 
       const { result } = renderHook(() => useSubscription(), {
         wrapper: SubscriptionProvider,
@@ -132,43 +129,12 @@ describe('SubscriptionContext', () => {
       });
 
       expect(result.current.subscription?.tier).toBe('free');
-      expect(result.current.error).toBe('Failed to fetch subscription');
-    });
-
-    it('should handle network error and fallback to free tier', async () => {
-      mockUseUser.mockReturnValue({ isSignedIn: true, isLoaded: true });
-      mockFetchWithAuth.mockRejectedValueOnce(new Error('Network error'));
-
-      const { result } = renderHook(() => useSubscription(), {
-        wrapper: SubscriptionProvider,
-      });
-
-      await waitFor(() => {
-        expect(result.current.isLoading).toBe(false);
-      });
-
-      expect(result.current.subscription?.tier).toBe('free');
-      expect(result.current.error).toBe('Network error');
+      expect(result.current.error).toBe('DB error');
     });
 
     it('should refetch subscription when refetch is called', async () => {
-      mockUseUser.mockReturnValue({ isSignedIn: true, isLoaded: true });
-      const mockSubscription: Subscription = {
-        id: 'sub_123',
-        tier: 'pro',
-        status: 'active',
-        currentPeriodStart: '2024-01-01',
-        currentPeriodEnd: '2024-02-01',
-        cancelAtPeriodEnd: false,
-        minutesIncluded: 500,
-        minutesUsed: 100,
-        creditsBalance: 50,
-      };
-
-      mockFetchWithAuth.mockResolvedValue({
-        ok: true,
-        json: async () => mockSubscription,
-      });
+      mockUseUser.mockReturnValue({ user: { id: 'user-123' }, isSignedIn: true, isLoaded: true });
+      mockSupabaseFrom.mockReturnValue(makeSubsChain(makeDbSub()));
 
       const { result } = renderHook(() => useSubscription(), {
         wrapper: SubscriptionProvider,
@@ -178,20 +144,17 @@ describe('SubscriptionContext', () => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      // Initial fetch
-      expect(mockFetchWithAuth).toHaveBeenCalledTimes(1);
+      expect(mockSupabaseFrom).toHaveBeenCalledTimes(1);
 
-      // Call refetch
       await result.current.refetch();
 
-      // Should have been called again
-      expect(mockFetchWithAuth).toHaveBeenCalledTimes(2);
+      expect(mockSupabaseFrom).toHaveBeenCalledTimes(2);
     });
   });
 
   describe('Feature Flags', () => {
     it('should return true for free tier features', async () => {
-      mockUseUser.mockReturnValue({ isSignedIn: false, isLoaded: true });
+      mockUseUser.mockReturnValue({ user: null, isSignedIn: false, isLoaded: true });
 
       const { result } = renderHook(() => useSubscription(), {
         wrapper: SubscriptionProvider,
@@ -208,7 +171,7 @@ describe('SubscriptionContext', () => {
     });
 
     it('should return false for pro features on free tier', async () => {
-      mockUseUser.mockReturnValue({ isSignedIn: false, isLoaded: true });
+      mockUseUser.mockReturnValue({ user: null, isSignedIn: false, isLoaded: true });
 
       const { result } = renderHook(() => useSubscription(), {
         wrapper: SubscriptionProvider,
@@ -224,20 +187,8 @@ describe('SubscriptionContext', () => {
     });
 
     it('should return true for pro tier features', async () => {
-      mockUseUser.mockReturnValue({ isSignedIn: true, isLoaded: true });
-      mockFetchWithAuth.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          id: 'sub_123',
-          tier: 'pro',
-          status: 'active',
-          currentPeriodStart: '2024-01-01',
-          currentPeriodEnd: '2024-02-01',
-          cancelAtPeriodEnd: false,
-          minutesUsed: 0,
-          creditsBalance: 0,
-        }),
-      });
+      mockUseUser.mockReturnValue({ user: { id: 'user-123' }, isSignedIn: true, isLoaded: true });
+      mockSupabaseFrom.mockReturnValue(makeSubsChain(makeDbSub({ minutes_used: 0 })));
 
       const { result } = renderHook(() => useSubscription(), {
         wrapper: SubscriptionProvider,
@@ -254,20 +205,8 @@ describe('SubscriptionContext', () => {
     });
 
     it('should return false for team-only features on pro tier', async () => {
-      mockUseUser.mockReturnValue({ isSignedIn: true, isLoaded: true });
-      mockFetchWithAuth.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          id: 'sub_123',
-          tier: 'pro',
-          status: 'active',
-          currentPeriodStart: '2024-01-01',
-          currentPeriodEnd: '2024-02-01',
-          cancelAtPeriodEnd: false,
-          minutesUsed: 0,
-          creditsBalance: 0,
-        }),
-      });
+      mockUseUser.mockReturnValue({ user: { id: 'user-123' }, isSignedIn: true, isLoaded: true });
+      mockSupabaseFrom.mockReturnValue(makeSubsChain(makeDbSub({ minutes_used: 0 })));
 
       const { result } = renderHook(() => useSubscription(), {
         wrapper: SubscriptionProvider,
@@ -281,54 +220,12 @@ describe('SubscriptionContext', () => {
       expect(result.current.hasFeature('shared-workspaces')).toBe(false);
       expect(result.current.hasFeature('admin-controls')).toBe(false);
     });
-
-    it('should return true for all features on team tier', async () => {
-      mockUseUser.mockReturnValue({ isSignedIn: true, isLoaded: true });
-      mockFetchWithAuth.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          id: 'sub_123',
-          tier: 'team',
-          status: 'active',
-          currentPeriodStart: '2024-01-01',
-          currentPeriodEnd: '2024-02-01',
-          cancelAtPeriodEnd: false,
-          minutesUsed: 0,
-          creditsBalance: 0,
-        }),
-      });
-
-      const { result } = renderHook(() => useSubscription(), {
-        wrapper: SubscriptionProvider,
-      });
-
-      await waitFor(() => {
-        expect(result.current.isLoading).toBe(false);
-      });
-
-      expect(result.current.hasFeature('team-collaboration')).toBe(true);
-      expect(result.current.hasFeature('shared-workspaces')).toBe(true);
-      expect(result.current.hasFeature('admin-controls')).toBe(true);
-      expect(result.current.hasFeature('priority-support')).toBe(true);
-    });
   });
 
   describe('Quota Checking', () => {
     it('should calculate remaining minutes correctly', async () => {
-      mockUseUser.mockReturnValue({ isSignedIn: true, isLoaded: true });
-      mockFetchWithAuth.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          id: 'sub_123',
-          tier: 'pro',
-          status: 'active',
-          currentPeriodStart: '2024-01-01',
-          currentPeriodEnd: '2024-02-01',
-          cancelAtPeriodEnd: false,
-          minutesUsed: 150,
-          creditsBalance: 0,
-        }),
-      });
+      mockUseUser.mockReturnValue({ user: { id: 'user-123' }, isSignedIn: true, isLoaded: true });
+      mockSupabaseFrom.mockReturnValue(makeSubsChain(makeDbSub({ minutes_used: 150 })));
 
       const { result } = renderHook(() => useSubscription(), {
         wrapper: SubscriptionProvider,
@@ -343,20 +240,8 @@ describe('SubscriptionContext', () => {
     });
 
     it('should show 0 remaining minutes when quota is exhausted', async () => {
-      mockUseUser.mockReturnValue({ isSignedIn: true, isLoaded: true });
-      mockFetchWithAuth.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          id: 'sub_123',
-          tier: 'pro',
-          status: 'active',
-          currentPeriodStart: '2024-01-01',
-          currentPeriodEnd: '2024-02-01',
-          cancelAtPeriodEnd: false,
-          minutesUsed: 500,
-          creditsBalance: 0,
-        }),
-      });
+      mockUseUser.mockReturnValue({ user: { id: 'user-123' }, isSignedIn: true, isLoaded: true });
+      mockSupabaseFrom.mockReturnValue(makeSubsChain(makeDbSub({ minutes_used: 500 })));
 
       const { result } = renderHook(() => useSubscription(), {
         wrapper: SubscriptionProvider,
@@ -370,20 +255,8 @@ describe('SubscriptionContext', () => {
     });
 
     it('should not show negative minutes when usage exceeds quota', async () => {
-      mockUseUser.mockReturnValue({ isSignedIn: true, isLoaded: true });
-      mockFetchWithAuth.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          id: 'sub_123',
-          tier: 'pro',
-          status: 'active',
-          currentPeriodStart: '2024-01-01',
-          currentPeriodEnd: '2024-02-01',
-          cancelAtPeriodEnd: false,
-          minutesUsed: 550, // Exceeds 500 minute quota
-          creditsBalance: 0,
-        }),
-      });
+      mockUseUser.mockReturnValue({ user: { id: 'user-123' }, isSignedIn: true, isLoaded: true });
+      mockSupabaseFrom.mockReturnValue(makeSubsChain(makeDbSub({ minutes_used: 550 })));
 
       const { result } = renderHook(() => useSubscription(), {
         wrapper: SubscriptionProvider,
@@ -397,20 +270,8 @@ describe('SubscriptionContext', () => {
     });
 
     it('should detect 80% quota usage threshold', async () => {
-      mockUseUser.mockReturnValue({ isSignedIn: true, isLoaded: true });
-      mockFetchWithAuth.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          id: 'sub_123',
-          tier: 'pro',
-          status: 'active',
-          currentPeriodStart: '2024-01-01',
-          currentPeriodEnd: '2024-02-01',
-          cancelAtPeriodEnd: false,
-          minutesUsed: 400, // 80% of 500
-          creditsBalance: 0,
-        }),
-      });
+      mockUseUser.mockReturnValue({ user: { id: 'user-123' }, isSignedIn: true, isLoaded: true });
+      mockSupabaseFrom.mockReturnValue(makeSubsChain(makeDbSub({ minutes_used: 400 })));
 
       const { result } = renderHook(() => useSubscription(), {
         wrapper: SubscriptionProvider,
@@ -429,20 +290,8 @@ describe('SubscriptionContext', () => {
     });
 
     it('should correctly report subscription status for different tiers', async () => {
-      mockUseUser.mockReturnValue({ isSignedIn: true, isLoaded: true });
-      mockFetchWithAuth.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          id: 'sub_123',
-          tier: 'pro',
-          status: 'active',
-          currentPeriodStart: '2024-01-01',
-          currentPeriodEnd: '2024-02-01',
-          cancelAtPeriodEnd: false,
-          minutesUsed: 0,
-          creditsBalance: 0,
-        }),
-      });
+      mockUseUser.mockReturnValue({ user: { id: 'user-123' }, isSignedIn: true, isLoaded: true });
+      mockSupabaseFrom.mockReturnValue(makeSubsChain(makeDbSub({ minutes_used: 0 })));
 
       const { result } = renderHook(() => useSubscription(), {
         wrapper: SubscriptionProvider,
@@ -457,7 +306,7 @@ describe('SubscriptionContext', () => {
     });
 
     it('should return false for isSubscribed on free tier', async () => {
-      mockUseUser.mockReturnValue({ isSignedIn: false, isLoaded: true });
+      mockUseUser.mockReturnValue({ user: null, isSignedIn: false, isLoaded: true });
 
       const { result } = renderHook(() => useSubscription(), {
         wrapper: SubscriptionProvider,
@@ -472,25 +321,13 @@ describe('SubscriptionContext', () => {
     });
 
     it('should respect TIER_MINUTES configuration for each tier', async () => {
-      mockUseUser.mockReturnValue({ isSignedIn: true, isLoaded: true });
+      mockUseUser.mockReturnValue({ user: { id: 'user-123' }, isSignedIn: true, isLoaded: true });
 
       // Test free tier
       expect(TIER_MINUTES.free).toBe(60);
 
       // Test pro tier
-      mockFetchWithAuth.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          id: 'sub_123',
-          tier: 'pro',
-          status: 'active',
-          currentPeriodStart: '2024-01-01',
-          currentPeriodEnd: '2024-02-01',
-          cancelAtPeriodEnd: false,
-          minutesUsed: 0,
-          creditsBalance: 0,
-        }),
-      });
+      mockSupabaseFrom.mockReturnValue(makeSubsChain(makeDbSub({ minutes_used: 0 })));
 
       const { result: proResult } = renderHook(() => useSubscription(), {
         wrapper: SubscriptionProvider,
@@ -502,9 +339,6 @@ describe('SubscriptionContext', () => {
 
       expect(proResult.current.subscription?.minutesIncluded).toBe(TIER_MINUTES.pro);
       expect(TIER_MINUTES.pro).toBe(500);
-
-      // Test team tier
-      expect(TIER_MINUTES.team).toBe(2000);
     });
   });
 });

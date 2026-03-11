@@ -1,4 +1,4 @@
-import { useUser } from '@clerk/react';
+import { useUser } from '@/hooks/useUser';
 import { useTranslation } from 'react-i18next';
 import { Mail, User as UserIcon, Calendar } from 'lucide-react';
 
@@ -8,17 +8,20 @@ export function ProfileTab() {
 
   if (!user) return null;
 
+  const fullName = (user.user_metadata?.full_name as string | undefined) ?? null;
+  const email = user.email ?? null;
+  // TODO: restore avatar once COEP/CORS is solved for lh3.googleusercontent.com.
+  // Google's avatar CDN doesn't send CORS headers required by COEP (needed for FFmpeg SharedArrayBuffer).
+  // const avatarUrl = user.user_metadata?.avatar_url as string | undefined;
+  const createdAt = user.created_at ?? null;
+
   const infoItems = [
-    { icon: UserIcon, label: t('userMenu.profile.name'), value: user.fullName || 'N/A' },
-    {
-      icon: Mail,
-      label: t('userMenu.profile.email'),
-      value: user.primaryEmailAddress?.emailAddress || 'N/A',
-    },
+    { icon: UserIcon, label: t('userMenu.profile.name'), value: fullName || 'N/A' },
+    { icon: Mail, label: t('userMenu.profile.email'), value: email || 'N/A' },
     {
       icon: Calendar,
       label: t('userMenu.profile.memberSince'),
-      value: user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A',
+      value: createdAt ? new Date(createdAt).toLocaleDateString() : 'N/A',
     },
   ];
 
@@ -26,14 +29,13 @@ export function ProfileTab() {
     <div className="space-y-6">
       {/* Avatar Section */}
       <div className="flex items-center gap-4">
-        <img
-          src={user.imageUrl}
-          alt={user.fullName || 'User'}
-          className="w-20 h-20 rounded-full border-2 border-border"
-        />
+        {/* TODO: show avatar img once COEP/CORS issue with Google CDN is resolved */}
+        <span className="w-20 h-20 rounded-full border-2 border-border bg-primary/20 flex items-center justify-center text-2xl font-medium text-primary">
+          {(fullName ?? email ?? 'U').charAt(0).toUpperCase()}
+        </span>
         <div>
-          <h3 className="text-lg font-semibold text-text-primary">{user.fullName}</h3>
-          <p className="text-sm text-text-secondary">{user.primaryEmailAddress?.emailAddress}</p>
+          <h3 className="text-lg font-semibold text-text-primary">{fullName ?? email}</h3>
+          <p className="text-sm text-text-secondary">{email}</p>
         </div>
       </div>
 
@@ -52,11 +54,6 @@ export function ProfileTab() {
           );
         })}
       </div>
-
-      {/* Managed by Clerk Notice */}
-      <p className="text-xs text-text-secondary text-center">
-        {t('userMenu.profile.managedByClerk')}
-      </p>
     </div>
   );
 }

@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '@clerk/react';
 import {
   Users,
   GraduationCap,
@@ -39,8 +38,6 @@ export function OnboardingPage() {
   const { t } = useTranslation();
   const { completeOnboarding, onboardingUseCase } = useOnboarding();
   const navigate = useNavigate();
-  const { getToken } = useAuth();
-
   const [step, setStep] = useState(1);
   const [selectedUseCase, setSelectedUseCase] = useState<string>(onboardingUseCase ?? '');
   const [apiKey, setApiKey] = useState('');
@@ -90,7 +87,7 @@ export function OnboardingPage() {
   const handleSelectUseCase = (id: string) => {
     setSelectedUseCase(id);
     // Fire and forget — non-blocking
-    void saveOnboardingUseCaseToDb(id, getToken);
+    void saveOnboardingUseCaseToDb(id);
   };
 
   const handleNext = () => {
@@ -122,7 +119,7 @@ export function OnboardingPage() {
     saveApiConfig('openai', apiKey, apiKey);
     if (rememberKey) {
       try {
-        await saveApiKey(apiKey, 'openai', getToken);
+        await saveApiKey(apiKey, 'openai');
       } catch {
         // Non-blocking: key is in sessionStorage for this session;
         // user can re-save from Account Settings if the request failed.

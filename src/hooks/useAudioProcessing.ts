@@ -67,7 +67,7 @@ export function useAudioProcessing({ onProgress, onComplete, onError }: UseAudio
         const minutesRemaining =
           (TIER_MINUTES[subscription.tier] || 0) - (subscription.minutesUsed || 0);
 
-        if (minutesRemaining <= 0 && subscription.tier !== 'pro' && subscription.tier !== 'team') {
+        if (minutesRemaining <= 0 && subscription.tier !== 'pro') {
           // Technically Pro/Team should have high limits, but if they hit it, they hit it.
           // However, strictly blocking Free users.
           const error = new Error('Usage limit exceeded. Please upgrade to continue.');

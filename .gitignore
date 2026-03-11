@@ -44,3 +44,4 @@ storybook-static
 stats.html
 playwright-report/
 test-results/
+.worktrees/

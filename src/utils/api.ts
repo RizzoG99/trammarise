@@ -2,6 +2,7 @@ import type { SummarizationResponse, ChatResponse, ChatMessage } from '../types/
 import { API_VALIDATION } from './constants';
 import { fetchWithTimeout } from './fetch-with-timeout';
 import { fetchWithAuth } from './fetch-with-auth';
+import { supabaseClient } from '@/lib/supabase/client';
 
 const { API_DEFAULT_TIMEOUT, TRANSCRIBE_TIMEOUT, VALIDATION_TIMEOUT } = API_VALIDATION;
 
@@ -33,7 +34,7 @@ export async function createTranscriptionJob(
     formData.append('performanceLevel', performanceLevel);
   }
 
-  const response = await fetchWithTimeout(
+  const response = await fetchWithAuth(
     '/api/transcribe',
     {
       method: 'POST',
@@ -66,7 +67,7 @@ export async function createTranscriptionJob(
  * Cancel a transcription job
  */
 export async function cancelJob(jobId: string): Promise<void> {
-  const response = await fetch(`/api/transcribe-job/${jobId}/cancel`, {
+  const response = await fetchWithAuth(`/api/transcribe-job/${jobId}/cancel`, {
     method: 'POST',
   });
 
@@ -90,7 +91,7 @@ export async function pollJobStatus(
 
   while (pollCount < MAX_POLLS) {
     try {
-      const response = await fetch(`/api/transcribe-job/${jobId}/status`);
+      const response = await fetchWithAuth(`/api/transcribe-job/${jobId}/status`);
 
       if (!response.ok) {
         if (response.status === 404) {
@@ -164,7 +165,7 @@ export async function transcribeAudio(
     formData.append('contentType', contentType);
   }
 
-  const response = await fetchWithTimeout(
+  const response = await fetchWithAuth(
     '/api/transcribe',
     {
       method: 'POST',
@@ -225,7 +226,7 @@ export async function summarizeTranscript(
     formData.append('noiseProfile', noiseProfile);
   }
 
-  const response = await fetchWithTimeout(
+  const response = await fetchWithAuth(
     '/api/summarize',
     {
       method: 'POST',
@@ -259,12 +260,10 @@ export async function chatWithAI(
   history: ChatMessage[],
   provider: string,
   apiKey: string,
-  getToken: (() => Promise<string | null>) | null,
   model?: string,
   language?: string
 ): Promise<ChatResponse> {
   const response = await fetchWithAuth(
-    getToken,
     '/api/chat',
     {
       method: 'POST',
@@ -359,12 +358,10 @@ export async function copyToClipboard(text: string): Promise<boolean> {
  */
 export async function saveApiKey(
   apiKey: string,
-  provider: string = 'openai',
-  getToken?: (() => Promise<string | null>) | null
+  provider: string = 'openai'
 ): Promise<{ success: boolean; message: string }> {
   try {
     const response = await fetchWithAuth(
-      getToken || null,
       '/api/user-settings/api-key',
       {
         method: 'POST',
@@ -391,13 +388,12 @@ export async function saveApiKey(
  * Retrieve saved API key from backend (decrypted)
  * Requires authentication
  */
-export async function getSavedApiKey(getToken?: (() => Promise<string | null>) | null): Promise<{
+export async function getSavedApiKey(): Promise<{
   hasKey: boolean;
   apiKey: string | null;
 }> {
   try {
     const response = await fetchWithAuth(
-      getToken || null,
       '/api/user-settings/api-key',
       {
         method: 'GET',
@@ -423,13 +419,12 @@ export async function getSavedApiKey(getToken?: (() => Promise<string | null>) |
  * Delete saved API key from backend
  * Requires authentication
  */
-export async function deleteSavedApiKey(getToken?: (() => Promise<string | null>) | null): Promise<{
+export async function deleteSavedApiKey(): Promise<{
   success: boolean;
   message: string;
 }> {
   try {
     const response = await fetchWithAuth(
-      getToken || null,
       '/api/user-settings/api-key',
       {
         method: 'DELETE',
@@ -451,22 +446,21 @@ export async function deleteSavedApiKey(getToken?: (() => Promise<string | null>
 }
 
 /**
- * Save onboarding use case to backend
+ * Save onboarding use case to Supabase user_settings table
  */
-export async function saveOnboardingUseCaseToDb(
-  useCase: string,
-  getToken?: (() => Promise<string | null>) | null
-): Promise<void> {
+export async function saveOnboardingUseCaseToDb(useCase: string): Promise<void> {
   try {
-    await fetchWithAuth(
-      getToken || null,
-      '/api/user-settings/preferences',
+    const {
+      data: { session },
+    } = await supabaseClient.auth.getSession();
+    if (!session) return;
+    await supabaseClient.from('user_settings').upsert(
       {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ onboardingUseCase: useCase }),
+        user_id: session.user.id,
+        onboarding_use_case: useCase,
+        updated_at: new Date().toISOString(),
       },
-      API_DEFAULT_TIMEOUT
+      { onConflict: 'user_id' }
     );
   } catch (error) {
     // Non-critical: log and swallow — does not block the user flow
@@ -475,20 +469,20 @@ export async function saveOnboardingUseCaseToDb(
 }
 
 /**
- * Retrieve onboarding use case from backend
+ * Retrieve onboarding use case from Supabase user_settings table
  */
-export async function getOnboardingUseCaseFromDb(
-  getToken?: (() => Promise<string | null>) | null
-): Promise<string | null> {
+export async function getOnboardingUseCaseFromDb(): Promise<string | null> {
   try {
-    const response = await fetchWithAuth(
-      getToken || null,
-      '/api/user-settings/preferences',
-      { method: 'GET' },
-      API_DEFAULT_TIMEOUT
-    );
-    const data = await response.json();
-    return data.onboardingUseCase ?? null;
+    const {
+      data: { session },
+    } = await supabaseClient.auth.getSession();
+    if (!session) return null;
+    const { data } = await supabaseClient
+      .from('user_settings')
+      .select('onboarding_use_case')
+      .eq('user_id', session.user.id)
+      .maybeSingle();
+    return (data?.onboarding_use_case as string | null) ?? null;
   } catch {
     return null;
   }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useUser } from '@clerk/react';
+import { useUser } from '@/hooks/useUser';
 import { ApiKeyInfo } from './ApiKeyInfo';
 import { Button, Input, SelectCard, ToggleSwitch } from '@/lib';
 import { validateApiKey, saveApiKey, getSavedApiKey } from '../../utils/api';

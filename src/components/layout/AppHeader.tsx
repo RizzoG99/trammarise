@@ -1,7 +1,7 @@
 import { AudioWaveform } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { SignInButton, useUser } from '@clerk/react';
-import { ThemeToggle, Button } from '@/lib';
+import { useUser } from '@/hooks/useUser';
+import { ThemeToggle } from '@/lib';
 import { useTheme } from '../../hooks/useTheme';
 import { LanguageSwitcher } from '../../features/i18n/components/LanguageSwitcher';
 import { CustomUserMenu } from '../../features/user-menu';
@@ -58,19 +58,7 @@ export function AppHeader() {
             <ThemeToggle theme={theme} onThemeChange={setTheme} />
 
             {/* Authentication - MOVED TO LAST */}
-            {isSignedIn ? (
-              <CustomUserMenu />
-            ) : (
-              <SignInButton mode="modal">
-                <Button
-                  variant="ghost"
-                  className="flex items-center gap-2 px-3"
-                  aria-label="Select language"
-                >
-                  <span className="text-sm font-medium">{t('auth.signIn')}</span>
-                </Button>
-              </SignInButton>
-            )}
+            {isSignedIn && <CustomUserMenu />}
           </div>
         </div>
       </div>

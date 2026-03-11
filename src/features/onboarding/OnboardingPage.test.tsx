@@ -87,10 +87,6 @@ vi.mock('@/utils/api', () => ({
   saveOnboardingUseCaseToDb: (...args: unknown[]) => mockSaveOnboardingUseCaseToDb(...args),
 }));
 
-vi.mock('@clerk/react', () => ({
-  useAuth: () => ({ getToken: vi.fn().mockResolvedValue('mock-token') }),
-}));
-
 // Stub lib components to keep tests focused
 vi.mock('@/lib', () => ({
   GlassCard: ({ children, className }: { children: React.ReactNode; className?: string }) => (
@@ -235,9 +231,7 @@ describe('OnboardingPage', () => {
     it('calls saveOnboardingUseCaseToDb when user picks a use case', async () => {
       render(<OnboardingPage />);
       fireEvent.click(screen.getByRole('button', { name: /lecture/i }));
-      await waitFor(() =>
-        expect(mockSaveOnboardingUseCaseToDb).toHaveBeenCalledWith('lecture', expect.any(Function))
-      );
+      await waitFor(() => expect(mockSaveOnboardingUseCaseToDb).toHaveBeenCalledWith('lecture'));
     });
   });
 
@@ -388,11 +382,7 @@ describe('OnboardingPage', () => {
       fireEvent.click(screen.getByText('Get Started'));
       await waitFor(() => expect(mockCompleteOnboarding).toHaveBeenCalledTimes(1));
       expect(mockSaveApiConfig).toHaveBeenCalledWith('openai', 'sk-validkey123', 'sk-validkey123');
-      expect(mockSaveApiKeyFn).toHaveBeenCalledWith(
-        'sk-validkey123',
-        'openai',
-        expect.any(Function)
-      );
+      expect(mockSaveApiKeyFn).toHaveBeenCalledWith('sk-validkey123', 'openai');
     });
 
     it('shows error when API key is rejected by server', async () => {
