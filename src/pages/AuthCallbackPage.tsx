@@ -8,8 +8,14 @@ export function AuthCallbackPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const code = new URLSearchParams(window.location.search).get('code');
-    if (code) {
+    const params = new URLSearchParams(window.location.search);
+    const error = params.get('error');
+    const code = params.get('code');
+
+    if (error) {
+      // OAuth provider denied access or returned an error
+      navigate('/?auth_error=1', { replace: true });
+    } else if (code) {
       supabaseClient.auth
         .exchangeCodeForSession(code)
         .then(() => navigate('/', { replace: true }))

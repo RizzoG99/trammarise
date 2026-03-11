@@ -69,6 +69,49 @@ describe('requireAuth middleware', () => {
 
       await expect(requireAuth(mockReq)).rejects.toThrow('Invalid or expired token');
     });
+
+    it('should throw 401 when scheme is not Bearer (e.g. Basic)', async () => {
+      const { requireAuth } = await import('../../middleware/auth');
+
+      const mockReq = {
+        method: 'GET',
+        url: '/api/test',
+        headers: { authorization: 'Basic dXNlcjpwYXNz' },
+      } as unknown as Parameters<typeof requireAuth>[0];
+
+      await expect(requireAuth(mockReq)).rejects.toThrow('Missing authorization token');
+    });
+
+    it('should throw 401 when Bearer token is empty', async () => {
+      const { requireAuth } = await import('../../middleware/auth');
+
+      const mockReq = {
+        method: 'GET',
+        url: '/api/test',
+        headers: { authorization: 'Bearer ' },
+      } as unknown as Parameters<typeof requireAuth>[0];
+
+      await expect(requireAuth(mockReq)).rejects.toThrow('Missing authorization token');
+    });
+
+    it('should use first element when authorization header is an array', async () => {
+      mockGetUser.mockResolvedValue({
+        data: { user: { id: 'uuid-array' } },
+        error: null,
+      });
+
+      const { requireAuth } = await import('../../middleware/auth');
+
+      const mockReq = {
+        method: 'GET',
+        url: '/api/test',
+        headers: { authorization: ['Bearer array-token', 'Bearer second-token'] },
+      } as unknown as Parameters<typeof requireAuth>[0];
+
+      const result = await requireAuth(mockReq);
+      expect(result).toEqual({ userId: 'uuid-array' });
+      expect(mockGetUser).toHaveBeenCalledWith('array-token');
+    });
   });
 
   describe('optionalAuth', () => {

@@ -82,7 +82,7 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
     } finally {
       setIsLoading(false);
     }
-  }, [isSignedIn, user]);
+  }, [isSignedIn, user?.id]);
 
   useEffect(() => {
     if (isLoaded) {

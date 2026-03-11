@@ -41,4 +41,17 @@ describe('AuthCallbackPage', () => {
     );
     vi.unstubAllGlobals();
   });
+
+  it('navigates to /?auth_error=1 when OAuth error param is present', async () => {
+    vi.stubGlobal('location', {
+      ...window.location,
+      search: '?error=access_denied&error_description=User+denied+access',
+    });
+    render(<AuthCallbackPage />);
+    await waitFor(() =>
+      expect(mockNavigate).toHaveBeenCalledWith('/?auth_error=1', { replace: true })
+    );
+    expect(mockExchange).not.toHaveBeenCalled();
+    vi.unstubAllGlobals();
+  });
 });
