@@ -11,6 +11,9 @@ export function initAnalytics(): void {
     person_profiles: 'identified_only',
     capture_pageview: true,
     capture_pageleave: true,
+    // Disable survey/feedback UI widgets — their assets are blocked by COEP
+    // (require-corp header needed for FFmpeg SharedArrayBuffer)
+    disable_surveys: true,
   });
 }
 
