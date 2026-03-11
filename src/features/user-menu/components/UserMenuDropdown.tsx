@@ -72,7 +72,7 @@ export function UserMenuDropdown({ isSubscribed, onClose }: UserMenuDropdownProp
       <button
         type="button"
         role="menuitem"
-        className="md:hidden w-full flex items-center gap-3 px-4 py-2.5 text-sm text-text-primary hover:bg-bg-hover transition-colors"
+        className="md:hidden w-full flex items-center gap-3 px-4 py-2.5 text-sm text-text-primary hover:bg-bg-surface-hover transition-colors cursor-pointer"
         onClick={() => {
           navigate(ROUTES.HISTORY);
           onClose();
@@ -89,7 +89,7 @@ export function UserMenuDropdown({ isSubscribed, onClose }: UserMenuDropdownProp
             key={index}
             type="button"
             role="menuitem"
-            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-text-primary hover:bg-bg-hover transition-colors"
+            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-text-primary hover:bg-bg-surface-hover transition-colors cursor-pointer"
             onClick={item.action}
           >
             <Icon className="w-4 h-4" />
@@ -101,7 +101,7 @@ export function UserMenuDropdown({ isSubscribed, onClose }: UserMenuDropdownProp
       <button
         type="button"
         role="menuitem"
-        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-accent-error hover:bg-bg-hover transition-colors"
+        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-accent-error hover:bg-bg-surface-hover transition-colors cursor-pointer"
         onClick={handleSignOut}
       >
         <LogOut className="w-4 h-4" />

@@ -298,12 +298,12 @@ export function Select({
       {/* Dropdown Menu */}
       {isOpen && (
         <div
-          className={`absolute z-50 w-full bg-bg-surface dark:bg-bg-secondary border border-[var(--color-border)] rounded-lg shadow-xl max-h-96 overflow-hidden animate-[fadeIn_0.1s_ease-out] ${
+          className={`absolute z-50 w-full bg-bg-surface border border-border rounded-lg shadow-xl backdrop-blur-md max-h-96 overflow-hidden animate-[fadeIn_0.1s_ease-out] ${
             openUpward ? 'bottom-full mb-2' : 'top-full mt-2'
           }`}
         >
           {searchable && (
-            <div className="p-2 border-b border-[var(--color-border)] sticky top-0 bg-bg-surface">
+            <div className="p-2 border-b border-border sticky top-0 bg-bg-surface">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-tertiary" />
                 <input
@@ -341,8 +341,8 @@ export function Select({
                   placeholder={searchPlaceholder}
                   className="
                     w-full pl-10 pr-8 py-2 rounded-md
-                    bg-bg-primary
-                    border border-[var(--color-border)]
+                    bg-bg-tertiary
+                    border border-border
                     text-sm text-text-primary
                     focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary
                     placeholder:text-text-tertiary
@@ -373,7 +373,7 @@ export function Select({
                     key={group.label}
                     className={groupIndex > 0 ? 'border-t border-border mt-1 pt-1' : ''}
                   >
-                    <div className="px-3 py-2 text-xs font-medium text-text-tertiary uppercase tracking-wider bg-bg-primary/50">
+                    <div className="px-3 py-2 text-xs font-medium text-text-tertiary uppercase tracking-wider bg-bg-surface/80">
                       {group.label}
                     </div>
                     {group.options.map((option) => {
