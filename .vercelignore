@@ -1,0 +1,8 @@
+# Exclude TypeScript API sources from deployment.
+# Vercel's built-in builder only transpiles (strips types, keeps `import`
+# statements) which fails at runtime. Instead, the vercel-build script uses
+# esbuild to produce self-contained CJS bundles in api-dist/ — deploy those.
+api/**/*.ts
+
+# Test infrastructure — not needed at runtime
+api/vitest.setup.ts

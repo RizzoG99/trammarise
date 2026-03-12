@@ -8,6 +8,7 @@
     "dev:vite": "vite",
     "dev:vercel": "vercel dev --yes",
     "build": "tsc -b tsconfig.app.json && vite build",
+    "vercel-build": "npm run build && node scripts/build-api.mjs",
     "build:sitemap": "node scripts/generate-sitemap.mjs",
     "lint": "eslint .",
     "preview": "vite preview",
