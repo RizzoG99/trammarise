@@ -13,29 +13,41 @@ import { RateLimitGovernor } from '../_utils/rate-limit-governor';
 import { generateMockAudio } from '../_utils/__test-helpers__/mock-audio-generator';
 import { createTestJob, createTestChunk } from '../_utils/__test-helpers__/test-fixtures';
 import { JOB_SAFEGUARDS } from '../_types/job';
-import { mockFFmpeg, mockFileSystem } from '../vitest.setup';
-import type { MockFluentFFmpegCommand } from '../_utils/__test-helpers__/types';
+import { mockFileSystem } from '../vitest.setup';
 
 // Mock ffmpeg-setup to prevent it from configuring real binaries
-vi.mock('../utils/ffmpeg-setup', () => ({
+const { mockFfprobeDuration, mockExtractFFmpegChunk } = vi.hoisted(() => ({
+  mockFfprobeDuration: vi.fn(),
+  mockExtractFFmpegChunk: vi.fn(),
+}));
+
+vi.mock('../_utils/ffmpeg-setup', () => ({
   setupFFmpeg: vi.fn(),
   getFFmpegPath: vi.fn(() => '/mock/ffmpeg'),
   getFFprobePath: vi.fn(() => '/mock/ffprobe'),
+  ffprobeDuration: mockFfprobeDuration,
+  extractFFmpegChunk: mockExtractFFmpegChunk,
 }));
 
 describe('Edge Cases', () => {
   beforeEach(() => {
     JobManager.clearAllJobs();
+    // Default: ffprobeDuration returns 60s
+    mockFfprobeDuration.mockResolvedValue(60);
+    // extractFFmpegChunk must write unique content per output path so computeChunkHash works
+    mockExtractFFmpegChunk.mockImplementation(
+      async (_input: string, startTime: number, duration: number, outputPath: string) => {
+        const uniqueContent = Buffer.from(`mock chunk: ${outputPath} t=${startTime} d=${duration}`);
+        globalThis.mockFileSystem.files.set(outputPath, uniqueContent);
+      }
+    );
   });
 
   describe('Empty Audio File', () => {
     it('should handle 0 duration audio gracefully', async () => {
       const audioBuffer = Buffer.from('');
 
-      // Override ffprobe for this test using mockImplementation (not Once)
-      mockFFmpeg.ffprobe.mockImplementationOnce((path, callback) => {
-        callback(null, { format: { duration: 0 } });
-      });
+      mockFfprobeDuration.mockResolvedValueOnce(0);
 
       const result = await chunkAudio(audioBuffer, 'empty.mp3', 'balanced');
 
@@ -138,10 +150,7 @@ describe('Edge Cases', () => {
     it('should propagate error when ffprobe fails', async () => {
       const audioBuffer = generateMockAudio({ durationSeconds: 100, format: 'mp3' });
 
-      // Use global mockFFmpeg and override ffprobe to simulate failure
-      mockFFmpeg.ffprobe.mockImplementationOnce((path, callback) => {
-        callback(new Error('FFprobe failed'), null);
-      });
+      mockFfprobeDuration.mockRejectedValueOnce(new Error('Failed to probe audio file'));
 
       await expect(chunkAudio(audioBuffer, 'test.mp3', 'balanced')).rejects.toThrow(
         /Failed to probe audio file/
@@ -149,27 +158,9 @@ describe('Edge Cases', () => {
     });
 
     it('should handle FFmpeg extraction failure', async () => {
-      const mockFFmpegInstance = {
-        setStartTime: vi.fn().mockReturnThis(),
-        setDuration: vi.fn().mockReturnThis(),
-        audioCodec: vi.fn().mockReturnThis(),
-        audioBitrate: vi.fn().mockReturnThis(),
-        audioChannels: vi.fn().mockReturnThis(),
-        audioFrequency: vi.fn().mockReturnThis(),
-        output: vi.fn().mockReturnThis(),
-        on: vi.fn((event, callback) => {
-          if (event === 'error') {
-            setTimeout(() => callback(new Error('Extraction failed')), 0);
-          }
-          return mockFFmpegInstance;
-        }),
-        run: vi.fn(),
-      };
+      mockExtractFFmpegChunk.mockRejectedValueOnce(new Error('FFmpeg extraction failed'));
 
-      // Override global mockFFmpeg to return error instance
-      mockFFmpeg.mockReturnValueOnce(mockFFmpegInstance as unknown as MockFluentFFmpegCommand);
-
-      const { extractChunk } = await import('../utils/audio-chunker');
+      const { extractChunk } = await import('../_utils/audio-chunker');
 
       await expect(extractChunk('/tmp/input.mp3', 0, 180, '/tmp/output.mp3')).rejects.toThrow(
         /FFmpeg extraction failed/
@@ -337,10 +328,7 @@ describe('Edge Cases', () => {
     it('should handle very short chunks (1 second)', async () => {
       const audioBuffer = generateMockAudio({ durationSeconds: 1, format: 'mp3' });
 
-      // Use global mockFFmpeg and override ffprobe for this test
-      mockFFmpeg.ffprobe.mockImplementationOnce((_path, callback) => {
-        callback(null, { format: { duration: 1 } });
-      });
+      mockFfprobeDuration.mockResolvedValueOnce(1);
 
       const result = await chunkAudio(audioBuffer, 'short.mp3', 'balanced');
 
@@ -379,10 +367,7 @@ describe('Edge Cases', () => {
       // Simulate extremely long audio (10 hours)
       const duration = 10 * 60 * 60; // 36000 seconds
 
-      // Use global mockFFmpeg and override ffprobe for this test
-      mockFFmpeg.ffprobe.mockImplementationOnce((_path, callback) => {
-        callback(null, { format: { duration } });
-      });
+      mockFfprobeDuration.mockResolvedValueOnce(duration);
 
       const audioBuffer = generateMockAudio({ durationSeconds: 100, format: 'mp3' });
       const result = await chunkAudio(audioBuffer, 'long.mp3', 'balanced');

@@ -19,7 +19,7 @@ const mockRequireAuth = vi.fn(async (req) => {
   }
   return { userId: 'test-user-id' };
 });
-vi.mock('../../middleware/auth', () => ({
+vi.mock('../../_middleware/auth', () => ({
   requireAuth: mockRequireAuth,
   AuthError,
 }));
@@ -30,7 +30,7 @@ const mockSupabaseSelect = vi.fn();
 const mockSupabaseEq = vi.fn();
 const mockSupabaseSingle = vi.fn();
 
-vi.mock('../../lib/supabase-admin', () => ({
+vi.mock('../../_lib/supabase-admin', () => ({
   supabaseAdmin: {
     from: mockSupabaseFrom,
   },

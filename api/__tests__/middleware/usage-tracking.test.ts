@@ -8,7 +8,7 @@ const mockSupabaseSingle = vi.fn();
 const mockSupabaseInsert = vi.fn();
 const mockSupabaseRpc = vi.fn();
 
-vi.mock('../../lib/supabase-admin', () => ({
+vi.mock('../../_lib/supabase-admin', () => ({
   supabaseAdmin: {
     from: mockSupabaseFrom,
     rpc: mockSupabaseRpc,
@@ -23,7 +23,7 @@ describe('Usage Tracking Middleware', () => {
   describe('trackUsage', () => {
     it('should track transcription usage in minutes', async () => {
       // Arrange
-      const { trackUsage } = await import('../../middleware/usage-tracking');
+      const { trackUsage } = await import('../../_middleware/usage-tracking');
       const userId = 'user-uuid-123';
       const durationSeconds = 300; // 5 minutes
       const operationType = 'transcription';
@@ -69,9 +69,9 @@ describe('Usage Tracking Middleware', () => {
       expect(mockSupabaseInsert).toHaveBeenCalledWith(
         expect.objectContaining({
           user_id: userId,
-          operation_type: operationType,
-          duration_seconds: durationSeconds,
-          minutes_used: 5, // Rounded up from 300 seconds
+          event_type: operationType,
+          audio_duration_seconds: durationSeconds,
+          minutes_consumed: 5, // Rounded up from 300 seconds
         })
       );
 
@@ -84,7 +84,7 @@ describe('Usage Tracking Middleware', () => {
 
     it('should round up partial minutes', async () => {
       // Arrange
-      const { trackUsage } = await import('../../middleware/usage-tracking');
+      const { trackUsage } = await import('../../_middleware/usage-tracking');
       const userId = 'user-uuid-123';
       const durationSeconds = 61; // 1 minute 1 second = 2 minutes (rounded up)
 
@@ -121,14 +121,14 @@ describe('Usage Tracking Middleware', () => {
       // Assert
       expect(mockSupabaseInsert).toHaveBeenCalledWith(
         expect.objectContaining({
-          minutes_used: 2, // 61 seconds rounded up to 2 minutes
+          minutes_consumed: 2, // 61 seconds rounded up to 2 minutes
         })
       );
     });
 
     it('should not track usage for free tier users', async () => {
       // Arrange
-      const { trackUsage } = await import('../../middleware/usage-tracking');
+      const { trackUsage } = await import('../../_middleware/usage-tracking');
       const userId = 'user-uuid-123';
 
       mockSupabaseFrom.mockReturnValueOnce({
@@ -155,7 +155,7 @@ describe('Usage Tracking Middleware', () => {
 
     it('should handle database errors gracefully', async () => {
       // Arrange
-      const { trackUsage } = await import('../../middleware/usage-tracking');
+      const { trackUsage } = await import('../../_middleware/usage-tracking');
       const userId = 'user-uuid-123';
 
       mockSupabaseFrom.mockReturnValueOnce({
@@ -188,7 +188,7 @@ describe('Usage Tracking Middleware', () => {
   describe('checkQuota', () => {
     it('should return true if user has remaining minutes', async () => {
       // Arrange
-      const { checkQuota } = await import('../../middleware/usage-tracking');
+      const { checkQuota } = await import('../../_middleware/usage-tracking');
       const userId = 'user-uuid-123';
       const requiredMinutes = 10;
 
@@ -221,7 +221,7 @@ describe('Usage Tracking Middleware', () => {
 
     it('should return false if user exceeds quota', async () => {
       // Arrange
-      const { checkQuota } = await import('../../middleware/usage-tracking');
+      const { checkQuota } = await import('../../_middleware/usage-tracking');
       const userId = 'user-uuid-123';
       const requiredMinutes = 100;
 
@@ -255,7 +255,7 @@ describe('Usage Tracking Middleware', () => {
 
     it('should allow unlimited usage for free tier with BYOK', async () => {
       // Arrange
-      const { checkQuota } = await import('../../middleware/usage-tracking');
+      const { checkQuota } = await import('../../_middleware/usage-tracking');
       const userId = 'user-uuid-123';
       const requiredMinutes = 1000;
 
@@ -283,7 +283,7 @@ describe('Usage Tracking Middleware', () => {
 
     it('should check credits balance if available', async () => {
       // Arrange
-      const { checkQuota } = await import('../../middleware/usage-tracking');
+      const { checkQuota } = await import('../../_middleware/usage-tracking');
       const userId = 'user-uuid-123';
       const requiredMinutes = 10;
 

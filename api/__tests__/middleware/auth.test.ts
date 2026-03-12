@@ -1,13 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Unmock the auth module to test the real implementation
-vi.unmock('../../middleware/auth');
+vi.unmock('../../_middleware/auth');
 
 // Create mock functions
 const mockGetUser = vi.fn();
 
 // Mock modules BEFORE importing the module under test
-vi.mock('../../lib/supabase-admin', () => ({
+vi.mock('../../_lib/supabase-admin', () => ({
   supabaseAdmin: {
     auth: { getUser: (...args: unknown[]) => mockGetUser(...args) },
   },
@@ -25,7 +25,7 @@ describe('requireAuth middleware', () => {
         error: null,
       });
 
-      const { requireAuth } = await import('../../middleware/auth');
+      const { requireAuth } = await import('../../_middleware/auth');
 
       const mockReq = {
         method: 'GET',
@@ -42,7 +42,7 @@ describe('requireAuth middleware', () => {
 
   describe('Authentication Errors', () => {
     it('should throw 401 when Authorization header is missing', async () => {
-      const { requireAuth } = await import('../../middleware/auth');
+      const { requireAuth } = await import('../../_middleware/auth');
 
       const mockReq = {
         method: 'GET',
@@ -59,7 +59,7 @@ describe('requireAuth middleware', () => {
         error: { message: 'Invalid JWT' },
       });
 
-      const { requireAuth } = await import('../../middleware/auth');
+      const { requireAuth } = await import('../../_middleware/auth');
 
       const mockReq = {
         method: 'GET',
@@ -71,7 +71,7 @@ describe('requireAuth middleware', () => {
     });
 
     it('should throw 401 when scheme is not Bearer (e.g. Basic)', async () => {
-      const { requireAuth } = await import('../../middleware/auth');
+      const { requireAuth } = await import('../../_middleware/auth');
 
       const mockReq = {
         method: 'GET',
@@ -83,7 +83,7 @@ describe('requireAuth middleware', () => {
     });
 
     it('should throw 401 when Bearer token is empty', async () => {
-      const { requireAuth } = await import('../../middleware/auth');
+      const { requireAuth } = await import('../../_middleware/auth');
 
       const mockReq = {
         method: 'GET',
@@ -100,7 +100,7 @@ describe('requireAuth middleware', () => {
         error: null,
       });
 
-      const { requireAuth } = await import('../../middleware/auth');
+      const { requireAuth } = await import('../../_middleware/auth');
 
       const mockReq = {
         method: 'GET',
@@ -116,7 +116,7 @@ describe('requireAuth middleware', () => {
 
   describe('optionalAuth', () => {
     it('should return null when no auth header is present', async () => {
-      const { optionalAuth } = await import('../../middleware/auth');
+      const { optionalAuth } = await import('../../_middleware/auth');
 
       const mockReq = {
         method: 'GET',
@@ -134,7 +134,7 @@ describe('requireAuth middleware', () => {
         error: null,
       });
 
-      const { optionalAuth } = await import('../../middleware/auth');
+      const { optionalAuth } = await import('../../_middleware/auth');
 
       const mockReq = {
         method: 'GET',

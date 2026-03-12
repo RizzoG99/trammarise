@@ -15,7 +15,7 @@ describe('Speaker Diarization Integration', () => {
 
   describe('TranscriptionProviderFactory integration', () => {
     it('should create AssemblyAI provider when speaker diarization is enabled', async () => {
-      const { TranscriptionProviderFactory } = await import('../providers/factory');
+      const { TranscriptionProviderFactory } = await import('../_providers/factory');
 
       const provider = TranscriptionProviderFactory.create({
         provider: 'assemblyai',
@@ -28,7 +28,7 @@ describe('Speaker Diarization Integration', () => {
     });
 
     it('should use OpenAI provider when speaker diarization is disabled', async () => {
-      const { TranscriptionProviderFactory } = await import('../providers/factory');
+      const { TranscriptionProviderFactory } = await import('../_providers/factory');
 
       const provider = TranscriptionProviderFactory.create({
         provider: 'assemblyai',
@@ -42,7 +42,7 @@ describe('Speaker Diarization Integration', () => {
     });
 
     it('should get default provider based on speaker diarization requirement', async () => {
-      const { TranscriptionProviderFactory } = await import('../providers/factory');
+      const { TranscriptionProviderFactory } = await import('../_providers/factory');
 
       expect(TranscriptionProviderFactory.getDefaultProvider(true)).toBe('assemblyai');
       expect(TranscriptionProviderFactory.getDefaultProvider(false)).toBe('openai');
@@ -80,7 +80,7 @@ describe('Speaker Diarization Integration', () => {
 
   describe('JobManager utterances handling', () => {
     it('should set and retrieve utterances from job', async () => {
-      const { JobManager } = await import('../utils/job-manager');
+      const { JobManager } = await import('../_utils/job-manager');
 
       // Create a test job
       const job = JobManager.createJob(
@@ -125,7 +125,7 @@ describe('Speaker Diarization Integration', () => {
     });
 
     it('should include utterances in job status response', async () => {
-      const { JobManager } = await import('../utils/job-manager');
+      const { JobManager } = await import('../_utils/job-manager');
 
       const job = JobManager.createJob(
         {

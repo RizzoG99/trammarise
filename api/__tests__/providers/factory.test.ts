@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { TranscriptionProviderFactory, type ProviderType } from '../../providers/factory';
+import { TranscriptionProviderFactory, type ProviderType } from '../../_providers/factory';
 
 describe('TranscriptionProviderFactory', () => {
   beforeEach(() => {

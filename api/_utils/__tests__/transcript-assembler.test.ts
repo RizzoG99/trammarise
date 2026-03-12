@@ -11,7 +11,7 @@ import {
   createOverlappingChunks,
   MOCK_TRANSCRIPTS,
 } from '../__test-helpers__/test-fixtures';
-import type { ChunkMetadata } from '../../types/chunking';
+import type { ChunkMetadata } from '../../_types/chunking';
 
 describe('Transcript Assembler', () => {
   describe('assembleTranscript() - Balanced Mode', () => {

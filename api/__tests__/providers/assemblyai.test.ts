@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type { TranscriptionRequest } from '../../types/provider';
+import type { TranscriptionRequest } from '../../_types/provider';
 
 // Mock axios for HTTP requests
 const mockAxiosPost = vi.fn();
@@ -23,7 +23,7 @@ describe('AssemblyAIProvider', () => {
   describe('transcribe', () => {
     it('should upload audio and start transcription with speaker labels', async () => {
       // Arrange
-      const { AssemblyAIProvider } = await import('../../providers/assemblyai');
+      const { AssemblyAIProvider } = await import('../../_providers/assemblyai');
       const provider = new AssemblyAIProvider({ pollingInterval: 10 });
 
       const mockAudioBuffer = Buffer.from('mock-audio-data');
@@ -121,7 +121,7 @@ describe('AssemblyAIProvider', () => {
 
     it('should transcribe without speaker labels when disabled', async () => {
       // Arrange
-      const { AssemblyAIProvider } = await import('../../providers/assemblyai');
+      const { AssemblyAIProvider } = await import('../../_providers/assemblyai');
       const provider = new AssemblyAIProvider({ pollingInterval: 10 });
 
       const request: TranscriptionRequest = {
@@ -166,7 +166,7 @@ describe('AssemblyAIProvider', () => {
 
     it('should specify number of speakers when provided', async () => {
       // Arrange
-      const { AssemblyAIProvider } = await import('../../providers/assemblyai');
+      const { AssemblyAIProvider } = await import('../../_providers/assemblyai');
       const provider = new AssemblyAIProvider({ pollingInterval: 10 });
 
       const request: TranscriptionRequest = {
@@ -210,7 +210,7 @@ describe('AssemblyAIProvider', () => {
 
     it('should handle transcription errors', async () => {
       // Arrange
-      const { AssemblyAIProvider } = await import('../../providers/assemblyai');
+      const { AssemblyAIProvider } = await import('../../_providers/assemblyai');
       const provider = new AssemblyAIProvider({ pollingInterval: 10 });
 
       const request: TranscriptionRequest = {
@@ -240,7 +240,7 @@ describe('AssemblyAIProvider', () => {
 
     it('should timeout after max polling attempts', async () => {
       // Arrange
-      const { AssemblyAIProvider } = await import('../../providers/assemblyai');
+      const { AssemblyAIProvider } = await import('../../_providers/assemblyai');
       // Use shorter timeout for testing
       const provider = new AssemblyAIProvider({
         maxPollingAttempts: 3,
@@ -278,7 +278,7 @@ describe('AssemblyAIProvider', () => {
 
     it('should handle network errors', async () => {
       // Arrange
-      const { AssemblyAIProvider } = await import('../../providers/assemblyai');
+      const { AssemblyAIProvider } = await import('../../_providers/assemblyai');
       const provider = new AssemblyAIProvider();
 
       const request: TranscriptionRequest = {
@@ -296,7 +296,7 @@ describe('AssemblyAIProvider', () => {
   describe('getProviderName', () => {
     it('should return AssemblyAI as provider name', async () => {
       // Arrange
-      const { AssemblyAIProvider } = await import('../../providers/assemblyai');
+      const { AssemblyAIProvider } = await import('../../_providers/assemblyai');
       const provider = new AssemblyAIProvider();
 
       // Act & Assert

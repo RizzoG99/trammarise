@@ -5,7 +5,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { createMocks } from 'node-mocks-http';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { rateLimit, RateLimitError, RATE_LIMITS } from '../../middleware/rate-limit';
+import { rateLimit, RateLimitError, RATE_LIMITS } from '../../_middleware/rate-limit';
 
 describe('Rate Limiting Middleware', () => {
   beforeEach(() => {

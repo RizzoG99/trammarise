@@ -3,8 +3,8 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { JobManager } from '../../utils/job-manager';
-import type { JobConfiguration } from '../../types/job';
+import { JobManager } from '../../_utils/job-manager';
+import type { JobConfiguration } from '../../_types/job';
 
 describe('Job Ownership Validation', () => {
   beforeEach(() => {
