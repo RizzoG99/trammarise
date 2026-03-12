@@ -33,11 +33,11 @@ await esbuild.build({
   platform: 'node',
   target: 'node20',
   format: 'cjs',
-  outdir: 'api-dist',
+  outdir: 'api',
   outbase: 'api',
   // Keep all npm packages external (resolved from node_modules at runtime).
   // Only local relative imports get inlined — that's the whole point.
   packages: 'external',
 });
 
-console.log('API bundles compiled to api-dist/');
+console.log('API bundles compiled to api/');

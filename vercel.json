@@ -16,24 +16,24 @@
     }
   ],
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api-dist/$1" },
+    { "source": "/api/(.*)", "destination": "/api/$1" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
   "functions": {
-    "api-dist/transcribe.js": {
+    "api/transcribe.js": {
       "maxDuration": 300,
       "memory": 1024,
       "includeFiles": "node_modules/{@ffmpeg-installer,@ffprobe-installer}/**"
     },
-    "api-dist/chat.js": { "maxDuration": 60 },
-    "api-dist/summarize.js": { "maxDuration": 60 },
-    "api-dist/validate-key.js": { "maxDuration": 60 },
-    "api-dist/audio/[sessionId].js": { "maxDuration": 60 },
-    "api-dist/credits/purchase.js": { "maxDuration": 60 },
-    "api-dist/stripe/create-checkout-session.js": { "maxDuration": 60 },
-    "api-dist/transcribe-job/[jobId]/cancel.js": { "maxDuration": 60 },
-    "api-dist/transcribe-job/[jobId]/status.js": { "maxDuration": 60 },
-    "api-dist/user-settings/api-key.js": { "maxDuration": 60 },
-    "api-dist/webhooks/stripe.js": { "maxDuration": 60 }
+    "api/chat.js": { "maxDuration": 60 },
+    "api/summarize.js": { "maxDuration": 60 },
+    "api/validate-key.js": { "maxDuration": 60 },
+    "api/audio/[sessionId].js": { "maxDuration": 60 },
+    "api/credits/purchase.js": { "maxDuration": 60 },
+    "api/stripe/create-checkout-session.js": { "maxDuration": 60 },
+    "api/transcribe-job/[jobId]/cancel.js": { "maxDuration": 60 },
+    "api/transcribe-job/[jobId]/status.js": { "maxDuration": 60 },
+    "api/user-settings/api-key.js": { "maxDuration": 60 },
+    "api/webhooks/stripe.js": { "maxDuration": 60 }
   }
 }
