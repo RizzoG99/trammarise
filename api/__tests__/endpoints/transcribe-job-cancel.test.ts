@@ -6,7 +6,7 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import handler from '../../transcribe-job/[jobId]/cancel';
-import { JobManager } from '../../utils/job-manager';
+import { JobManager } from '../../_utils/job-manager';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 // Mock response object
@@ -19,8 +19,8 @@ function createMockResponse(): VercelResponse {
 }
 
 // Mock cleanupChunks
-vi.mock('../../utils/audio-chunker', async () => {
-  const actual = await vi.importActual('../../utils/audio-chunker');
+vi.mock('../../_utils/audio-chunker', async () => {
+  const actual = await vi.importActual('../../_utils/audio-chunker');
   return {
     ...actual,
     cleanupChunks: vi.fn().mockResolvedValue(undefined),
@@ -114,7 +114,7 @@ describe('POST /api/transcribe-job/[jobId]/cancel', () => {
       expect(res.status).toHaveBeenCalledWith(200);
 
       // Verify cleanup was called
-      const { cleanupChunks } = await import('../../utils/audio-chunker');
+      const { cleanupChunks } = await import('../../_utils/audio-chunker');
       expect(cleanupChunks).toHaveBeenCalledWith(
         expect.arrayContaining([
           expect.objectContaining({ filePath: '/tmp/chunk_0.mp3' }),
@@ -149,7 +149,7 @@ describe('POST /api/transcribe-job/[jobId]/cancel', () => {
       JobManager.initializeChunks(job.jobId, chunks);
 
       // Mock cleanup to fail
-      const { cleanupChunks } = await import('../../utils/audio-chunker');
+      const { cleanupChunks } = await import('../../_utils/audio-chunker');
       vi.mocked(cleanupChunks).mockRejectedValueOnce(new Error('Cleanup failed'));
 
       const req = {

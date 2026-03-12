@@ -103,12 +103,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     switch (event.type) {
       case 'customer.subscription.created':
       case 'customer.subscription.updated': {
-        const subscription = event.data.object as Stripe.Subscription;
+        const subscription = event.data.object as Stripe.Subscription & {
+          metadata?: Record<string, string>;
+        };
 
         // Extract tier from price ID
-        const priceId = subscription.items.data[0]?.price.id;
-        const tier = subscription.metadata.tier || determineTier(priceId);
-        const userId = subscription.metadata.userId;
+        const priceId = subscription.items?.data?.[0]?.price?.id;
+        const tier = (subscription.metadata?.tier || determineTier(priceId)) as 'free' | 'pro';
+        const userId = subscription.metadata?.userId;
 
         if (!userId) {
           console.error('No userId in subscription metadata');

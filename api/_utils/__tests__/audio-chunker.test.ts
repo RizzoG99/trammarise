@@ -5,9 +5,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import * as ffmpeg from 'fluent-ffmpeg';
-import { mockFFmpeg } from '../../vitest.setup';
-import type { ChunkMetadata } from '../../types/chunking';
+import type { ChunkMetadata } from '../../_types/chunking';
 import {
   chunkAudio,
   getAudioDuration,
@@ -23,17 +21,38 @@ import {
 } from '../__test-helpers__/mock-audio-generator';
 import * as crypto from 'crypto';
 
-// Helper to configure ffprobe mock for a specific duration
+// Mock the ffmpeg-setup module so no real CLI binaries are invoked
+const { mockSetupFFmpeg, mockFfprobeDuration, mockExtractFFmpegChunk } = vi.hoisted(() => ({
+  mockSetupFFmpeg: vi.fn(),
+  mockFfprobeDuration: vi.fn(),
+  mockExtractFFmpegChunk: vi.fn(),
+}));
+
+vi.mock('../ffmpeg-setup', () => ({
+  setupFFmpeg: mockSetupFFmpeg,
+  ffprobeDuration: mockFfprobeDuration,
+  extractFFmpegChunk: mockExtractFFmpegChunk,
+  getFFmpegPath: vi.fn().mockReturnValue('/usr/bin/ffmpeg'),
+  getFFprobePath: vi.fn().mockReturnValue('/usr/bin/ffprobe'),
+}));
+
+// Helper to configure ffprobeDuration mock for a specific duration
 function mockFFprobeDuration(duration: number) {
-  vi.mocked(ffmpeg.ffprobe).mockImplementation(((
-    _path: string,
-    callback: (err: unknown, data?: unknown) => void
-  ) => {
-    callback(null, { format: { duration } });
-  }) as unknown as typeof ffmpeg.ffprobe);
+  mockFfprobeDuration.mockResolvedValue(duration);
 }
 
 describe('Audio Chunker', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    // extractFFmpegChunk must write unique content per output path so computeChunkHash works
+    mockExtractFFmpegChunk.mockImplementation(
+      async (_input: string, startTime: number, duration: number, outputPath: string) => {
+        const uniqueContent = Buffer.from(`mock chunk: ${outputPath} t=${startTime} d=${duration}`);
+        globalThis.mockFileSystem.files.set(outputPath, uniqueContent);
+      }
+    );
+  });
+
   describe('chunkAudio()', () => {
     // Use real timers for all chunkAudio() tests
     beforeEach(() => {
@@ -49,7 +68,6 @@ describe('Audio Chunker', () => {
       const duration = 90 * 60; // 5400 seconds
       const expectedChunks = Math.ceil(duration / 180); // 30 chunks
 
-      // Mock ffprobe to return 90min duration
       mockFFprobeDuration(duration);
 
       const result = await chunkAudio(audioBuffer, 'test-90min.mp3', 'balanced');
@@ -160,39 +178,25 @@ describe('Audio Chunker', () => {
   });
 
   describe('getAudioDuration()', () => {
-    it('should extract duration from ffprobe metadata', async () => {
+    it('should extract duration from ffprobeDuration', async () => {
       const expectedDuration = 1234.56;
 
-      vi.mocked(ffmpeg.ffprobe).mockImplementation(((
-        _path: string,
-        callback: (err: unknown, data?: unknown) => void
-      ) => {
-        callback(null, { format: { duration: expectedDuration } });
-      }) as unknown as typeof ffmpeg.ffprobe);
+      mockFfprobeDuration.mockResolvedValue(expectedDuration);
 
       const duration = await getAudioDuration('/tmp/test.mp3');
 
       expect(duration).toBe(expectedDuration);
+      expect(mockFfprobeDuration).toHaveBeenCalledWith('/tmp/test.mp3');
     });
 
-    it('should reject if ffprobe fails', async () => {
-      vi.mocked(ffmpeg.ffprobe).mockImplementation(((
-        _path: string,
-        callback: (err: unknown, data?: unknown) => void
-      ) => {
-        callback(new Error('FFprobe failed'), null);
-      }) as unknown as typeof ffmpeg.ffprobe);
+    it('should reject if ffprobeDuration fails', async () => {
+      mockFfprobeDuration.mockRejectedValue(new Error('Failed to probe audio file'));
 
       await expect(getAudioDuration('/tmp/test.mp3')).rejects.toThrow('Failed to probe audio file');
     });
 
-    it('should reject if duration is not a number', async () => {
-      vi.mocked(ffmpeg.ffprobe).mockImplementation(((
-        _path: string,
-        callback: (err: unknown, data?: unknown) => void
-      ) => {
-        callback(null, { format: { duration: null } });
-      }) as unknown as typeof ffmpeg.ffprobe);
+    it('should reject if duration cannot be determined', async () => {
+      mockFfprobeDuration.mockRejectedValue(new Error('Could not determine audio duration'));
 
       await expect(getAudioDuration('/tmp/test.mp3')).rejects.toThrow(
         'Could not determine audio duration'
@@ -201,73 +205,21 @@ describe('Audio Chunker', () => {
   });
 
   describe('extractChunk()', () => {
-    let originalFFmpegMock: unknown;
-
-    beforeEach(() => {
-      // Save original mock implementation
-      originalFFmpegMock = vi.mocked(mockFFmpeg).getMockImplementation();
-    });
-
-    afterEach(() => {
-      // Restore original mock implementation
-      if (originalFFmpegMock) {
-        vi.mocked(mockFFmpeg).mockImplementation(originalFFmpegMock as never);
-      }
-    });
-
-    it('should construct correct FFmpeg command', async () => {
-      const mockFFmpegInstance = {
-        setStartTime: vi.fn().mockReturnThis(),
-        setDuration: vi.fn().mockReturnThis(),
-        audioCodec: vi.fn().mockReturnThis(),
-        audioBitrate: vi.fn().mockReturnThis(),
-        audioChannels: vi.fn().mockReturnThis(),
-        audioFrequency: vi.fn().mockReturnThis(),
-        output: vi.fn().mockReturnThis(),
-        on: vi.fn((event, callback) => {
-          if (event === 'end') {
-            setTimeout(callback, 0);
-          }
-          return mockFFmpegInstance;
-        }),
-        run: vi.fn(),
-      };
-
-      // Mock ffprobe for this test
-      vi.mocked(mockFFmpeg).mockReturnValue(mockFFmpegInstance);
+    it('should call extractFFmpegChunk with correct arguments', async () => {
+      mockExtractFFmpegChunk.mockResolvedValue(undefined);
 
       await extractChunk('/tmp/input.mp3', 120, 180, '/tmp/output.mp3');
 
-      expect(mockFFmpegInstance.setStartTime).toHaveBeenCalledWith(120);
-      expect(mockFFmpegInstance.setDuration).toHaveBeenCalledWith(180);
-      expect(mockFFmpegInstance.audioCodec).toHaveBeenCalledWith('libmp3lame');
-      expect(mockFFmpegInstance.audioBitrate).toHaveBeenCalledWith('64k');
-      expect(mockFFmpegInstance.audioChannels).toHaveBeenCalledWith(1);
-      expect(mockFFmpegInstance.audioFrequency).toHaveBeenCalledWith(16000);
-      expect(mockFFmpegInstance.output).toHaveBeenCalledWith('/tmp/output.mp3');
-      expect(mockFFmpegInstance.run).toHaveBeenCalled();
+      expect(mockExtractFFmpegChunk).toHaveBeenCalledWith(
+        '/tmp/input.mp3',
+        120,
+        180,
+        '/tmp/output.mp3'
+      );
     });
 
-    it('should reject if FFmpeg fails', async () => {
-      const mockFFmpegInstance = {
-        setStartTime: vi.fn().mockReturnThis(),
-        setDuration: vi.fn().mockReturnThis(),
-        audioCodec: vi.fn().mockReturnThis(),
-        audioBitrate: vi.fn().mockReturnThis(),
-        audioChannels: vi.fn().mockReturnThis(),
-        audioFrequency: vi.fn().mockReturnThis(),
-        output: vi.fn().mockReturnThis(),
-        on: vi.fn((event, callback) => {
-          if (event === 'error') {
-            setTimeout(() => callback(new Error('FFmpeg error')), 0);
-          }
-          return mockFFmpegInstance;
-        }),
-        run: vi.fn(),
-      };
-
-      // Mock ffprobe for this test
-      vi.mocked(mockFFmpeg).mockReturnValue(mockFFmpegInstance);
+    it('should reject if extractFFmpegChunk fails', async () => {
+      mockExtractFFmpegChunk.mockRejectedValue(new Error('FFmpeg extraction failed'));
 
       await expect(extractChunk('/tmp/input.mp3', 0, 180, '/tmp/output.mp3')).rejects.toThrow(
         'FFmpeg extraction failed'
@@ -388,21 +340,13 @@ describe('Audio Chunker', () => {
   });
 
   describe('Edge cases', () => {
-    let originalFfprobe: unknown;
-
     // Use real timers for chunkAudio() tests
     beforeEach(() => {
       vi.useRealTimers();
-      // Save original ffprobe implementation
-      originalFfprobe = mockFFmpeg.ffprobe;
     });
 
     afterEach(() => {
       vi.useFakeTimers();
-      // Restore original ffprobe implementation
-      if (originalFfprobe) {
-        mockFFmpeg.ffprobe = originalFfprobe as never;
-      }
     });
 
     it('should handle zero duration audio', async () => {

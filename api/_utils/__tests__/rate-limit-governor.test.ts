@@ -7,7 +7,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { RateLimitGovernor } from '../rate-limit-governor';
 import { ConcurrencyTracker, BackoffTracker } from '../__test-helpers__/test-fixtures';
-import { DEGRADED_MODE_CONFIG } from '../../types/rate-limiting';
+import { DEGRADED_MODE_CONFIG } from '../../_types/rate-limiting';
 
 describe('Rate Limit Governor', () => {
   afterEach(() => {

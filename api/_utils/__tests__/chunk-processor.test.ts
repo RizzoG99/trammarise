@@ -8,8 +8,8 @@ import { describe, it, expect, vi } from 'vitest';
 import { processChunk } from '../chunk-processor';
 import { RateLimitGovernor } from '../rate-limit-governor';
 import { createTestJob, createTestChunk } from '../__test-helpers__/test-fixtures';
-import { JOB_SAFEGUARDS } from '../../types/job';
-import { AUTO_SPLIT_CONFIG } from '../../types/chunking';
+import { JOB_SAFEGUARDS } from '../../_types/job';
+import { AUTO_SPLIT_CONFIG } from '../../_types/chunking';
 import { generateMockAudio } from '../__test-helpers__/mock-audio-generator';
 
 describe('Chunk Processor', () => {
