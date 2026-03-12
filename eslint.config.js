@@ -15,7 +15,10 @@ export default defineConfig([
     'coverage',
     '.agent/**',
     '.agents/**',
-    '.claude/**'
+    '.claude/**',
+    '.vercel/**',
+    '.worktrees/**',
+    'api/**/*.js',
   ]),
   {
     files: ['**/*.{ts,tsx}'],
