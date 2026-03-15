@@ -16,61 +16,55 @@ const defaultProps = {
 describe('HistoryFilterPanel', () => {
   it('does not render when isOpen is false', () => {
     render(<HistoryFilterPanel {...defaultProps} isOpen={false} />);
-    expect(screen.queryByRole('button', { name: /all|All/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /meeting/i })).not.toBeInTheDocument();
   });
 
   it('renders pill chips for all content types when open', () => {
     render(<HistoryFilterPanel {...defaultProps} />);
-    const buttons = screen.getAllByRole('button');
-    // Should have at least 7 content type buttons + 4 sort buttons + 1 close button = 12
-    expect(buttons.length).toBeGreaterThanOrEqual(11);
+    expect(screen.getByRole('button', { name: /^all$/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^meeting$/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^lecture$/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^interview$/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^podcast$/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^voice memo$/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^other$/i })).toBeInTheDocument();
   });
 
   it('calls onContentTypeChange with correct value when chip clicked', async () => {
     const user = userEvent.setup();
     const onContentTypeChange = vi.fn();
     render(<HistoryFilterPanel {...defaultProps} onContentTypeChange={onContentTypeChange} />);
-    const buttons = screen.getAllByRole('button');
-    // Find the meeting button (should be second one after "All")
-    const meetingButton = buttons[1];
-    await user.click(meetingButton);
-    expect(onContentTypeChange).toHaveBeenCalled();
+    await user.click(screen.getByRole('button', { name: /^meeting$/i }));
+    expect(onContentTypeChange).toHaveBeenCalledWith('meeting');
   });
 
   it('active content type chip has bg-primary styling', () => {
     render(<HistoryFilterPanel {...defaultProps} contentTypeFilter="meeting" />);
-    const buttons = screen.getAllByRole('button');
-    // Find button with bg-primary (should be the "All" button since it's active)
-    const activeButton = buttons.find((btn) => btn.className.includes('bg-primary'));
-    expect(activeButton?.className).toMatch(/bg-primary/);
+    const meetingButton = screen.getByRole('button', { name: /^meeting$/i });
+    expect(meetingButton.className).toMatch(/bg-primary/);
   });
 
   it('renders pill chips for sort options', () => {
     render(<HistoryFilterPanel {...defaultProps} />);
-    const buttons = screen.getAllByRole('button');
-    // Sort buttons should exist (after content type buttons)
-    expect(buttons.length).toBeGreaterThanOrEqual(12);
+    expect(screen.getByRole('button', { name: /newest first/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /oldest first/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /name \(a-z\)/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /name \(z-a\)/i })).toBeInTheDocument();
   });
 
   it('calls onSortChange with correct value when sort chip clicked', async () => {
     const user = userEvent.setup();
     const onSortChange = vi.fn();
     render(<HistoryFilterPanel {...defaultProps} onSortChange={onSortChange} />);
-    const buttons = screen.getAllByRole('button');
-    // Find a sort button (around index 8-11)
-    const sortButton = buttons[8];
-    await user.click(sortButton);
-    expect(onSortChange).toHaveBeenCalled();
+    await user.click(screen.getByRole('button', { name: /oldest first/i }));
+    expect(onSortChange).toHaveBeenCalledWith('oldest');
   });
 
   it('calls onClose when close button clicked', async () => {
     const user = userEvent.setup();
     const onClose = vi.fn();
     render(<HistoryFilterPanel {...defaultProps} onClose={onClose} />);
-    const buttons = screen.getAllByRole('button');
-    // Last button should be the close button
-    const closeButton = buttons[buttons.length - 1];
-    await user.click(closeButton);
+    await user.click(screen.getByRole('button', { name: /clear all/i }));
     expect(onClose).toHaveBeenCalled();
   });
 });

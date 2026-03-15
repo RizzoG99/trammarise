@@ -59,44 +59,45 @@ describe('HistoryList', () => {
     expect(container.firstChild).toBeNull();
   });
 
-  it('calls t() with history.groups.today key for today group header', () => {
+  it('renders today group header text', () => {
     const groups = { ...emptyGroups, today: [makeSession('1')] };
     render(
       <MemoryRouter>
         <HistoryList {...defaultProps} groupedSessions={groups} />
       </MemoryRouter>
     );
-    expect(mockT).toHaveBeenCalledWith('history.groups.today');
+    // mockT returns the key as text, so the heading renders the i18n key
+    expect(screen.getByText('history.groups.today')).toBeInTheDocument();
   });
 
-  it('calls t() with history.groups.yesterday key', () => {
+  it('renders yesterday group header text', () => {
     const groups = { ...emptyGroups, yesterday: [makeSession('2')] };
     render(
       <MemoryRouter>
         <HistoryList {...defaultProps} groupedSessions={groups} />
       </MemoryRouter>
     );
-    expect(mockT).toHaveBeenCalledWith('history.groups.yesterday');
+    expect(screen.getByText('history.groups.yesterday')).toBeInTheDocument();
   });
 
-  it('calls t() with history.groups.thisWeek key', () => {
+  it('renders thisWeek group header text', () => {
     const groups = { ...emptyGroups, thisWeek: [makeSession('3')] };
     render(
       <MemoryRouter>
         <HistoryList {...defaultProps} groupedSessions={groups} />
       </MemoryRouter>
     );
-    expect(mockT).toHaveBeenCalledWith('history.groups.thisWeek');
+    expect(screen.getByText('history.groups.thisWeek')).toBeInTheDocument();
   });
 
-  it('calls t() with history.groups.lastWeek key', () => {
+  it('renders lastWeek group header text', () => {
     const groups = { ...emptyGroups, lastWeek: [makeSession('4')] };
     render(
       <MemoryRouter>
         <HistoryList {...defaultProps} groupedSessions={groups} />
       </MemoryRouter>
     );
-    expect(mockT).toHaveBeenCalledWith('history.groups.lastWeek');
+    expect(screen.getByText('history.groups.lastWeek')).toBeInTheDocument();
   });
 
   it('renders HistoryCard for each session in today group', () => {
