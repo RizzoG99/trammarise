@@ -161,7 +161,7 @@ export function HistoryCard({
             <Button
               variant="ghost"
               onClick={handleDelete}
-              className="w-8 h-8 !p-0 text-text-tertiary hover:text-accent-error hover:bg-accent-error/10 rounded-full transition-colors"
+              className="w-8 h-8 !p-0 opacity-0 group-hover:opacity-100 text-text-tertiary hover:text-accent-error hover:bg-accent-error/10 rounded-full transition-colors"
               aria-label={t('history.card.delete', { name: session.audioName })}
             >
               <Trash2 className="w-4 h-4" />

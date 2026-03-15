@@ -1,18 +1,13 @@
-import { Play, Copy, Check, Download } from 'lucide-react';
+import { Copy, Check, Download } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface HistoryQuickActionsProps {
-  onPlay?: () => void;
   onCopySummary?: () => Promise<void>;
   onDownload?: () => void;
 }
 
-export function HistoryQuickActions({
-  onPlay,
-  onCopySummary,
-  onDownload,
-}: HistoryQuickActionsProps) {
+export function HistoryQuickActions({ onCopySummary, onDownload }: HistoryQuickActionsProps) {
   const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
   const [copying, setCopying] = useState(false);
@@ -28,28 +23,13 @@ export function HistoryQuickActions({
     }
   };
 
-  const handlePlay = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onPlay?.();
-  };
-
   const handleDownload = (e: React.MouseEvent) => {
     e.stopPropagation();
     onDownload?.();
   };
 
   return (
-    <div className="flex items-center gap-2 transition-opacity duration-200 bg-white/90 dark:bg-black/90 rounded-full px-2 py-1 shadow-sm backdrop-blur-sm border border-border/50">
-      {onPlay && (
-        <button
-          onClick={handlePlay}
-          className="p-1.5 rounded-full hover:bg-primary/10 text-text-secondary hover:text-primary transition-colors"
-          title={t('history.quickActions.play')}
-        >
-          <Play className="w-4 h-4" />
-        </button>
-      )}
-
+    <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-bg-surface/80 rounded-full px-2 py-1 backdrop-blur-sm border border-border/50">
       {onCopySummary && (
         <button
           onClick={handleCopy}
