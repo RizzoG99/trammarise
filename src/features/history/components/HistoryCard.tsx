@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Trash2, Calendar, FileText, Globe, CheckCircle2, Clock } from 'lucide-react';
+import { Trash2, CheckCircle2 } from 'lucide-react';
 import { GlassCard } from '@/lib/components/ui/GlassCard';
 import { Button } from '@/lib/components/ui/Button';
 import { Badge } from '@/lib/components/ui/Badge';
@@ -102,22 +102,17 @@ export function HistoryCard({
                 {session.audioName}
               </h3>
 
-              <div className="flex items-center gap-2 text-sm text-text-secondary">
-                <Calendar className="w-3.5 h-3.5" />
-                <span>{formatDate(session.createdAt)}</span>
-              </div>
+              <div className="text-sm text-text-secondary">{formatDate(session.createdAt)}</div>
             </div>
 
             <div className="flex items-center gap-2">
               {session.hasSummary ? (
                 <Badge variant="success" size="sm">
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">{t('history.card.processed')}</span>
+                  {t('history.card.processed')}
                 </Badge>
               ) : (
                 <Badge variant="warning" size="sm">
-                  <Clock className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">{t('history.card.unprocessed')}</span>
+                  {t('history.card.unprocessed')}
                 </Badge>
               )}
             </div>
@@ -128,11 +123,9 @@ export function HistoryCard({
             className={`flex flex-wrap gap-2 mb-4 transition-all duration-200 ${selectionMode || selected ? 'pl-8' : 'group-hover:pl-8'}`}
           >
             <Badge variant="default" size="sm">
-              <FileText className="w-3 h-3 mr-1.5 opacity-70" />
               {t(`common.contentTypes.${session.contentType}`, session.contentType)}
             </Badge>
             <Badge variant="default" size="sm">
-              <Globe className="w-3 h-3 mr-1.5 opacity-70" />
               {t(`common.languages.${session.language}`, session.language)}
             </Badge>
           </div>
@@ -151,7 +144,7 @@ export function HistoryCard({
             <Button
               variant="ghost"
               onClick={handleDelete}
-              className="w-8 h-8 !p-0 text-text-tertiary hover:text-accent-error hover:bg-accent-error/10 rounded-full transition-colors opacity-0 group-hover:opacity-100"
+              className="w-8 h-8 !p-0 text-text-tertiary hover:text-accent-error hover:bg-accent-error/10 rounded-full transition-colors"
               aria-label={t('history.card.delete', { name: session.audioName })}
             >
               <Trash2 className="w-4 h-4" />

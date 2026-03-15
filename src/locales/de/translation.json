@@ -686,8 +686,8 @@
     "card": {
       "select": "{{name}} auswählen",
       "delete": "{{name}} löschen",
-      "processed": "Verarbeitet",
-      "unprocessed": "Unverarbeitet"
+      "processed": "Fertig",
+      "unprocessed": "Ausstehend"
     },
     "empty": {
       "noMatchingTitle": "Keine passenden Aufnahmen",

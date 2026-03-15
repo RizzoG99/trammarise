@@ -685,8 +685,8 @@
     "card": {
       "select": "Select {{name}}",
       "delete": "Delete {{name}}",
-      "processed": "Processed",
-      "unprocessed": "Unprocessed"
+      "processed": "Done",
+      "unprocessed": "Pending"
     },
     "empty": {
       "noMatchingTitle": "No Matching Recordings",

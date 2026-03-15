@@ -39,7 +39,7 @@ export function HistoryQuickActions({
   };
 
   return (
-    <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white/90 dark:bg-black/90 rounded-full px-2 py-1 shadow-sm backdrop-blur-sm border border-border/50">
+    <div className="flex items-center gap-2 transition-opacity duration-200 bg-white/90 dark:bg-black/90 rounded-full px-2 py-1 shadow-sm backdrop-blur-sm border border-border/50">
       {onPlay && (
         <button
           onClick={handlePlay}

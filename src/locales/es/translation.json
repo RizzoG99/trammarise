@@ -686,8 +686,8 @@
     "card": {
       "select": "Seleccionar {{name}}",
       "delete": "Eliminar {{name}}",
-      "processed": "Procesado",
-      "unprocessed": "No procesado"
+      "processed": "Listo",
+      "unprocessed": "Pendiente"
     },
     "empty": {
       "noMatchingTitle": "No se encontraron grabaciones",

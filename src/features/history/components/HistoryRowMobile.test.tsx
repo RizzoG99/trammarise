@@ -43,13 +43,13 @@ describe('HistoryRowMobile', () => {
 
   it('renders Done badge when hasSummary is true', () => {
     renderWithRouter(<HistoryRowMobile {...defaultProps} />);
-    expect(screen.getByText(/processed/i)).toBeInTheDocument();
+    expect(screen.getByText(/done/i)).toBeInTheDocument();
   });
 
   it('renders Pending badge when hasSummary is false', () => {
     const pendingSession = { ...mockSession, hasSummary: false };
     renderWithRouter(<HistoryRowMobile {...defaultProps} session={pendingSession} />);
-    expect(screen.getByText(/unprocessed/i)).toBeInTheDocument();
+    expect(screen.getByText(/pending/i)).toBeInTheDocument();
   });
 
   it('dots button opens the dropdown menu', async () => {

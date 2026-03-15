@@ -686,8 +686,8 @@
     "card": {
       "select": "Seleziona {{name}}",
       "delete": "Elimina {{name}}",
-      "processed": "Elaborato",
-      "unprocessed": "Non elaborato"
+      "processed": "Fatto",
+      "unprocessed": "In attesa"
     },
     "empty": {
       "noMatchingTitle": "Nessuna registrazione trovata",

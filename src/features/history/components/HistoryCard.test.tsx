@@ -52,19 +52,17 @@ describe('HistoryCard', () => {
     expect(screen.getByText(/common.languages.en/i)).toBeInTheDocument();
   });
 
-  it('should show "Processed" badge when hasSummary=true', () => {
+  it('should show "Done" badge when hasSummary=true', () => {
     renderWithRouter(<HistoryCard session={mockSession} onDelete={() => {}} />);
 
-    // Renders value for static key
-    expect(screen.getByText(/Processed/i)).toBeInTheDocument();
+    expect(screen.getByText(/Done/i)).toBeInTheDocument();
   });
 
-  it('should show "Unprocessed" badge when hasSummary=false', () => {
+  it('should show "Pending" badge when hasSummary=false', () => {
     const unprocessedSession = { ...mockSession, hasSummary: false };
     renderWithRouter(<HistoryCard session={unprocessedSession} onDelete={() => {}} />);
 
-    // Renders value for static key
-    expect(screen.getByText(/Unprocessed/i)).toBeInTheDocument();
+    expect(screen.getByText(/Pending/i)).toBeInTheDocument();
   });
 
   it('should truncate long audio names with ellipsis', () => {
