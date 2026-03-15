@@ -63,13 +63,14 @@ export function HistoryDashboard({ sessions }: HistoryDashboardProps) {
           </Text>
         </div>
 
+        {/* h-16 = 64px container; ~14px for label + 4px gap → ~46px available for bars */}
         <div className="flex items-end justify-between gap-2 h-16 w-full mt-2">
           {(() => {
-            // Calculate max once for all bars
             const max = Math.max(...stats.activityLast7Days.map((d) => d.count), 1);
+            const maxBarPx = 46;
 
             return stats.activityLast7Days.map((day, index) => {
-              const heightPct = Math.max((day.count / max) * 100, 10); // Min 10% height
+              const barPx = day.count > 0 ? Math.max((day.count / max) * maxBarPx, 4) : 3;
 
               return (
                 <div key={index} className="flex flex-col items-center gap-1 flex-1 group relative">
@@ -83,7 +84,7 @@ export function HistoryDashboard({ sessions }: HistoryDashboardProps) {
                     className={`w-full rounded-t-sm transition-all duration-500 ease-out ${
                       day.count > 0 ? 'bg-primary/80 hover:bg-primary' : 'bg-border/30'
                     }`}
-                    style={{ height: `${day.count > 0 ? heightPct : 5}%` }}
+                    style={{ height: `${barPx}px` }}
                   />
 
                   {/* Label */}
