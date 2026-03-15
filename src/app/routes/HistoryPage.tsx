@@ -324,19 +324,30 @@ export function HistoryPage() {
 
           {/* Pro Banner */}
           {showLockedHistoryBanner && (
-            <GlassCard variant="primary" className="p-6 border-amber-500/20 bg-amber-500/5">
+            <GlassCard
+              variant="primary"
+              className="p-6 border-accent-warning/20"
+              style={{ backgroundColor: 'var(--color-accent-warning-alpha-10)' }}
+            >
               <div className="flex items-center gap-4">
-                <div className="p-3 bg-amber-500/20 rounded-full text-amber-400">
+                <div
+                  className="p-3 rounded-full text-accent-warning"
+                  style={{ backgroundColor: 'var(--color-accent-warning-alpha-20)' }}
+                >
                   <Lock className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-amber-100">
+                  <h3 className="text-lg font-bold text-text-primary">
                     {t('history.proBanner.title')}
                   </h3>
-                  <p className="text-amber-200/70">{t('history.proBanner.description')}</p>
+                  <p className="text-text-secondary">{t('history.proBanner.description')}</p>
                 </div>
                 <Button
-                  className="ml-auto bg-amber-500 text-black hover:bg-amber-400 border-0"
+                  className="ml-auto border-0"
+                  style={{
+                    backgroundColor: 'var(--color-accent-warning)',
+                    color: 'var(--color-bg-primary)',
+                  }}
                   onClick={() => setIsUpgradeModalOpen(true)}
                 >
                   {t('history.proBanner.cta')}

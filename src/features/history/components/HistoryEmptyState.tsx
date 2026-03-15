@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Clock } from 'lucide-react';
+import { FileAudio } from 'lucide-react';
 import { Button } from '@/lib/components/ui/Button';
 import { ROUTES } from '@/types/routing';
 
@@ -16,7 +16,7 @@ export function HistoryEmptyState({ hasFilters, onClearFilters }: HistoryEmptySt
   return (
     <div className="flex flex-col items-center justify-center py-16 px-4">
       <div className="w-16 h-16 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center mb-6">
-        <Clock className="w-8 h-8 text-primary" />
+        <FileAudio className="w-8 h-8 text-primary" />
       </div>
 
       {hasFilters ? (
