@@ -645,7 +645,7 @@
       "download": "Download"
     },
     "title": "Recording History",
-    "subtitle": "{{count}} total recordings",
+    "subtitle": "{{count}} sessions · ~{{time}} · Top: {{topType}}",
     "description": "Manage your recordings and generated summaries",
     "searchPlaceholder": "Search by name or content...",
     "sort": {
@@ -653,6 +653,22 @@
       "oldest": "Oldest First",
       "nameAsc": "Name (A-Z)",
       "nameDesc": "Name (Z-A)"
+    },
+    "groups": {
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "thisWeek": "This Week",
+      "lastWeek": "Last Week"
+    },
+    "menu": {
+      "copySummary": "Copy Summary",
+      "downloadAudio": "Download Audio",
+      "delete": "Delete"
+    },
+    "filter": {
+      "allTypes": "All",
+      "toggleAriaLabel": "Toggle filters",
+      "clearAll": "Clear all"
     },
     "stats": {
       "recordingCount": "{{count}} recording",

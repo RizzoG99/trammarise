@@ -634,7 +634,7 @@
   },
   "history": {
     "title": "Aufnahmeverlauf",
-    "subtitle": "{{count}} Aufnahmen insgesamt",
+    "subtitle": "{{count}} Sitzungen · ~{{time}} · Top: {{topType}}",
     "description": "Verwalten Sie Ihre Aufnahmen und generierten Zusammenfassungen",
     "searchPlaceholder": "Nach Name oder Inhalt suchen...",
     "sort": {
@@ -642,6 +642,22 @@
       "oldest": "Älteste zuerst",
       "nameAsc": "Name (A-Z)",
       "nameDesc": "Name (Z-A)"
+    },
+    "groups": {
+      "today": "Heute",
+      "yesterday": "Gestern",
+      "thisWeek": "Diese Woche",
+      "lastWeek": "Letzte Woche"
+    },
+    "menu": {
+      "copySummary": "Zusammenfassung kopieren",
+      "downloadAudio": "Audio herunterladen",
+      "delete": "Löschen"
+    },
+    "filter": {
+      "allTypes": "Alle",
+      "toggleAriaLabel": "Filter anzeigen",
+      "clearAll": "Filter löschen"
     },
     "dashboard": {
       "totalProcessed": "Gesamt Verarbeitet",

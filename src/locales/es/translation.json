@@ -634,7 +634,7 @@
   },
   "history": {
     "title": "Historial de Grabaciones",
-    "subtitle": "{{count}} grabaciones totales",
+    "subtitle": "{{count}} sesiones · ~{{time}} · Top: {{topType}}",
     "description": "Gestiona tus grabaciones y resúmenes generados",
     "searchPlaceholder": "Buscar por nombre o contenido...",
     "sort": {
@@ -642,6 +642,22 @@
       "oldest": "Más Antiguos",
       "nameAsc": "Nombre (A-Z)",
       "nameDesc": "Nombre (Z-A)"
+    },
+    "groups": {
+      "today": "Hoy",
+      "yesterday": "Ayer",
+      "thisWeek": "Esta semana",
+      "lastWeek": "La semana pasada"
+    },
+    "menu": {
+      "copySummary": "Copiar resumen",
+      "downloadAudio": "Descargar audio",
+      "delete": "Eliminar"
+    },
+    "filter": {
+      "allTypes": "Todos",
+      "toggleAriaLabel": "Mostrar filtros",
+      "clearAll": "Limpiar filtros"
     },
     "dashboard": {
       "totalProcessed": "Total Procesado",

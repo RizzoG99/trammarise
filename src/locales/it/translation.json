@@ -646,7 +646,7 @@
       "download": "Scarica"
     },
     "title": "Cronologia Registrazioni",
-    "subtitle": "{{count}} registrazioni totali",
+    "subtitle": "{{count}} sessioni · ~{{time}} · Top: {{topType}}",
     "description": "Gestisci le tue registrazioni e i riassunti generati",
     "searchPlaceholder": "Cerca per nome o contenuto...",
     "sort": {
@@ -654,6 +654,22 @@
       "oldest": "Più Vecchi",
       "nameAsc": "Nome (A-Z)",
       "nameDesc": "Nome (Z-A)"
+    },
+    "groups": {
+      "today": "Oggi",
+      "yesterday": "Ieri",
+      "thisWeek": "Questa settimana",
+      "lastWeek": "La settimana scorsa"
+    },
+    "menu": {
+      "copySummary": "Copia riepilogo",
+      "downloadAudio": "Scarica audio",
+      "delete": "Elimina"
+    },
+    "filter": {
+      "allTypes": "Tutti",
+      "toggleAriaLabel": "Mostra filtri",
+      "clearAll": "Cancella filtri"
     },
     "stats": {
       "recordingCount": "{{count}} registrazione",
