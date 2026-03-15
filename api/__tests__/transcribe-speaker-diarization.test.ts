@@ -3,7 +3,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { Readable } from 'stream';
 
 // Mock authentication and dependencies
-vi.mock('../middleware/auth', () => ({
+vi.mock('../_middleware/auth', () => ({
   requireAuth: vi.fn().mockResolvedValue({ userId: 'test-user-123', clerkId: 'clerk_123' }),
   AuthError: class AuthError extends Error {
     constructor(
@@ -16,7 +16,7 @@ vi.mock('../middleware/auth', () => ({
   },
 }));
 
-vi.mock('../lib/supabase-admin', () => ({
+vi.mock('../_lib/supabase-admin', () => ({
   supabaseAdmin: {
     from: vi.fn().mockReturnValue({
       select: vi.fn().mockReturnThis(),
@@ -30,7 +30,7 @@ vi.mock('../lib/supabase-admin', () => ({
   },
 }));
 
-vi.mock('../middleware/rate-limit', () => ({
+vi.mock('../_middleware/rate-limit', () => ({
   rateLimit: vi.fn().mockResolvedValue(undefined),
   RateLimitError: class RateLimitError extends Error {
     constructor(
@@ -46,12 +46,12 @@ vi.mock('../middleware/rate-limit', () => ({
   },
 }));
 
-vi.mock('../middleware/usage-tracking', () => ({
+vi.mock('../_middleware/usage-tracking', () => ({
   checkQuota: vi.fn().mockResolvedValue({ allowed: true }),
   trackUsage: vi.fn().mockResolvedValue(undefined),
 }));
 
-vi.mock('../utils/file-validator', () => ({
+vi.mock('../_utils/file-validator', () => ({
   validateAudioFile: vi.fn().mockResolvedValue({
     valid: true,
     duration: 120,
@@ -66,7 +66,7 @@ const mockCreate = vi.fn().mockReturnValue({
   supportsSpeakerDiarization: () => true,
 });
 
-vi.mock('../providers/factory', () => ({
+vi.mock('../_providers/factory', () => ({
   TranscriptionProviderFactory: {
     create: mockCreate,
   },
@@ -78,7 +78,7 @@ const mockUpdateJobStatus = vi.fn();
 const mockSetJobTranscript = vi.fn();
 const mockSetJobUtterances = vi.fn();
 
-vi.mock('../utils/job-manager', () => ({
+vi.mock('../_utils/job-manager', () => ({
   JobManager: {
     createJob: mockCreateJob,
     updateJobStatus: mockUpdateJobStatus,

@@ -62,12 +62,16 @@ export async function trackUsage(
     const minutesUsed = Math.ceil(durationSeconds / 60);
 
     // Insert usage event (always track for analytics)
+    const now = new Date();
+    const billingPeriod = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     const { error: insertError } = await supabaseAdmin.from('usage_events').insert({
       user_id: userId,
-      operation_type: operationType,
-      duration_seconds: durationSeconds,
-      minutes_used: minutesUsed,
-      created_at: new Date().toISOString(),
+      event_type: operationType,
+      audio_duration_seconds: durationSeconds,
+      minutes_consumed: minutesUsed,
+      provider: 'system',
+      billing_period: billingPeriod,
+      created_at: now.toISOString(),
     });
 
     if (insertError) {

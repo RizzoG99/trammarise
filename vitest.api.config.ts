@@ -13,5 +13,7 @@ export default defineConfig({
     alias: {
       '@/api': path.resolve(__dirname, './api'),
     },
+    // Prefer .ts over .js so esbuild bundles in api/ don't shadow TypeScript sources
+    extensions: ['.mts', '.ts', '.tsx', '.mjs', '.js', '.jsx', '.json'],
   },
 });

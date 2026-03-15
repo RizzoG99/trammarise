@@ -7,26 +7,26 @@ import { createMocks } from 'node-mocks-http';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 // Mock modules before imports
-vi.mock('../../lib/supabase-admin', () => ({
+vi.mock('../../_lib/supabase-admin', () => ({
   supabaseAdmin: {
     from: vi.fn(),
     rpc: vi.fn(),
   },
 }));
-vi.mock('../../middleware/rate-limit');
-vi.mock('../../middleware/usage-tracking');
-vi.mock('../../utils/file-validator');
+vi.mock('../../_middleware/rate-limit');
+vi.mock('../../_middleware/usage-tracking');
+vi.mock('../../_utils/file-validator');
 
 // Don't mock auth - we need the real AuthError class
-import { requireAuth, AuthError } from '../../middleware/auth';
-import { supabaseAdmin } from '../../lib/supabase-admin';
-import { rateLimit } from '../../middleware/rate-limit';
-import { checkQuota } from '../../middleware/usage-tracking';
-import { validateAudioFile } from '../../utils/file-validator';
+import { requireAuth, AuthError } from '../../_middleware/auth';
+import { supabaseAdmin } from '../../_lib/supabase-admin';
+import { rateLimit } from '../../_middleware/rate-limit';
+import { checkQuota } from '../../_middleware/usage-tracking';
+import { validateAudioFile } from '../../_utils/file-validator';
 
 // Mock requireAuth function separately
-vi.mock('../../middleware/auth', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('../../middleware/auth')>();
+vi.mock('../../_middleware/auth', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../_middleware/auth')>();
   return {
     ...actual,
     requireAuth: vi.fn(),

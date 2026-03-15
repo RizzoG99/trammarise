@@ -1,0 +1,4 @@
+# Exclude test infrastructure — not needed at runtime
+api/__tests__/
+api/**/*.test.ts
+api/vitest.setup.ts

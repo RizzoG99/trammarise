@@ -103,17 +103,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     switch (event.type) {
       case 'customer.subscription.created':
       case 'customer.subscription.updated': {
-        const subscription = event.data.object as Stripe.Subscription;
+        const subscription = event.data.object as Stripe.Subscription & {
+          metadata?: Record<string, string>;
+        };
 
         // Extract tier from price ID
-        const priceId = subscription.items.data[0]?.price.id;
-        const tier = subscription.metadata.tier || determineTier(priceId);
-        const userId = subscription.metadata.userId;
+        const priceId = subscription.items?.data?.[0]?.price?.id;
+        const tier = (subscription.metadata?.tier || determineTier(priceId)) as 'free' | 'pro';
+        const userId = subscription.metadata?.userId;
 
         if (!userId) {
           console.error('No userId in subscription metadata');
           break;
         }
+
+        // Stripe SDK v20 moved period dates — cast to access them safely
+        const sub = subscription as unknown as {
+          current_period_start: number;
+          current_period_end: number;
+        } & typeof subscription;
 
         // Upsert subscription in database
         const { error } = await supabaseAdmin.from('subscriptions').upsert({
@@ -121,9 +129,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           stripe_subscription_id: subscription.id,
           stripe_customer_id: subscription.customer as string,
           tier,
-          status: subscription.status,
-          current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
-          current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+          status: subscription.status as 'active' | 'canceled' | 'past_due' | 'trialing',
+          current_period_start: new Date(sub.current_period_start * 1000).toISOString(),
+          current_period_end: new Date(sub.current_period_end * 1000).toISOString(),
           cancel_at_period_end: subscription.cancel_at_period_end,
           updated_at: new Date().toISOString(),
         });

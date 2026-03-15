@@ -7,8 +7,8 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { JobManager } from '../job-manager';
 import { setupMockChunks } from '../__test-helpers__/test-fixtures';
-import type { JobConfiguration } from '../../types/job';
-import { JOB_SAFEGUARDS } from '../../types/job';
+import type { JobConfiguration } from '../../_types/job';
+import { JOB_SAFEGUARDS } from '../../_types/job';
 
 describe('Job Manager', () => {
   beforeEach(() => {

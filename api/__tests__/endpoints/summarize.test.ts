@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import handler from '../../summarize';
-import { AIProviderFactory } from '../../providers/ai-factory';
-import { extractPdfText } from '../../utils/pdf-extractor';
+import { AIProviderFactory } from '../../_providers/ai-factory';
+import { extractPdfText } from '../../_utils/pdf-extractor';
 
 interface BusboyMock {
   on: (event: string, callback: (...args: unknown[]) => void) => void;
@@ -36,7 +36,7 @@ vi.mock('busboy', () => {
 });
 
 // Mock authentication and dependencies
-vi.mock('../../middleware/auth', () => ({
+vi.mock('../../_middleware/auth', () => ({
   requireAuth: vi.fn().mockResolvedValue({ userId: 'test-user-123', clerkId: 'clerk_123' }),
   AuthError: class AuthError extends Error {
     constructor(
@@ -63,7 +63,7 @@ vi.mock('../../lib/supabase-admin', () => ({
   },
 }));
 
-vi.mock('../../middleware/rate-limit', () => ({
+vi.mock('../../_middleware/rate-limit', () => ({
   rateLimit: vi.fn().mockResolvedValue(undefined),
   RateLimitError: class RateLimitError extends Error {
     constructor(
@@ -79,17 +79,17 @@ vi.mock('../../middleware/rate-limit', () => ({
   },
 }));
 
-vi.mock('../../middleware/usage-tracking', () => ({
+vi.mock('../../_middleware/usage-tracking', () => ({
   checkQuota: vi.fn().mockResolvedValue({ allowed: true }),
   trackUsage: vi.fn().mockResolvedValue(undefined),
 }));
 
-vi.mock('../../utils/file-validator', () => ({
+vi.mock('../../_utils/file-validator', () => ({
   validatePdfFile: vi.fn().mockReturnValue({ valid: true }),
 }));
 
-vi.mock('../../providers/ai-factory');
-vi.mock('../../utils/pdf-extractor');
+vi.mock('../../_providers/ai-factory');
+vi.mock('../../_utils/pdf-extractor');
 
 describe('Summarize API Endpoint', () => {
   let req: { method: string; headers: Record<string, string>; pipe: ReturnType<typeof vi.fn> };
