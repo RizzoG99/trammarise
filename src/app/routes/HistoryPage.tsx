@@ -134,6 +134,11 @@ export function HistoryPage() {
     setBulkDeleteCount(null);
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handleDownload = (_sessionId: string, _audioName: string) => {};
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handleCopySummary = (_sessionId: string) => {};
+
   if (isLoading) {
     return (
       <PageLayout>
@@ -283,6 +288,8 @@ export function HistoryPage() {
             <HistoryList
               groupedSessions={groupedSessions}
               onDelete={handleDeleteClick}
+              onDownload={handleDownload}
+              onCopySummary={handleCopySummary}
               selectedIds={selectedIds}
               onToggleSelection={toggleSelection}
               selectionMode={hasSelection}
