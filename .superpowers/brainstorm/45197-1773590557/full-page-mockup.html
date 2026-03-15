@@ -1,0 +1,278 @@
+<h2>Full History page — complete design</h2>
+<p class="subtitle">Mobile (left) and Desktop (right) showing all chosen patterns together. Click to approve or let me know what to change.</p>
+
+<div class="split">
+
+  <!-- MOBILE -->
+  <div class="mockup">
+    <div class="mockup-header">📱 Mobile (375px)</div>
+    <div class="mockup-body" style="background:#0f1623;padding:16px;font-family:system-ui,sans-serif;">
+
+      <!-- Page header -->
+      <div style="margin-bottom:14px;">
+        <div style="font-size:20px;font-weight:700;color:#e2e8f0;letter-spacing:-0.02em;">Recordings</div>
+        <div style="font-size:11px;color:#64748b;margin-top:3px;display:flex;gap:6px;align-items:center;">
+          <span>24 sessions</span>
+          <span style="opacity:0.4;">·</span>
+          <span>~14h audio</span>
+          <span style="opacity:0.4;">·</span>
+          <span>Top: Meeting</span>
+        </div>
+      </div>
+
+      <!-- Search + filter icon -->
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
+        <div style="display:flex;align-items:center;gap:8px;flex:1;background:#1a2235;border-radius:10px;padding:9px 12px;border:1px solid #2a3548;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <span style="font-size:12px;color:#475569;">Search recordings...</span>
+        </div>
+        <button style="width:38px;height:38px;border-radius:10px;background:#3b82f620;border:1px solid #3b82f640;color:#3b82f6;display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+        </button>
+      </div>
+
+      <!-- Active filter chips (when filter is set) -->
+      <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:4px;font-size:10px;padding:4px 8px;background:#3b82f620;color:#3b82f6;border-radius:20px;border:1px solid #3b82f640;">
+          Meeting
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </div>
+      </div>
+
+      <!-- Group: Today -->
+      <div style="font-size:9px;color:#475569;text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:8px;">Today</div>
+      <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:16px;">
+
+        <!-- Row 1 -->
+        <div style="display:flex;align-items:center;gap:10px;padding:11px 13px;background:#1a2235;border-radius:10px;border:1px solid #2a3548;">
+          <div style="width:34px;height:34px;border-radius:8px;background:#3b82f615;flex-shrink:0;display:flex;align-items:center;justify-content:center;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="1.5"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+          </div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:12px;font-weight:600;color:#e2e8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Team standup 2026-03-10</div>
+            <div style="font-size:10px;color:#64748b;margin-top:2px;">Meeting · Mar 10</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+            <div style="font-size:10px;padding:2px 7px;background:#22c55e18;color:#22c55e;border-radius:20px;border:1px solid #22c55e30;">Done</div>
+            <button style="width:28px;height:28px;border-radius:7px;background:#1e293b;border:1px solid #2a3548;color:#64748b;font-size:15px;display:flex;align-items:center;justify-content:center;cursor:pointer;letter-spacing:1px;font-weight:700;">···</button>
+          </div>
+        </div>
+
+        <!-- Row 2 -->
+        <div style="display:flex;align-items:center;gap:10px;padding:11px 13px;background:#1a2235;border-radius:10px;border:1px solid #2a3548;">
+          <div style="width:34px;height:34px;border-radius:8px;background:#3b82f615;flex-shrink:0;display:flex;align-items:center;justify-content:center;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="1.5"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+          </div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:12px;font-weight:600;color:#e2e8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Product interview — Sarah K.</div>
+            <div style="font-size:10px;color:#64748b;margin-top:2px;">Interview · Mar 9</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+            <div style="font-size:10px;padding:2px 7px;background:#22c55e18;color:#22c55e;border-radius:20px;border:1px solid #22c55e30;">Done</div>
+            <button style="width:28px;height:28px;border-radius:7px;background:#1e293b;border:1px solid #2a3548;color:#64748b;font-size:15px;display:flex;align-items:center;justify-content:center;cursor:pointer;letter-spacing:1px;font-weight:700;">···</button>
+          </div>
+        </div>
+
+        <!-- Row 3 -->
+        <div style="display:flex;align-items:center;gap:10px;padding:11px 13px;background:#1a2235;border-radius:10px;border:1px solid #2a3548;">
+          <div style="width:34px;height:34px;border-radius:8px;background:#3b82f615;flex-shrink:0;display:flex;align-items:center;justify-content:center;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="1.5"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+          </div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:12px;font-weight:600;color:#e2e8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">CS401 — Week 8 lecture</div>
+            <div style="font-size:10px;color:#64748b;margin-top:2px;">Lecture · Mar 8</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+            <div style="font-size:10px;padding:2px 7px;background:#f59e0b18;color:#f59e0b;border-radius:20px;border:1px solid #f59e0b30;">Pending</div>
+            <button style="width:28px;height:28px;border-radius:7px;background:#1e293b;border:1px solid #2a3548;color:#64748b;font-size:15px;display:flex;align-items:center;justify-content:center;cursor:pointer;letter-spacing:1px;font-weight:700;">···</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Group: Yesterday -->
+      <div style="font-size:9px;color:#475569;text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:8px;">Yesterday</div>
+      <div style="display:flex;flex-direction:column;gap:5px;">
+        <div style="display:flex;align-items:center;gap:10px;padding:11px 13px;background:#1a2235;border-radius:10px;border:1px solid #2a3548;opacity:0.7;">
+          <div style="width:34px;height:34px;border-radius:8px;background:#3b82f615;flex-shrink:0;display:flex;align-items:center;justify-content:center;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="1.5"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+          </div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:12px;font-weight:600;color:#e2e8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Podcast ep.12 — guest intro</div>
+            <div style="font-size:10px;color:#64748b;margin-top:2px;">Podcast · Mar 7</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+            <div style="font-size:10px;padding:2px 7px;background:#22c55e18;color:#22c55e;border-radius:20px;border:1px solid #22c55e30;">Done</div>
+            <button style="width:28px;height:28px;border-radius:7px;background:#1e293b;border:1px solid #2a3548;color:#64748b;font-size:15px;display:flex;align-items:center;justify-content:center;cursor:pointer;letter-spacing:1px;font-weight:700;">···</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ⋯ menu open state (shown below as example) -->
+      <div style="margin-top:14px;background:#1e293b;border:1px solid #334155;border-radius:12px;padding:6px;box-shadow:0 8px 24px rgba(0,0,0,0.5);max-width:180px;">
+        <div style="font-size:10px;color:#64748b;padding:4px 10px 6px;border-bottom:1px solid #2a3548;margin-bottom:4px;">Team standup 2026-03-10</div>
+        <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:6px;cursor:pointer;color:#94a3b8;font-size:11px;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy summary
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:6px;cursor:pointer;color:#94a3b8;font-size:11px;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download audio
+        </div>
+        <div style="height:1px;background:#2a3548;margin:4px 0;"></div>
+        <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:6px;cursor:pointer;color:#ef4444;font-size:11px;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+          Delete
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- DESKTOP -->
+  <div class="mockup">
+    <div class="mockup-header">🖥 Desktop (1280px)</div>
+    <div class="mockup-body" style="background:#0f1623;padding:20px;font-family:system-ui,sans-serif;">
+
+      <!-- Header -->
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:20px;">
+        <div>
+          <div style="font-size:22px;font-weight:700;color:#e2e8f0;letter-spacing:-0.02em;">Recordings</div>
+          <div style="font-size:12px;color:#64748b;margin-top:3px;">24 sessions</div>
+        </div>
+      </div>
+
+      <!-- Stats dashboard (desktop only) -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 2fr;gap:10px;margin-bottom:20px;">
+        <div style="padding:14px;background:#1a2235;border-radius:12px;border:1px solid #2a3548;display:flex;align-items:center;gap:12px;">
+          <div style="width:36px;height:36px;border-radius:10px;background:#3b82f615;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div><div style="font-size:11px;color:#64748b;font-weight:500;">Total audio</div><div style="font-size:18px;font-weight:700;color:#e2e8f0;margin-top:2px;">~14h</div></div>
+        </div>
+        <div style="padding:14px;background:#1a2235;border-radius:12px;border:1px solid #2a3548;display:flex;align-items:center;gap:12px;">
+          <div style="width:36px;height:36px;border-radius:10px;background:#3b82f615;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          <div><div style="font-size:11px;color:#64748b;font-weight:500;">Top type</div><div style="font-size:18px;font-weight:700;color:#e2e8f0;margin-top:2px;">Meeting</div></div>
+        </div>
+        <div style="padding:14px;background:#1a2235;border-radius:12px;border:1px solid #2a3548;">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
+            <div style="width:20px;height:20px;border-radius:5px;background:#22c55e18;display:flex;align-items:center;justify-content:center;">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
+            </div>
+            <div style="font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:0.08em;font-weight:600;">7-day activity</div>
+          </div>
+          <div style="display:flex;align-items:flex-end;gap:4px;height:36px;">
+            <div style="flex:1;background:#3b82f630;border-radius:3px 3px 0 0;height:20%"></div>
+            <div style="flex:1;background:#3b82f660;border-radius:3px 3px 0 0;height:50%"></div>
+            <div style="flex:1;background:#3b82f6;border-radius:3px 3px 0 0;height:100%"></div>
+            <div style="flex:1;background:#3b82f660;border-radius:3px 3px 0 0;height:60%"></div>
+            <div style="flex:1;background:#3b82f630;border-radius:3px 3px 0 0;height:30%"></div>
+            <div style="flex:1;background:#3b82f660;border-radius:3px 3px 0 0;height:70%"></div>
+            <div style="flex:1;background:#3b82f6;border-radius:3px 3px 0 0;height:80%"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:4px;">
+            <span style="font-size:9px;color:#475569;">Mon</span><span style="font-size:9px;color:#475569;">Tue</span><span style="font-size:9px;color:#475569;">Wed</span><span style="font-size:9px;color:#475569;">Thu</span><span style="font-size:9px;color:#475569;">Fri</span><span style="font-size:9px;color:#475569;">Sat</span><span style="font-size:9px;color:#475569;">Sun</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search + sort -->
+      <div style="display:flex;gap:10px;align-items:center;padding:12px 14px;background:#1a2235;border-radius:12px;border:1px solid #2a3548;margin-bottom:20px;position:sticky;top:8px;z-index:10;">
+        <div style="display:flex;align-items:center;gap:8px;flex:1;background:#0f1623;border-radius:8px;padding:8px 12px;border:1px solid #2a3548;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <span style="font-size:12px;color:#475569;">Search recordings...</span>
+        </div>
+        <select style="font-size:12px;padding:8px 12px;background:#0f1623;border:1px solid #2a3548;border-radius:8px;color:#94a3b8;cursor:pointer;appearance:none;padding-right:28px;">
+          <option>Newest first</option>
+        </select>
+        <select style="font-size:12px;padding:8px 12px;background:#0f1623;border:1px solid #2a3548;border-radius:8px;color:#94a3b8;cursor:pointer;appearance:none;padding-right:28px;">
+          <option>All types</option>
+        </select>
+      </div>
+
+      <!-- Group: Today — card grid (3 cols) -->
+      <div style="font-size:10px;color:#475569;text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:10px;">Today</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px;">
+        <!-- Card 1 -->
+        <div style="padding:14px;background:#1a2235;border-radius:12px;border:1px solid #2a3548;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:12px;font-weight:600;color:#e2e8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px;">Team standup 2026-03-10</div>
+              <div style="font-size:10px;color:#64748b;">Mar 10, 2026</div>
+            </div>
+            <div style="font-size:9px;padding:2px 7px;background:#22c55e18;color:#22c55e;border-radius:20px;border:1px solid #22c55e30;margin-left:6px;flex-shrink:0;">Done</div>
+          </div>
+          <div style="display:flex;gap:5px;margin-bottom:10px;">
+            <div style="font-size:9px;padding:2px 7px;background:#3b82f610;color:#3b82f6;border-radius:20px;border:1px solid #3b82f630;">Meeting</div>
+            <div style="font-size:9px;padding:2px 7px;background:#3b82f610;color:#3b82f6;border-radius:20px;border:1px solid #3b82f630;">EN</div>
+          </div>
+          <div style="border-top:1px solid #2a3548;padding-top:8px;display:flex;justify-content:space-between;align-items:center;">
+            <div style="display:flex;gap:4px;">
+              <button style="width:26px;height:26px;border-radius:6px;background:#1e293b;border:none;color:#64748b;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;">▶</button>
+              <button style="width:26px;height:26px;border-radius:6px;background:#1e293b;border:none;color:#64748b;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;">⎘</button>
+              <button style="width:26px;height:26px;border-radius:6px;background:#1e293b;border:none;color:#64748b;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;">↓</button>
+            </div>
+            <button style="width:26px;height:26px;border-radius:6px;background:#ef444410;border:none;color:#ef4444;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+          </div>
+        </div>
+        <!-- Card 2 -->
+        <div style="padding:14px;background:#1a2235;border-radius:12px;border:1px solid #2a3548;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:12px;font-weight:600;color:#e2e8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px;">Product interview — Sarah</div>
+              <div style="font-size:10px;color:#64748b;">Mar 9, 2026</div>
+            </div>
+            <div style="font-size:9px;padding:2px 7px;background:#22c55e18;color:#22c55e;border-radius:20px;border:1px solid #22c55e30;margin-left:6px;flex-shrink:0;">Done</div>
+          </div>
+          <div style="display:flex;gap:5px;margin-bottom:10px;">
+            <div style="font-size:9px;padding:2px 7px;background:#3b82f610;color:#3b82f6;border-radius:20px;border:1px solid #3b82f630;">Interview</div>
+            <div style="font-size:9px;padding:2px 7px;background:#3b82f610;color:#3b82f6;border-radius:20px;border:1px solid #3b82f630;">EN</div>
+          </div>
+          <div style="border-top:1px solid #2a3548;padding-top:8px;display:flex;justify-content:space-between;align-items:center;">
+            <div style="display:flex;gap:4px;">
+              <button style="width:26px;height:26px;border-radius:6px;background:#1e293b;border:none;color:#64748b;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;">▶</button>
+              <button style="width:26px;height:26px;border-radius:6px;background:#1e293b;border:none;color:#64748b;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;">⎘</button>
+              <button style="width:26px;height:26px;border-radius:6px;background:#1e293b;border:none;color:#64748b;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;">↓</button>
+            </div>
+            <button style="width:26px;height:26px;border-radius:6px;background:#ef444410;border:none;color:#ef4444;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+          </div>
+        </div>
+        <!-- Card 3 -->
+        <div style="padding:14px;background:#1a2235;border-radius:12px;border:1px solid #2a3548;border:1px solid #2a3548;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:12px;font-weight:600;color:#e2e8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px;">CS401 — Week 8 lecture</div>
+              <div style="font-size:10px;color:#64748b;">Mar 8, 2026</div>
+            </div>
+            <div style="font-size:9px;padding:2px 7px;background:#f59e0b18;color:#f59e0b;border-radius:20px;border:1px solid #f59e0b30;margin-left:6px;flex-shrink:0;">Pending</div>
+          </div>
+          <div style="display:flex;gap:5px;margin-bottom:10px;">
+            <div style="font-size:9px;padding:2px 7px;background:#3b82f610;color:#3b82f6;border-radius:20px;border:1px solid #3b82f630;">Lecture</div>
+            <div style="font-size:9px;padding:2px 7px;background:#3b82f610;color:#3b82f6;border-radius:20px;border:1px solid #3b82f630;">IT</div>
+          </div>
+          <div style="border-top:1px solid #2a3548;padding-top:8px;display:flex;justify-content:space-between;align-items:center;">
+            <div style="display:flex;gap:4px;">
+              <button style="width:26px;height:26px;border-radius:6px;background:#1e293b;border:none;color:#64748b;font-size:11px;cursor:pointer;">▶</button>
+              <button style="width:26px;height:26px;border-radius:6px;background:#1e293b;border:none;color:#64748b;font-size:11px;cursor:pointer;">⎘</button>
+              <button style="width:26px;height:26px;border-radius:6px;background:#1e293b;border:none;color:#64748b;font-size:11px;cursor:pointer;">↓</button>
+            </div>
+            <button style="width:26px;height:26px;border-radius:6px;background:#ef444410;border:none;color:#ef4444;font-size:11px;cursor:pointer;">✕</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<div style="margin-top:24px;padding:16px;background:var(--bg-card);border-radius:12px;border:1px solid var(--border);">
+  <h3 style="margin:0 0 8px;">Design summary</h3>
+  <ul style="margin:0;padding-left:18px;color:var(--text-secondary);font-size:13px;line-height:1.8;">
+    <li><strong>Mobile:</strong> Compact list rows · stats in subtitle · full-width search + filter icon · active filter chips · ⋯ menu for actions</li>
+    <li><strong>Desktop:</strong> Rich card grid (3-col) · stats dashboard · sticky search bar with inline dropdowns · hover actions unchanged</li>
+    <li><strong>Shared:</strong> Date group headers · design token colors · no gradient header text · i18n'd strings · selection bar (bulk delete)</li>
+  </ul>
+</div>
