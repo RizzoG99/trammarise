@@ -95,7 +95,7 @@ export function HistoryRowMobile({
       )}
 
       {/* Icon */}
-      <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+      <div className="w-[34px] h-[34px] rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
         <Mic className="w-4 h-4" style={{ color: 'var(--color-primary)' }} />
       </div>
 
