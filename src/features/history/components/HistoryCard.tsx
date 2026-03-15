@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Trash2, Copy, Check } from 'lucide-react';
 import { GlassCard } from '@/lib/components/ui/GlassCard';
 import { Badge } from '@/lib/components/ui/Badge';
+import { Checkbox } from '@/lib/components/ui/Checkbox';
 import { useTranslation } from 'react-i18next';
 
 import type { HistorySession } from '../types/history';
@@ -80,16 +81,11 @@ export function HistoryCard({
           className={`absolute top-4 left-4 z-20 transition-opacity duration-200 ${selectionMode || selected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="relative flex items-center justify-center w-5 h-5">
-            <input
-              type="checkbox"
-              checked={selected}
-              onChange={handleCheckboxChange}
-              className="peer appearance-none w-5 h-5 rounded border border-border checked:bg-primary checked:border-primary transition-colors cursor-pointer"
-              aria-label={t('history.card.select', { name: session.audioName })}
-            />
-            <Check className="absolute w-3 h-3 text-white opacity-0 peer-checked:opacity-100 pointer-events-none" />
-          </div>
+          <Checkbox
+            checked={!!selected}
+            onChange={handleCheckboxChange}
+            aria-label={t('history.card.select', { name: session.audioName })}
+          />
         </div>
 
         {/* Card content */}

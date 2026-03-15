@@ -222,7 +222,7 @@ export function HistoryPage() {
 
               {/* Desktop: full search + sort dropdowns */}
               <div className="hidden sm:flex items-center gap-4 w-full">
-                <div className="relative w-full md:w-96">
+                <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-tertiary pointer-events-none" />
                   <input
                     value={searchQuery}
@@ -276,40 +276,38 @@ export function HistoryPage() {
 
           {/* Selection Bar */}
           {hasSelection && (
-            <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-40 w-[90%] max-w-2xl animate-in slide-in-from-bottom-4 fade-in duration-300">
+            <div
+              className="fixed bottom-28 sm:bottom-6 left-1/2 -translate-x-1/2 z-40 w-[92%] max-w-2xl animate-in slide-in-from-bottom-4 fade-in duration-300"
+              style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+            >
               <GlassCard
                 variant="primary"
-                className="p-4 flex items-center justify-between shadow-2xl shadow-primary/40 border-primary/20 backdrop-blur-xl"
+                className="px-4 py-3 flex flex-col sm:flex-row sm:items-center gap-3"
               >
-                <div className="flex items-center gap-4">
-                  <span className="text-primary font-medium px-3 py-1 bg-primary/20 rounded-full text-sm">
+                <div className="flex items-center gap-3 flex-1">
+                  <span className="text-primary font-medium px-3 py-1.5 bg-primary/20 rounded-full text-sm shrink-0">
                     {t('history.batch.selected', { count: selectedIds.size })}
                   </span>
-                  <Button
-                    variant="ghost"
-                    className="text-primary hover:text-primary hover:bg-primary/20 px-3 py-1 text-sm h-auto"
+                  <button
+                    className="text-sm text-text-secondary hover:text-primary transition-colors cursor-pointer min-h-[44px] px-1"
                     onClick={() => selectAll(filteredSessions.map((s) => s.sessionId))}
                   >
                     {t('history.batch.selectAll')}
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    className="text-primary hover:text-primary hover:bg-primary/20 px-3 py-1 text-sm h-auto"
+                  </button>
+                  <button
+                    className="text-sm text-text-secondary hover:text-primary transition-colors cursor-pointer min-h-[44px] px-1"
                     onClick={clearSelection}
                   >
                     {t('history.batch.deselectAll')}
-                  </Button>
+                  </button>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="danger"
-                    onClick={handleBulkDelete}
-                    className="bg-accent-error/20 text-accent-error hover:bg-accent-error/30 border border-accent-error/30"
-                  >
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    {t('history.menu.delete')}
-                  </Button>
-                </div>
+                <button
+                  onClick={handleBulkDelete}
+                  className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-accent-error text-white text-sm font-medium hover:bg-accent-error/90 transition-colors cursor-pointer w-full sm:w-auto min-h-[44px]"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  {t('history.menu.delete')}
+                </button>
               </GlassCard>
             </div>
           )}

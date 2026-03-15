@@ -1,0 +1,28 @@
+import { Check } from 'lucide-react';
+
+export interface CheckboxProps {
+  checked: boolean;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  'aria-label': string;
+  className?: string;
+}
+
+export function Checkbox({
+  checked,
+  onChange,
+  'aria-label': ariaLabel,
+  className = '',
+}: CheckboxProps) {
+  return (
+    <div className={`relative flex items-center justify-center w-5 h-5 ${className}`}>
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={onChange}
+        className="peer appearance-none w-5 h-5 rounded border border-border checked:bg-primary checked:border-primary transition-colors cursor-pointer"
+        aria-label={ariaLabel}
+      />
+      <Check className="absolute w-3 h-3 text-white opacity-0 peer-checked:opacity-100 pointer-events-none" />
+    </div>
+  );
+}
