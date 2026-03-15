@@ -25,6 +25,7 @@ import { formatDuration } from '@/features/history/utils/formatters';
 import { useBlobDownload } from '@/features/history/hooks/useBlobDownload';
 import { groupSessionsByDate } from '@/features/history/utils/sessionGrouping';
 import { loadSessionMetadata } from '@/utils/session-manager';
+import type { ContentType } from '@/types/content-types';
 import type { HistorySession, SortOption } from '@/features/history/types/history';
 import { useTranslation } from 'react-i18next';
 
@@ -269,6 +270,20 @@ export function HistoryPage() {
                   />
                 </div>
                 <div className="flex items-center gap-3 w-full md:w-auto">
+                  <Select
+                    value={contentTypeFilter}
+                    onChange={(value) => setContentTypeFilter(value as ContentType | 'all')}
+                    className="w-44"
+                    options={[
+                      { value: 'all', label: t('history.filter.allTypes') },
+                      { value: 'meeting', label: t('home.meetingType.options.meeting') },
+                      { value: 'lecture', label: t('home.meetingType.options.lecture') },
+                      { value: 'interview', label: t('home.meetingType.options.interview') },
+                      { value: 'podcast', label: t('home.meetingType.options.podcast') },
+                      { value: 'voice-memo', label: t('home.meetingType.options.voice-memo') },
+                      { value: 'other', label: t('home.meetingType.options.other') },
+                    ]}
+                  />
                   <Select
                     value={sortBy}
                     onChange={(value) => setSortBy(value as SortOption)}
