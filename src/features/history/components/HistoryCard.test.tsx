@@ -151,4 +151,28 @@ describe('HistoryCard', () => {
     // Should still render the card
     expect(screen.getByText('team-meeting.webm')).toBeInTheDocument();
   });
+
+  it('should show duration badge when durationSeconds is present', () => {
+    renderWithRouter(<HistoryCard session={mockSession} onDelete={() => {}} />);
+    // mockSession has durationSeconds: 300 → formatDuration(300) = "5m 0s"
+    // Find text matching a time format
+    const durationEl = screen.getByText(/\d+[mhs]/i);
+    expect(durationEl).toBeInTheDocument();
+  });
+
+  it('should not show duration when durationSeconds is undefined', () => {
+    const sessionWithoutDuration = { ...mockSession, durationSeconds: undefined };
+    renderWithRouter(<HistoryCard session={sessionWithoutDuration} onDelete={() => {}} />);
+    // Should not show any duration text
+    expect(screen.queryByText(/\d+[mhs]\s+\d+[s]/)).not.toBeInTheDocument();
+  });
+
+  it('should apply border-l-4 class for content-type differentiation', () => {
+    const { container } = renderWithRouter(
+      <HistoryCard session={mockSession} onDelete={() => {}} />
+    );
+    // The GlassCard wrapper should have border-l-4
+    const cardWithBorder = container.querySelector('.border-l-4');
+    expect(cardWithBorder).not.toBeNull();
+  });
 });

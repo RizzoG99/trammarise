@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { useBlobDownload } from '../hooks/useBlobDownload';
 
 import type { HistorySession } from '../types/history';
-import { formatDate } from '../utils/formatters';
+import { formatDate, formatDuration } from '../utils/formatters';
 import { ROUTES } from '@/types/routing';
 import { loadSessionMetadata } from '@/utils/session-manager';
 
@@ -19,6 +19,15 @@ interface HistoryCardProps {
   onSelect?: (sessionId: string) => void;
   selectionMode?: boolean;
 }
+
+const CONTENT_TYPE_BORDER_COLOR: Record<string, string> = {
+  meeting: 'var(--color-primary)',
+  lecture: 'color-mix(in srgb, var(--color-primary) 70%, transparent)',
+  interview: 'color-mix(in srgb, var(--color-primary) 50%, transparent)',
+  podcast: 'var(--color-accent-success)',
+  'voice-memo': 'var(--color-accent-warning)',
+  other: 'var(--color-border)',
+};
 
 export function HistoryCard({
   session,
@@ -72,8 +81,11 @@ export function HistoryCard({
       <GlassCard
         variant="dark"
         className={`h-full p-5 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-[0_0_20px_rgba(59,130,246,0.15)]
-          ${selected ? 'ring-2 ring-primary border-primary/50' : 'border-white/5'} 
-          hover:border-primary/30`}
+          border-l-4
+          ${selected ? 'ring-2 ring-primary border-primary/50' : 'hover:border-primary/30'}`}
+        style={{
+          borderLeftColor: CONTENT_TYPE_BORDER_COLOR[session.contentType] ?? 'var(--color-border)',
+        }}
       >
         <div className="flex flex-col h-full">
           {/* Header */}
@@ -128,6 +140,11 @@ export function HistoryCard({
             <Badge variant="default" size="sm">
               {t(`common.languages.${session.language}`, session.language)}
             </Badge>
+            {session.durationSeconds != null && (
+              <Badge variant="default" size="sm">
+                {formatDuration(session.durationSeconds)}
+              </Badge>
+            )}
           </div>
 
           <div
