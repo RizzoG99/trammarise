@@ -124,16 +124,6 @@ export function HistoryCard({
                   </button>
                 )}
 
-                {session.hasSummary ? (
-                  <Badge variant="success" size="sm">
-                    {t('history.card.processed')}
-                  </Badge>
-                ) : (
-                  <Badge variant="warning" size="sm">
-                    {t('history.card.unprocessed')}
-                  </Badge>
-                )}
-
                 <button
                   onClick={handleDelete}
                   className="w-6 h-6 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 text-text-tertiary hover:text-accent-error hover:bg-accent-error/10 transition-all duration-200 cursor-pointer"

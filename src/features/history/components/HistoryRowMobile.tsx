@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Mic, MoreHorizontal, Copy, Trash2, CheckCircle2 } from 'lucide-react';
-import { Badge } from '@/lib/components/ui/Badge';
+import { Mic, MoreHorizontal, Copy, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '@/types/routing';
 import { formatDate } from '../utils/formatters';
@@ -100,42 +99,28 @@ export function HistoryRowMobile({
         </p>
       </Link>
 
-      {/* Status badge */}
+      {/* Actions: direct delete for pending, ⋯ menu for processed */}
       {session.hasSummary ? (
-        <Badge variant="success" size="sm" className="shrink-0">
-          <CheckCircle2 className="w-3.5 h-3.5" />
-          <span>{t('history.card.processed', 'Processed')}</span>
-        </Badge>
-      ) : (
-        <Badge variant="warning" size="sm" className="shrink-0">
-          <span>{t('history.card.unprocessed', 'Unprocessed')}</span>
-        </Badge>
-      )}
-
-      {/* ⋯ button + dropdown */}
-      <div className="relative shrink-0" ref={menuRef}>
-        <button
-          ref={dotsRef}
-          onClick={() => setMenuOpen((v) => !v)}
-          className="w-7 h-7 min-h-11 flex items-center justify-center rounded-lg text-text-tertiary hover:text-text-primary hover:bg-bg-surface transition-colors cursor-pointer"
-          aria-label="More options"
-          aria-expanded={menuOpen}
-          aria-haspopup="menu"
-        >
-          <MoreHorizontal className="w-4 h-4" />
-        </button>
-
-        {menuOpen && (
-          <div
-            role="menu"
-            className="absolute right-0 top-full mt-1 w-48 bg-bg-surface border border-border rounded-xl shadow-lg z-50 py-1 overflow-hidden"
+        <div className="relative shrink-0" ref={menuRef}>
+          <button
+            ref={dotsRef}
+            onClick={() => setMenuOpen((v) => !v)}
+            className="w-7 h-7 min-h-11 flex items-center justify-center rounded-lg text-text-tertiary hover:text-text-primary hover:bg-bg-surface transition-colors cursor-pointer"
+            aria-label="More options"
+            aria-expanded={menuOpen}
+            aria-haspopup="menu"
           >
-            {/* Header label */}
-            <p className="px-3 py-2 text-xs text-text-tertiary truncate border-b border-border">
-              {session.audioName}
-            </p>
+            <MoreHorizontal className="w-4 h-4" />
+          </button>
 
-            {session.hasSummary && (
+          {menuOpen && (
+            <div
+              role="menu"
+              className="absolute right-0 top-full mt-1 w-48 bg-bg-surface border border-border rounded-xl shadow-lg z-50 py-1 overflow-hidden"
+            >
+              <p className="px-3 py-2 text-xs text-text-tertiary truncate border-b border-border">
+                {session.audioName}
+              </p>
               <button
                 role="menuitem"
                 onClick={handleCopySummary}
@@ -144,21 +129,27 @@ export function HistoryRowMobile({
                 <Copy className="w-4 h-4 shrink-0 text-text-tertiary" />
                 {t('history.menu.copySummary', 'Copy Summary')}
               </button>
-            )}
-
-            <div className="h-px bg-border mx-2 my-1" />
-
-            <button
-              role="menuitem"
-              onClick={handleDelete}
-              className="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm text-accent-error hover:bg-accent-error/10 transition-colors cursor-pointer"
-            >
-              <Trash2 className="w-4 h-4 shrink-0" />
-              {t('history.menu.delete', 'Delete')}
-            </button>
-          </div>
-        )}
-      </div>
+              <div className="h-px bg-border mx-2 my-1" />
+              <button
+                role="menuitem"
+                onClick={handleDelete}
+                className="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm text-accent-error hover:bg-accent-error/10 transition-colors cursor-pointer"
+              >
+                <Trash2 className="w-4 h-4 shrink-0" />
+                {t('history.menu.delete', 'Delete')}
+              </button>
+            </div>
+          )}
+        </div>
+      ) : (
+        <button
+          onClick={handleDelete}
+          className="w-7 h-7 min-h-11 shrink-0 flex items-center justify-center rounded-lg text-text-tertiary hover:text-accent-error hover:bg-accent-error/10 transition-colors cursor-pointer"
+          aria-label={t('history.card.delete', { name: session.audioName })}
+        >
+          <Trash2 className="w-4 h-4" />
+        </button>
+      )}
     </div>
   );
 }

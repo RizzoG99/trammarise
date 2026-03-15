@@ -40,15 +40,10 @@ describe('HistoryRowMobile', () => {
     expect(screen.getByText(/meeting/i)).toBeInTheDocument();
   });
 
-  it('renders Done badge when hasSummary is true', () => {
+  it('does not render a status badge', () => {
     renderWithRouter(<HistoryRowMobile {...defaultProps} />);
-    expect(screen.getByText(/done/i)).toBeInTheDocument();
-  });
-
-  it('renders Pending badge when hasSummary is false', () => {
-    const pendingSession = { ...mockSession, hasSummary: false };
-    renderWithRouter(<HistoryRowMobile {...defaultProps} session={pendingSession} />);
-    expect(screen.getByText(/pending/i)).toBeInTheDocument();
+    expect(screen.queryByText(/done/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/pending/i)).not.toBeInTheDocument();
   });
 
   it('dots button opens the dropdown menu', async () => {
@@ -76,11 +71,11 @@ describe('HistoryRowMobile', () => {
     expect(screen.queryByText(/copy summary/i)).not.toBeInTheDocument();
   });
 
-  it('does not show Copy Summary when session.hasSummary is false', async () => {
-    const user = userEvent.setup();
+  it('shows direct delete button (no menu) when session.hasSummary is false', () => {
     const noSummary = { ...mockSession, hasSummary: false };
     renderWithRouter(<HistoryRowMobile {...defaultProps} session={noSummary} />);
-    await user.click(screen.getByRole('button', { name: /more options/i }));
+    expect(screen.queryByRole('button', { name: /more options/i })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /delete/i })).toBeInTheDocument();
     expect(screen.queryByText(/copy summary/i)).not.toBeInTheDocument();
   });
 
