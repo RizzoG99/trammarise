@@ -720,6 +720,14 @@
       "importButton": "Importar ahora",
       "importing": "Importando...",
       "dismissButton": "Tal vez más tarde"
+    },
+    "proBanner": {
+      "title": "Desbloquea el historial completo",
+      "description": "Actualiza a Pro para acceder a todas tus grabaciones pasadas para siempre.",
+      "cta": "Actualizar ahora"
+    },
+    "error": {
+      "title": "No se pudo cargar el historial"
     }
   },
   "welcome": {

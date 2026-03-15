@@ -719,6 +719,14 @@
       "importButton": "Import Now",
       "importing": "Importing...",
       "dismissButton": "Maybe Later"
+    },
+    "proBanner": {
+      "title": "Unlock Full History",
+      "description": "Upgrade to Pro to access all your past recordings forever.",
+      "cta": "Upgrade Now"
+    },
+    "error": {
+      "title": "Failed to load history"
     }
   },
   "welcome": {

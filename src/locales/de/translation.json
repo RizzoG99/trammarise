@@ -720,6 +720,14 @@
       "importButton": "Jetzt importieren",
       "importing": "Importiere...",
       "dismissButton": "Vielleicht später"
+    },
+    "proBanner": {
+      "title": "Vollständigen Verlauf freischalten",
+      "description": "Upgrade auf Pro, um dauerhaft auf alle vergangenen Aufnahmen zuzugreifen.",
+      "cta": "Jetzt upgraden"
+    },
+    "error": {
+      "title": "Verlauf konnte nicht geladen werden"
     }
   },
   "welcome": {
