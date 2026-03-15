@@ -276,12 +276,12 @@ export function HistoryPage() {
                     className="w-44"
                     options={[
                       { value: 'all', label: t('history.filter.allTypes') },
-                      { value: 'meeting', label: t('home.meetingType.options.meeting') },
-                      { value: 'lecture', label: t('home.meetingType.options.lecture') },
-                      { value: 'interview', label: t('home.meetingType.options.interview') },
-                      { value: 'podcast', label: t('home.meetingType.options.podcast') },
-                      { value: 'voice-memo', label: t('home.meetingType.options.voice-memo') },
-                      { value: 'other', label: t('home.meetingType.options.other') },
+                      { value: 'meeting', label: t('history.filter.type.meeting') },
+                      { value: 'lecture', label: t('history.filter.type.lecture') },
+                      { value: 'interview', label: t('history.filter.type.interview') },
+                      { value: 'podcast', label: t('history.filter.type.podcast') },
+                      { value: 'voice-memo', label: t('history.filter.type.voice-memo') },
+                      { value: 'other', label: t('history.filter.type.other') },
                     ]}
                   />
                   <Select

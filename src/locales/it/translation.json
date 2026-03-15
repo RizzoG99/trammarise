@@ -669,7 +669,15 @@
     "filter": {
       "allTypes": "Tutti",
       "toggleAriaLabel": "Mostra filtri",
-      "clearAll": "Cancella filtri"
+      "clearAll": "Cancella filtri",
+      "type": {
+        "meeting": "Riunione",
+        "lecture": "Lezione",
+        "interview": "Intervista",
+        "podcast": "Podcast",
+        "voice-memo": "Memo Vocale",
+        "other": "Altro"
+      }
     },
     "stats": {
       "recordingCount": "{{count}} registrazione",

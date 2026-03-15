@@ -14,12 +14,12 @@ interface HistoryFilterPanelProps {
 
 const CONTENT_TYPE_CHIPS: { value: ContentType | 'all'; labelKey: string }[] = [
   { value: 'all', labelKey: 'history.filter.allTypes' },
-  { value: 'meeting', labelKey: 'home.meetingType.options.meeting' },
-  { value: 'lecture', labelKey: 'home.meetingType.options.lecture' },
-  { value: 'interview', labelKey: 'home.meetingType.options.interview' },
-  { value: 'podcast', labelKey: 'home.meetingType.options.podcast' },
-  { value: 'voice-memo', labelKey: 'home.meetingType.options.voice-memo' },
-  { value: 'other', labelKey: 'home.meetingType.options.other' },
+  { value: 'meeting', labelKey: 'history.filter.type.meeting' },
+  { value: 'lecture', labelKey: 'history.filter.type.lecture' },
+  { value: 'interview', labelKey: 'history.filter.type.interview' },
+  { value: 'podcast', labelKey: 'history.filter.type.podcast' },
+  { value: 'voice-memo', labelKey: 'history.filter.type.voice-memo' },
+  { value: 'other', labelKey: 'history.filter.type.other' },
 ];
 
 const SORT_CHIPS: { value: SortOption; labelKey: string }[] = [

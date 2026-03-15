@@ -657,7 +657,15 @@
     "filter": {
       "allTypes": "Todos",
       "toggleAriaLabel": "Mostrar filtros",
-      "clearAll": "Limpiar filtros"
+      "clearAll": "Limpiar filtros",
+      "type": {
+        "meeting": "Reunión",
+        "lecture": "Clase",
+        "interview": "Entrevista",
+        "podcast": "Podcast",
+        "voice-memo": "Memo de Voz",
+        "other": "Otro"
+      }
     },
     "dashboard": {
       "totalProcessed": "Total Procesado",

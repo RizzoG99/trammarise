@@ -668,7 +668,15 @@
     "filter": {
       "allTypes": "All",
       "toggleAriaLabel": "Toggle filters",
-      "clearAll": "Clear all"
+      "clearAll": "Clear all",
+      "type": {
+        "meeting": "Meeting",
+        "lecture": "Lecture",
+        "interview": "Interview",
+        "podcast": "Podcast",
+        "voice-memo": "Voice Memo",
+        "other": "Other"
+      }
     },
     "stats": {
       "recordingCount": "{{count}} recording",

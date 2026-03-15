@@ -657,7 +657,15 @@
     "filter": {
       "allTypes": "Alle",
       "toggleAriaLabel": "Filter anzeigen",
-      "clearAll": "Filter löschen"
+      "clearAll": "Filter löschen",
+      "type": {
+        "meeting": "Meeting",
+        "lecture": "Vorlesung",
+        "interview": "Interview",
+        "podcast": "Podcast",
+        "voice-memo": "Sprachmemo",
+        "other": "Sonstiges"
+      }
     },
     "dashboard": {
       "totalProcessed": "Gesamt Verarbeitet",
