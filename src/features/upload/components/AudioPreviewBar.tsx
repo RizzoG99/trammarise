@@ -11,9 +11,9 @@ export function AudioPreviewBar({ file }: AudioPreviewBarProps) {
   return (
     <div className="lg:hidden animate-fade-up mb-4">
       <GlassCard variant="dark" className="p-3 rounded-xl border border-border">
-        <div className="flex items-center gap-3">
-          {/* Filename */}
-          <div className="flex items-center gap-2 flex-shrink-0 max-w-[40%] min-w-0">
+        <div className="flex flex-col gap-2">
+          {/* Filename row */}
+          <div className="flex items-center gap-2 min-w-0">
             <Music size={16} style={{ color: 'var(--color-primary)' }} aria-hidden="true" />
             <span
               className="text-sm font-medium truncate"
@@ -24,8 +24,8 @@ export function AudioPreviewBar({ file }: AudioPreviewBarProps) {
             </span>
           </div>
 
-          {/* Player */}
-          <AudioPlayer file={file} className="flex-1 min-w-0" />
+          {/* Player row — full width so the seek slider never overflows */}
+          <AudioPlayer file={file} className="w-full min-w-0" />
         </div>
       </GlassCard>
     </div>
