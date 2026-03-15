@@ -14,8 +14,6 @@ import { Trash2, Search, Lock, SlidersHorizontal } from 'lucide-react';
 import { useSubscription } from '@/context/SubscriptionContext';
 import { UpgradeModal } from '@/components/marketing/UpgradeModal';
 
-import { Input } from '@/lib/components/ui/Input';
-
 import { Select } from '@/lib/components/ui/Select';
 import { GlassCard } from '@/lib/components/ui/GlassCard';
 
@@ -209,7 +207,7 @@ export function HistoryPage() {
                   <h1 className="text-4xl font-bold text-text-primary mb-2">
                     {t('history.title')}
                   </h1>
-                  <p className="text-text-secondary">
+                  <p className="text-text-secondary sm:hidden">
                     {sessions.length > 0
                       ? t('history.subtitle', {
                           count: sessions.length,
@@ -237,12 +235,12 @@ export function HistoryPage() {
               {/* Mobile: search + filter toggle */}
               <div className="flex items-center gap-2 w-full sm:hidden">
                 <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-tertiary" />
-                  <Input
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-tertiary pointer-events-none" />
+                  <input
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder={t('history.searchPlaceholder')}
-                    className="pl-10 bg-bg-secondary/50 border-border text-text-primary placeholder:text-text-tertiary focus:ring-primary/50"
+                    className="pl-10 pr-4 py-2.5 w-full rounded-lg bg-bg-secondary/50 border border-border text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary/50"
                   />
                 </div>
                 <button
@@ -262,12 +260,12 @@ export function HistoryPage() {
               {/* Desktop: full search + sort dropdowns */}
               <div className="hidden sm:flex items-center gap-4 w-full">
                 <div className="relative w-full md:w-96">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-tertiary" />
-                  <Input
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-tertiary pointer-events-none" />
+                  <input
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder={t('history.searchPlaceholder')}
-                    className="pl-10 bg-bg-secondary/50 border-border text-text-primary placeholder:text-text-tertiary focus:ring-primary/50"
+                    className="pl-10 pr-4 py-2.5 w-full rounded-lg bg-bg-secondary/50 border border-border text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary/50"
                   />
                 </div>
                 <div className="flex items-center gap-3 w-full md:w-auto">

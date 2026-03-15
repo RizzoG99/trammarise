@@ -51,7 +51,7 @@ export function HistoryList({
       <DateGroupHeader title={title} />
 
       {/* Mobile: compact list rows */}
-      <div className="sm:hidden bg-bg-surface border border-border rounded-xl overflow-hidden">
+      <div className="sm:hidden bg-bg-surface border border-border rounded-xl">
         {sessions.map((session) => (
           <HistoryRowMobile
             key={session.sessionId}
