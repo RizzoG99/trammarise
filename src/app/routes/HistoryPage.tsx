@@ -21,8 +21,6 @@ import { GlassCard } from '@/lib/components/ui/GlassCard';
 import { useHistorySessions } from '@/features/history/hooks/useHistorySessions';
 import { useHistoryFilters } from '@/features/history/hooks/useHistoryFilters';
 import { useHistorySelection } from '@/features/history/hooks/useHistorySelection';
-import { calculateHistoryStats } from '@/features/history/utils/historyStats';
-import { formatDuration } from '@/features/history/utils/formatters';
 import { useBlobDownload } from '@/features/history/hooks/useBlobDownload';
 import { groupSessionsByDate } from '@/features/history/utils/sessionGrouping';
 import { loadSessionMetadata } from '@/utils/session-manager';
@@ -194,31 +192,8 @@ export function HistoryPage() {
       <div className="bg-bg-primary text-text-primary p-4 md:p-8">
         <div className="max-w-7xl mx-auto space-y-8">
           {/* Header Section */}
-          {(() => {
-            const stats = calculateHistoryStats(sessions);
-            const time = formatDuration(stats.totalDurationSeconds);
-            return (
-              <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-                <div>
-                  <h1 className="text-4xl font-bold text-text-primary mb-2">
-                    {t('history.title')}
-                  </h1>
-                  <p className="text-text-secondary sm:hidden">
-                    {sessions.length > 0
-                      ? t('history.subtitle', {
-                          count: sessions.length,
-                          time,
-                          topType: stats.topContentType ?? '—',
-                        })
-                      : t('history.subtitle', { count: 0, time: '0s', topType: '—' })}
-                  </p>
-                </div>
-              </div>
-            );
-          })()}
-
-          {/* Stats Dashboard — desktop only */}
-          <div className="hidden sm:block">
+          <div>
+            <h1 className="text-4xl font-bold text-text-primary mb-2">{t('history.title')}</h1>
             <HistoryDashboard sessions={sessions} />
           </div>
 

@@ -638,7 +638,8 @@
       "topCategory": "Categoria Top",
       "activity": "Attività (Ultimi 7 Giorni)",
       "sessions": "{{count}} sessione",
-      "sessions_plural": "{{count}} sessioni"
+      "sessions_plural": "{{count}} sessioni",
+      "statStrip": "{{count}} sessioni · {{time}} totali · Tipo top: {{topType}}"
     },
     "quickActions": {
       "play": "Anteprima",

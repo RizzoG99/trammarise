@@ -672,7 +672,8 @@
       "topCategory": "Categoría Principal",
       "activity": "Actividad (Últimos 7 Días)",
       "sessions": "{{count}} sesión",
-      "sessions_plural": "{{count}} sesiones"
+      "sessions_plural": "{{count}} sesiones",
+      "statStrip": "{{count}} sesiones · {{time}} en total · Más frecuente: {{topType}}"
     },
     "quickActions": {
       "play": "Vista previa",

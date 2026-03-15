@@ -637,7 +637,8 @@
       "topCategory": "Top Category",
       "activity": "Activity (Last 7 Days)",
       "sessions": "{{count}} session",
-      "sessions_plural": "{{count}} sessions"
+      "sessions_plural": "{{count}} sessions",
+      "statStrip": "{{count}} sessions · {{time}} total · Top: {{topType}}"
     },
     "quickActions": {
       "play": "Play Preview",

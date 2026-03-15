@@ -672,7 +672,8 @@
       "topCategory": "Top Kategorie",
       "activity": "Aktivität (Letzte 7 Tage)",
       "sessions": "{{count}} Sitzung",
-      "sessions_plural": "{{count}} Sitzungen"
+      "sessions_plural": "{{count}} Sitzungen",
+      "statStrip": "{{count}} Sitzungen · {{time}} gesamt · Häufigste: {{topType}}"
     },
     "quickActions": {
       "play": "Vorschau abspielen",
