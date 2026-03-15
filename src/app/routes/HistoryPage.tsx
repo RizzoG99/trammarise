@@ -9,6 +9,7 @@ import { HistoryFilterPanel } from '@/features/history/components/HistoryFilterP
 import { PageLoader } from '@/lib/components/ui/PageLoader/PageLoader';
 import { Snackbar } from '@/lib/components/ui/Snackbar';
 import { Button } from '@/lib/components/ui/Button';
+import { Alert } from '@/lib/components/ui/Alert/Alert';
 import { Trash2, Search, Lock, SlidersHorizontal } from 'lucide-react';
 
 import { useSubscription } from '@/context/SubscriptionContext';
@@ -173,19 +174,13 @@ export function HistoryPage() {
   if (error) {
     return (
       <PageLayout>
-        <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-          <div className="p-4 bg-accent-error/10 rounded-full text-accent-error">
-            <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </div>
-          <h2 className="text-xl font-semibold text-text-primary">Failed to load history</h2>
-          <p className="text-text-secondary">{error}</p>
+        <div className="flex items-center justify-center min-h-[60vh] p-8">
+          <Alert variant="error">
+            <div className="space-y-2">
+              <h2 className="text-lg font-semibold">{t('history.error.title')}</h2>
+              <p className="text-sm">{error}</p>
+            </div>
+          </Alert>
         </div>
       </PageLayout>
     );
@@ -321,21 +316,21 @@ export function HistoryPage() {
               >
                 <div className="flex items-center gap-4">
                   <span className="text-primary font-medium px-3 py-1 bg-primary/20 rounded-full text-sm">
-                    {selectedIds.size} selected
+                    {t('history.batch.selected', { count: selectedIds.size })}
                   </span>
                   <Button
                     variant="ghost"
                     className="text-primary hover:text-primary hover:bg-primary/20 px-3 py-1 text-sm h-auto"
                     onClick={() => selectAll(filteredSessions.map((s) => s.sessionId))}
                   >
-                    Select All
+                    {t('history.batch.selectAll')}
                   </Button>
                   <Button
                     variant="ghost"
                     className="text-primary hover:text-primary hover:bg-primary/20 px-3 py-1 text-sm h-auto"
                     onClick={clearSelection}
                   >
-                    Clear
+                    {t('history.batch.deselectAll')}
                   </Button>
                 </div>
                 <div className="flex items-center gap-2">
@@ -345,7 +340,7 @@ export function HistoryPage() {
                     className="bg-accent-error/20 text-accent-error hover:bg-accent-error/30 border border-accent-error/30"
                   >
                     <Trash2 className="w-4 h-4 mr-2" />
-                    Delete
+                    {t('history.menu.delete')}
                   </Button>
                 </div>
               </GlassCard>
@@ -360,16 +355,16 @@ export function HistoryPage() {
                   <Lock className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-amber-100">Unlock Full History</h3>
-                  <p className="text-amber-200/70">
-                    Upgrade to Pro to access all your past recordings forever.
-                  </p>
+                  <h3 className="text-lg font-bold text-amber-100">
+                    {t('history.proBanner.title')}
+                  </h3>
+                  <p className="text-amber-200/70">{t('history.proBanner.description')}</p>
                 </div>
                 <Button
                   className="ml-auto bg-amber-500 text-black hover:bg-amber-400 border-0"
                   onClick={() => setIsUpgradeModalOpen(true)}
                 >
-                  Upgrade Now
+                  {t('history.proBanner.cta')}
                 </Button>
               </div>
             </GlassCard>
