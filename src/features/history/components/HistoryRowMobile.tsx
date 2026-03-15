@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Mic, MoreHorizontal, Copy, Download, Trash2, CheckCircle2 } from 'lucide-react';
+import { Mic, MoreHorizontal, Copy, Trash2, CheckCircle2 } from 'lucide-react';
 import { Badge } from '@/lib/components/ui/Badge';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '@/types/routing';
@@ -10,7 +10,6 @@ import type { HistorySession } from '../types/history';
 interface HistoryRowMobileProps {
   session: HistorySession;
   onDelete: (sessionId: string) => void;
-  onDownload: (sessionId: string, audioName: string) => void;
   onCopySummary?: (sessionId: string) => void;
   onSelect?: (sessionId: string) => void;
   selectionMode: boolean;
@@ -20,7 +19,6 @@ interface HistoryRowMobileProps {
 export function HistoryRowMobile({
   session,
   onDelete,
-  onDownload,
   onCopySummary,
   onSelect,
   selectionMode,
@@ -56,11 +54,6 @@ export function HistoryRowMobile({
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
   }, [menuOpen]);
-
-  const handleDownload = () => {
-    onDownload(session.sessionId, session.audioName);
-    setMenuOpen(false);
-  };
 
   const handleDelete = () => {
     onDelete(session.sessionId);
@@ -152,15 +145,6 @@ export function HistoryRowMobile({
                 {t('history.menu.copySummary', 'Copy Summary')}
               </button>
             )}
-
-            <button
-              role="menuitem"
-              onClick={handleDownload}
-              className="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm text-text-primary hover:bg-bg-secondary transition-colors cursor-pointer"
-            >
-              <Download className="w-4 h-4 shrink-0 text-text-tertiary" />
-              {t('history.menu.downloadAudio', 'Download Audio')}
-            </button>
 
             <div className="h-px bg-border mx-2 my-1" />
 

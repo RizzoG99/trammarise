@@ -21,7 +21,6 @@ import { GlassCard } from '@/lib/components/ui/GlassCard';
 import { useHistorySessions } from '@/features/history/hooks/useHistorySessions';
 import { useHistoryFilters } from '@/features/history/hooks/useHistoryFilters';
 import { useHistorySelection } from '@/features/history/hooks/useHistorySelection';
-import { useBlobDownload } from '@/features/history/hooks/useBlobDownload';
 import { groupSessionsByDate } from '@/features/history/utils/sessionGrouping';
 import { loadSessionMetadata } from '@/utils/session-manager';
 import type { ContentType } from '@/types/content-types';
@@ -61,24 +60,17 @@ export function HistoryPage() {
   } | null>(null);
 
   const groupedSessions = groupSessionsByDate(filteredSessions);
-  const { download } = useBlobDownload({ onError: (err) => console.error(err) });
-
-  const handleDownload = async (sessionId: string, audioName: string) => {
-    try {
-      await download(sessionId, audioName);
-    } catch (err) {
-      console.error('Download failed:', err);
-    }
-  };
 
   const handleCopySummary = async (sessionId: string) => {
     try {
       const data = loadSessionMetadata(sessionId);
       if (data?.result?.summary) {
         await navigator.clipboard.writeText(data.result.summary);
+        setSnackbar({ message: t('history.messages.copySummarySuccess'), variant: 'success' });
       }
     } catch (err) {
       console.error('Failed to copy summary:', err);
+      setSnackbar({ message: t('history.messages.copySummaryError'), variant: 'error' });
     }
   };
 
@@ -361,7 +353,6 @@ export function HistoryPage() {
             <HistoryList
               groupedSessions={groupedSessions}
               onDelete={handleDeleteClick}
-              onDownload={handleDownload}
               onCopySummary={handleCopySummary}
               selectedIds={selectedIds}
               onToggleSelection={toggleSelection}

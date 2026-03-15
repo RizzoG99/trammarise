@@ -704,7 +704,9 @@
       "deleteSelectFail": "Failed to delete {{count}} recordings",
       "deleteGenericError": "Failed to delete some recordings",
       "deleteSingleSuccess": "Recording deleted successfully",
-      "deleteSingleError": "Failed to delete recording"
+      "deleteSingleError": "Failed to delete recording",
+      "copySummarySuccess": "Summary copied to clipboard",
+      "copySummaryError": "Failed to copy summary"
     },
     "batch": {
       "selected": "{{count}} selected",

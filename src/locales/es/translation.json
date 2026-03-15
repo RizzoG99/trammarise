@@ -705,7 +705,9 @@
       "deleteSelectFail": "Error al eliminar {{count}} grabaciones",
       "deleteGenericError": "Error al eliminar algunas grabaciones",
       "deleteSingleSuccess": "Grabación eliminada con éxito",
-      "deleteSingleError": "Error al eliminar la grabación"
+      "deleteSingleError": "Error al eliminar la grabación",
+      "copySummarySuccess": "Resumen copiado al portapapeles",
+      "copySummaryError": "No se pudo copiar el resumen"
     },
     "batch": {
       "selected": "{{count}} seleccionados",
@@ -953,7 +955,10 @@
           "name": "Chat IA en resultados",
           "desc": "Pregunta, traduce o refina tu transcripción con IA"
         },
-        "diarization": { "name": "Diarización de oradores", "desc": "Identifica quién dijo qué" },
+        "diarization": {
+          "name": "Diarización de oradores",
+          "desc": "Identifica quién dijo qué"
+        },
         "cloudSync": {
           "name": "Sincronización en la nube",
           "desc": "Accede a tus transcripciones desde cualquier dispositivo"

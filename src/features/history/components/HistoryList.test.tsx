@@ -43,7 +43,6 @@ const makeSession = (id: string) => ({
 const defaultProps = {
   groupedSessions: emptyGroups,
   onDelete: vi.fn(),
-  onDownload: vi.fn(),
   onCopySummary: vi.fn(),
   selectedIds: new Set<string>(),
   onToggleSelection: vi.fn(),

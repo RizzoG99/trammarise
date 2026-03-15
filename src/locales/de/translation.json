@@ -705,7 +705,9 @@
       "deleteSelectFail": "Fehler beim Löschen von {{count}} Aufnahmen",
       "deleteGenericError": "Fehler beim Löschen einiger Aufnahmen",
       "deleteSingleSuccess": "Aufnahme erfolgreich gelöscht",
-      "deleteSingleError": "Fehler beim Löschen der Aufnahme"
+      "deleteSingleError": "Fehler beim Löschen der Aufnahme",
+      "copySummarySuccess": "Zusammenfassung in die Zwischenablage kopiert",
+      "copySummaryError": "Zusammenfassung konnte nicht kopiert werden"
     },
     "batch": {
       "selected": "{{count}} ausgewählt",
@@ -953,7 +955,10 @@
           "name": "KI-Chat zu Ergebnissen",
           "desc": "Fragen stellen, übersetzen oder verfeinern mit KI"
         },
-        "diarization": { "name": "Sprecher-Diarisierung", "desc": "Erkennt, wer was gesagt hat" },
+        "diarization": {
+          "name": "Sprecher-Diarisierung",
+          "desc": "Erkennt, wer was gesagt hat"
+        },
         "cloudSync": {
           "name": "Cloud-Synchronisierung",
           "desc": "Zugriff auf deine Transkriptionen von überall"

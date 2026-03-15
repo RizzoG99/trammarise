@@ -6,7 +6,6 @@ import type { GroupedSessions, HistorySession } from '../types/history';
 interface HistoryListProps {
   groupedSessions: GroupedSessions;
   onDelete: (sessionId: string) => void;
-  onDownload: (sessionId: string, audioName: string) => void;
   onCopySummary: (sessionId: string) => void;
   selectedIds: Set<string>;
   onToggleSelection: (sessionId: string) => void;
@@ -23,7 +22,6 @@ const DateGroupHeader = ({ title }: { title: string }) => (
 export function HistoryList({
   groupedSessions,
   onDelete,
-  onDownload,
   onCopySummary,
   selectedIds,
   onToggleSelection,
@@ -57,7 +55,6 @@ export function HistoryList({
             key={session.sessionId}
             session={session}
             onDelete={onDelete}
-            onDownload={onDownload}
             onCopySummary={onCopySummary}
             selected={selectedIds.has(session.sessionId)}
             onSelect={onToggleSelection}
@@ -77,6 +74,7 @@ export function HistoryList({
             <HistoryCard
               session={session}
               onDelete={onDelete}
+              onCopySummary={onCopySummary}
               selected={selectedIds.has(session.sessionId)}
               onSelect={onToggleSelection}
               selectionMode={selectionMode}

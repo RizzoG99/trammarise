@@ -21,7 +21,6 @@ const mockSession: HistorySession = {
 const defaultProps = {
   session: mockSession,
   onDelete: vi.fn(),
-  onDownload: vi.fn(),
   onCopySummary: vi.fn(),
   onSelect: vi.fn(),
   selectionMode: false,
@@ -57,7 +56,6 @@ describe('HistoryRowMobile', () => {
     renderWithRouter(<HistoryRowMobile {...defaultProps} />);
     const dotsBtn = screen.getByRole('button', { name: /more options/i });
     await user.click(dotsBtn);
-    expect(screen.getByText(/download audio/i)).toBeInTheDocument();
     expect(screen.getByText(/^delete$/i)).toBeInTheDocument();
   });
 
@@ -86,16 +84,6 @@ describe('HistoryRowMobile', () => {
     expect(screen.queryByText(/copy summary/i)).not.toBeInTheDocument();
   });
 
-  it('clicking Download audio calls onDownload and closes menu', async () => {
-    const user = userEvent.setup();
-    const onDownload = vi.fn();
-    renderWithRouter(<HistoryRowMobile {...defaultProps} onDownload={onDownload} />);
-    await user.click(screen.getByRole('button', { name: /more options/i }));
-    await user.click(screen.getByText(/download audio/i));
-    expect(onDownload).toHaveBeenCalledWith('session-abc', 'Team standup 2026-03-10');
-    expect(screen.queryByText(/download audio/i)).not.toBeInTheDocument();
-  });
-
   it('clicking Delete calls onDelete and closes menu', async () => {
     const user = userEvent.setup();
     const onDelete = vi.fn();
@@ -110,9 +98,9 @@ describe('HistoryRowMobile', () => {
     const user = userEvent.setup();
     renderWithRouter(<HistoryRowMobile {...defaultProps} />);
     await user.click(screen.getByRole('button', { name: /more options/i }));
-    expect(screen.getByText(/download audio/i)).toBeInTheDocument();
+    expect(screen.getByText(/^delete$/i)).toBeInTheDocument();
     await user.keyboard('{Escape}');
-    expect(screen.queryByText(/download audio/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/^delete$/i)).not.toBeInTheDocument();
   });
 
   it('checkbox is not rendered when selectionMode is false', () => {

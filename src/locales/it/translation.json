@@ -705,7 +705,9 @@
       "deleteSelectFail": "Impossibile eliminare {{count}} registrazioni",
       "deleteGenericError": "Impossibile eliminare alcune registrazioni",
       "deleteSingleSuccess": "Registrazione eliminata con successo",
-      "deleteSingleError": "Impossibile eliminare la registrazione"
+      "deleteSingleError": "Impossibile eliminare la registrazione",
+      "copySummarySuccess": "Riepilogo copiato negli appunti",
+      "copySummaryError": "Impossibile copiare il riepilogo"
     },
     "batch": {
       "selected": "{{count}} selezionati",
@@ -953,7 +955,10 @@
           "name": "Chat AI sui risultati",
           "desc": "Fai domande, traduci o raffina la trascrizione con l'AI"
         },
-        "diarization": { "name": "Diarizzazione speaker", "desc": "Identifica chi ha detto cosa" },
+        "diarization": {
+          "name": "Diarizzazione speaker",
+          "desc": "Identifica chi ha detto cosa"
+        },
         "cloudSync": {
           "name": "Sincronizzazione cloud",
           "desc": "Accedi alle tue trascrizioni da qualsiasi dispositivo"
