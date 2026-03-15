@@ -1,9 +1,3 @@
 {
-  "extends": "../tsconfig.api.json",
-  "compilerOptions": {
-    "moduleResolution": "bundler",
-    "module": "ESNext",
-    "allowImportingTsExtensions": true,
-    "noEmit": true
-  }
+  "extends": "../tsconfig.api.json"
 }
