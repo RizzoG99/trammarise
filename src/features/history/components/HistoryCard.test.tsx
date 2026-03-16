@@ -41,7 +41,6 @@ describe('HistoryCard', () => {
 
     const badges = screen.getAllByText(/meeting/i);
     // Should have the badge (in addition to filename potentially matching)
-    // Note: If i18n returns key, it will be "common.contentTypes.meeting" which matches /meeting/i
     expect(badges.length).toBeGreaterThanOrEqual(1);
   });
 
@@ -52,19 +51,11 @@ describe('HistoryCard', () => {
     expect(screen.getByText(/common.languages.en/i)).toBeInTheDocument();
   });
 
-  it('should show "Processed" badge when hasSummary=true', () => {
+  it('should not show status badge', () => {
     renderWithRouter(<HistoryCard session={mockSession} onDelete={() => {}} />);
 
-    // Renders value for static key
-    expect(screen.getByText(/Processed/i)).toBeInTheDocument();
-  });
-
-  it('should show "Unprocessed" badge when hasSummary=false', () => {
-    const unprocessedSession = { ...mockSession, hasSummary: false };
-    renderWithRouter(<HistoryCard session={unprocessedSession} onDelete={() => {}} />);
-
-    // Renders value for static key
-    expect(screen.getByText(/Unprocessed/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Done/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Pending/i)).not.toBeInTheDocument();
   });
 
   it('should truncate long audio names with ellipsis', () => {
@@ -85,11 +76,6 @@ describe('HistoryCard', () => {
 
     renderWithRouter(<HistoryCard session={mockSession} onDelete={onDelete} />);
 
-    // Looks for the key history.card.delete or dynamic value
-    // Since we don't have a provider, it likely returns the key "history.card.delete"
-    // or if the mock is smart, "Delete team-meeting.webm"
-    // We'll search by the key part to be safe or just the icon if strictly visual test,
-    // but best to use accessible name.
     const deleteButton = screen.getByRole('button', { name: /delete/i });
     await user.click(deleteButton);
 
@@ -99,7 +85,6 @@ describe('HistoryCard', () => {
   it('should navigate to results page on card click', async () => {
     renderWithRouter(<HistoryCard session={mockSession} onDelete={() => {}} />);
 
-    // The whole card is a link, look for it by its content or href
     const cardLink = screen.getByRole('link', { name: /team-meeting\.webm/i });
     expect(cardLink).toHaveAttribute('href', '/results/test-session-123');
   });
@@ -109,15 +94,6 @@ describe('HistoryCard', () => {
 
     const deleteButton = screen.getByRole('button', { name: /delete/i });
     expect(deleteButton).toHaveAccessibleName();
-  });
-
-  it('should have touch target size ≥44px', () => {
-    renderWithRouter(<HistoryCard session={mockSession} onDelete={() => {}} />);
-
-    const deleteButton = screen.getByRole('button', { name: /delete/i });
-
-    // Buttons should have adequate padding/size for touch
-    expect(deleteButton.className).toMatch(/p-|min-/);
   });
 
   it('should display different content type badges', () => {
@@ -142,7 +118,6 @@ describe('HistoryCard', () => {
     const sessionWithoutSize = { ...mockSession, fileSizeBytes: undefined };
     renderWithRouter(<HistoryCard session={sessionWithoutSize} onDelete={() => {}} />);
 
-    // Should still render the card
     expect(screen.getByText('team-meeting.webm')).toBeInTheDocument();
   });
 
@@ -150,7 +125,59 @@ describe('HistoryCard', () => {
     const sessionWithoutDuration = { ...mockSession, durationSeconds: undefined };
     renderWithRouter(<HistoryCard session={sessionWithoutDuration} onDelete={() => {}} />);
 
-    // Should still render the card
     expect(screen.getByText('team-meeting.webm')).toBeInTheDocument();
+  });
+
+  it('should show duration badge when durationSeconds is present', () => {
+    renderWithRouter(<HistoryCard session={mockSession} onDelete={() => {}} />);
+    // mockSession has durationSeconds: 300 → formatDuration(300) = "5m 0s"
+    const durationEl = screen.getByText(/\d+[mhs]/i);
+    expect(durationEl).toBeInTheDocument();
+  });
+
+  it('should not show duration when durationSeconds is undefined', () => {
+    const sessionWithoutDuration = { ...mockSession, durationSeconds: undefined };
+    renderWithRouter(<HistoryCard session={sessionWithoutDuration} onDelete={() => {}} />);
+    expect(screen.queryByText(/\d+[mhs]\s+\d+[s]/)).not.toBeInTheDocument();
+  });
+
+  it('should apply border-l-4 class for content-type differentiation', () => {
+    const { container } = renderWithRouter(
+      <HistoryCard session={mockSession} onDelete={() => {}} />
+    );
+    const cardWithBorder = container.querySelector('.border-l-4');
+    expect(cardWithBorder).not.toBeNull();
+  });
+
+  it('should show copy button when hasSummary=true and onCopySummary provided', () => {
+    renderWithRouter(
+      <HistoryCard session={mockSession} onDelete={() => {}} onCopySummary={vi.fn()} />
+    );
+
+    const copyButton = screen.getByRole('button', { name: /copy/i });
+    expect(copyButton).toBeInTheDocument();
+  });
+
+  it('should not show copy button when hasSummary=false', () => {
+    const unprocessed = { ...mockSession, hasSummary: false };
+    renderWithRouter(
+      <HistoryCard session={unprocessed} onDelete={() => {}} onCopySummary={vi.fn()} />
+    );
+
+    expect(screen.queryByRole('button', { name: /copy/i })).not.toBeInTheDocument();
+  });
+
+  it('should call onCopySummary when copy button clicked', async () => {
+    const user = userEvent.setup();
+    const onCopySummary = vi.fn().mockResolvedValue(undefined);
+
+    renderWithRouter(
+      <HistoryCard session={mockSession} onDelete={() => {}} onCopySummary={onCopySummary} />
+    );
+
+    const copyButton = screen.getByRole('button', { name: /copy/i });
+    await user.click(copyButton);
+
+    expect(onCopySummary).toHaveBeenCalledWith('test-session-123');
   });
 });

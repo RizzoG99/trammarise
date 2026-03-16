@@ -638,7 +638,8 @@
       "topCategory": "Categoria Top",
       "activity": "Attività (Ultimi 7 Giorni)",
       "sessions": "{{count}} sessione",
-      "sessions_plural": "{{count}} sessioni"
+      "sessions_plural": "{{count}} sessioni",
+      "statStrip": "{{count}} sessioni · {{time}} totali · Tipo top: {{topType}}"
     },
     "quickActions": {
       "play": "Anteprima",
@@ -646,7 +647,7 @@
       "download": "Scarica"
     },
     "title": "Cronologia Registrazioni",
-    "subtitle": "{{count}} registrazioni totali",
+    "subtitle": "{{count}} sessioni · ~{{time}} · Top: {{topType}}",
     "description": "Gestisci le tue registrazioni e i riassunti generati",
     "searchPlaceholder": "Cerca per nome o contenuto...",
     "sort": {
@@ -655,6 +656,30 @@
       "nameAsc": "Nome (A-Z)",
       "nameDesc": "Nome (Z-A)"
     },
+    "groups": {
+      "today": "Oggi",
+      "yesterday": "Ieri",
+      "thisWeek": "Questa settimana",
+      "lastWeek": "La settimana scorsa"
+    },
+    "menu": {
+      "copySummary": "Copia riepilogo",
+      "downloadAudio": "Scarica audio",
+      "delete": "Elimina"
+    },
+    "filter": {
+      "allTypes": "Tutti",
+      "toggleAriaLabel": "Mostra filtri",
+      "clearAll": "Cancella filtri",
+      "type": {
+        "meeting": "Riunione",
+        "lecture": "Lezione",
+        "interview": "Intervista",
+        "podcast": "Podcast",
+        "voice-memo": "Memo Vocale",
+        "other": "Altro"
+      }
+    },
     "stats": {
       "recordingCount": "{{count}} registrazione",
       "recordingCount_plural": "{{count}} registrazioni"
@@ -662,8 +687,8 @@
     "card": {
       "select": "Seleziona {{name}}",
       "delete": "Elimina {{name}}",
-      "processed": "Elaborato",
-      "unprocessed": "Non elaborato"
+      "processed": "Fatto",
+      "unprocessed": "In attesa"
     },
     "empty": {
       "noMatchingTitle": "Nessuna registrazione trovata",
@@ -680,7 +705,9 @@
       "deleteSelectFail": "Impossibile eliminare {{count}} registrazioni",
       "deleteGenericError": "Impossibile eliminare alcune registrazioni",
       "deleteSingleSuccess": "Registrazione eliminata con successo",
-      "deleteSingleError": "Impossibile eliminare la registrazione"
+      "deleteSingleError": "Impossibile eliminare la registrazione",
+      "copySummarySuccess": "Riepilogo copiato negli appunti",
+      "copySummaryError": "Impossibile copiare il riepilogo"
     },
     "batch": {
       "selected": "{{count}} selezionati",
@@ -696,6 +723,14 @@
       "importButton": "Importa ora",
       "importing": "Importazione...",
       "dismissButton": "Forse più tardi"
+    },
+    "proBanner": {
+      "title": "Sblocca la cronologia completa",
+      "description": "Passa al piano Pro per accedere a tutte le tue registrazioni passate per sempre.",
+      "cta": "Passa a Pro"
+    },
+    "error": {
+      "title": "Impossibile caricare la cronologia"
     }
   },
   "welcome": {
@@ -920,7 +955,10 @@
           "name": "Chat AI sui risultati",
           "desc": "Fai domande, traduci o raffina la trascrizione con l'AI"
         },
-        "diarization": { "name": "Diarizzazione speaker", "desc": "Identifica chi ha detto cosa" },
+        "diarization": {
+          "name": "Diarizzazione speaker",
+          "desc": "Identifica chi ha detto cosa"
+        },
         "cloudSync": {
           "name": "Sincronizzazione cloud",
           "desc": "Accedi alle tue trascrizioni da qualsiasi dispositivo"

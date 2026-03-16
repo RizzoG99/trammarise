@@ -1,38 +1,44 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Trash2, Calendar, FileText, Globe, CheckCircle2, Clock } from 'lucide-react';
+import { Trash2, Copy, Check } from 'lucide-react';
 import { GlassCard } from '@/lib/components/ui/GlassCard';
-import { Button } from '@/lib/components/ui/Button';
 import { Badge } from '@/lib/components/ui/Badge';
-import { HistoryQuickActions } from './HistoryQuickActions';
+import { Checkbox } from '@/lib/components/ui/Checkbox';
 import { useTranslation } from 'react-i18next';
-import { useBlobDownload } from '../hooks/useBlobDownload';
 
 import type { HistorySession } from '../types/history';
-import { formatDate } from '../utils/formatters';
+import { formatDate, formatDuration } from '../utils/formatters';
 import { ROUTES } from '@/types/routing';
-import { loadSessionMetadata } from '@/utils/session-manager';
 
 interface HistoryCardProps {
   session: HistorySession;
   onDelete: (sessionId: string) => void;
+  onCopySummary?: (sessionId: string) => void | Promise<void>;
   selected?: boolean;
   onSelect?: (sessionId: string) => void;
   selectionMode?: boolean;
 }
 
+const CONTENT_TYPE_BORDER_COLOR: Record<string, string> = {
+  meeting: 'var(--color-primary)',
+  lecture: 'color-mix(in srgb, var(--color-primary) 70%, transparent)',
+  interview: 'color-mix(in srgb, var(--color-primary) 50%, transparent)',
+  podcast: 'var(--color-accent-success)',
+  'voice-memo': 'var(--color-accent-warning)',
+  other: 'var(--color-border)',
+};
+
 export function HistoryCard({
   session,
   onDelete,
+  onCopySummary,
   selected,
   onSelect,
   selectionMode,
 }: HistoryCardProps) {
   const { t } = useTranslation();
-  const { download } = useBlobDownload({
-    onError: (error) => {
-      console.error('Download failed:', error);
-    },
-  });
+  const [copied, setCopied] = useState(false);
+  const [copying, setCopying] = useState(false);
 
   const handleDelete = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -45,23 +51,15 @@ export function HistoryCard({
     onSelect?.(session.sessionId);
   };
 
-  const handleCopySummary = async () => {
-    try {
-      const data = loadSessionMetadata(session.sessionId);
-      if (data?.result?.summary) {
-        await navigator.clipboard.writeText(data.result.summary);
-      }
-    } catch (err) {
-      console.error('Failed to copy summary:', err);
-    }
-  };
-
-  const handleDownload = async () => {
-    try {
-      await download(session.sessionId, session.audioName);
-    } catch (err) {
-      console.error('Download failed:', err);
-    }
+  const handleCopy = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!onCopySummary || copying) return;
+    setCopying(true);
+    await onCopySummary(session.sessionId);
+    setCopied(true);
+    setCopying(false);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   return (
@@ -72,90 +70,83 @@ export function HistoryCard({
       <GlassCard
         variant="dark"
         className={`h-full p-5 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-[0_0_20px_rgba(59,130,246,0.15)]
-          ${selected ? 'ring-2 ring-primary border-primary/50' : 'border-white/5'} 
-          hover:border-primary/30`}
+          border-l-4
+          ${selected ? 'ring-2 ring-primary border-primary/50' : 'hover:border-primary/30'}`}
+        style={{
+          borderLeftColor: CONTENT_TYPE_BORDER_COLOR[session.contentType] ?? 'var(--color-border)',
+        }}
       >
-        <div className="flex flex-col h-full">
-          {/* Header */}
-          <div className="flex items-start justify-between gap-3 mb-4">
-            {/* Selection Checkbox */}
-            <div
-              className={`absolute top-5 left-5 z-20 transition-opacity duration-200 ${selectionMode || selected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="relative flex items-center justify-center w-5 h-5">
-                <input
-                  type="checkbox"
-                  checked={selected}
-                  onChange={handleCheckboxChange}
-                  className="peer appearance-none w-5 h-5 rounded border border-border checked:bg-primary checked:border-primary transition-colors cursor-pointer"
-                  aria-label={t('history.card.select', { name: session.audioName })}
-                />
-                <CheckCircle2 className="absolute w-3.5 h-3.5 text-white opacity-0 peer-checked:opacity-100 pointer-events-none" />
-              </div>
-            </div>
+        {/* Selection Checkbox — absolute top-left */}
+        <div
+          className={`absolute top-4 left-4 z-20 transition-opacity duration-200 ${selectionMode || selected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <Checkbox
+            checked={!!selected}
+            onChange={handleCheckboxChange}
+            aria-label={t('history.card.select', { name: session.audioName })}
+          />
+        </div>
 
-            <div
-              className={`flex-1 min-w-0 transition-all duration-200 ${selectionMode || selected ? 'pl-8' : 'group-hover:pl-8'}`}
-            >
-              <h3 className="text-lg font-semibold text-text-primary truncate mb-2 group-hover:text-primary transition-colors">
+        {/* Card content */}
+        <div className="flex flex-col gap-3">
+          {/* Title row: name + copy + status + delete — all inline, vertically aligned */}
+          <div
+            className={`transition-all duration-200 ${selectionMode || selected ? 'pl-8' : 'group-hover:pl-8'}`}
+          >
+            <div className="flex items-center gap-2 mb-1">
+              <h3 className="flex-1 min-w-0 text-base font-semibold text-text-primary truncate group-hover:text-primary transition-colors">
                 {session.audioName}
               </h3>
 
-              <div className="flex items-center gap-2 text-sm text-text-secondary">
-                <Calendar className="w-3.5 h-3.5" />
-                <span>{formatDate(session.createdAt)}</span>
-              </div>
-            </div>
+              {/* Copy + status + delete — all in one row, stopPropagation so clicks don't navigate */}
+              <div
+                className="flex items-center gap-1.5 shrink-0"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {session.hasSummary && onCopySummary && (
+                  <button
+                    onClick={handleCopy}
+                    disabled={copying}
+                    className="w-6 h-6 flex items-center justify-center rounded hover:bg-primary/10 text-text-tertiary hover:text-primary transition-colors disabled:opacity-40 cursor-pointer"
+                    title={t('history.quickActions.copy')}
+                    aria-label={t('history.quickActions.copy')}
+                  >
+                    {copied ? (
+                      <Check className="w-3.5 h-3.5 text-accent-success" />
+                    ) : (
+                      <Copy className="w-3.5 h-3.5" />
+                    )}
+                  </button>
+                )}
 
-            <div className="flex items-center gap-2">
-              {session.hasSummary ? (
-                <Badge variant="success" size="sm">
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">{t('history.card.processed')}</span>
-                </Badge>
-              ) : (
-                <Badge variant="warning" size="sm">
-                  <Clock className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">{t('history.card.unprocessed')}</span>
-                </Badge>
-              )}
+                <button
+                  onClick={handleDelete}
+                  className="w-6 h-6 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 text-text-tertiary hover:text-accent-error hover:bg-accent-error/10 transition-all duration-200 cursor-pointer"
+                  aria-label={t('history.card.delete', { name: session.audioName })}
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
             </div>
           </div>
 
-          {/* Metadata Badges */}
+          {/* Metadata row: date + type + language + duration */}
           <div
-            className={`flex flex-wrap gap-2 mb-4 transition-all duration-200 ${selectionMode || selected ? 'pl-8' : 'group-hover:pl-8'}`}
+            className={`flex flex-wrap items-center gap-x-2 gap-y-1 transition-all duration-200 ${selectionMode || selected ? 'pl-8' : 'group-hover:pl-8'}`}
           >
+            <span className="text-sm text-text-secondary">{formatDate(session.createdAt)}</span>
             <Badge variant="default" size="sm">
-              <FileText className="w-3 h-3 mr-1.5 opacity-70" />
               {t(`common.contentTypes.${session.contentType}`, session.contentType)}
             </Badge>
             <Badge variant="default" size="sm">
-              <Globe className="w-3 h-3 mr-1.5 opacity-70" />
               {t(`common.languages.${session.language}`, session.language)}
             </Badge>
-          </div>
-
-          <div
-            className={`mt-auto pt-4 border-t border-border flex items-center justify-between transition-all duration-200 ${selectionMode || selected ? 'pl-8' : 'group-hover:pl-8'}`}
-          >
-            {/* Quick Actions (Hover) */}
-            <div className="-ml-2">
-              <HistoryQuickActions
-                onCopySummary={session.hasSummary ? handleCopySummary : undefined}
-                onDownload={handleDownload}
-              />
-            </div>
-
-            <Button
-              variant="ghost"
-              onClick={handleDelete}
-              className="w-8 h-8 !p-0 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full transition-colors opacity-0 group-hover:opacity-100"
-              aria-label={t('history.card.delete', { name: session.audioName })}
-            >
-              <Trash2 className="w-4 h-4" />
-            </Button>
+            {session.durationSeconds != null && (
+              <Badge variant="default" size="sm">
+                {formatDuration(session.durationSeconds)}
+              </Badge>
+            )}
           </div>
         </div>
       </GlassCard>

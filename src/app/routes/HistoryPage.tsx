@@ -1,18 +1,19 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useUser } from '@/hooks/useUser';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { HistoryList } from '@/features/history/components/HistoryList';
 import { HistoryEmptyState } from '@/features/history/components/HistoryEmptyState';
 import { DeleteConfirmModal } from '@/features/history/components/DeleteConfirmModal';
+import { HistoryDashboard } from '@/features/history/components/HistoryDashboard';
+import { HistoryFilterPanel } from '@/features/history/components/HistoryFilterPanel';
 import { PageLoader } from '@/lib/components/ui/PageLoader/PageLoader';
 import { Snackbar } from '@/lib/components/ui/Snackbar';
 import { Button } from '@/lib/components/ui/Button';
-import { Trash2, Search, Lock } from 'lucide-react';
+import { Alert } from '@/lib/components/ui/Alert/Alert';
+import { Trash2, Search, Lock, SlidersHorizontal } from 'lucide-react';
 
 import { useSubscription } from '@/context/SubscriptionContext';
 import { UpgradeModal } from '@/components/marketing/UpgradeModal';
-
-import { Input } from '@/lib/components/ui/Input';
 
 import { Select } from '@/lib/components/ui/Select';
 import { GlassCard } from '@/lib/components/ui/GlassCard';
@@ -21,6 +22,8 @@ import { useHistorySessions } from '@/features/history/hooks/useHistorySessions'
 import { useHistoryFilters } from '@/features/history/hooks/useHistoryFilters';
 import { useHistorySelection } from '@/features/history/hooks/useHistorySelection';
 import { groupSessionsByDate } from '@/features/history/utils/sessionGrouping';
+import { loadSessionMetadata } from '@/utils/session-manager';
+import type { ContentType } from '@/types/content-types';
 import type { HistorySession, SortOption } from '@/features/history/types/history';
 import { useTranslation } from 'react-i18next';
 
@@ -31,11 +34,12 @@ export function HistoryPage() {
   const userTier = subscription?.tier || 'free';
   const { sessions, isLoading, error, deleteSession, totalCount } = useHistorySessions();
   const {
-    searchQuery,
+    contentTypeFilter,
     sortBy,
     filteredSessions,
     hasActiveFilters,
     setSearchQuery,
+    setContentTypeFilter,
     setSortBy,
     clearFilters,
   } = useHistoryFilters(sessions);
@@ -44,6 +48,22 @@ export function HistoryPage() {
   const { selectedIds, toggleSelection, selectAll, clearSelection, hasSelection } =
     useHistorySelection();
 
+  // Local input state for search — debounced to avoid filtering on every keystroke
+  const [searchInput, setSearchInput] = useState('');
+  const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const handleSearchChange = (value: string) => {
+    setSearchInput(value);
+    if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+    searchDebounceRef.current = setTimeout(() => setSearchQuery(value), 300);
+  };
+  useEffect(
+    () => () => {
+      if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+    },
+    []
+  );
+
+  const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
   const [sessionToDelete, setSessionToDelete] = useState<HistorySession | null>(null);
   const [bulkDeleteCount, setBulkDeleteCount] = useState<number | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -54,6 +74,19 @@ export function HistoryPage() {
   } | null>(null);
 
   const groupedSessions = groupSessionsByDate(filteredSessions);
+
+  const handleCopySummary = async (sessionId: string) => {
+    try {
+      const data = loadSessionMetadata(sessionId);
+      if (data?.result?.summary) {
+        await navigator.clipboard.writeText(data.result.summary);
+        setSnackbar({ message: t('history.messages.copySummarySuccess'), variant: 'success' });
+      }
+    } catch (err) {
+      console.error('Failed to copy summary:', err);
+      setSnackbar({ message: t('history.messages.copySummaryError'), variant: 'error' });
+    }
+  };
 
   const handleDeleteClick = (sessionId: string) => {
     const session = sessions.find((s) => s.sessionId === sessionId);
@@ -67,12 +100,20 @@ export function HistoryPage() {
     setBulkDeleteCount(selectedIds.size);
   };
 
+  const BULK_DELETE_BATCH_SIZE = 20;
+
   const handleBulkDeleteConfirm = async () => {
     setIsDeleting(true);
     const idsToDelete = Array.from(selectedIds);
 
     try {
-      const results = await Promise.allSettled(idsToDelete.map((id) => deleteSession(id)));
+      const allResults: PromiseSettledResult<void>[] = [];
+      for (let i = 0; i < idsToDelete.length; i += BULK_DELETE_BATCH_SIZE) {
+        const batch = idsToDelete.slice(i, i + BULK_DELETE_BATCH_SIZE);
+        const batchResults = await Promise.allSettled(batch.map((id) => deleteSession(id)));
+        allResults.push(...batchResults);
+      }
+      const results = allResults;
 
       const succeeded = results.filter((r) => r.status === 'fulfilled').length;
       const failed = results.filter((r) => r.status === 'rejected').length;
@@ -134,6 +175,12 @@ export function HistoryPage() {
     setBulkDeleteCount(null);
   };
 
+  const handleClearFilters = () => {
+    setSearchInput('');
+    if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+    clearFilters();
+  };
+
   if (isLoading) {
     return (
       <PageLayout>
@@ -145,21 +192,13 @@ export function HistoryPage() {
   if (error) {
     return (
       <PageLayout>
-        <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-          <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-full text-red-600 dark:text-red-400">
-            <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </div>
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-            Failed to load history
-          </h2>
-          <p className="text-gray-600 dark:text-gray-400">{error}</p>
+        <div className="flex items-center justify-center min-h-[60vh] p-8">
+          <Alert variant="error">
+            <div className="space-y-2">
+              <h2 className="text-lg font-semibold">{t('history.error.title')}</h2>
+              <p className="text-sm">{error}</p>
+            </div>
+          </Alert>
         </div>
       </PageLayout>
     );
@@ -173,106 +212,163 @@ export function HistoryPage() {
       <div className="bg-bg-primary text-text-primary p-4 md:p-8">
         <div className="max-w-7xl mx-auto space-y-8">
           {/* Header Section */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-            <div>
-              <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400 mb-2">
-                {t('history.title')}
-              </h1>
-              <p className="text-slate-400">{t('history.subtitle', { count: totalCount })}</p>
-            </div>
-
-            <div className="flex items-center gap-3">{/* Batch Actions will go here */}</div>
+          <div>
+            <h1 className="text-4xl font-bold text-text-primary mb-2">{t('history.title')}</h1>
+            <HistoryDashboard sessions={sessions} />
           </div>
 
           {/* Filters & Search */}
-          <GlassCard
-            variant="glow"
-            className="p-4 flex flex-col md:flex-row gap-4 items-center justify-between sticky top-4 z-30"
-          >
-            <div className="relative w-full md:w-96">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-              <Input
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={t('history.searchPlaceholder')}
-                className="pl-10 bg-slate-900/50 border-white/10 text-white placeholder:text-slate-500 focus:ring-primary/50"
-              />
-            </div>
+          <div className="sticky top-4 z-30">
+            <GlassCard
+              variant="glow"
+              className="p-4 flex flex-col md:flex-row gap-4 items-center justify-between"
+            >
+              {/* Mobile: search + filter toggle */}
+              <div className="flex items-center gap-2 w-full sm:hidden">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-tertiary pointer-events-none" />
+                  <input
+                    value={searchInput}
+                    onChange={(e) => handleSearchChange(e.target.value)}
+                    placeholder={t('history.searchPlaceholder')}
+                    className="pl-10 pr-4 py-2.5 w-full rounded-lg bg-bg-secondary/50 border border-border text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  />
+                </div>
+                <button
+                  onClick={() => setIsFilterPanelOpen((v) => !v)}
+                  className={`w-[38px] h-[38px] shrink-0 flex items-center justify-center rounded-lg border transition-colors cursor-pointer ${
+                    isFilterPanelOpen || hasActiveFilters
+                      ? 'bg-primary/10 border-primary/40 text-primary'
+                      : 'bg-bg-surface border-border text-text-tertiary hover:text-text-primary'
+                  }`}
+                  aria-label={t('history.filter.toggleAriaLabel')}
+                  aria-expanded={isFilterPanelOpen}
+                >
+                  <SlidersHorizontal className="w-4 h-4" />
+                </button>
+              </div>
 
-            <div className="flex items-center gap-3 w-full md:w-auto">
-              <Select
-                value={sortBy || 'date-desc'}
-                onChange={(value) => setSortBy(value as SortOption)}
-                className="w-48"
-                options={[
-                  { value: 'date-desc', label: t('history.sort.newest') },
-                  { value: 'date-asc', label: t('history.sort.oldest') },
-                  { value: 'name-asc', label: t('history.sort.nameAsc') },
-                  { value: 'name-desc', label: t('history.sort.nameDesc') },
-                ]}
+              {/* Desktop: full search + sort dropdowns */}
+              <div className="hidden sm:flex items-center gap-4 w-full">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-tertiary pointer-events-none" />
+                  <input
+                    value={searchInput}
+                    onChange={(e) => handleSearchChange(e.target.value)}
+                    placeholder={t('history.searchPlaceholder')}
+                    className="pl-10 pr-4 py-2.5 w-full rounded-lg bg-bg-secondary/50 border border-border text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  />
+                </div>
+                <div className="flex items-center gap-3 w-full md:w-auto">
+                  <Select
+                    value={contentTypeFilter}
+                    onChange={(value) => setContentTypeFilter(value as ContentType | 'all')}
+                    className="w-44"
+                    options={[
+                      { value: 'all', label: t('history.filter.allTypes') },
+                      { value: 'meeting', label: t('history.filter.type.meeting') },
+                      { value: 'lecture', label: t('history.filter.type.lecture') },
+                      { value: 'interview', label: t('history.filter.type.interview') },
+                      { value: 'podcast', label: t('history.filter.type.podcast') },
+                      { value: 'voice-memo', label: t('history.filter.type.voice-memo') },
+                      { value: 'other', label: t('history.filter.type.other') },
+                    ]}
+                  />
+                  <Select
+                    value={sortBy}
+                    onChange={(value) => setSortBy(value as SortOption)}
+                    className="w-48"
+                    options={[
+                      { value: 'newest', label: t('history.sort.newest') },
+                      { value: 'oldest', label: t('history.sort.oldest') },
+                      { value: 'a-z', label: t('history.sort.nameAsc') },
+                      { value: 'z-a', label: t('history.sort.nameDesc') },
+                    ]}
+                  />
+                </div>
+              </div>
+            </GlassCard>
+
+            {/* Mobile filter panel */}
+            <div className="sm:hidden">
+              <HistoryFilterPanel
+                isOpen={isFilterPanelOpen}
+                contentTypeFilter={contentTypeFilter}
+                onContentTypeChange={setContentTypeFilter}
+                sortBy={sortBy}
+                onSortChange={setSortBy}
+                onClose={() => setIsFilterPanelOpen(false)}
               />
-              {/* Additional Filters can be added here */}
             </div>
-          </GlassCard>
+          </div>
 
           {/* Selection Bar */}
           {hasSelection && (
-            <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-40 w-[90%] max-w-2xl animate-in slide-in-from-bottom-4 fade-in duration-300">
+            <div
+              className="fixed bottom-28 sm:bottom-6 left-1/2 -translate-x-1/2 z-40 w-[92%] max-w-2xl animate-in slide-in-from-bottom-4 fade-in duration-300"
+              style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+            >
               <GlassCard
                 variant="primary"
-                className="p-4 flex items-center justify-between shadow-2xl shadow-blue-900/40 border-blue-500/20 backdrop-blur-xl"
+                className="px-4 py-3 flex flex-col sm:flex-row sm:items-center gap-3"
               >
-                <div className="flex items-center gap-4">
-                  <span className="text-blue-100 font-medium px-3 py-1 bg-blue-500/20 rounded-full text-sm">
-                    {selectedIds.size} selected
+                <div className="flex items-center gap-3 flex-1">
+                  <span className="text-primary font-medium px-3 py-1.5 bg-primary/20 rounded-full text-sm shrink-0">
+                    {t('history.batch.selected', { count: selectedIds.size })}
                   </span>
-                  <Button
-                    variant="ghost"
-                    className="text-blue-200 hover:text-white hover:bg-blue-500/20 px-3 py-1 text-sm h-auto"
+                  <button
+                    className="text-sm text-text-secondary hover:text-primary transition-colors cursor-pointer min-h-[44px] px-1"
                     onClick={() => selectAll(filteredSessions.map((s) => s.sessionId))}
                   >
-                    Select All
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    className="text-blue-200 hover:text-white hover:bg-blue-500/20 px-3 py-1 text-sm h-auto"
+                    {t('history.batch.selectAll')}
+                  </button>
+                  <button
+                    className="text-sm text-text-secondary hover:text-primary transition-colors cursor-pointer min-h-[44px] px-1"
                     onClick={clearSelection}
                   >
-                    Clear
-                  </Button>
+                    {t('history.batch.deselectAll')}
+                  </button>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="danger"
-                    onClick={handleBulkDelete}
-                    className="bg-red-500/20 text-red-200 hover:bg-red-500/30 border border-red-500/30"
-                  >
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    Delete
-                  </Button>
-                </div>
+                <button
+                  onClick={handleBulkDelete}
+                  className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-accent-error text-white text-sm font-medium hover:bg-accent-error/90 transition-colors cursor-pointer w-full sm:w-auto min-h-[44px]"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  {t('history.menu.delete')}
+                </button>
               </GlassCard>
             </div>
           )}
 
           {/* Pro Banner */}
           {showLockedHistoryBanner && (
-            <GlassCard variant="primary" className="p-6 border-amber-500/20 bg-amber-500/5">
+            <GlassCard
+              variant="primary"
+              className="p-6 border-accent-warning/20"
+              style={{ backgroundColor: 'var(--color-accent-warning-alpha-10)' }}
+            >
               <div className="flex items-center gap-4">
-                <div className="p-3 bg-amber-500/20 rounded-full text-amber-400">
+                <div
+                  className="p-3 rounded-full text-accent-warning"
+                  style={{ backgroundColor: 'var(--color-accent-warning-alpha-20)' }}
+                >
                   <Lock className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-amber-100">Unlock Full History</h3>
-                  <p className="text-amber-200/70">
-                    Upgrade to Pro to access all your past recordings forever.
-                  </p>
+                  <h3 className="text-lg font-bold text-text-primary">
+                    {t('history.proBanner.title')}
+                  </h3>
+                  <p className="text-text-secondary">{t('history.proBanner.description')}</p>
                 </div>
                 <Button
-                  className="ml-auto bg-amber-500 text-black hover:bg-amber-400 border-0"
+                  className="ml-auto border-0"
+                  style={{
+                    backgroundColor: 'var(--color-accent-warning)',
+                    color: 'var(--color-bg-primary)',
+                  }}
                   onClick={() => setIsUpgradeModalOpen(true)}
                 >
-                  Upgrade Now
+                  {t('history.proBanner.cta')}
                 </Button>
               </div>
             </GlassCard>
@@ -283,12 +379,13 @@ export function HistoryPage() {
             <HistoryList
               groupedSessions={groupedSessions}
               onDelete={handleDeleteClick}
+              onCopySummary={handleCopySummary}
               selectedIds={selectedIds}
               onToggleSelection={toggleSelection}
               selectionMode={hasSelection}
             />
           ) : (
-            <HistoryEmptyState hasFilters={hasActiveFilters} onClearFilters={clearFilters} />
+            <HistoryEmptyState hasFilters={hasActiveFilters} onClearFilters={handleClearFilters} />
           )}
         </div>
       </div>
