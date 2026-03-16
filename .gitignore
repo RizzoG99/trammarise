@@ -42,6 +42,8 @@ data/
 .superpowers/**/.server-info
 .superpowers/**/.server.pid
 .superpowers/**/.server.log
+# Superpowers brainstorm design exploration files (local only, not for repo)
+.superpowers/brainstorm/
 
 *storybook.log
 storybook-static

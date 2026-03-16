@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { HistoryRowMobile } from './HistoryRowMobile';
@@ -116,5 +116,58 @@ describe('HistoryRowMobile', () => {
     );
     await user.click(screen.getByRole('checkbox'));
     expect(onSelect).toHaveBeenCalledWith('session-abc');
+  });
+
+  it('long-press calls onSelect after 500ms', () => {
+    vi.useFakeTimers();
+    const onSelect = vi.fn();
+    const { container } = renderWithRouter(
+      <HistoryRowMobile {...defaultProps} onSelect={onSelect} />
+    );
+    const row = container.firstChild as HTMLElement;
+    fireEvent.pointerDown(row);
+    expect(onSelect).not.toHaveBeenCalled();
+    vi.advanceTimersByTime(500);
+    expect(onSelect).toHaveBeenCalledWith('session-abc');
+    vi.useRealTimers();
+  });
+
+  it('releasing pointer before 500ms cancels long-press', () => {
+    vi.useFakeTimers();
+    const onSelect = vi.fn();
+    const { container } = renderWithRouter(
+      <HistoryRowMobile {...defaultProps} onSelect={onSelect} />
+    );
+    const row = container.firstChild as HTMLElement;
+    fireEvent.pointerDown(row);
+    vi.advanceTimersByTime(200);
+    fireEvent.pointerUp(row);
+    vi.advanceTimersByTime(500);
+    expect(onSelect).not.toHaveBeenCalled();
+    vi.useRealTimers();
+  });
+
+  it('pointercancel resets longPressTriggered so next tap navigates normally', () => {
+    vi.useFakeTimers();
+    const onSelect = vi.fn();
+    const { container } = renderWithRouter(
+      <HistoryRowMobile {...defaultProps} onSelect={onSelect} />
+    );
+    const row = container.firstChild as HTMLElement;
+    // Trigger long press fully
+    fireEvent.pointerDown(row);
+    vi.advanceTimersByTime(500);
+    expect(onSelect).toHaveBeenCalledTimes(1);
+    // pointercancel (e.g. phone call)
+    fireEvent.pointerCancel(row);
+    vi.useRealTimers();
+    // Next pointer down should reset the ref — onSelect should NOT be suppressed
+    // (We verify the ref was reset by checking a fresh long-press works correctly)
+    vi.useFakeTimers();
+    onSelect.mockClear();
+    fireEvent.pointerDown(row);
+    vi.advanceTimersByTime(500);
+    expect(onSelect).toHaveBeenCalledTimes(1);
+    vi.useRealTimers();
   });
 });

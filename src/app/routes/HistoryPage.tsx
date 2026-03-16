@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useUser } from '@/hooks/useUser';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { HistoryList } from '@/features/history/components/HistoryList';
@@ -34,7 +34,6 @@ export function HistoryPage() {
   const userTier = subscription?.tier || 'free';
   const { sessions, isLoading, error, deleteSession, totalCount } = useHistorySessions();
   const {
-    searchQuery,
     contentTypeFilter,
     sortBy,
     filteredSessions,
@@ -48,6 +47,21 @@ export function HistoryPage() {
   // Bulk Selection State
   const { selectedIds, toggleSelection, selectAll, clearSelection, hasSelection } =
     useHistorySelection();
+
+  // Local input state for search — debounced to avoid filtering on every keystroke
+  const [searchInput, setSearchInput] = useState('');
+  const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const handleSearchChange = (value: string) => {
+    setSearchInput(value);
+    if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+    searchDebounceRef.current = setTimeout(() => setSearchQuery(value), 300);
+  };
+  useEffect(
+    () => () => {
+      if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+    },
+    []
+  );
 
   const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
   const [sessionToDelete, setSessionToDelete] = useState<HistorySession | null>(null);
@@ -86,12 +100,20 @@ export function HistoryPage() {
     setBulkDeleteCount(selectedIds.size);
   };
 
+  const BULK_DELETE_BATCH_SIZE = 20;
+
   const handleBulkDeleteConfirm = async () => {
     setIsDeleting(true);
     const idsToDelete = Array.from(selectedIds);
 
     try {
-      const results = await Promise.allSettled(idsToDelete.map((id) => deleteSession(id)));
+      const allResults: PromiseSettledResult<void>[] = [];
+      for (let i = 0; i < idsToDelete.length; i += BULK_DELETE_BATCH_SIZE) {
+        const batch = idsToDelete.slice(i, i + BULK_DELETE_BATCH_SIZE);
+        const batchResults = await Promise.allSettled(batch.map((id) => deleteSession(id)));
+        allResults.push(...batchResults);
+      }
+      const results = allResults;
 
       const succeeded = results.filter((r) => r.status === 'fulfilled').length;
       const failed = results.filter((r) => r.status === 'rejected').length;
@@ -153,6 +175,12 @@ export function HistoryPage() {
     setBulkDeleteCount(null);
   };
 
+  const handleClearFilters = () => {
+    setSearchInput('');
+    if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+    clearFilters();
+  };
+
   if (isLoading) {
     return (
       <PageLayout>
@@ -200,8 +228,8 @@ export function HistoryPage() {
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-tertiary pointer-events-none" />
                   <input
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    value={searchInput}
+                    onChange={(e) => handleSearchChange(e.target.value)}
                     placeholder={t('history.searchPlaceholder')}
                     className="pl-10 pr-4 py-2.5 w-full rounded-lg bg-bg-secondary/50 border border-border text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary/50"
                   />
@@ -225,8 +253,8 @@ export function HistoryPage() {
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-tertiary pointer-events-none" />
                   <input
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    value={searchInput}
+                    onChange={(e) => handleSearchChange(e.target.value)}
                     placeholder={t('history.searchPlaceholder')}
                     className="pl-10 pr-4 py-2.5 w-full rounded-lg bg-bg-secondary/50 border border-border text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary/50"
                   />
@@ -357,7 +385,7 @@ export function HistoryPage() {
               selectionMode={hasSelection}
             />
           ) : (
-            <HistoryEmptyState hasFilters={hasActiveFilters} onClearFilters={clearFilters} />
+            <HistoryEmptyState hasFilters={hasActiveFilters} onClearFilters={handleClearFilters} />
           )}
         </div>
       </div>

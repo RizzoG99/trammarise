@@ -34,30 +34,28 @@ export function HistoryRowMobile({
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const longPressTriggered = useRef(false);
 
-  // Close on outside click
+  // Close on outside click or Escape
   useEffect(() => {
-    if (!menuOpen) return;
-    const handler = (e: MouseEvent) => {
+    const mouseHandler = (e: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
         setMenuOpen(false);
         dotsRef.current?.focus();
       }
     };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, [menuOpen]);
-
-  // Close on Escape
-  useEffect(() => {
-    if (!menuOpen) return;
-    const handler = (e: KeyboardEvent) => {
+    const keyHandler = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setMenuOpen(false);
         dotsRef.current?.focus();
       }
     };
-    document.addEventListener('keydown', handler);
-    return () => document.removeEventListener('keydown', handler);
+    if (menuOpen) {
+      document.addEventListener('mousedown', mouseHandler);
+      document.addEventListener('keydown', keyHandler);
+    }
+    return () => {
+      document.removeEventListener('mousedown', mouseHandler);
+      document.removeEventListener('keydown', keyHandler);
+    };
   }, [menuOpen]);
 
   // Long-press to enter selection mode
@@ -78,6 +76,13 @@ export function HistoryRowMobile({
       longPressTimer.current = null;
     }
     setPressing(false);
+  };
+
+  // On pointer cancel (e.g. phone call, scroll interrupt), also reset the triggered
+  // ref so the next tap is not incorrectly suppressed.
+  const handlePointerCancel = () => {
+    cancelLongPress();
+    longPressTriggered.current = false;
   };
 
   // In selection mode, row tap toggles selection instead of navigating
@@ -124,7 +129,7 @@ export function HistoryRowMobile({
       onPointerDown={handlePointerDown}
       onPointerUp={cancelLongPress}
       onPointerLeave={cancelLongPress}
-      onPointerCancel={cancelLongPress}
+      onPointerCancel={handlePointerCancel}
       onContextMenu={(e) => e.preventDefault()}
     >
       <div
@@ -165,7 +170,7 @@ export function HistoryRowMobile({
             <button
               ref={dotsRef}
               onClick={() => setMenuOpen((v) => !v)}
-              className="w-7 h-7 min-h-11 flex items-center justify-center rounded-lg text-text-tertiary hover:text-text-primary hover:bg-bg-surface transition-colors cursor-pointer"
+              className="w-11 h-11 flex items-center justify-center rounded-lg text-text-tertiary hover:text-text-primary hover:bg-bg-surface transition-colors cursor-pointer"
               aria-label="More options"
               aria-expanded={menuOpen}
               aria-haspopup="menu"
@@ -204,7 +209,7 @@ export function HistoryRowMobile({
         ) : (
           <button
             onClick={handleDelete}
-            className="w-7 h-7 min-h-11 shrink-0 flex items-center justify-center rounded-lg text-text-tertiary hover:text-accent-error hover:bg-accent-error/10 transition-colors cursor-pointer"
+            className="w-11 h-11 shrink-0 flex items-center justify-center rounded-lg text-text-tertiary hover:text-accent-error hover:bg-accent-error/10 transition-colors cursor-pointer"
             aria-label={t('history.card.delete', { name: session.audioName })}
           >
             <Trash2 className="w-4 h-4" />
