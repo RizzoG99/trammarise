@@ -634,7 +634,7 @@
   },
   "history": {
     "title": "Aufnahmeverlauf",
-    "subtitle": "{{count}} Aufnahmen insgesamt",
+    "subtitle": "{{count}} Sitzungen · ~{{time}} · Top: {{topType}}",
     "description": "Verwalten Sie Ihre Aufnahmen und generierten Zusammenfassungen",
     "searchPlaceholder": "Nach Name oder Inhalt suchen...",
     "sort": {
@@ -643,12 +643,37 @@
       "nameAsc": "Name (A-Z)",
       "nameDesc": "Name (Z-A)"
     },
+    "groups": {
+      "today": "Heute",
+      "yesterday": "Gestern",
+      "thisWeek": "Diese Woche",
+      "lastWeek": "Letzte Woche"
+    },
+    "menu": {
+      "copySummary": "Zusammenfassung kopieren",
+      "downloadAudio": "Audio herunterladen",
+      "delete": "Löschen"
+    },
+    "filter": {
+      "allTypes": "Alle",
+      "toggleAriaLabel": "Filter anzeigen",
+      "clearAll": "Filter löschen",
+      "type": {
+        "meeting": "Meeting",
+        "lecture": "Vorlesung",
+        "interview": "Interview",
+        "podcast": "Podcast",
+        "voice-memo": "Sprachmemo",
+        "other": "Sonstiges"
+      }
+    },
     "dashboard": {
       "totalProcessed": "Gesamt Verarbeitet",
       "topCategory": "Top Kategorie",
       "activity": "Aktivität (Letzte 7 Tage)",
       "sessions": "{{count}} Sitzung",
-      "sessions_plural": "{{count}} Sitzungen"
+      "sessions_plural": "{{count}} Sitzungen",
+      "statStrip": "{{count}} Sitzungen · {{time}} gesamt · Häufigste: {{topType}}"
     },
     "quickActions": {
       "play": "Vorschau abspielen",
@@ -662,8 +687,8 @@
     "card": {
       "select": "{{name}} auswählen",
       "delete": "{{name}} löschen",
-      "processed": "Verarbeitet",
-      "unprocessed": "Unverarbeitet"
+      "processed": "Fertig",
+      "unprocessed": "Ausstehend"
     },
     "empty": {
       "noMatchingTitle": "Keine passenden Aufnahmen",
@@ -680,7 +705,9 @@
       "deleteSelectFail": "Fehler beim Löschen von {{count}} Aufnahmen",
       "deleteGenericError": "Fehler beim Löschen einiger Aufnahmen",
       "deleteSingleSuccess": "Aufnahme erfolgreich gelöscht",
-      "deleteSingleError": "Fehler beim Löschen der Aufnahme"
+      "deleteSingleError": "Fehler beim Löschen der Aufnahme",
+      "copySummarySuccess": "Zusammenfassung in die Zwischenablage kopiert",
+      "copySummaryError": "Zusammenfassung konnte nicht kopiert werden"
     },
     "batch": {
       "selected": "{{count}} ausgewählt",
@@ -696,6 +723,14 @@
       "importButton": "Jetzt importieren",
       "importing": "Importiere...",
       "dismissButton": "Vielleicht später"
+    },
+    "proBanner": {
+      "title": "Vollständigen Verlauf freischalten",
+      "description": "Upgrade auf Pro, um dauerhaft auf alle vergangenen Aufnahmen zuzugreifen.",
+      "cta": "Jetzt upgraden"
+    },
+    "error": {
+      "title": "Verlauf konnte nicht geladen werden"
     }
   },
   "welcome": {
@@ -920,7 +955,10 @@
           "name": "KI-Chat zu Ergebnissen",
           "desc": "Fragen stellen, übersetzen oder verfeinern mit KI"
         },
-        "diarization": { "name": "Sprecher-Diarisierung", "desc": "Erkennt, wer was gesagt hat" },
+        "diarization": {
+          "name": "Sprecher-Diarisierung",
+          "desc": "Erkennt, wer was gesagt hat"
+        },
         "cloudSync": {
           "name": "Cloud-Synchronisierung",
           "desc": "Zugriff auf deine Transkriptionen von überall"

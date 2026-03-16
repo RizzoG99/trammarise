@@ -10,8 +10,9 @@ export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
 
 const variantStyles: Record<BadgeVariant, React.CSSProperties> = {
   default: {
-    backgroundColor: 'var(--color-bg-tertiary)',
+    backgroundColor: 'transparent',
     color: 'var(--color-text-secondary)',
+    border: '1px solid var(--color-border)',
   },
   secondary: {
     backgroundColor: 'var(--color-primary-alpha-10)',

@@ -634,7 +634,7 @@
   },
   "history": {
     "title": "Historial de Grabaciones",
-    "subtitle": "{{count}} grabaciones totales",
+    "subtitle": "{{count}} sesiones · ~{{time}} · Top: {{topType}}",
     "description": "Gestiona tus grabaciones y resúmenes generados",
     "searchPlaceholder": "Buscar por nombre o contenido...",
     "sort": {
@@ -643,12 +643,37 @@
       "nameAsc": "Nombre (A-Z)",
       "nameDesc": "Nombre (Z-A)"
     },
+    "groups": {
+      "today": "Hoy",
+      "yesterday": "Ayer",
+      "thisWeek": "Esta semana",
+      "lastWeek": "La semana pasada"
+    },
+    "menu": {
+      "copySummary": "Copiar resumen",
+      "downloadAudio": "Descargar audio",
+      "delete": "Eliminar"
+    },
+    "filter": {
+      "allTypes": "Todos",
+      "toggleAriaLabel": "Mostrar filtros",
+      "clearAll": "Limpiar filtros",
+      "type": {
+        "meeting": "Reunión",
+        "lecture": "Clase",
+        "interview": "Entrevista",
+        "podcast": "Podcast",
+        "voice-memo": "Memo de Voz",
+        "other": "Otro"
+      }
+    },
     "dashboard": {
       "totalProcessed": "Total Procesado",
       "topCategory": "Categoría Principal",
       "activity": "Actividad (Últimos 7 Días)",
       "sessions": "{{count}} sesión",
-      "sessions_plural": "{{count}} sesiones"
+      "sessions_plural": "{{count}} sesiones",
+      "statStrip": "{{count}} sesiones · {{time}} en total · Más frecuente: {{topType}}"
     },
     "quickActions": {
       "play": "Vista previa",
@@ -662,8 +687,8 @@
     "card": {
       "select": "Seleccionar {{name}}",
       "delete": "Eliminar {{name}}",
-      "processed": "Procesado",
-      "unprocessed": "No procesado"
+      "processed": "Listo",
+      "unprocessed": "Pendiente"
     },
     "empty": {
       "noMatchingTitle": "No se encontraron grabaciones",
@@ -680,7 +705,9 @@
       "deleteSelectFail": "Error al eliminar {{count}} grabaciones",
       "deleteGenericError": "Error al eliminar algunas grabaciones",
       "deleteSingleSuccess": "Grabación eliminada con éxito",
-      "deleteSingleError": "Error al eliminar la grabación"
+      "deleteSingleError": "Error al eliminar la grabación",
+      "copySummarySuccess": "Resumen copiado al portapapeles",
+      "copySummaryError": "No se pudo copiar el resumen"
     },
     "batch": {
       "selected": "{{count}} seleccionados",
@@ -696,6 +723,14 @@
       "importButton": "Importar ahora",
       "importing": "Importando...",
       "dismissButton": "Tal vez más tarde"
+    },
+    "proBanner": {
+      "title": "Desbloquea el historial completo",
+      "description": "Actualiza a Pro para acceder a todas tus grabaciones pasadas para siempre.",
+      "cta": "Actualizar ahora"
+    },
+    "error": {
+      "title": "No se pudo cargar el historial"
     }
   },
   "welcome": {
@@ -920,7 +955,10 @@
           "name": "Chat IA en resultados",
           "desc": "Pregunta, traduce o refina tu transcripción con IA"
         },
-        "diarization": { "name": "Diarización de oradores", "desc": "Identifica quién dijo qué" },
+        "diarization": {
+          "name": "Diarización de oradores",
+          "desc": "Identifica quién dijo qué"
+        },
         "cloudSync": {
           "name": "Sincronización en la nube",
           "desc": "Accede a tus transcripciones desde cualquier dispositivo"

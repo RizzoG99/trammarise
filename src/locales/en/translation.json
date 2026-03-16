@@ -637,7 +637,8 @@
       "topCategory": "Top Category",
       "activity": "Activity (Last 7 Days)",
       "sessions": "{{count}} session",
-      "sessions_plural": "{{count}} sessions"
+      "sessions_plural": "{{count}} sessions",
+      "statStrip": "{{count}} sessions · {{time}} total · Top: {{topType}}"
     },
     "quickActions": {
       "play": "Play Preview",
@@ -645,7 +646,7 @@
       "download": "Download"
     },
     "title": "Recording History",
-    "subtitle": "{{count}} total recordings",
+    "subtitle": "{{count}} sessions · ~{{time}} · Top: {{topType}}",
     "description": "Manage your recordings and generated summaries",
     "searchPlaceholder": "Search by name or content...",
     "sort": {
@@ -654,6 +655,30 @@
       "nameAsc": "Name (A-Z)",
       "nameDesc": "Name (Z-A)"
     },
+    "groups": {
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "thisWeek": "This Week",
+      "lastWeek": "Last Week"
+    },
+    "menu": {
+      "copySummary": "Copy Summary",
+      "downloadAudio": "Download Audio",
+      "delete": "Delete"
+    },
+    "filter": {
+      "allTypes": "All",
+      "toggleAriaLabel": "Toggle filters",
+      "clearAll": "Clear all",
+      "type": {
+        "meeting": "Meeting",
+        "lecture": "Lecture",
+        "interview": "Interview",
+        "podcast": "Podcast",
+        "voice-memo": "Voice Memo",
+        "other": "Other"
+      }
+    },
     "stats": {
       "recordingCount": "{{count}} recording",
       "recordingCount_plural": "{{count}} recordings"
@@ -661,8 +686,8 @@
     "card": {
       "select": "Select {{name}}",
       "delete": "Delete {{name}}",
-      "processed": "Processed",
-      "unprocessed": "Unprocessed"
+      "processed": "Done",
+      "unprocessed": "Pending"
     },
     "empty": {
       "noMatchingTitle": "No Matching Recordings",
@@ -679,7 +704,9 @@
       "deleteSelectFail": "Failed to delete {{count}} recordings",
       "deleteGenericError": "Failed to delete some recordings",
       "deleteSingleSuccess": "Recording deleted successfully",
-      "deleteSingleError": "Failed to delete recording"
+      "deleteSingleError": "Failed to delete recording",
+      "copySummarySuccess": "Summary copied to clipboard",
+      "copySummaryError": "Failed to copy summary"
     },
     "batch": {
       "selected": "{{count}} selected",
@@ -695,6 +722,14 @@
       "importButton": "Import Now",
       "importing": "Importing...",
       "dismissButton": "Maybe Later"
+    },
+    "proBanner": {
+      "title": "Unlock Full History",
+      "description": "Upgrade to Pro to access all your past recordings forever.",
+      "cta": "Upgrade Now"
+    },
+    "error": {
+      "title": "Failed to load history"
     }
   },
   "welcome": {

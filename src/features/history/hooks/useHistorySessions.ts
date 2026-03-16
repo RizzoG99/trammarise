@@ -94,6 +94,9 @@ export function useHistorySessions(): UseHistorySessionsReturn {
         loadedSessions = await loadSessionsFromLocal();
       }
 
+      // Only show completed sessions (has summary = fully processed)
+      loadedSessions = loadedSessions.filter((s) => s.hasSummary);
+
       setTotalCount(loadedSessions.length);
 
       // Apply Tier Limits (Free: Max 5 items)
