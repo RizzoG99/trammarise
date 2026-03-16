@@ -33,9 +33,9 @@ export function ProfileTab() {
         <span className="w-20 h-20 rounded-full border-2 border-border bg-primary/20 flex items-center justify-center text-2xl font-medium text-primary">
           {(fullName ?? email ?? 'U').charAt(0).toUpperCase()}
         </span>
-        <div>
-          <h3 className="text-lg font-semibold text-text-primary">{fullName ?? email}</h3>
-          <p className="text-sm text-text-secondary">{email}</p>
+        <div className="min-w-0">
+          <h3 className="text-lg font-semibold text-text-primary truncate">{fullName ?? email}</h3>
+          <p className="text-sm text-text-secondary truncate">{email}</p>
         </div>
       </div>
 

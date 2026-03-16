@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { User, Key, Sparkles, ArrowLeft } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
+import { User, Key, Sparkles } from 'lucide-react';
 import { GlassCard, Heading } from '@/lib';
-import { ROUTES } from '@/types/routing';
 import { ProfileTab } from '../user-menu/components/ProfileTab';
 import { ApiKeysTab } from '../user-menu/components/ApiKeysTab';
 import { UsagePanel } from './components/UsagePanel';
@@ -14,7 +13,6 @@ const VALID_SECTIONS: Section[] = ['profile', 'apiKeys', 'plan'];
 
 export function AccountBillingPage() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
   const paramSection = searchParams.get('section') as Section | null;
@@ -32,27 +30,41 @@ export function AccountBillingPage() {
   return (
     <div className="bg-bg-primary">
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Back button */}
-        <div className="mb-8">
-          <button
-            type="button"
-            onClick={() => (window.history.length > 1 ? navigate(-1) : navigate(ROUTES.HOME))}
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-text-secondary hover:text-text-primary hover:bg-bg-surface transition-all cursor-pointer"
-            aria-label={t('account.back')}
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>{t('account.back')}</span>
-          </button>
-        </div>
-
         <Heading level="h1" className="mb-8">
           {t('account.title')}
         </Heading>
 
-        {/* Two-column layout */}
-        <div className="flex gap-8">
-          {/* Sidebar nav */}
-          <nav className="w-48 flex-shrink-0" aria-label={t('account.title')}>
+        {/* Mobile horizontal tab bar */}
+        <nav
+          className="sm:hidden flex border-b border-border mb-6 overflow-x-auto"
+          aria-label={t('account.title')}
+        >
+          {sections.map(({ id, icon: Icon, label }) => (
+            <button
+              key={id}
+              type="button"
+              onClick={() => setActiveSection(id)}
+              className={`
+                flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap
+                border-b-2 transition-colors cursor-pointer shrink-0 min-h-11
+                ${
+                  activeSection === id
+                    ? 'border-primary text-primary'
+                    : 'border-transparent text-text-secondary'
+                }
+              `}
+              aria-current={activeSection === id ? 'page' : undefined}
+            >
+              <Icon className="w-4 h-4 shrink-0" />
+              <span>{label}</span>
+            </button>
+          ))}
+        </nav>
+
+        {/* Two-column layout (desktop) / stacked (mobile) */}
+        <div className="flex flex-col sm:flex-row gap-8">
+          {/* Sidebar nav — desktop only */}
+          <nav className="hidden sm:block w-48 shrink-0" aria-label={t('account.title')}>
             <ul className="space-y-1">
               {sections.map(({ id, icon: Icon, label }) => (
                 <li key={id}>
@@ -70,7 +82,7 @@ export function AccountBillingPage() {
                     `}
                     aria-current={activeSection === id ? 'page' : undefined}
                   >
-                    <Icon className="w-4 h-4 flex-shrink-0" />
+                    <Icon className="w-4 h-4 shrink-0" />
                     <span>{label}</span>
                   </button>
                 </li>
@@ -80,7 +92,7 @@ export function AccountBillingPage() {
 
           {/* Section content */}
           <div className="flex-1 min-w-0">
-            <GlassCard variant="dark" className="p-6">
+            <GlassCard variant="dark" className="p-4 sm:p-6">
               {activeSection === 'profile' && <ProfileTab />}
               {activeSection === 'apiKeys' && <ApiKeysTab />}
               {activeSection === 'plan' && <UsagePanel />}

@@ -5,11 +5,9 @@ import { AccountBillingPage } from './AccountBillingPage';
 
 // --- Mocks ---
 
-const mockNavigate = vi.fn();
 let mockSearchParams = new URLSearchParams();
 
 vi.mock('react-router-dom', () => ({
-  useNavigate: () => mockNavigate,
   useSearchParams: () => [mockSearchParams],
 }));
 
@@ -64,23 +62,23 @@ describe('AccountBillingPage', () => {
     expect(screen.queryByTestId('usage-tab')).not.toBeInTheDocument();
   });
 
-  it('renders sidebar navigation items', () => {
+  it('renders navigation items', () => {
     render(<AccountBillingPage />);
-    expect(screen.getByText('Profile')).toBeInTheDocument();
-    expect(screen.getByText('API Keys')).toBeInTheDocument();
-    expect(screen.getByText('Plan & Usage')).toBeInTheDocument();
+    expect(screen.getAllByText('Profile').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('API Keys').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Plan & Usage').length).toBeGreaterThan(0);
   });
 
-  it('switches to API Keys section when clicking sidebar nav', () => {
+  it('switches to API Keys section when clicking nav', () => {
     render(<AccountBillingPage />);
-    fireEvent.click(screen.getByText('API Keys'));
+    fireEvent.click(screen.getAllByText('API Keys')[0]);
     expect(screen.getByTestId('apikeys-tab')).toBeInTheDocument();
     expect(screen.queryByTestId('profile-tab')).not.toBeInTheDocument();
   });
 
-  it('switches to Plan section when clicking sidebar nav', () => {
+  it('switches to Plan section when clicking nav', () => {
     render(<AccountBillingPage />);
-    fireEvent.click(screen.getByText('Plan & Usage'));
+    fireEvent.click(screen.getAllByText('Plan & Usage')[0]);
     expect(screen.getByTestId('usage-tab')).toBeInTheDocument();
     expect(screen.queryByTestId('profile-tab')).not.toBeInTheDocument();
   });
@@ -103,21 +101,6 @@ describe('AccountBillingPage', () => {
     mockSearchParams = new URLSearchParams('section=unknown');
     render(<AccountBillingPage />);
     expect(screen.getByTestId('profile-tab')).toBeInTheDocument();
-  });
-
-  it('renders back button', () => {
-    render(<AccountBillingPage />);
-    expect(screen.getByRole('button', { name: 'Back to app' })).toBeInTheDocument();
-  });
-
-  it('back button calls navigate(-1) when history exists', () => {
-    Object.defineProperty(window, 'history', {
-      value: { ...window.history, length: 2 },
-      configurable: true,
-    });
-    render(<AccountBillingPage />);
-    fireEvent.click(screen.getByRole('button', { name: 'Back to app' }));
-    expect(mockNavigate).toHaveBeenCalledWith(-1);
   });
 
   it('active section button has aria-current="page"', () => {
