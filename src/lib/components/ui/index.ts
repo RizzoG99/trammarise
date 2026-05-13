@@ -77,6 +77,10 @@ export type { TooltipProps, TooltipPlacement } from './Tooltip';
 export { PricingCard } from './PricingCard';
 export type { PricingCardProps, PricingPlan } from './PricingCard';
 
+// Alert
+export { Alert } from './Alert/Alert';
+export type { AlertProps, AlertVariant } from './Alert/Alert';
+
 // Checkbox
 export { Checkbox } from './Checkbox';
 export type { CheckboxProps } from './Checkbox';

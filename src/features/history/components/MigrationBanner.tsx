@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Upload, X, CheckCircle } from 'lucide-react';
 import { Button } from '@/lib/components/ui/Button';
+import { Alert } from '@/lib/components/ui/Alert/Alert';
 import { getAllSessionIds, loadSessionMetadata } from '@/utils/session-manager';
 
 interface MigrationBannerProps {
@@ -150,9 +151,9 @@ export function MigrationBanner({ onImportComplete }: MigrationBannerProps) {
           </p>
 
           {error && (
-            <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
-              <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
-            </div>
+            <Alert variant="error" className="mb-4">
+              {error}
+            </Alert>
           )}
 
           {!imported && (

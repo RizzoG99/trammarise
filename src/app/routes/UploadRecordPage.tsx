@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import type { ContentType } from '../../types/content-types';
 import type { ProcessingMode } from '../../features/configuration/components/ProcessingModeSelector';
 import { SlidersHorizontal } from 'lucide-react';
-import { Heading, Text, GlassCard, SEO } from '@/lib';
+import { Heading, Text, GlassCard, Alert, SEO } from '@/lib';
 import { PageLayout } from '../../components/layout/PageLayout';
 import { UploadPanel } from '../../features/upload/components/UploadPanel';
 import { RecordPanel, type RecordPanelRef } from '../../features/upload/components/RecordPanel';
@@ -256,9 +256,9 @@ export function UploadRecordPage() {
 
         {/* Error Display */}
         {processingError && (
-          <div className="mt-6 p-3 rounded-lg bg-red-500/10 border border-red-500/30">
-            <Text className="text-red-600 dark:text-red-400 text-sm">{processingError}</Text>
-          </div>
+          <Alert variant="error" className="mt-6">
+            {processingError}
+          </Alert>
         )}
       </GlassCard>
 
