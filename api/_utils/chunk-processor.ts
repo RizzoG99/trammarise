@@ -66,8 +66,8 @@ export async function processChunk(
             apiKey,
             model: job.config.model,
             language: job.config.language,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            ...((job.config as any) || {}),
+            prompt: job.config.prompt,
+            temperature: job.config.temperature,
           }),
         chunk.index // Priority based on chunk order
       );

@@ -7,6 +7,7 @@ import { Checkbox } from '@/lib/components/ui/Checkbox';
 import { useTranslation } from 'react-i18next';
 
 import type { HistorySession } from '../types/history';
+import type { ContentType } from '@/types/content-types';
 import { formatDate, formatDuration } from '../utils/formatters';
 import { ROUTES } from '@/types/routing';
 
@@ -19,12 +20,17 @@ interface HistoryCardProps {
   selectionMode?: boolean;
 }
 
-const CONTENT_TYPE_BORDER_COLOR: Record<string, string> = {
+const CONTENT_TYPE_BORDER_COLOR: Record<ContentType, string> = {
   meeting: 'var(--color-primary)',
   lecture: 'color-mix(in srgb, var(--color-primary) 70%, transparent)',
   interview: 'color-mix(in srgb, var(--color-primary) 50%, transparent)',
   podcast: 'var(--color-accent-success)',
   'voice-memo': 'var(--color-accent-warning)',
+  'sales-call': 'var(--color-primary)',
+  'medical-clinical': 'color-mix(in srgb, var(--color-accent-success) 70%, transparent)',
+  legal: 'color-mix(in srgb, var(--color-accent-warning) 70%, transparent)',
+  'daily-stand-up': 'color-mix(in srgb, var(--color-primary) 60%, transparent)',
+  'focus-group': 'color-mix(in srgb, var(--color-primary) 40%, transparent)',
   other: 'var(--color-border)',
 };
 

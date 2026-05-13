@@ -583,10 +583,6 @@
     "label": "Token Usage",
     "warning": "Approaching daily token limit"
   },
-  "configPlaceholder": {
-    "title": "Configuration",
-    "description": "AI provider selection page - will be enhanced in Phase 3"
-  },
   "docs": {
     "title": "Documentation & FAQ",
     "description": "Guides and answers to common questions about Trammarise.",

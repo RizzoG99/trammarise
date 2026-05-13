@@ -13,9 +13,9 @@ import type { ProcessingMode } from './_types/chunking';
 import type { JobConfiguration } from './_types/job';
 import { requireAuth, AuthError } from './_middleware/auth';
 import { rateLimit, RateLimitError, RATE_LIMITS } from './_middleware/rate-limit';
-import { checkQuota, trackUsage } from './_middleware/usage-tracking';
+import { trackUsage } from './_middleware/usage-tracking';
 import { validateAudioFile } from './_utils/file-validator';
-import { supabaseAdmin } from './_lib/supabase-admin';
+import { resolveApiKey, FreeUserNoKeyError, QuotaExceededError } from './_utils/resolve-api-key';
 
 export const config = {
   api: {
@@ -140,52 +140,34 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     // 4. API KEY LOGIC - Two-tier system (BYOK or Platform)
+    const estimatedMinutes = Math.ceil((validation.duration || 0) / 60);
     let finalApiKey: string;
     let shouldTrackQuota = false;
 
-    if (apiKey) {
-      // BYOK Mode: User provided their own API key (free tier or paid tier preference)
-      finalApiKey = apiKey;
-      shouldTrackQuota = false; // Analytics only, no quota deduction
-      console.log(`[Transcribe] User ${userId} using BYOK mode`);
-    } else {
-      // No API key provided - check if user has paid subscription
-      const { data: subscription } = await supabaseAdmin
-        .from('subscriptions')
-        .select('tier')
-        .eq('user_id', userId)
-        .single();
-
-      if (!subscription || subscription.tier === 'free') {
-        // Free user without API key - require them to configure one
+    try {
+      const resolved = await resolveApiKey(userId, apiKey, estimatedMinutes, 'Transcribe');
+      finalApiKey = resolved.apiKey;
+      shouldTrackQuota = resolved.shouldTrackQuota;
+    } catch (e) {
+      if (e instanceof FreeUserNoKeyError) {
         return res.status(403).json({
           error: 'API key required',
           message:
             'Free tier users must provide their own OpenAI API key. Configure it in Settings or upgrade to Pro.',
           upgradeUrl: '/pricing',
-          requiresApiKey: true, // Flag for frontend to show API key setup modal
+          requiresApiKey: true,
         });
       }
-
-      // Paid user (Pro/Team) - use platform key with quota tracking
-      const estimatedMinutes = Math.ceil((validation.duration || 0) / 60);
-      const quotaCheck = await checkQuota(userId, estimatedMinutes);
-
-      if (!quotaCheck.allowed) {
+      if (e instanceof QuotaExceededError) {
         return res.status(429).json({
           error: 'Quota exceeded',
-          minutesRemaining: quotaCheck.minutesRemaining,
-          minutesRequired: quotaCheck.minutesRequired,
+          minutesRemaining: e.minutesRemaining,
+          minutesRequired: e.minutesRequired,
           message: 'Insufficient quota. Please upgrade your plan or purchase additional credits.',
           upgradeUrl: '/pricing',
         });
       }
-
-      finalApiKey = process.env.OPENAI_API_KEY!;
-      shouldTrackQuota = true;
-      console.log(
-        `[Transcribe] User ${userId} (${subscription.tier}) using platform API with quota tracking`
-      );
+      throw e;
     }
 
     // Determine processing mode from performance level

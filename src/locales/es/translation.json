@@ -584,10 +584,6 @@
     "label": "Uso de Tokens",
     "warning": "Acercándose al límite diario de tokens"
   },
-  "configPlaceholder": {
-    "title": "Configuración",
-    "description": "Página de selección de proveedor de IA - se mejorará en Fase 3"
-  },
   "docs": {
     "title": "Documentación y Preguntas Frecuentes",
     "description": "Guías y respuestas a preguntas comunes sobre Trammarise.",
