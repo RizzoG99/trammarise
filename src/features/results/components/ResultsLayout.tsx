@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react';
 
+const RESULTS_MAX_WIDTH = 'max-w-[1600px]';
+
 /**
  * Props for ResultsLayout component
  */
@@ -45,7 +47,9 @@ export function ResultsLayout({
       <div className="sticky top-0 z-40">{audioPlayer}</div>
 
       {/* Main Content: Split Panel Layout */}
-      <div className="flex-1 w-full max-w-[1600px] mx-auto p-4 lg:p-6 transition-all duration-300">
+      <div
+        className={`flex-1 w-full ${RESULTS_MAX_WIDTH} mx-auto p-4 lg:p-6 transition-all duration-300`}
+      >
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 relative items-start">
           {/* Summary Panel - 4 cols when chat open, 5 cols when chat closed */}
           <div

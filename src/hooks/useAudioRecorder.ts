@@ -28,9 +28,24 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
   const chunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<number | null>(null);
   const startTimeRef = useRef<number>(0);
+
   const durationRef = useRef<number>(0);
   const permissionStatusRef = useRef<PermissionStatus | null>(null);
   const shouldProcessResultRef = useRef<boolean>(true);
+
+  const startRecordingTimer = useCallback(
+    (recorder: MediaRecorder) => {
+      timerRef.current = window.setInterval(() => {
+        const elapsed = Math.floor((Date.now() - startTimeRef.current) / 1000);
+        durationRef.current = elapsed;
+        setDuration(elapsed);
+        if (recorder.state === 'recording') {
+          recorder.requestData();
+        }
+      }, AUDIO_CONSTANTS.RECORDING_TIMER_INTERVAL);
+    },
+    [setDuration]
+  );
 
   // Cleanup on unmount
   useEffect(() => {
@@ -135,15 +150,7 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
       // Start timer
       startTimeRef.current = Date.now();
       durationRef.current = 0;
-      timerRef.current = window.setInterval(() => {
-        const elapsed = Math.floor((Date.now() - startTimeRef.current) / 1000);
-        durationRef.current = elapsed;
-        setDuration(elapsed);
-        // Request data periodically for better Safari support
-        if (mediaRecorder.state === 'recording') {
-          mediaRecorder.requestData();
-        }
-      }, AUDIO_CONSTANTS.RECORDING_TIMER_INTERVAL);
+      startRecordingTimer(mediaRecorder);
 
       return true; // Success
     } catch (err) {
@@ -153,7 +160,7 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
       setError('Microphone access denied. Please grant permission in your browser settings.');
       return false; // Failure
     }
-  }, []);
+  }, [startRecordingTimer]);
 
   const pauseRecording = useCallback(() => {
     if (mediaRecorderRef.current?.state === 'recording') {
@@ -176,16 +183,9 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
       // Resume timer using the ref value
       const pausedDuration = durationRef.current;
       startTimeRef.current = Date.now() - pausedDuration * 1000;
-      timerRef.current = window.setInterval(() => {
-        const elapsed = Math.floor((Date.now() - startTimeRef.current) / 1000);
-        durationRef.current = elapsed;
-        setDuration(elapsed);
-        if (mediaRecorderRef.current?.state === 'recording') {
-          mediaRecorderRef.current.requestData();
-        }
-      }, AUDIO_CONSTANTS.RECORDING_TIMER_INTERVAL);
+      startRecordingTimer(mediaRecorderRef.current);
     }
-  }, []);
+  }, [startRecordingTimer]);
 
   const stopRecording = useCallback(() => {
     if (

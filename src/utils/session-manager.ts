@@ -21,7 +21,7 @@ const SESSION_KEY_PREFIX = 'trammarise_session_';
  * This ensures stable File references across loadSession() calls,
  * preventing unnecessary useEffect cleanup/re-initialization in hooks.
  */
-const audioFileCache = new Map<string, { blob: Blob; file: File }>();
+const sessionAudioBlobCache = new Map<string, { blob: Blob; file: File }>();
 
 /**
  * Generate a unique session ID
@@ -163,7 +163,7 @@ export async function loadSession(sessionId: string): Promise<SessionData | null
     const audioFileRecord = await loadAudioFile(sessionId);
     if (audioFileRecord) {
       // Check cache to avoid creating new File objects for same blob
-      let cached = audioFileCache.get(sessionId);
+      let cached = sessionAudioBlobCache.get(sessionId);
 
       // Only create new File if blob has changed or not cached
       if (!cached || cached.blob !== audioFileRecord.audioBlob) {
@@ -171,7 +171,7 @@ export async function loadSession(sessionId: string): Promise<SessionData | null
           type: audioFileRecord.audioBlob.type,
         });
         cached = { blob: audioFileRecord.audioBlob, file };
-        audioFileCache.set(sessionId, cached);
+        sessionAudioBlobCache.set(sessionId, cached);
       }
 
       session.audioFile = {
@@ -204,7 +204,7 @@ export async function loadSession(sessionId: string): Promise<SessionData | null
 export async function deleteSession(sessionId: string): Promise<void> {
   try {
     // Clear cache entry to prevent memory leaks
-    audioFileCache.delete(sessionId);
+    sessionAudioBlobCache.delete(sessionId);
 
     // Remove from localStorage and IndexedDB
     localStorage.removeItem(getSessionKey(sessionId));
@@ -251,7 +251,7 @@ export function getAllSessionIds(): string[] {
  */
 export async function clearAllSessions(): Promise<void> {
   // Clear entire cache
-  audioFileCache.clear();
+  sessionAudioBlobCache.clear();
 
   const sessionIds = getAllSessionIds();
   await Promise.all(sessionIds.map(deleteSession));

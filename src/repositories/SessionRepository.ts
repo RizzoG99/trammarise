@@ -147,7 +147,7 @@ export class SessionRepository {
       .select()
       .single();
 
-    if (error) throw new Error('Failed to create session');
+    if (error) throw new Error(`Failed to create session: ${error.message}`);
     return fromDbRow(row as Record<string, unknown>);
   }
 
@@ -163,7 +163,7 @@ export class SessionRepository {
       .select()
       .single();
 
-    if (error) throw new Error('Failed to upsert session');
+    if (error) throw new Error(`Failed to upsert session ${data.sessionId}: ${error.message}`);
     return fromDbRow(row as Record<string, unknown>);
   }
 
@@ -179,7 +179,7 @@ export class SessionRepository {
       .is('deleted_at', null)
       .maybeSingle();
 
-    if (error) throw new Error('Failed to fetch session');
+    if (error) throw new Error(`Failed to fetch session ${sessionId}: ${error.message}`);
     if (!row) return null;
     return fromDbRow(row as Record<string, unknown>);
   }
@@ -209,7 +209,7 @@ export class SessionRepository {
       .select()
       .single();
 
-    if (error) throw new Error('Failed to update session');
+    if (error) throw new Error(`Failed to update session ${sessionId}: ${error.message}`);
     return fromDbRow(row as Record<string, unknown>);
   }
 
@@ -224,7 +224,7 @@ export class SessionRepository {
       .update(softDelete)
       .eq('session_id', sessionId);
 
-    if (error) throw new Error('Failed to delete session');
+    if (error) throw new Error(`Failed to delete session ${sessionId}: ${error.message}`);
   }
 
   /**
@@ -244,7 +244,7 @@ export class SessionRepository {
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1);
 
-    if (error) throw new Error('Failed to fetch sessions');
+    if (error) throw new Error(`Failed to fetch sessions: ${error.message}`);
     return {
       sessions: (rows ?? []).map((r) => fromDbRow(r as Record<string, unknown>)),
       total: count ?? 0,
