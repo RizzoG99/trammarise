@@ -15,8 +15,7 @@
     "home": "Inicio",
     "upload": "Subir",
     "configure": "Configurar",
-    "history": "Historial",
-    "settings": "Configuración"
+    "history": "Historial"
   },
   "userMenu": {
     "ariaLabel": "Menú de usuario",
@@ -528,7 +527,9 @@
       "noResults": "No se encontraron resultados",
       "noUtterances": "No hay intervenciones disponibles",
       "jumpTo": "Ir a {{timestamp}}",
-      "clearSearch": "Borrar búsqueda"
+      "clearSearch": "Borrar búsqueda",
+      "previousMatch": "Coincidencia anterior",
+      "nextMatch": "Siguiente coincidencia"
     },
     "summary": {
       "title": "Resumen",
@@ -550,7 +551,8 @@
     "title": "Refinar con IA",
     "emptyState": "Pregúntame cualquier cosa sobre tu transcripción o resumen",
     "disclaimer": "La IA puede cometer errores. Verifica la información importante.",
-    "tokenLimit": "Límite de tokens alcanzado"
+    "tokenLimit": "Límite de tokens alcanzado",
+    "inputPlaceholder": "Escribe tu mensaje..."
   },
   "pdfModal": {
     "generating": "Generando PDF",

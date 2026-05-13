@@ -13,7 +13,7 @@ describe('GlassCard', () => {
       const { container } = render(<GlassCard>Content</GlassCard>);
       const card = container.firstChild as HTMLElement;
       expect(card).toHaveClass('bg-white/80');
-      expect(card).toHaveClass('border-white/20');
+      expect(card).toHaveClass('border-[var(--color-border)]');
     });
 
     it('renders with dark variant', () => {
@@ -53,7 +53,7 @@ describe('GlassCard', () => {
       const { container } = render(<GlassCard variant="light">Content</GlassCard>);
       const card = container.firstChild as HTMLElement;
       expect(card).toHaveClass('bg-white/80');
-      expect(card).toHaveClass('border-white/20');
+      expect(card).toHaveClass('border-[var(--color-border)]');
     });
 
     it('applies dark variant classes correctly', () => {

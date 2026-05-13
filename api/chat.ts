@@ -5,8 +5,7 @@ import {
   getSummarizationModelForLevel,
   type PerformanceLevel,
 } from '../src/types/performance-levels';
-import { requireAuth, AuthError } from './_middleware/auth';
-import { rateLimit, RateLimitError, RATE_LIMITS } from './_middleware/rate-limit';
+import { withApiMiddleware, handleMiddlewareError } from './_utils/with-api-middleware';
 
 const {
   MAX_MESSAGE_LENGTH,
@@ -22,14 +21,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    // 1. AUTHENTICATION - Required for all users
-    const { userId } = await requireAuth(req);
-
-    // 2. RATE LIMITING - Prevent abuse
-    await rateLimit(req, {
-      ...RATE_LIMITS.CHAT,
-      keyGenerator: () => `user:${userId}`,
-    });
+    await withApiMiddleware(req, { rateLimitKey: 'CHAT' });
 
     const { transcript, summary, message, history, provider, apiKey, model, language } = req.body;
 
@@ -118,20 +110,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     return res.status(200).json({ response });
   } catch (error) {
-    // Handle authentication errors
-    if (error instanceof AuthError) {
-      return res.status(error.statusCode).json({ error: error.message });
-    }
-
-    // Handle rate limit errors
-    if (error instanceof RateLimitError) {
-      res.setHeader('Retry-After', error.retryAfter.toString());
-      return res.status(429).json({
-        error: 'Too many requests',
-        message: 'Please wait before trying again',
-        retryAfter: error.retryAfter,
-      });
-    }
+    if (handleMiddlewareError(error, res)) return;
 
     const err = error as { message?: string };
     console.error('Chat error:', error);

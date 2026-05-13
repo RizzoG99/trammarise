@@ -3,6 +3,10 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '@/types/routing';
 
+// TODO: replace with real URLs before launch
+const LEGAL_URLS = { privacy: '#', terms: '#' };
+const SOCIAL_URLS = { twitter: '#' };
+
 interface AppFooterProps {
   className?: string;
 }
@@ -39,13 +43,13 @@ export function AppFooter({ className = '' }: AppFooterProps) {
           <div className="flex items-center gap-4 flex-wrap">
             {/* Legal links */}
             <a
-              href="#"
+              href={LEGAL_URLS.privacy}
               className="text-xs text-text-tertiary hover:text-text-primary transition-colors"
             >
               {t('footer.links.privacy')}
             </a>
             <a
-              href="#"
+              href={LEGAL_URLS.terms}
               className="text-xs text-text-tertiary hover:text-text-primary transition-colors"
             >
               {t('footer.links.terms')}
@@ -74,7 +78,7 @@ export function AppFooter({ className = '' }: AppFooterProps) {
               <Linkedin className="w-4 h-4" />
             </a>
             <a
-              href="#"
+              href={SOCIAL_URLS.twitter}
               aria-label={t('footer.social.twitter')}
               target="_blank"
               rel="noopener noreferrer"

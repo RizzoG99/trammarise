@@ -1,11 +1,16 @@
-import { Sparkles, ListChecks, FileText } from 'lucide-react';
+import { Sparkles, ListChecks, FileText, type LucideIcon } from 'lucide-react';
+
+interface SuggestionItem {
+  text: string;
+  icon: LucideIcon;
+}
 
 export interface SuggestionChipsProps {
   onSuggestionClick: (suggestion: string) => void;
   disabled?: boolean;
 }
 
-const SUGGESTIONS = [
+const SUGGESTIONS: SuggestionItem[] = [
   { text: 'Summarize in bullets', icon: ListChecks },
   { text: 'Extract action items', icon: FileText },
   { text: 'Fix grammar', icon: Sparkles },

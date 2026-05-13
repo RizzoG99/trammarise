@@ -111,14 +111,14 @@ export const SearchableTranscript = memo(function SearchableTranscript({
               <button
                 onClick={goToPreviousMatch}
                 className="p-2 rounded-lg bg-bg-surface border border-border hover:border-primary/40 hover:text-primary transition-colors cursor-pointer"
-                aria-label="Previous match"
+                aria-label={t('results.transcript.previousMatch')}
               >
                 <ChevronUp className="w-4 h-4" />
               </button>
               <button
                 onClick={goToNextMatch}
                 className="p-2 rounded-lg bg-bg-surface border border-border hover:border-primary/40 hover:text-primary transition-colors cursor-pointer"
-                aria-label="Next match"
+                aria-label={t('results.transcript.nextMatch')}
               >
                 <ChevronDown className="w-4 h-4" />
               </button>
