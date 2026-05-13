@@ -1,6 +1,6 @@
-// src/features/account/components/UsagePanel/UsagePanel.tsx
 import { useTranslation } from 'react-i18next';
 import { useSubscription } from '@/context/SubscriptionContext';
+import { Alert } from '@/lib/components/ui/Alert/Alert';
 import { FreePlanPanel } from './FreePlanPanel';
 import { ProPlanPanel } from './ProPlanPanel';
 
@@ -19,14 +19,7 @@ export function UsagePanel() {
   }
 
   if (error || !subscription) {
-    return (
-      <div
-        role="alert"
-        className="p-4 rounded-xl border border-accent-error/25 bg-accent-error/10 text-accent-error text-sm"
-      >
-        {t('usagePanel.error')}
-      </div>
-    );
+    return <Alert variant="error">{t('usagePanel.error')}</Alert>;
   }
 
   if (subscription.tier === 'free') {

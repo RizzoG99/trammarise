@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Modal } from '../../lib/components/ui/Modal/Modal';
 import { Button } from '../../lib/components/ui/Button/Button';
 import { Badge } from '@/lib/components/ui/Badge';
+import { Alert } from '@/lib/components/ui/Alert/Alert';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 
@@ -136,11 +137,7 @@ function PaymentForm({ onSuccess, onCancel }: PaymentFormProps) {
     <form onSubmit={handleSubmit} className="space-y-4">
       <PaymentElement />
 
-      {error && (
-        <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-800 dark:text-red-200 text-sm">
-          {error}
-        </div>
-      )}
+      {error && <Alert variant="error">{error}</Alert>}
 
       <div className="flex gap-3 justify-end pt-4">
         <Button variant="secondary" onClick={onCancel} disabled={processing}>
@@ -233,11 +230,7 @@ export function CreditPurchaseModal({ isOpen, onClose, onSuccess }: CreditPurcha
               Purchase additional transcription minutes for hosted API usage. Credits never expire.
             </p>
 
-            {error && (
-              <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-800 dark:text-red-200 text-sm">
-                {error}
-              </div>
-            )}
+            {error && <Alert variant="error">{error}</Alert>}
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {CREDIT_PACKAGES.map((pkg) => (
