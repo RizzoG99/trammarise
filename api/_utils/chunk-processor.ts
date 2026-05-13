@@ -257,8 +257,3 @@ async function cleanupSubChunks(subChunks: ChunkMetadata[]): Promise<void> {
     })
   );
 }
-
-/**
- * Create a transcription function that calls OpenAI Whisper API
- */
-// createTranscribeFunction removed directly via replace_file logic; this chunk targets the removal
