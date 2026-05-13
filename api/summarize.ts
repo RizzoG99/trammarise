@@ -10,9 +10,9 @@ import {
 import { chunkText, shouldUseMapReduce } from './_utils/text-chunker';
 import { requireAuth, AuthError } from './_middleware/auth';
 import { rateLimit, RateLimitError, RATE_LIMITS } from './_middleware/rate-limit';
-import { checkQuota, trackUsage } from './_middleware/usage-tracking';
+import { trackUsage } from './_middleware/usage-tracking';
 import { validatePdfFile } from './_utils/file-validator';
-import { supabaseAdmin } from './_lib/supabase-admin';
+import { resolveApiKey, FreeUserNoKeyError, QuotaExceededError } from './_utils/resolve-api-key';
 
 export const config = {
   api: {
@@ -130,29 +130,29 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // 4. API KEY LOGIC - Tier-based enforcement
     const userProvidedKey = apiKey;
+
+    // Validate format when user provides their own key
+    if (
+      userProvidedKey &&
+      (userProvidedKey.length < MIN_API_KEY_LENGTH || userProvidedKey.length > MAX_API_KEY_LENGTH)
+    ) {
+      return res.status(400).json({ error: 'Invalid API key format' });
+    }
+
     let finalApiKey: string;
     let shouldTrackQuota = false;
 
-    if (userProvidedKey) {
-      // User provided their own API key - validate format and use it
-      if (
-        userProvidedKey.length < MIN_API_KEY_LENGTH ||
-        userProvidedKey.length > MAX_API_KEY_LENGTH
-      ) {
-        return res.status(400).json({ error: 'Invalid API key format' });
-      }
-      finalApiKey = userProvidedKey;
-      shouldTrackQuota = false; // Analytics only
-      console.log(`[Summarize] User ${userId} using own API key`);
-    } else {
-      // No user key provided - check tier
-      const { data: subscription, error: subError } = await supabaseAdmin
-        .from('subscriptions')
-        .select('tier')
-        .eq('user_id', userId)
-        .single();
-
-      if (subError || !subscription || subscription.tier === 'free') {
+    try {
+      const resolved = await resolveApiKey(
+        userId,
+        userProvidedKey || null,
+        1, // estimate 1 minute for summarization
+        'Summarize'
+      );
+      finalApiKey = resolved.apiKey;
+      shouldTrackQuota = resolved.shouldTrackQuota;
+    } catch (e) {
+      if (e instanceof FreeUserNoKeyError) {
         return res.status(403).json({
           error: 'API key required',
           message:
@@ -160,23 +160,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           upgradeUrl: '/pricing',
         });
       }
-
-      // Pro/Team user - check quota (estimate 1 minute for summarization)
-      const quotaCheck = await checkQuota(userId, 1);
-      if (!quotaCheck.allowed) {
+      if (e instanceof QuotaExceededError) {
         return res.status(429).json({
           error: 'Quota exceeded',
-          minutesRemaining: quotaCheck.minutesRemaining,
+          minutesRemaining: e.minutesRemaining,
           message: 'Insufficient quota. Please upgrade your plan or purchase additional credits.',
         });
       }
-
-      // Use platform key (OpenAI for now)
-      finalApiKey = process.env.OPENAI_API_KEY!;
-      shouldTrackQuota = true;
-      console.log(
-        `[Summarize] User ${userId} (${subscription.tier}) using platform key with quota`
-      );
+      throw e;
     }
 
     // Validate OpenRouter-specific requirements

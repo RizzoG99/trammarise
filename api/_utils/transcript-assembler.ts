@@ -78,43 +78,14 @@ async function removeOverlaps(chunks: ChunkMetadata[], transcripts: string[]): P
     const estimatedOverlapWords = Math.min(estimatedByDuration, maxOverlapWords);
     const overlapWords = previousWords.slice(-estimatedOverlapWords).join(' ');
 
-    // Find overlap in current transcript - try multiple strategies
+    // Find overlap in current transcript - try multiple strategies in priority order
     const currentWords = currentTranscript.split(/\s+/);
 
-    // Strategy 1: Try first 50% (expanded from 30%)
-    const searchWindowSize = Math.ceil(currentWords.length * 0.5);
-    const searchWindow = currentWords.slice(0, searchWindowSize).join(' ');
-
-    let matchPosition = findOverlapMatch(
-      overlapWords,
-      searchWindow,
-      0.7 // 70% similarity threshold
-    );
-
-    // Strategy 2: If not found, try full current transcript
-    if (matchPosition === -1) {
-      matchPosition = findOverlapMatch(overlapWords, currentTranscript, 0.7);
-    }
-
-    // Strategy 3: If still not found, try substring matching
-    if (matchPosition === -1) {
-      const overlapWordsArray = overlapWords.split(/\s+/);
-      const minMatchLength = Math.floor(overlapWordsArray.length * 0.6); // Match at least 60% of words
-
-      for (let startIdx = 0; startIdx < overlapWordsArray.length - minMatchLength + 1; startIdx++) {
-        const phraseToFind = overlapWordsArray.slice(startIdx, startIdx + minMatchLength).join(' ');
-        const lowerCurrentTranscript = currentTranscript.toLowerCase();
-        const index = lowerCurrentTranscript.indexOf(phraseToFind.toLowerCase());
-
-        if (index !== -1) {
-          // Convert character index to word index
-          const beforeMatch = lowerCurrentTranscript.substring(0, index);
-          const wordsBeforeMatch = beforeMatch.split(/\s+/).filter((w) => w.length > 0).length;
-          matchPosition = wordsBeforeMatch + minMatchLength;
-          break;
-        }
-      }
-    }
+    let matchPosition = findOverlapInSearchWindow(overlapWords, currentWords);
+    if (matchPosition === -1)
+      matchPosition = findOverlapInFullTranscript(overlapWords, currentTranscript);
+    if (matchPosition === -1)
+      matchPosition = findOverlapBySubstringMatch(overlapWords, currentTranscript);
 
     if (matchPosition !== -1) {
       // Found match, remove overlap from current transcript
@@ -139,6 +110,34 @@ async function removeOverlaps(chunks: ChunkMetadata[], transcripts: string[]): P
   // Join all deduplicated transcripts
   const assembled = deduplicatedTranscripts.join(' ');
   return normalizeSentences(assembled);
+}
+
+function findOverlapInSearchWindow(overlapWords: string, currentWords: string[]): number {
+  const windowSize = Math.ceil(currentWords.length * 0.5);
+  const searchWindow = currentWords.slice(0, windowSize).join(' ');
+  return findOverlapMatch(overlapWords, searchWindow, 0.7);
+}
+
+function findOverlapInFullTranscript(overlapWords: string, currentTranscript: string): number {
+  return findOverlapMatch(overlapWords, currentTranscript, 0.7);
+}
+
+function findOverlapBySubstringMatch(overlapWords: string, currentTranscript: string): number {
+  const overlapWordsArray = overlapWords.split(/\s+/);
+  const minMatchLength = Math.floor(overlapWordsArray.length * 0.6);
+  const lowerCurrentTranscript = currentTranscript.toLowerCase();
+
+  for (let startIdx = 0; startIdx < overlapWordsArray.length - minMatchLength + 1; startIdx++) {
+    const phraseToFind = overlapWordsArray.slice(startIdx, startIdx + minMatchLength).join(' ');
+    const index = lowerCurrentTranscript.indexOf(phraseToFind.toLowerCase());
+
+    if (index !== -1) {
+      const beforeMatch = lowerCurrentTranscript.substring(0, index);
+      const wordsBeforeMatch = beforeMatch.split(/\s+/).filter((w) => w.length > 0).length;
+      return wordsBeforeMatch + minMatchLength;
+    }
+  }
+  return -1;
 }
 
 /**

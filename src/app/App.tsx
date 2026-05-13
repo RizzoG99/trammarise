@@ -51,26 +51,6 @@ const AuthCallbackPage = lazy(() =>
   import('../pages/AuthCallbackPage').then((module) => ({ default: module.AuthCallbackPage }))
 );
 
-// Placeholder for Configuration page (will be enhanced later)
-import { Heading, Text, GlassCard } from '@/lib';
-import { useTranslation } from 'react-i18next';
-
-function ConfigurationPlaceholder() {
-  const { t } = useTranslation();
-  return (
-    <div className="w-full max-w-[800px] mx-auto">
-      <GlassCard variant="light" className="p-8">
-        <Heading level="h1" className="mb-4">
-          {t('configPlaceholder.title')}
-        </Heading>
-        <Text variant="body" color="secondary">
-          {t('configPlaceholder.description')}
-        </Text>
-      </GlassCard>
-    </div>
-  );
-}
-
 import { PageLoader } from '@/lib/components/ui/PageLoader/PageLoader';
 
 import { migrateFromSessionStorage } from '@/utils/session-manager';
@@ -153,7 +133,7 @@ function AppRoutes() {
           {/* Dev preview route */}
           {import.meta.env.DEV && <Route path={ROUTES.PREVIEW} element={<PreviewPage />} />}
           {/* PDF Debug route */}
-          {import.meta.env.DEV && <Route path="/debug/pdf" element={<PdfPreviewPage />} />}
+          {import.meta.env.DEV && <Route path={ROUTES.DEBUG_PDF} element={<PdfPreviewPage />} />}
 
           {/* Authenticated Routes */}
           {isSignedIn ? (
@@ -166,8 +146,8 @@ function AppRoutes() {
                 {/* Audio editing route */}
                 <Route path={ROUTES.AUDIO} element={<AudioEditingPage />} />
 
-                {/* Configuration route */}
-                <Route path={ROUTES.CONFIGURE} element={<ConfigurationPlaceholder />} />
+                {/* Configuration route — redirects to home (page not yet implemented) */}
+                <Route path={ROUTES.CONFIGURE} element={<Navigate to={ROUTES.HOME} replace />} />
 
                 {/* Processing route with step checklist */}
                 <Route path={ROUTES.PROCESSING} element={<ProcessingPage />} />
@@ -185,7 +165,7 @@ function AppRoutes() {
                 <Route path={ROUTES.DOCS} element={<DocsPage />} />
 
                 {/* Pricing route */}
-                <Route path="/pricing" element={<PricingPage />} />
+                <Route path={ROUTES.PRICING} element={<PricingPage />} />
 
                 {/* Account & Billing route */}
                 <Route path={ROUTES.ACCOUNT} element={<AccountBillingPage />} />

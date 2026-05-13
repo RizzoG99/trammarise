@@ -584,10 +584,6 @@
     "label": "Token-Nutzung",
     "warning": "Annäherung an das tägliche Token-Limit"
   },
-  "configPlaceholder": {
-    "title": "Konfiguration",
-    "description": "KI-Anbieter-Auswahlseite - wird in Phase 3 verbessert"
-  },
   "docs": {
     "title": "Dokumentation & FAQ",
     "description": "Anleitungen und Antworten auf häufige Fragen zu Trammarise.",

@@ -81,7 +81,7 @@ export const Input: React.FC<InputProps> = ({
       {label && (
         <label
           htmlFor={inputId}
-          className="text-sm font-medium text-slate-900 dark:text-white flex items-center gap-1"
+          className="text-sm font-medium text-text-primary flex items-center gap-1"
         >
           {label}
           {props.required && <span className="text-red-500">*</span>}
@@ -91,11 +91,11 @@ export const Input: React.FC<InputProps> = ({
       <input
         id={inputId}
         className={`
-          px-4 py-3 rounded-lg border bg-white dark:bg-slate-800
-          text-slate-900 dark:text-white text-base transition-all
-          focus:outline-none focus:border-indigo-600 focus:ring-2
-          focus:ring-indigo-600/20 focus:bg-white dark:focus:bg-slate-800
-          placeholder:text-slate-400 dark:placeholder:text-slate-500
+          px-4 py-3 rounded-lg border bg-bg-surface
+          text-text-primary text-base transition-all
+          focus:outline-none focus:border-primary focus:ring-2
+          focus:ring-primary/20 focus:bg-bg-surface
+          placeholder:text-text-tertiary
           disabled:opacity-50 disabled:cursor-not-allowed
           hover:border-primary
           ${error ? 'border-accent-error focus:ring-accent-error-alpha-20' : 'border-border'}
@@ -107,7 +107,7 @@ export const Input: React.FC<InputProps> = ({
         <span className="text-xs text-red-500 animate-[slideDown_0.2s_ease-out]">{error}</span>
       )}
 
-      {hint && !error && <span className="text-xs text-slate-500 dark:text-slate-400">{hint}</span>}
+      {hint && !error && <span className="text-xs text-text-tertiary">{hint}</span>}
     </div>
   );
 };
