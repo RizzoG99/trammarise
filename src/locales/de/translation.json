@@ -15,8 +15,7 @@
     "home": "Start",
     "upload": "Hochladen",
     "configure": "Konfigurieren",
-    "history": "Verlauf",
-    "settings": "Einstellungen"
+    "history": "Verlauf"
   },
   "userMenu": {
     "ariaLabel": "Benutzermenü",
@@ -528,7 +527,9 @@
       "noResults": "Keine Ergebnisse gefunden",
       "noUtterances": "Keine Äußerungen verfügbar",
       "jumpTo": "Zu {{timestamp}} springen",
-      "clearSearch": "Suche löschen"
+      "clearSearch": "Suche löschen",
+      "previousMatch": "Vorherige Übereinstimmung",
+      "nextMatch": "Nächste Übereinstimmung"
     },
     "summary": {
       "title": "Zusammenfassung",
@@ -550,7 +551,8 @@
     "title": "Mit KI Verfeinern",
     "emptyState": "Fragen Sie mich alles über Ihr Transkript oder Ihre Zusammenfassung",
     "disclaimer": "KI kann Fehler machen. Überprüfen Sie wichtige Informationen.",
-    "tokenLimit": "Token-Limit erreicht"
+    "tokenLimit": "Token-Limit erreicht",
+    "inputPlaceholder": "Schreib deine Nachricht..."
   },
   "pdfModal": {
     "generating": "PDF wird generiert",

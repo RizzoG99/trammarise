@@ -148,7 +148,9 @@ export function ChatModal({
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder={isAtLimit ? 'Token limit reached' : 'Type your message...'}
+                placeholder={
+                  isAtLimit ? t('chatModal.tokenLimit') : t('chatModal.inputPlaceholder')
+                }
                 disabled={isLoading || isAtLimit}
                 className="
                   flex-1 px-4 py-2 rounded-lg

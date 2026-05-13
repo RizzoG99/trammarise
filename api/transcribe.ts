@@ -11,8 +11,7 @@ import { TranscriptionProviderFactory } from './_providers/factory';
 import { assembleTranscript } from './_utils/transcript-assembler';
 import type { ProcessingMode } from './_types/chunking';
 import type { JobConfiguration } from './_types/job';
-import { requireAuth, AuthError } from './_middleware/auth';
-import { rateLimit, RateLimitError, RATE_LIMITS } from './_middleware/rate-limit';
+import { withApiMiddleware, handleMiddlewareError } from './_utils/with-api-middleware';
 import { trackUsage } from './_middleware/usage-tracking';
 import { validateAudioFile } from './_utils/file-validator';
 import { resolveApiKey, FreeUserNoKeyError, QuotaExceededError } from './_utils/resolve-api-key';
@@ -34,14 +33,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    // 1. AUTHENTICATION - Required for all users
-    const { userId } = await requireAuth(req);
-
-    // 2. RATE LIMITING - Prevent abuse
-    await rateLimit(req, {
-      ...RATE_LIMITS.TRANSCRIBE,
-      keyGenerator: () => `user:${userId}`,
-    });
+    const { userId } = await withApiMiddleware(req, { rateLimitKey: 'TRANSCRIBE' });
 
     // Parse multipart form data with busboy
     const bb = busboy({
@@ -225,17 +217,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       JobManager.updateJobStatus(job.jobId, 'failed', error.message);
     });
   } catch (error) {
-    if (error instanceof AuthError) {
-      return res.status(error.statusCode).json({ error: error.message });
-    }
-
-    if (error instanceof RateLimitError) {
-      res.setHeader('Retry-After', error.retryAfter.toString());
-      return res.status(429).json({
-        error: 'Rate limit exceeded',
-        retryAfter: error.retryAfter,
-      });
-    }
+    if (handleMiddlewareError(error, res)) return;
 
     const err = error as { message?: string };
     console.error('[Transcribe API] Error:', error);

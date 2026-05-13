@@ -88,6 +88,7 @@ export async function trackUsage(
 
       if (rpcError) {
         console.error('Failed to increment minutes_used:', rpcError);
+        throw new Error(`Quota deduction failed for user ${userId}: ${rpcError.message}`);
       }
     } else {
       console.log(

@@ -15,8 +15,7 @@
     "home": "Home",
     "upload": "Carica",
     "configure": "Configura",
-    "history": "Cronologia",
-    "settings": "Impostazioni"
+    "history": "Cronologia"
   },
   "userMenu": {
     "ariaLabel": "Menu utente",
@@ -528,7 +527,9 @@
       "noResults": "Nessun risultato trovato",
       "noUtterances": "Nessun intervento disponibile",
       "jumpTo": "Vai a {{timestamp}}",
-      "clearSearch": "Cancella ricerca"
+      "clearSearch": "Cancella ricerca",
+      "previousMatch": "Corrispondenza precedente",
+      "nextMatch": "Corrispondenza successiva"
     },
     "summary": {
       "title": "Riassunto",
@@ -550,7 +551,8 @@
     "title": "Perfeziona con AI",
     "emptyState": "Chiedimi qualsiasi cosa sulla tua trascrizione o riassunto",
     "disclaimer": "L'AI può commettere errori. Verifica le informazioni importanti.",
-    "tokenLimit": "Limite di token raggiunto"
+    "tokenLimit": "Limite di token raggiunto",
+    "inputPlaceholder": "Scrivi il tuo messaggio..."
   },
   "pdfModal": {
     "generating": "Generazione PDF",

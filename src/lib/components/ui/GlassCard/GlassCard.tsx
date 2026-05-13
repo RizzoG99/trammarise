@@ -55,7 +55,7 @@ export function GlassCard({
 }: GlassCardProps) {
   const variantClasses = {
     light:
-      'bg-white/80 dark:bg-slate-900/40 border-white/20 dark:border-white/10 shadow-lg backdrop-blur-md',
+      'bg-white/80 dark:bg-slate-900/40 border-[var(--color-border)] shadow-lg backdrop-blur-md',
     dark: 'bg-[var(--color-bg-surface)] border-[var(--color-border)] shadow-xl backdrop-blur-xl',
     primary:
       'bg-blue-500/10 dark:bg-blue-500/5 border-blue-200/50 dark:border-blue-500/20 shadow-lg shadow-blue-500/5 backdrop-blur-md',

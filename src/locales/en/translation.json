@@ -527,7 +527,9 @@
       "noResults": "No results found",
       "noUtterances": "No utterances available",
       "jumpTo": "Jump to {{timestamp}}",
-      "clearSearch": "Clear search"
+      "clearSearch": "Clear search",
+      "previousMatch": "Previous match",
+      "nextMatch": "Next match"
     },
     "summary": {
       "title": "Summary",
@@ -549,7 +551,8 @@
     "title": "Refine with AI",
     "emptyState": "Ask me anything about your transcript or summary",
     "disclaimer": "AI can make mistakes. Verify important information.",
-    "tokenLimit": "Token limit reached"
+    "tokenLimit": "Token limit reached",
+    "inputPlaceholder": "Type your message..."
   },
   "pdfModal": {
     "generating": "Generating PDF",

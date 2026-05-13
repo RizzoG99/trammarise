@@ -8,8 +8,7 @@ import {
   type PerformanceLevel,
 } from '../src/types/performance-levels';
 import { chunkText, shouldUseMapReduce } from './_utils/text-chunker';
-import { requireAuth, AuthError } from './_middleware/auth';
-import { rateLimit, RateLimitError, RATE_LIMITS } from './_middleware/rate-limit';
+import { withApiMiddleware, handleMiddlewareError } from './_utils/with-api-middleware';
 import { trackUsage } from './_middleware/usage-tracking';
 import { validatePdfFile } from './_utils/file-validator';
 import { resolveApiKey, FreeUserNoKeyError, QuotaExceededError } from './_utils/resolve-api-key';
@@ -34,14 +33,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    // 1. AUTHENTICATION - All users must authenticate
-    const { userId } = await requireAuth(req);
-
-    // 2. RATE LIMITING - Prevent abuse
-    await rateLimit(req, {
-      ...RATE_LIMITS.SUMMARIZE,
-      keyGenerator: () => `user:${userId}`,
-    });
+    const { userId } = await withApiMiddleware(req, { rateLimitKey: 'SUMMARIZE' });
 
     console.log('Summarize API called');
     const bb = busboy({ headers: req.headers });
@@ -250,17 +242,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     return res.status(200).json({ summary });
   } catch (error) {
-    if (error instanceof AuthError) {
-      return res.status(error.statusCode).json({ error: error.message });
-    }
-
-    if (error instanceof RateLimitError) {
-      res.setHeader('Retry-After', error.retryAfter.toString());
-      return res.status(429).json({
-        error: 'Rate limit exceeded',
-        retryAfter: error.retryAfter,
-      });
-    }
+    if (handleMiddlewareError(error, res)) return;
 
     const err = error as { message?: string };
     console.error('Summarization error:', error);
